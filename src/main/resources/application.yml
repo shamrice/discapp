@@ -1,0 +1,29 @@
+spring:
+
+  # h2:
+  #  console:
+  #    enabled: true
+
+  # h2 connect url: jdbc:h2:mem:testdb
+  # h2 console: http://localhost:8081/h2-console/
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/discapp?serverTimezone=UTC
+    username: root
+    password: password
+  #  testWhileIdle: true
+  #  validationQuery: select 1
+
+  jpa:
+    show-sql: true
+  #  hibernate:
+
+  #    ddl-auto: update
+  #   naming-strategy: org.hibernate.cfg
+  #  properties:
+  #    hibernate:
+  #      dialect: org.hibernate.dialect.MySQLServer
+
+server:
+  port: 8081

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Disc App</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${appId}.css|}" />
+</head>
+<body>
+
+    <div th:replace="indices/fragments/prologue :: prologue">
+        static prototyping placeholder
+    </div>
+
+    <form method="get" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}" enctype="multipart/form-data">
+        <input type="hidden" name="disc" th:value="${appId}"  />
+        <div id="post_button" style="text-align:center; margin-top:1em;">
+            <input type="submit" class="button" value="Post Message" id="postarticle" style/>
+        </div>
+    </form>
+
+    <div th:replace="indices/fragments/threads :: threads">
+        static thread prototyping placeholder
+    </div>
+
+    <h1><p th:text="${appName}"/> App View</h1>
+    <br />
+    <br />
+    <h2>App info</h2>
+    <p th:text="${appInfo}"/>
+
+    <br />
+    <br />
+    <h2>Errors</h2>
+    <p th:text="${error}"/>
+
+    <br />
+    <br />
+    <a th:href="@{|~/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
+
+    <div th:replace="indices/fragments/epilogue :: epilogue">
+        static prototyping placeholder
+    </div>
+
+</body>
+</html>
