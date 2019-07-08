@@ -5,6 +5,8 @@
 <body>
 <div class="threads" th:fragment="threads">
     <hr />
+    <p th:text="${testText}"/>
+    <!--
     <div class="thread" th:if="${not #lists.isEmpty(threadList)}">
         <div th:each="thread : ${threadList}">
             <div class="first_message_div">
@@ -24,6 +26,7 @@
             <br />
         </div>
     </div>
+    -->
     <hr />
 </div>
 </body>

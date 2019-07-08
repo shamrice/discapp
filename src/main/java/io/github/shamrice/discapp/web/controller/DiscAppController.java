@@ -4,6 +4,7 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.ApplicationService;
 import io.github.shamrice.discapp.service.ThreadService;
+import io.github.shamrice.discapp.service.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,9 +40,18 @@ public class DiscAppController {
                 model.addAttribute("appInfo", appStr);
                 model.addAttribute("newthread", new NewThreadViewModel()); //TODO : remove this
 
-                List<Thread> threadList = threadService.getThreads(app.getId());
-                model.addAttribute("threadList", threadList);
+                //List<Thread> threadList = threadService.getThreads(app.getId());
+                //List<Thread> threadList = threadService.getFullThreadTree(1L);
+                ThreadTreeNode threadTreeNode = threadService.getFullThreadTree(1L);
+                //model.addAttribute("threadList", threadList);
+                model.addAttribute("threadList", threadTreeNode);
 
+                String testText = threadTreeNode.getCurrent().getSubject() + " " + threadTreeNode.getCurrent().getSubmitter() + " : ";
+                for (ThreadTreeNode next : threadTreeNode.getSubThreads()) {
+                    testText += next.getCurrent().getSubject() + " " + next.getCurrent().getSubmitter() + " : ";
+                }
+
+                model.addAttribute("testText", testText);
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");

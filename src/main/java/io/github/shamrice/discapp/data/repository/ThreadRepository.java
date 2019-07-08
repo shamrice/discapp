@@ -10,4 +10,5 @@ import java.util.List;
 public interface ThreadRepository extends JpaRepository<Thread, Long> {
 
     List<Thread> findByApplicationId(Long applicationId);
+    List<Thread> findByApplicationIdAndParentId(Long applicationId, Long parentId);
 }
