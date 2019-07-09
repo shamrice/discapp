@@ -2,10 +2,12 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Thread;
-import io.github.shamrice.discapp.service.ApplicationService;
-import io.github.shamrice.discapp.service.ThreadService;
-import io.github.shamrice.discapp.service.ThreadTreeNode;
+import io.github.shamrice.discapp.data.model.ThreadBody;
+import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
+import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +38,14 @@ public class DiscAppController {
             Application app = applicationService.get(id);
 
             if (app != null) {
-                String appStr = "Id: " + app.getId() + " Name: " + app.getName()
-                        + " owner_id: " + app.getOwnerId()
-                        + " create: " + app.getCreateDt() + " mod: " + app.getModDt();
 
                 model.addAttribute("appName", app.getName());
                 model.addAttribute("appId", app.getId());
-                model.addAttribute("appInfo", appStr);
-                model.addAttribute("newthread", new NewThreadViewModel()); //TODO : remove this
 
-                //TODO : prologue and epilogue html should be pulled from database tables as well.
+                //model.addAttribute("newthread", new NewThreadViewModel()); //TODO : remove this
+
                 model.addAttribute("prologueText", applicationService.getPrologueText(app.getId()));
+                model.addAttribute("epilogueText", applicationService.getEpilogueText(app.getId()));
 
                 //TODO : limit should be pulled from database configuration
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 10);
@@ -60,9 +59,11 @@ public class DiscAppController {
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");
+                logger.info("Disc app with application id of " + appId + " does not exist. Returning null.");
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex.getMessage());
         }
 
         return "indices/appView";
@@ -81,7 +82,7 @@ public class DiscAppController {
                                 @ModelAttribute NewThreadViewModel newThreadViewModel,
                                 Model model) {
         if (newThreadViewModel != null) {
-            System.out.println("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
+            logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
                     + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
             //TODO : create thread in db;
         }
@@ -89,10 +90,49 @@ public class DiscAppController {
         return getAppView(appId, model);
     }
 
+    @GetMapping("discussion.cgi")
+    public String getViewThread(@RequestParam(name = "disc") Long appId,
+                                @RequestParam(name = "article") Long threadId,
+                                @RequestParam(name = "title") String pageTitle,
+                                Model model) {
+
+        logger.info("Getting thread id " + threadId + " for app id: " + appId + " with title : " + pageTitle);
+
+        Thread currentThread = threadService.getThread(threadId);
+        if (currentThread != null) {
+            ThreadTreeNode subThreadNode = threadService.getFullThreadTree(currentThread.getId());
+
+            List<String> subThreadsHtml = new ArrayList<>();
+            if (subThreadNode != null) {
+                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "<ul>") + "</ul>");
+            }
+
+            String threadBody = threadService.getThreadBodyText(threadId);
+
+            ThreadViewModel threadViewModel = new ThreadViewModel();
+            threadViewModel.setBody(threadBody);
+            threadViewModel.setCreateDt(currentThread.getCreateDt().toString());
+            threadViewModel.setModDt(currentThread.getModDt().toString());
+            threadViewModel.setAppId(appId.toString());
+            threadViewModel.setId(threadId.toString());
+            threadViewModel.setIpAddress(currentThread.getIpAddress());
+            threadViewModel.setParentId(currentThread.getParentId().toString());
+            threadViewModel.setSubject(currentThread.getSubject());
+            threadViewModel.setSubmitter(currentThread.getSubmitter());
+
+            model.addAttribute("threadViewModel", threadViewModel);
+            model.addAttribute("subThreadsHtml", subThreadsHtml);
+
+        }
+
+        return "indices/viewThread";
+    }
+
     @GetMapping("/styles/disc_{applicationId}.css")
     public String getAppStyleSheet(@PathVariable(name = "applicationId") String appId) {
         return "styles/disc_" + appId + ".css";
     }
+
 
     /**
      * Recursive function that builds HTML for each thread in the app.
@@ -105,7 +145,8 @@ public class DiscAppController {
                 "<div class=\"first_message_header\">" +
                 "        <span class=\"first_message_span\">" +
                 "            <a class=\"article_link\"" +
-        " href=\"/discussion.cgi?disc=46108;article=21011;title=N.E.M.B.%20\" name=\"21011\">" +
+        " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
+                + "&article=" + currentNode.getCurrent().getId() + "&title=N.E.M.B.%20\" name=\"21011\">" +
             currentNode.getCurrent().getSubject() +
         "                    </a> " +
         "        &#9787; " +

@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.service;
+package io.github.shamrice.discapp.service.thread;
 
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.model.ThreadBody;
@@ -48,8 +48,22 @@ public class ThreadService {
         return threadList;
     }
 
+    public Thread getThread(Long threadId) {
+        return threadRepository.getOne(threadId);
+    }
+
     public ThreadBody getThreadBody(Long threadId) {
         return threadBodyRepository.findByThreadId(threadId);
+    }
+
+    public String getThreadBodyText(Long threadId) {
+        ThreadBody threadBody = threadBodyRepository.findByThreadId(threadId);
+        if (threadBody != null) {
+            return threadBody.getBody();
+        }
+
+        logger.info("Unable to find thread body for thread id " + threadId + ". returning empty string.");
+        return "";
     }
 
     public ThreadTreeNode getFullThreadTree(Long topLevelThreadId) {

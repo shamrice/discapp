@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.service;
+package io.github.shamrice.discapp.service.configuration;
 
 import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.data.repository.ConfigurationRepository;

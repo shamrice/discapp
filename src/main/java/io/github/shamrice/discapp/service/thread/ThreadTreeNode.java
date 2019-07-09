@@ -1,11 +1,10 @@
-package io.github.shamrice.discapp.service;
+package io.github.shamrice.discapp.service.thread;
 
 import io.github.shamrice.discapp.data.model.Thread;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//todo : find a better place for this
 public class ThreadTreeNode {
 
     private Thread current;

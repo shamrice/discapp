@@ -23,6 +23,8 @@ div.message_preview { width:30em; }
 </head>
 <body>
 
+    <p th:text="${error}"/>
+
     <div th:replace="indices/fragments/prologue :: prologue">
         static prototyping placeholder
     </div>
@@ -38,24 +40,12 @@ div.message_preview { width:30em; }
         static thread prototyping placeholder
     </div>
 
-    <h1><p th:text="${appName}"/> App View</h1>
-    <br />
-    <br />
-    <h2>App info</h2>
-    <p th:text="${appInfo}"/>
-
-    <br />
-    <br />
-    <h2>Errors</h2>
-    <p th:text="${error}"/>
-
-    <br />
-    <br />
-    <a th:href="@{|~/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
-
     <div th:replace="indices/fragments/epilogue :: epilogue">
         static prototyping placeholder
     </div>
+
+    <a th:href="@{|~/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
+
 
 </body>
 </html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>Disc App</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${threadViewModel.getAppId()}.css|}" />
+
+    <style type="text/css">
+         <!--/* <![CDATA[ */
+            ul {margin-top:0; padding-top:1px; margin-bottom:0;}
+            li.nested_list { list-style-type:none; display:inline; }
+            div.message_and_thread li.message_entry { margin-top:1em; }
+
+            /* li { margin-top: 1ex } */
+
+            div.message_preview { width:30em; }
+
+
+            /* ]]> */-->
+      </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+</head>
+<body>
+<div id="body">
+
+    <!-- todo : this style comes from application configuraiton -->
+    <style type="text/css"> body{ font: small terminal; color:#9C9C9C; } a:link {color:#2eff00}; a:visited {color:#1b9600}; </style>
+
+    <div class="message_and_thread">
+
+        <div class="message">
+            <div class="headers">
+                <div class="header"><span class="author_header" th:text="${threadViewModel.getSubmitter()}"></span></div>
+                <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
+                <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}" ></span></div>
+                <div class="header"><span class="ip_header" th:text="${threadViewModel.getIpAddress()}" ></span></div>
+            </div>
+            <br>
+            <div class="message_text" th:utext="${threadViewModel.getBody()}"></div>
+            </FORM><br>
+            <div class="buttons">
+                <form method="post" action="discussion.cgi?disc=46108" enctype="multipart/form-data"><input type="hidden" name="disc" value="46108"  /><input type="hidden" name="parent" value="21012"  /><input type="hidden" name="grandparent" value="21012"  /><input type="submit" name="postresponse" value="Post Reply" class="button" id="postresponse" style="float:left;" /><input type="submit" name="returntoarticles" value="Return to Messages" class="button" id="returntoarticles" style="float:left;" /></form>
+                <form method="post" action="http://www.addthis.com/bookmark.php?url=http%3A%2F%2Fdisc.yourwebapps.com%2Fdiscussion.cgi%3Fdisc%3D46108%3Barticle%3D21012&amp;title=N.E.M.B.%20%20-%20123456789012345678901234567890123456789012345678901234567890&amp;pub=brunnock" enctype="multipart/form-data"><input type="submit" name="share" value="Spam Button (DON&#39;T PRESS)" class="button" id="share" style="float:left;" /></form>
+            </div>
+            <div style="clear:left;"></div>
+        </div>
+
+        <div class="responses">
+            <li class="nested_list">
+                <ul>
+                    <li class="message_entry ">
+                        <div class="response_headers"><span class="response_headers "><a class="article_link" href="/discussion.cgi?disc=46108;article=21013;title=N.E.M.B.%20">*....one last test. (nm)</a> &#9787; <span class="author_cell">12345678901234567890123456789012345678901234567890,</span>   <span class="date_cell">Sun Jul 7 2:32am</span></span></div>
+                    </li>
+                    <li class="nested_list">
+                        <ul>
+                            <li class="message_entry ">
+                                <div class="response_headers"><span class="response_headers "><a class="article_link" href="/discussion.cgi?disc=46108;article=21014;title=N.E.M.B.%20">*...could have just looked at the html source.. whoops. (nm)</a> &#9787; <span class="author_cell">Erik,</span>   <span class="date_cell">Sun Jul 7 2:37am</span></span></div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </div>
+
+        <div style="font-size:smaller; padding-top:6px;"><a href="http://disc.yourwebapps.com/disc-list-subscribe.cgi?id=46108">Click here to receive daily updates</a></div>
+
+    </div>
+    <!-- todo : this comes from application configuration in database -->
+    <i>"Don't quote me." - Erik </i>
+    <STYLE TYPE="text/css">
+         </form>
+    </div>
+
+
+   </body>
+</html>
+
