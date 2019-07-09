@@ -7,8 +7,11 @@ import io.github.shamrice.discapp.data.repository.ThreadRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,9 +25,27 @@ public class ThreadService {
     @Autowired
     private ThreadBodyRepository threadBodyRepository;
 
-    //TODO : get threads with a date limit
     public List<Thread> getThreads(Long applicationId) {
         return threadRepository.findByApplicationId(applicationId);
+    }
+
+    public List<ThreadTreeNode> getLatestThreads(Long applicationId, int numThreads) {
+
+        //query to get latest parent threads (parentId = 0L) for an application
+        Pageable limit = PageRequest.of(0, numThreads);
+        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdOrderByCreateDtDesc(
+                applicationId,
+                0L,
+                limit
+        );
+
+        //create full thread node list based on parent threads.
+        List<ThreadTreeNode> threadList = new ArrayList<>();
+        for (Thread parentThread : parentThreads) {
+            threadList.add(getFullThreadTree(parentThread.getId()));
+        }
+
+        return threadList;
     }
 
     public ThreadBody getThreadBody(Long threadId) {
@@ -51,7 +72,6 @@ public class ThreadService {
 
             logger.info("Found top level thread id of: " + topLevelThread.getId() + " : subject: " + topLevelThread.getSubject());
         }
-
 
         return topThreadNode;
 

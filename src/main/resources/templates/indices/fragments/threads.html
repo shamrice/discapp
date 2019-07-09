@@ -5,29 +5,14 @@
 <body>
 <div class="threads" th:fragment="threads">
     <hr />
-    <p th:text="${testText}"/>
-    <!--
-    <div class="thread" th:if="${not #lists.isEmpty(threadList)}">
-        <div th:each="thread : ${threadList}">
-            <div class="first_message_div">
-                <div class="first_message_header">
-                        <span class="first_message_span">
-                            <a class="article_link"
-                               href="/discussion.cgi?disc=46108;article=21011;title=N.E.M.B.%20" name="21011"
-                                th:text="${thread.subject}">
-                            </a>
-                            &#9787;
-                            <span class="author_cell" th:text="${thread.submitter}">,</span>
-                            <span class="date_cell" th:text="${thread.createDt}"></span>
-                        </span>
-                </div>
 
-            </div>
-            <br />
+    <div class="thread" th:if="${not #lists.isEmpty(threadNodeList)}">
+        <div th:each="threadHtml : ${threadNodeList}">
+            <div th:utext="${threadHtml}"/>
+            <hr />
         </div>
     </div>
-    -->
-    <hr />
+
 </div>
 </body>
 </html>

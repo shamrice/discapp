@@ -2,6 +2,8 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.service.ApplicationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class DiscAppMaintenanceController {
+
+    private static Logger logger = LoggerFactory.getLogger(DiscAppMaintenanceController.class);
 
     @Autowired
     private ApplicationService applicationService;
