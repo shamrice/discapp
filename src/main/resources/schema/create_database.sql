@@ -3,11 +3,12 @@
 Database creation script.
 
 */
-
 CREATE DATABASE IF NOT EXISTS discapp;
 
 USE discapp;
 
+DROP TABLE IF EXISTS prologue;
+DROP TABLE IF EXISTS epilogue;
 DROP TABLE IF EXISTS thread_body;
 DROP TABLE IF EXISTS thread;
 DROP TABLE IF EXISTS configuration;
@@ -83,9 +84,26 @@ CREATE TABLE thread_body (
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
 
-commit;
+CREATE TABLE prologue (
+    id int(255) NOT NULL AUTO_INCREMENT,
+    application_id int(20) NOT NULL,
+    text varchar(16384) NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
 
-use discapp;
-select * from configuration;
+CREATE TABLE epilogue (
+    id int(255) NOT NULL AUTO_INCREMENT,
+    application_id int(20) NOT NULL,
+    text varchar(16384) NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
+commit;
 
 

@@ -45,6 +45,10 @@ public class DiscAppController {
                 model.addAttribute("appInfo", appStr);
                 model.addAttribute("newthread", new NewThreadViewModel()); //TODO : remove this
 
+                //TODO : prologue and epilogue html should be pulled from database tables as well.
+                model.addAttribute("prologueText", applicationService.getPrologueText(app.getId()));
+
+                //TODO : limit should be pulled from database configuration
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 10);
                 List<String> threadTreeHtml = new ArrayList<>();
 

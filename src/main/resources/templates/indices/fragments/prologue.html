@@ -4,7 +4,7 @@
 </head>
 <body>
     <div class="prologue" th:fragment="prologue">
-        <h1 th:text="@{|${appName} Prologue|}"/>
+        <div th:utext="${prologueText}"/>
     </div>
 </body>
 </html>
