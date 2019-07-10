@@ -4,9 +4,11 @@ public class NewThreadViewModel {
 
     private String appId;
     private String submitter;
+    private String email;
     private String ipAddress;
     private String subject;
     private String body;
+    private String parentId;
     private String submitNewThread;
     private String returnToApp;
 
@@ -24,6 +26,14 @@ public class NewThreadViewModel {
 
     public void setSubmitter(String submitter) {
         this.submitter = submitter;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getIpAddress() {
@@ -64,5 +74,13 @@ public class NewThreadViewModel {
 
     public void setSubmitNewThread(String submitNewThread) {
         this.submitNewThread = submitNewThread;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

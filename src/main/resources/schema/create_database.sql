@@ -61,7 +61,7 @@ CREATE TABLE thread (
     id int(255) NOT NULL AUTO_INCREMENT,
     application_id int(20) NOT NULL,
     submitter varchar(50) NOT NULL,
-    email varchar(60) NOT NULL,
+    email varchar(60),
     ip_address varchar(64),
     subject varchar(60) NOT NULL,
     deleted bool default false,

@@ -5,6 +5,7 @@ public class ThreadViewModel {
     private String id;
     private String appId;
     private String submitter;
+    private String email;
     private String ipAddress;
     private String subject;
     private String body;
@@ -12,6 +13,7 @@ public class ThreadViewModel {
     private String createDt;
     private String modDt;
     private String returnToApp;
+    private String postResponse;
 
     public String getId() {
         return id;
@@ -35,6 +37,14 @@ public class ThreadViewModel {
 
     public void setSubmitter(String submitter) {
         this.submitter = submitter;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getIpAddress() {
@@ -91,5 +101,13 @@ public class ThreadViewModel {
 
     public void setReturnToApp(String returnToApp) {
         this.returnToApp = returnToApp;
+    }
+
+    public String getPostResponse() {
+        return postResponse;
+    }
+
+    public void setPostResponse(String postResponse) {
+        this.postResponse = postResponse;
     }
 }

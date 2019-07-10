@@ -28,6 +28,7 @@
     <style type="text/css"> body{ font: small terminal; color:#9C9C9C; } a:link {color:#2eff00}; a:visited {color:#1b9600}; </style>
     <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data">
         <input type="hidden" name="appId" th:value="${appId}"  />
+        <input type="hidden" name="parentId" th:value="${parentThreadId}"/>
         <div class="post_message_form">
             <table>
                 <tr>

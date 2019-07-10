@@ -72,11 +72,17 @@ public class DiscAppController {
 
     @GetMapping("/createThread")
     public String createNewThread(@RequestParam(name = "disc") Long appId,
+                                @RequestParam(name = "parent", required = false) Long parentThreadId,
                                 Model model) {
         Application app = applicationService.get(appId);
 
+        if (parentThreadId == null) {
+            parentThreadId = 0L;
+        }
+
         model.addAttribute("appName", app.getName());
         model.addAttribute("appId", appId);
+        model.addAttribute("parentThreadId", parentThreadId);
         model.addAttribute("newthread", new NewThreadViewModel());
         return "indices/createThread";
     }
@@ -98,7 +104,7 @@ public class DiscAppController {
                 Thread newThread = new Thread();
                 //TODO : error check
                 newThread.setApplicationId(appId);
-                newThread.setParentId(0L);
+                newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
                 newThread.setSubject(newThreadViewModel.getSubject());
                 newThread.setSubmitter(newThreadViewModel.getSubmitter());
 
@@ -161,6 +167,13 @@ public class DiscAppController {
             if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
                 logger.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
                 return new RedirectView("/indices/" + appId + "#" + threadViewModel.getId());
+            } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
+                logger.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
+                        + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
+                        + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
+                        + " : body: " + threadViewModel.getBody());
+
+                return new RedirectView("/createThread?disc=" + appId + "&parent=" + threadViewModel.getId());
             }
         }
 
