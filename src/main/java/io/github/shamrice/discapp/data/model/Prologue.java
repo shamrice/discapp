@@ -9,7 +9,7 @@ import java.util.Date;
 public class Prologue {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
     private Long id;
 
     private Long applicationId;

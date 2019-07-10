@@ -7,6 +7,8 @@ public class NewThreadViewModel {
     private String ipAddress;
     private String subject;
     private String body;
+    private String submitNewThread;
+    private String returnToApp;
 
     public String getAppId() {
         return appId;
@@ -46,5 +48,21 @@ public class NewThreadViewModel {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getReturnToApp() {
+        return returnToApp;
+    }
+
+    public void setReturnToApp(String returnToApp) {
+        this.returnToApp = returnToApp;
+    }
+
+    public String getSubmitNewThread() {
+        return submitNewThread;
+    }
+
+    public void setSubmitNewThread(String submitNewThread) {
+        this.submitNewThread = submitNewThread;
     }
 }

@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <title>Disc App</title>
+    <title th:text="${appName}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${appId}.css|}" />
 
@@ -26,8 +26,8 @@
 <body>
 <div id="body">
     <style type="text/css"> body{ font: small terminal; color:#9C9C9C; } a:link {color:#2eff00}; a:visited {color:#1b9600}; </style>
-    <form method="post" action="postThread?disc=46108" th:object="${newThreadViewModel}" enctype="multipart/form-data">
-        <input type="hidden" name="appId" value="46108"  />
+    <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data">
+        <input type="hidden" name="appId" th:value="${appId}"  />
         <div class="post_message_form">
             <table>
                 <tr>
@@ -51,9 +51,9 @@
             <input type="hidden" name="postcode" value="20zs7YlBa7nf."  />
             <div class="buttons">
                 <input type="submit" name="previewarticle" value="Preview" class="button" id="previewarticle" style />
-                <input type="submit" name="submitarticle" value="Post Message" class="button" id="submitarticle" style />
+                <input type="submit" name="submitNewThread" value="Post Message" class="button" id="submitNewThread" style />
                 <input type="hidden" name="postpostarticle" value="1"  />
-                <input type="submit" name="returntoarticles" value="Return to Messages" class="button" id="returntoarticles" style />
+                <input type="submit" name="returnToApp" value="Return to Messages" class="button" id="returnToApp" style />
             </div>
         </div>
 

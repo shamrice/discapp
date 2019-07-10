@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,40 +64,61 @@ public class DiscAppController {
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
-            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex.getMessage());
+            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
         return "indices/appView";
     }
 
     @GetMapping("/createThread")
-    public String createNewThread(@RequestParam(name = "disc") String appId,
+    public String createNewThread(@RequestParam(name = "disc") Long appId,
                                 Model model) {
+        Application app = applicationService.get(appId);
+
+        model.addAttribute("appName", app.getName());
         model.addAttribute("appId", appId);
         model.addAttribute("newthread", new NewThreadViewModel());
         return "indices/createThread";
     }
 
     @PostMapping("/postThread")
-    public String postNewThread(@RequestParam(name = "disc") Long appId,
+    public RedirectView postNewThread(@RequestParam(name = "disc") Long appId,
                                 @ModelAttribute NewThreadViewModel newThreadViewModel,
                                 Model model) {
         if (newThreadViewModel != null) {
-            logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
-                    + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
-            //TODO : create thread in db;
+
+            if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
+                logger.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
+                return new RedirectView("/indices/" + appId);
+            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()) {
+
+                logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
+                        + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
+
+                Thread newThread = new Thread();
+                //TODO : error check
+                newThread.setApplicationId(appId);
+                newThread.setParentId(0L);
+                newThread.setSubject(newThreadViewModel.getSubject());
+                newThread.setSubmitter(newThreadViewModel.getSubmitter());
+
+                threadService.createNewThread(newThread, newThreadViewModel.getBody());
+
+                //TODO : create thread in db;
+            }
+
         }
         //TODO: if success only.
-        return getAppView(appId, model);
+        logger.info("Fallback return to thread view.");
+        return new RedirectView("/indices/" + appId);
     }
 
     @GetMapping("discussion.cgi")
     public String getViewThread(@RequestParam(name = "disc") Long appId,
                                 @RequestParam(name = "article") Long threadId,
-                                @RequestParam(name = "title", required = false) String pageTitle,
                                 Model model) {
 
-        logger.info("Getting thread id " + threadId + " for app id: " + appId + " with title : " + pageTitle);
+        logger.info("Getting thread id " + threadId + " for app id: " + appId);
 
         Thread currentThread = threadService.getThread(threadId);
         if (currentThread != null) {
@@ -120,6 +142,9 @@ public class DiscAppController {
             threadViewModel.setSubject(currentThread.getSubject());
             threadViewModel.setSubmitter(currentThread.getSubmitter());
 
+            Application app = applicationService.get(appId);
+            model.addAttribute("appName", app.getName());
+
             model.addAttribute("threadViewModel", threadViewModel);
             model.addAttribute("subThreadsHtml", subThreadsHtml);
 
@@ -129,10 +154,18 @@ public class DiscAppController {
     }
 
     @PostMapping("discussion.cgi")
-    public String postDiscussionForm(@RequestParam(name = "disc") Long appId,
-                                Model model) {
+    public RedirectView postDiscussionForm(@RequestParam(name = "disc") Long appId,
+                                           ThreadViewModel threadViewModel,
+                                           Model model) {
+        if (threadViewModel != null) {
+            if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
+                logger.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
+                return new RedirectView("/indices/" + appId + "#" + threadViewModel.getId());
+            }
+        }
 
-        return getAppView(appId, model);
+        logger.info("Fallback return to thread view.");
+        return new RedirectView("/indices/" + appId + "#" + threadViewModel.getId());
     }
 
     @GetMapping("/styles/disc_{applicationId}.css")
@@ -156,7 +189,8 @@ public class DiscAppController {
                     + "    <span class=\"first_message_span\">"
                     + "        <a class=\"article_link\""
                     + " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
-                    + "&article=" + currentNode.getCurrent().getId() + "&title=N.E.M.B.%20\" name=\"21011\">"
+                    + "&article=" + currentNode.getCurrent().getId() + "\""
+                    + " name=\"" + currentNode.getCurrent().getId() + "\">"
                     + currentNode.getCurrent().getSubject()
                     + "        </a> "
                     + "        &#9787; " //todo: separator comes from app config in db

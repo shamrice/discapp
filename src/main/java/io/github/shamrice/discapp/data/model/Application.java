@@ -10,7 +10,7 @@ import java.util.Date;
 public class Application {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
     private Long id;
 
     private String name;

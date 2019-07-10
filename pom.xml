@@ -7,6 +7,7 @@
     <groupId>io.github.shamrice.discapp</groupId>
     <artifactId>web</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <!--packaging>war</packaging-->
 
     <parent>
         <groupId>org.springframework.boot</groupId>

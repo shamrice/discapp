@@ -11,6 +11,7 @@ public class ThreadViewModel {
     private String parentId;
     private String createDt;
     private String modDt;
+    private String returnToApp;
 
     public String getId() {
         return id;
@@ -82,5 +83,13 @@ public class ThreadViewModel {
 
     public void setModDt(String modDt) {
         this.modDt = modDt;
+    }
+
+    public String getReturnToApp() {
+        return returnToApp;
+    }
+
+    public void setReturnToApp(String returnToApp) {
+        this.returnToApp = returnToApp;
     }
 }

@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <title>Disc App</title>
+    <title th:text="${appName}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${threadViewModel.getAppId()}.css|}" />
 
@@ -42,12 +42,12 @@
             <div class="message_text" th:utext="${threadViewModel.getBody()}"></div>
             </FORM><br>
             <div class="buttons">
-                <form method="post" th:action="@{|/discussion.cgi?disc=${threadViewModel.getAppId()}|}" enctype="multipart/form-data">
+                <form method="post" th:action="@{|/discussion.cgi?disc=${threadViewModel.getAppId()}|}" th:object="${threadViewModel}" enctype="multipart/form-data">
                     <input type="hidden" name="disc" th:value="${threadViewModel.getAppId()}"  />
                     <input type="hidden" name="parent" th:value="${threadViewModel.getParentId()}"  />
                     <input type="hidden" name="id" th:value="${threadViewModel.getId()}"  />
                     <input type="submit" name="postresponse" value="Post Reply" class="button" id="postresponse" style="float:left;" />
-                    <input type="submit" name="returntoarticles" value="Return to Messages" class="button" id="returntoarticles" style="float:left;" />
+                    <input type="submit" name="returnToApp" value="Return to Messages" class="button" id="returnToApp" style="float:left;" />
                 </form>
                 <form method="post" action="http://www.addthis.com/bookmark.php?url=http%3A%2F%2Fdisc.yourwebapps.com%2Fdiscussion.cgi%3Fdisc%3D46108%3Barticle%3D21012&amp;title=N.E.M.B.%20%20-%20123456789012345678901234567890123456789012345678901234567890&amp;pub=brunnock" enctype="multipart/form-data"><input type="submit" name="share" value="Spam Button (DON&#39;T PRESS)" class="button" id="share" style="float:left;" /></form>
             </div>

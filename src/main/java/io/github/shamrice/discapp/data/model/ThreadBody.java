@@ -10,7 +10,7 @@ import java.util.Date;
 public class ThreadBody {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "application_id")

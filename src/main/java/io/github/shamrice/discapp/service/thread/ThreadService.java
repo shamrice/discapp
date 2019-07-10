@@ -25,6 +25,21 @@ public class ThreadService {
     @Autowired
     private ThreadBodyRepository threadBodyRepository;
 
+    public void createNewThread(Thread newThread, String threadBodyText) {
+
+        if (newThread != null) {
+            Thread createThread = threadRepository.save(newThread);
+            if (threadBodyText != null && !threadBodyText.isEmpty() && createThread != null) {
+                ThreadBody newThreadBody = new ThreadBody();
+                newThreadBody.setApplicationId(createThread.getApplicationId());
+                newThreadBody.setBody(threadBodyText);
+                newThreadBody.setThreadId(createThread.getId());
+
+                threadBodyRepository.save(newThreadBody);
+            }
+        }
+    }
+
     public List<Thread> getThreads(Long applicationId) {
         return threadRepository.findByApplicationId(applicationId);
     }
