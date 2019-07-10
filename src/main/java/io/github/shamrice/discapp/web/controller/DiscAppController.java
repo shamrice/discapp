@@ -30,12 +30,12 @@ public class DiscAppController {
     private ThreadService threadService;
 
     @GetMapping("/indices/{applicationId}")
-    public String getAppView(@PathVariable(name = "applicationId") String appId, Model model) {
+    public String getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
 
         try {
-            Long id = Long.parseLong(appId);
+            //Long id = Long.parseLong(appId);
 
-            Application app = applicationService.get(id);
+            Application app = applicationService.get(appId);
 
             if (app != null) {
 
@@ -52,7 +52,7 @@ public class DiscAppController {
                 List<String> threadTreeHtml = new ArrayList<>();
 
                 for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>") + "</ul>");
+                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>", false) + "</ul>");
                 }
 
                 model.addAttribute("threadNodeList", threadTreeHtml);
@@ -78,7 +78,7 @@ public class DiscAppController {
     }
 
     @PostMapping("/postThread")
-    public String postNewThread(@RequestParam(name = "disc") String appId,
+    public String postNewThread(@RequestParam(name = "disc") Long appId,
                                 @ModelAttribute NewThreadViewModel newThreadViewModel,
                                 Model model) {
         if (newThreadViewModel != null) {
@@ -93,7 +93,7 @@ public class DiscAppController {
     @GetMapping("discussion.cgi")
     public String getViewThread(@RequestParam(name = "disc") Long appId,
                                 @RequestParam(name = "article") Long threadId,
-                                @RequestParam(name = "title") String pageTitle,
+                                @RequestParam(name = "title", required = false) String pageTitle,
                                 Model model) {
 
         logger.info("Getting thread id " + threadId + " for app id: " + appId + " with title : " + pageTitle);
@@ -104,7 +104,7 @@ public class DiscAppController {
 
             List<String> subThreadsHtml = new ArrayList<>();
             if (subThreadNode != null) {
-                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "<ul>") + "</ul>");
+                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "", true) + "</ul>");
             }
 
             String threadBody = threadService.getThreadBodyText(threadId);
@@ -128,6 +128,13 @@ public class DiscAppController {
         return "indices/viewThread";
     }
 
+    @PostMapping("discussion.cgi")
+    public String postDiscussionForm(@RequestParam(name = "disc") Long appId,
+                                Model model) {
+
+        return getAppView(appId, model);
+    }
+
     @GetMapping("/styles/disc_{applicationId}.css")
     public String getAppStyleSheet(@PathVariable(name = "applicationId") String appId) {
         return "styles/disc_" + appId + ".css";
@@ -140,26 +147,29 @@ public class DiscAppController {
      * @param currentHtml Current html string. This is the the string that is built and returned
      * @return built HTML list structure for thread
      */
-    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml) {
-        currentHtml += " <li>           <div class=\"first_message_div\">" +
-                "<div class=\"first_message_header\">" +
-                "        <span class=\"first_message_span\">" +
-                "            <a class=\"article_link\"" +
-        " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
-                + "&article=" + currentNode.getCurrent().getId() + "&title=N.E.M.B.%20\" name=\"21011\">" +
-            currentNode.getCurrent().getSubject() +
-        "                    </a> " +
-        "        &#9787; " +
-        "                    <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> " +
-        "                    <span class=\"date_cell\"> " + currentNode.getCurrent().getCreateDt() + "</span> " +
-        "                </span> " +
-        "        </div> " +
-        "    </div>";
+    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrentNode) {
 
+        if (!skipCurrentNode) {
+            currentHtml += " <li>"
+                    + " <div class=\"first_message_div\">"
+                    + " <div class=\"first_message_header\">"
+                    + "    <span class=\"first_message_span\">"
+                    + "        <a class=\"article_link\""
+                    + " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
+                    + "&article=" + currentNode.getCurrent().getId() + "&title=N.E.M.B.%20\" name=\"21011\">"
+                    + currentNode.getCurrent().getSubject()
+                    + "        </a> "
+                    + "        &#9787; " //todo: separator comes from app config in db
+                    + "        <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> "
+                    + "        <span class=\"date_cell\"> " + currentNode.getCurrent().getCreateDt() + "</span> "
+                    + "    </span> "
+                    + "</div> "
+                    + "</div>";
+        }
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getAppViewThreadHtml(node, currentHtml);
+            currentHtml = getAppViewThreadHtml(node, currentHtml, false);
             currentHtml += "</ul>";
         }
 

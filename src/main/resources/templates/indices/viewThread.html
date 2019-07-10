@@ -42,28 +42,21 @@
             <div class="message_text" th:utext="${threadViewModel.getBody()}"></div>
             </FORM><br>
             <div class="buttons">
-                <form method="post" action="discussion.cgi?disc=46108" enctype="multipart/form-data"><input type="hidden" name="disc" value="46108"  /><input type="hidden" name="parent" value="21012"  /><input type="hidden" name="grandparent" value="21012"  /><input type="submit" name="postresponse" value="Post Reply" class="button" id="postresponse" style="float:left;" /><input type="submit" name="returntoarticles" value="Return to Messages" class="button" id="returntoarticles" style="float:left;" /></form>
+                <form method="post" th:action="@{|/discussion.cgi?disc=${threadViewModel.getAppId()}|}" enctype="multipart/form-data">
+                    <input type="hidden" name="disc" th:value="${threadViewModel.getAppId()}"  />
+                    <input type="hidden" name="parent" th:value="${threadViewModel.getParentId()}"  />
+                    <input type="hidden" name="id" th:value="${threadViewModel.getId()}"  />
+                    <input type="submit" name="postresponse" value="Post Reply" class="button" id="postresponse" style="float:left;" />
+                    <input type="submit" name="returntoarticles" value="Return to Messages" class="button" id="returntoarticles" style="float:left;" />
+                </form>
                 <form method="post" action="http://www.addthis.com/bookmark.php?url=http%3A%2F%2Fdisc.yourwebapps.com%2Fdiscussion.cgi%3Fdisc%3D46108%3Barticle%3D21012&amp;title=N.E.M.B.%20%20-%20123456789012345678901234567890123456789012345678901234567890&amp;pub=brunnock" enctype="multipart/form-data"><input type="submit" name="share" value="Spam Button (DON&#39;T PRESS)" class="button" id="share" style="float:left;" /></form>
             </div>
             <div style="clear:left;"></div>
         </div>
 
-        <div class="responses">
-            <li class="nested_list">
-                <ul>
-                    <li class="message_entry ">
-                        <div class="response_headers"><span class="response_headers "><a class="article_link" href="/discussion.cgi?disc=46108;article=21013;title=N.E.M.B.%20">*....one last test. (nm)</a> &#9787; <span class="author_cell">12345678901234567890123456789012345678901234567890,</span>   <span class="date_cell">Sun Jul 7 2:32am</span></span></div>
-                    </li>
-                    <li class="nested_list">
-                        <ul>
-                            <li class="message_entry ">
-                                <div class="response_headers"><span class="response_headers "><a class="article_link" href="/discussion.cgi?disc=46108;article=21014;title=N.E.M.B.%20">*...could have just looked at the html source.. whoops. (nm)</a> &#9787; <span class="author_cell">Erik,</span>   <span class="date_cell">Sun Jul 7 2:37am</span></span></div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </div>
+
+        <div class="responses" th:utext="${subThreadsHtml}"/>
+
 
         <div style="font-size:smaller; padding-top:6px;"><a href="http://disc.yourwebapps.com/disc-list-subscribe.cgi?id=46108">Click here to receive daily updates</a></div>
 
