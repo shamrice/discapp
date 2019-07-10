@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,6 +35,8 @@ public class ThreadService {
                 newThreadBody.setApplicationId(createThread.getApplicationId());
                 newThreadBody.setBody(threadBodyText);
                 newThreadBody.setThreadId(createThread.getId());
+                newThreadBody.setCreateDt(new Date());
+                newThreadBody.setModDt(new Date());
 
                 threadBodyRepository.save(newThreadBody);
             }

@@ -18,12 +18,12 @@ DROP TABLE IF EXISTS owner;
 commit;
 
 CREATE TABLE owner (
-    id int(20) NOT NULL AUTO_INCREMENT,
+    id serial NOT NULL,
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
     phone varchar(50),
     email varchar(255) UNIQUE NOT NULL,
-    enabled BOOL DEFAULT false,
+    enabled BOOL NOT NULL DEFAULT false,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id)
@@ -34,9 +34,9 @@ commit;
 
 
 CREATE TABLE application (
-    id int(20) NOT NULL AUTO_INCREMENT,
+    id serial NOT NULL,
     name varchar(255) NOT NULL,
-    owner_id int(20) NOT NULL,
+    owner_id int NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
@@ -47,8 +47,8 @@ commit;
 
 
 CREATE TABLE configuration (
-    id int(20) NOT NULL AUTO_INCREMENT,
-    application_id int(20) NOT NULL,
+    id serial NOT NULL,
+    application_id int NOT NULL,
     name varchar(255) NOT NULL,
     value varchar(255) NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
@@ -58,35 +58,35 @@ CREATE TABLE configuration (
 );
 
 CREATE TABLE thread (
-    id int(255) NOT NULL AUTO_INCREMENT,
-    application_id int(20) NOT NULL,
+    id serial NOT NULL,
+    application_id int NOT NULL,
     submitter varchar(50) NOT NULL,
     email varchar(60),
     ip_address varchar(64),
     subject varchar(60) NOT NULL,
-    deleted bool default false,
-    parent_id int(255) NOT NULL DEFAULT 0,
-    create_dt TIMESTAMP DEFAULT NOW(),
-    mod_dt TIMESTAMP DEFAULT NOW(),
+    deleted bool NOT NULL default false,
+    parent_id int NOT NULL DEFAULT 0,
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
 CREATE TABLE thread_body (
-    id int(255) NOT NULL AUTO_INCREMENT,
-    application_id int(20) NOT NULL,
-    thread_id int(255) NOT NULL,
+    id serial NOT NULL,
+    application_id int NOT NULL,
+    thread_id int NOT NULL,
     body varchar(16384) NOT NULL,
-    create_dt TIMESTAMP DEFAULT NOW(),
-    mod_dt TIMESTAMP DEFAULT NOW(),
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),
     FOREIGN KEY (application_id) REFERENCES application(id),
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
 
 CREATE TABLE prologue (
-    id int(255) NOT NULL AUTO_INCREMENT,
-    application_id int(20) UNIQUE NOT NULL,
+    id serial NOT NULL,
+    application_id int UNIQUE NOT NULL,
     text varchar(16384) NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
@@ -95,8 +95,8 @@ CREATE TABLE prologue (
 );
 
 CREATE TABLE epilogue (
-    id int(255) NOT NULL AUTO_INCREMENT,
-    application_id int(20) UNIQUE NOT NULL,
+    id serial NOT NULL,
+    application_id int UNIQUE NOT NULL,
     text varchar(16384) NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),

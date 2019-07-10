@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -105,6 +106,9 @@ public class DiscAppController {
                 //TODO : error check
                 newThread.setApplicationId(appId);
                 newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
+                newThread.setDeleted(false);
+                newThread.setCreateDt(new Date());
+                newThread.setModDt(new Date());
                 newThread.setSubject(newThreadViewModel.getSubject());
                 newThread.setSubmitter(newThreadViewModel.getSubmitter());
 

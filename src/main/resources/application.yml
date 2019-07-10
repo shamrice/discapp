@@ -9,8 +9,9 @@ spring:
 
 
   datasource:
-    url: jdbc:mysql://localhost:3306/discapp?serverTimezone=UTC
-    username: root
+  #  url: jdbc:mysql://localhost:3306/discapp?serverTimezone=UTC
+    url: jdbc:postgresql://localhost:5432/discapp
+    username: postgres
     password: password
   #  testWhileIdle: true
   #  validationQuery: select 1

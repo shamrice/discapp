@@ -25,10 +25,6 @@ public class Thread {
     private Date createDt;
     private Date modDt;
 
-    public Thread() {
-
-    }
-
     public Long getId() {
         return id;
     }
