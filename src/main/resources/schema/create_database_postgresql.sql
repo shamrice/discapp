@@ -63,7 +63,7 @@ CREATE TABLE thread (
     submitter varchar(50) NOT NULL,
     email varchar(60),
     ip_address varchar(64),
-    subject varchar(60) NOT NULL,
+    subject varchar(65) NOT NULL,
     deleted bool NOT NULL default false,
     parent_id int NOT NULL DEFAULT 0,
     create_dt TIMESTAMP NOT NULL DEFAULT NOW(),

@@ -28,6 +28,12 @@ public class ThreadService {
 
     public void createNewThread(Thread newThread, String threadBodyText) {
 
+        //add (nm) to subjects with no body.
+        if (threadBodyText == null || threadBodyText.isEmpty()) {
+            String noBodySubject = newThread.getSubject() + " (nm)";
+            newThread.setSubject(noBodySubject);
+        }
+
         if (newThread != null) {
             Thread createThread = threadRepository.save(newThread);
             if (threadBodyText != null && !threadBodyText.isEmpty() && createThread != null) {
