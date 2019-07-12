@@ -35,3 +35,8 @@ values (46108, 1, 'This is a test of the thread body');
 
 update application
 set mod_dt = current_timestamp where id = 1;
+
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'thread.entry.break.text', ' &#9787; ');

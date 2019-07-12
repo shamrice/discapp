@@ -4,6 +4,8 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
@@ -31,6 +33,9 @@ public class DiscAppController {
     @Autowired
     private ThreadService threadService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @GetMapping("/indices/{applicationId}")
     public String getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
 
@@ -44,17 +49,16 @@ public class DiscAppController {
                 model.addAttribute("appName", app.getName());
                 model.addAttribute("appId", app.getId());
 
-                //model.addAttribute("newthread", new NewThreadViewModel()); //TODO : remove this
-
                 model.addAttribute("prologueText", applicationService.getPrologueText(app.getId()));
                 model.addAttribute("epilogueText", applicationService.getEpilogueText(app.getId()));
 
                 //TODO : limit should be pulled from database configuration
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 10);
                 List<String> threadTreeHtml = new ArrayList<>();
+                String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
                 for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>", false) + "</ul>");
+                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>", entryBreakString, false) + "</ul>");
                 }
 
                 model.addAttribute("threadNodeList", threadTreeHtml);
@@ -136,7 +140,8 @@ public class DiscAppController {
 
             List<String> subThreadsHtml = new ArrayList<>();
             if (subThreadNode != null) {
-                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "", true) + "</ul>");
+                String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "", entryBreakString, true) + "</ul>");
             }
 
             String threadBody = threadService.getThreadBodyText(threadId);
@@ -197,7 +202,8 @@ public class DiscAppController {
      * @param currentHtml Current html string. This is the the string that is built and returned
      * @return built HTML list structure for thread
      */
-    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrentNode) {
+    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString, boolean skipCurrentNode) {
+
 
         if (!skipCurrentNode) {
             currentHtml += " <li>"
@@ -209,8 +215,8 @@ public class DiscAppController {
                     + "&article=" + currentNode.getCurrent().getId() + "\""
                     + " name=\"" + currentNode.getCurrent().getId() + "\">"
                     + currentNode.getCurrent().getSubject()
-                    + "        </a> "
-                    + "        &#9787; " //todo: separator comes from app config in db
+                    + "        </a>  "
+                    + "        " + entryBreakString
                     + "        <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> "
                     + "        <span class=\"date_cell\"> " + currentNode.getCurrent().getCreateDt() + "</span> "
                     + "    </span> "
@@ -220,7 +226,7 @@ public class DiscAppController {
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getAppViewThreadHtml(node, currentHtml, false);
+            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false);
             currentHtml += "</ul>";
         }
 
