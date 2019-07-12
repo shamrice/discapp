@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ConfigurationRepository extends JpaRepository<Configuration, Long> {
 
     Configuration findOneByApplicationIdAndName(Long applicationId, String name);
+
+    Configuration findOneByName(String name);
 }

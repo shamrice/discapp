@@ -4,19 +4,26 @@ import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class ConfigurationCache {
 
     private static Logger logger = LoggerFactory.getLogger(ConfigurationCache.class);
 
     private Map<Long, Map<ConfigurationProperty, Configuration>> configurationCacheMap = new ConcurrentHashMap<>();
+    private Map<Long, Date> configIdLastRefreshDateList = new ConcurrentHashMap<>();
 
-    Date lastRefreshDate = new Date();
+    private long maxCacheAgeMilliseconds = 900000L; //default 15 min
+
+    public void setMaxCacheAgeMilliseconds(long milliseconds) {
+        this.maxCacheAgeMilliseconds = milliseconds;
+    }
 
     public Configuration getFromCache(Long applicationId, ConfigurationProperty configurationProperty) {
 
@@ -28,6 +35,21 @@ public class ConfigurationCache {
             Configuration config = appConfigs.get(configurationProperty);
 
             if (config != null) {
+
+                //make sure value in config cache isn't stale.
+                Date lastRefresh = configIdLastRefreshDateList.get(config.getId());
+                if (lastRefresh != null) {
+                    logger.info("newDate.getTime():       " + new Date().getTime());
+                    logger.info("lastRefresh.getTime():   " + lastRefresh.getTime());
+                    logger.info("maxCacheAgeMilliseconds: " + maxCacheAgeMilliseconds);
+                }
+                if (lastRefresh != null && (new Date().getTime() - lastRefresh.getTime() > maxCacheAgeMilliseconds)) {
+
+                    logger.info("Config property: " + config.getName() + " for appId: " + applicationId
+                            + " is stale in config and needs to be refreshed. Returning null.");
+                    return null;
+                }
+
                 logger.info("Found configuration for appId: " + applicationId + " : prop: " + config.getName()
                         + " = " + config.getValue());
                 return config;
@@ -51,21 +73,8 @@ public class ConfigurationCache {
 
             configs.put(configurationProperty, configuration);
             configurationCacheMap.put(applicationId, configs);
+            configIdLastRefreshDateList.put(configuration.getId(), new Date());
         }
     }
 
-    public void refreshCache(List<Configuration> configurations) {
-
-        configurationCacheMap.clear();
-
-        //TODO : think on this more
-        //TODO : configurations should be pulled from cache to decrease load put on database.
-        for (Configuration configuration : configurations) {
-            Long appId = configuration.getApplicationId();
-            ConfigurationProperty configurationProperty = ConfigurationProperty.valueOf(configuration.getName());
-            //configurationCacheMap.put(appId, )
-        }
-
-        lastRefreshDate = new Date();
-    }
 }
