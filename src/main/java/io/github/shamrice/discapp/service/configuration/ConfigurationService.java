@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.service.configuration;
 
 import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
+import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class ConfigurationService {
     @Autowired
     private ConfigurationRepository configurationRepository;
 
+    ConfigurationCache configurationCache = new ConfigurationCache();
+
     public List<Configuration> list() {
         return configurationRepository.findAll();
     }
@@ -25,6 +28,7 @@ public class ConfigurationService {
 
         logger.info("Setting up default configuration values for appId: " + applicationId + " in database.");
 
+        //todo: pull these default values from properties file
         Map<ConfigurationProperty, String> configsToSet = new HashMap<>();
         configsToSet.put(ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Author");
         configsToSet.put(ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject");
@@ -68,6 +72,13 @@ public class ConfigurationService {
 
     public String getStringValue(Long applicationId, ConfigurationProperty configurationProperty, String defaultValue) {
 
+        //try to get from cache first:
+        Configuration configFromCache = configurationCache.getFromCache(applicationId, configurationProperty);
+        if (configFromCache != null) {
+            return configFromCache.getValue();
+        }
+
+        //search database if cache doesn't exist
         Configuration configuration = configurationRepository.findOneByApplicationIdAndName(
                 applicationId,
                 configurationProperty.getPropName()
@@ -76,11 +87,13 @@ public class ConfigurationService {
         if (configuration != null) {
             logger.info("Found configuration property: " + configurationProperty.getPropName()
                     + " for appid: " + applicationId + ". Returnning value of: " + configuration.getValue());
+
+            configurationCache.updateCache(applicationId, configurationProperty, configuration);
             return configuration.getValue();
         }
 
         logger.info("Unable to find configuration property: " + configurationProperty.getPropName()
-                + " for appid: " + applicationId + ". Returnning default value of: " + defaultValue);
+                + " for appid: " + applicationId + ". Returning default value of: " + defaultValue);
         return defaultValue;
     }
 

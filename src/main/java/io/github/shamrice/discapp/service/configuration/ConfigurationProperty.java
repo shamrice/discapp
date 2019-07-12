@@ -28,7 +28,7 @@ public enum ConfigurationProperty {
 
     private final String propName;
 
-    private ConfigurationProperty(String propName) {
+    ConfigurationProperty(String propName) {
         this.propName = propName;
     }
 

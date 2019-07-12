@@ -27,9 +27,11 @@ public class ConfigurationCache {
         if (appConfigs != null) {
             Configuration config = appConfigs.get(configurationProperty);
 
-            logger.info("Found configuration for appId: " + applicationId + " : prop: " + config.getName()
-                    + " = " + config.getValue());
-            return config;
+            if (config != null) {
+                logger.info("Found configuration for appId: " + applicationId + " : prop: " + config.getName()
+                        + " = " + config.getValue());
+                return config;
+            }
         }
 
         logger.info("Configuration does not currently exist in the cache. appId: " + applicationId
@@ -37,7 +39,22 @@ public class ConfigurationCache {
         return null;
     }
 
-    private void refreshCache(List<Configuration> configurations) {
+    public void updateCache(Long applicationId, ConfigurationProperty configurationProperty, Configuration configuration) {
+        if (applicationId != null && applicationId > 0 && configuration != null) {
+            logger.info("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
+                    + configuration.getName() + " = " + configuration.getValue());
+
+            Map<ConfigurationProperty, Configuration> configs = configurationCacheMap.get(applicationId);
+            if (configs == null) {
+                configs = new ConcurrentHashMap<>();
+            }
+
+            configs.put(configurationProperty, configuration);
+            configurationCacheMap.put(applicationId, configs);
+        }
+    }
+
+    public void refreshCache(List<Configuration> configurations) {
 
         configurationCacheMap.clear();
 
