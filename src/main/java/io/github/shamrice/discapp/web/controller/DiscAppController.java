@@ -64,6 +64,8 @@ public class DiscAppController {
                 }
 
                 model.addAttribute("threadNodeList", threadTreeHtml);
+                model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");
@@ -91,6 +93,18 @@ public class DiscAppController {
         model.addAttribute("appId", appId);
         model.addAttribute("parentThreadId", parentThreadId);
         model.addAttribute("newthread", new NewThreadViewModel());
+
+        model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
+        model.addAttribute("emailLabel", configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
+        model.addAttribute("subjectLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
+        model.addAttribute("bodyLabel", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BODY_LABEL_TEXT, "Message Text:"));
+        model.addAttribute("previewButtonText", configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview"));
+        model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+        model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+
+        model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+        model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+
         return "indices/createThread";
     }
 
@@ -103,13 +117,14 @@ public class DiscAppController {
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
                 logger.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
                 return new RedirectView("/indices/" + appId);
-            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()) {
+            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()
+                    && newThreadViewModel.getSubmitter() != null && !newThreadViewModel.getSubmitter().isEmpty()
+                    && newThreadViewModel.getSubject() != null && !newThreadViewModel.getSubject().isEmpty()) {
 
                 logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
                         + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
 
                 Thread newThread = new Thread();
-                //TODO : error check
                 newThread.setApplicationId(appId);
                 newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
                 newThread.setDeleted(false);
@@ -119,13 +134,9 @@ public class DiscAppController {
                 newThread.setSubmitter(newThreadViewModel.getSubmitter());
 
                 threadService.createNewThread(newThread, newThreadViewModel.getBody());
-
-                //TODO : create thread in db;
             }
-
         }
-        //TODO: if success only.
-        logger.info("Fallback return to thread view.");
+        logger.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
         return new RedirectView("/indices/" + appId);
     }
 
@@ -165,6 +176,12 @@ public class DiscAppController {
             model.addAttribute("threadViewModel", threadViewModel);
             model.addAttribute("subThreadsHtml", subThreadsHtml);
 
+            model.addAttribute("replyButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply"));
+            model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+            model.addAttribute("shareButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Share"));
+
+            model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+            model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
         }
 
         return "indices/viewThread";

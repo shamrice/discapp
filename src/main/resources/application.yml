@@ -9,6 +9,9 @@ spring:
     username: postgres
     password: password
 
+  #  url: jdbc:postgres://ydzhitbwcsixba:409e9ad28ef600fc4d01c17d8b05aa874a50e876aa965cf1de370f7bd21cb1a4@ec2-107-21-120-104.compute-1.amazonaws.com:5432/d9ol8g0nn0aa91
+  #  username: ydzhitbwcsixba
+  #  password: 409e9ad28ef600fc4d01c17d8b05aa874a50e876aa965cf1de370f7bd21cb1a4
 
   #  testWhileIdle: true
   #  validationQuery: select 1
