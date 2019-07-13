@@ -4,12 +4,11 @@
 </head>
 <body>
 <div class="threads" th:fragment="threads">
-    <hr />
 
     <div class="thread" th:if="${not #lists.isEmpty(threadNodeList)}">
         <div th:each="threadHtml : ${threadNodeList}">
             <div th:utext="${threadHtml}"/>
-            <hr />
+            <div th:utext="${threadSeparator}"/>
         </div>
     </div>
 

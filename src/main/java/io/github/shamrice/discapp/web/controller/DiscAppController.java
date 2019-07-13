@@ -66,6 +66,7 @@ public class DiscAppController {
                 model.addAttribute("threadNodeList", threadTreeHtml);
                 model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
                 model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");

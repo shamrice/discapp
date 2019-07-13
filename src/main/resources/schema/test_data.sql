@@ -105,7 +105,7 @@ values (46108, 'thread.highlight.new', 'true');
 
 insert into configuration
 (application_id, name, value)
-values (46108, 'thread.break.text', '<br /><center>&#9829; &#9830; &#9827; &#9824; &#9829; &#9830; &#9827; &#9824; &#9829; &#9830; &#9827; &#9824; &#9829;</center>');
+values (46108, 'thread.break.text', '<center>&#9829; &#9830; &#9827; &#9824; &#9829; &#9830; &#9827; &#9824; &#9829; &#9830; &#9827; &#9824; &#9829;</center>');
 
 insert into configuration
 (application_id, name, value)
