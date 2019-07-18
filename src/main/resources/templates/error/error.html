@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page</title>
+</head>
+<body>
+
+An error occurred processing your request:
+
+<h3 th:text="@{|Status Code: ${errorStatusCode}|}"></h3>
+<div th:text="${errorText}"></div>
+<br />
+<form>
+    <input type="button" value="Click here to return to previous page" onclick="history.back()">
+</form>
+</body>
+</html>

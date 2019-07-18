@@ -2,7 +2,6 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Thread;
-import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
@@ -37,11 +37,9 @@ public class DiscAppController {
     private ConfigurationService configurationService;
 
     @GetMapping("/indices/{applicationId}")
-    public String getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
+    public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
 
         try {
-            //Long id = Long.parseLong(appId);
-
             Application app = applicationService.get(appId);
 
             if (app != null) {
@@ -77,23 +75,29 @@ public class DiscAppController {
             logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
-        return "indices/appView";
+        return new ModelAndView("indices/appView");
     }
 
     @GetMapping("/createThread")
-    public String createNewThread(@RequestParam(name = "disc") Long appId,
-                                @RequestParam(name = "parent", required = false) Long parentThreadId,
-                                Model model) {
+    public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
+                                        @ModelAttribute ThreadViewModel newThreadViewModel,
+                                        Model model) {
         Application app = applicationService.get(appId);
 
-        if (parentThreadId == null) {
-            parentThreadId = 0L;
+        long parentId = 0L;
+        if (newThreadViewModel != null && newThreadViewModel.getId() != null) {
+            try {
+                parentId = Long.parseLong(newThreadViewModel.getId());
+            } catch (NumberFormatException ex) {
+                logger.error("Unable to parse parent id from model. appId: " + appId
+                        + " : attempted parentId: " + newThreadViewModel.getId());
+            }
         }
 
         model.addAttribute("appName", app.getName());
         model.addAttribute("appId", appId);
-        model.addAttribute("parentThreadId", parentThreadId);
-        model.addAttribute("newthread", new NewThreadViewModel());
+        model.addAttribute("parentThreadId", parentId); //parentThreadId);
+        model.addAttribute("newthread", new NewThreadViewModel()); //  new NewThreadViewModel());
 
         model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
         model.addAttribute("emailLabel", configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
@@ -106,18 +110,46 @@ public class DiscAppController {
         model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
         model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
 
-        return "indices/createThread";
+        return new ModelAndView("indices/createThread");
+    }
+
+    @PostMapping("/previewThread")
+    public ModelAndView postPreviewThread(@RequestParam(name = "disc") Long appId,
+                             NewThreadViewModel newThreadViewModel,
+                             Model model) {
+
+        Application app = applicationService.get(appId);
+        model.addAttribute("appName", app.getName());
+        model.addAttribute("appId", appId);
+
+        //model.addAttribute("submitter", newThreadViewModel.getSubmitter());
+        //model.addAttribute("subject", newThreadViewModel.getSubject());
+        //model.addAttribute("body", newThreadViewModel.getBody());
+        model.addAttribute("editButtonText", configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message"));
+        model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+        model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+
+        model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+        model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+
+        return new ModelAndView("indices/previewThread", "model", model);
     }
 
     @PostMapping("/postThread")
-    public RedirectView postNewThread(@RequestParam(name = "disc") Long appId,
+    public ModelAndView postNewThread(@RequestParam(name = "disc") Long appId,
                                 @ModelAttribute NewThreadViewModel newThreadViewModel,
                                 Model model) {
         if (newThreadViewModel != null) {
 
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
                 logger.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
-                return new RedirectView("/indices/" + appId);
+                //return new RedirectView("/indices/" + appId);
+                return new ModelAndView("redirect:/indices/" + appId);
+
+            } else if (newThreadViewModel.getPreviewArticle() != null && !newThreadViewModel.getPreviewArticle().isEmpty()) {
+
+                return postPreviewThread(appId, newThreadViewModel, model);
+
             } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()
                     && newThreadViewModel.getSubmitter() != null && !newThreadViewModel.getSubmitter().isEmpty()
                     && newThreadViewModel.getSubject() != null && !newThreadViewModel.getSubject().isEmpty()) {
@@ -138,13 +170,18 @@ public class DiscAppController {
             }
         }
         logger.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
-        return new RedirectView("/indices/" + appId);
+        return new ModelAndView("redirect:/indices/" + appId);
     }
 
     @GetMapping("discussion.cgi")
     public String getViewThread(@RequestParam(name = "disc") Long appId,
-                                @RequestParam(name = "article") Long threadId,
+                                @RequestParam(name = "article", required = false) Long threadId,
                                 Model model) {
+
+        if (threadId == null || threadId < 1) {
+            logger.error("Null or invalid article id passed to view thread. Returning to app view for appId: " + appId);
+            return "redirect:/indices/" + appId;
+        }
 
         logger.info("Getting thread id " + threadId + " for app id: " + appId);
 
@@ -189,25 +226,28 @@ public class DiscAppController {
     }
 
     @PostMapping("discussion.cgi")
-    public RedirectView postDiscussionForm(@RequestParam(name = "disc") Long appId,
+    public ModelAndView postDiscussionForm(@RequestParam(name = "disc") Long appId,
                                            ThreadViewModel threadViewModel,
                                            Model model) {
         if (threadViewModel != null) {
             if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
+
                 logger.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
-                return new RedirectView("/indices/" + appId + "#" + threadViewModel.getId());
+                return new ModelAndView("redirect:/indices/" + appId + "#" + threadViewModel.getId());
+
             } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
+
                 logger.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
                         + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
 
-                return new RedirectView("/createThread?disc=" + appId + "&parent=" + threadViewModel.getId());
+                return createNewThread(appId, threadViewModel, model);
             }
         }
 
         logger.info("Fallback return to thread view.");
-        return new RedirectView("/indices/" + appId + "#" + threadViewModel.getId());
+        return new ModelAndView("redirect:/indices/" + appId);
     }
 
     @GetMapping("/styles/disc_{applicationId}.css")

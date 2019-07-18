@@ -1,0 +1,80 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title th:text="${appName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${newThreadViewModel.getAppId()}.css|}"/>
+
+    <style type="text/css">
+         <!--/* <![CDATA[ */
+            ul {margin-top:0; padding-top:1px; margin-bottom:0;}
+            li.nested_list { list-style-type:none; display:inline; }
+            div.message_and_thread li.message_entry { margin-top:1em; }
+
+            /* li { margin-top: 1ex } */
+
+            div.message_preview { width:30em; }
+
+
+            /* ]]> */-->
+
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div id="body">
+
+    <div th:utext="${headerText}"></div>
+
+    <div class="message_and_thread">
+
+        <div class="message">
+
+            <!-- todo : this is not submitting the data from the view model to the controller on submit... -->
+
+            <div class="headers">
+                <div class="header"><span class="author_header" name="submitter" th:text="${newThreadViewModel.getSubmitter()}"></span>
+                </div>
+                <div class="header"><span class="email_header" name="email" th:text="${newThreadViewModel.getEmail()}"></span></div>
+                <div class="header"><span class="subject_header" name="subject" th:text="${newThreadViewModel.getSubject()}"></span></div>
+            </div>
+            <br>
+            <div class="message_text" name="body" th:utext="${newThreadViewModel.getBody()}"></div>
+            <br>
+            <div class="buttons">
+
+                <form method="get" th:action="@{|/createThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data" action="submit">
+                    <input type="submit" name="editMessage" th:value="${editButtonText}" class="button" id="editMessage" style="float:left;" />
+                    <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
+                    <input type="hidden" name="parentThreadId" th:value="${newThreadViewModel.getParentId()}"/>
+                </form>
+                <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data">
+                    <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
+                    <input type="hidden" name="parentThreadId" th:value="${newThreadViewModel.getParentId()}"/>
+                    <input type="submit" name="submitNewThread" th:value="${postButtonText}" class="button" id="submitNewThread"
+                           style="float:left;"/>
+                    <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
+                           style="float:left;"/>
+                </form>
+            </div>
+            <div style="clear:left;"></div>
+        </div>
+
+        <!--div class="responses" th:utext="${subThreadsHtml}"/-->
+
+        <div style="font-size:smaller; padding-top:6px;"><a
+                th:href="@{|http://disc.yourwebapps.com/disc-list-subscribe.cgi?id=${newThreadViewModel.getAppId()}|}">Click here to receive daily
+            updates</a></div>
+    </div>
+
+    <div th:utext="${footerText}"></div>
+
+    </form>
+</div>
+
+</body>
+</html>
+

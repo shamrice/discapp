@@ -11,6 +11,7 @@ public class NewThreadViewModel {
     private String parentId;
     private String submitNewThread;
     private String returnToApp;
+    private String previewArticle;
 
     public String getAppId() {
         return appId;
@@ -82,5 +83,13 @@ public class NewThreadViewModel {
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
+    }
+
+    public String getPreviewArticle() {
+        return previewArticle;
+    }
+
+    public void setPreviewArticle(String previewArticle) {
+        this.previewArticle = previewArticle;
     }
 }
