@@ -78,26 +78,44 @@ public class DiscAppController {
         return new ModelAndView("indices/appView");
     }
 
-    @GetMapping("/createThread")
+    @PostMapping("/createThread")
     public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
-                                        @ModelAttribute ThreadViewModel newThreadViewModel,
+                                        @ModelAttribute ThreadViewModel threadViewModel,
+                                        @ModelAttribute NewThreadViewModel newThreadViewModel,
                                         Model model) {
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
-        if (newThreadViewModel != null && newThreadViewModel.getId() != null) {
+        //if coming from view page
+        if (threadViewModel != null && threadViewModel.getId() != null) {
             try {
-                parentId = Long.parseLong(newThreadViewModel.getId());
+                parentId = Long.parseLong(threadViewModel.getId());
             } catch (NumberFormatException ex) {
-                logger.error("Unable to parse parent id from model. appId: " + appId
-                        + " : attempted parentId: " + newThreadViewModel.getId());
+                logger.error("Unable to parse parent id from view thread model. appId: " + appId
+                        + " : attempted parentId: " + threadViewModel.getId());
+            }
+        }
+
+        //if coming from preview page
+        if (newThreadViewModel != null) {
+            model.addAttribute("submitter", newThreadViewModel.getSubmitter());
+            model.addAttribute("subject", newThreadViewModel.getSubject());
+            model.addAttribute("email", newThreadViewModel.getEmail());
+            model.addAttribute("body", newThreadViewModel.getBody());
+
+            if (newThreadViewModel.getParentId() != null) {
+                try {
+                    parentId = Long.parseLong(newThreadViewModel.getParentId());
+                } catch (NumberFormatException ex) {
+                    logger.error("Unable to parse parent id from returned new thread model from preview page. appId: " + appId
+                            + " : attempted parentId: " + newThreadViewModel.getParentId());
+                }
             }
         }
 
         model.addAttribute("appName", app.getName());
         model.addAttribute("appId", appId);
         model.addAttribute("parentThreadId", parentId); //parentThreadId);
-        model.addAttribute("newthread", new NewThreadViewModel()); //  new NewThreadViewModel());
 
         model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
         model.addAttribute("emailLabel", configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
@@ -121,10 +139,8 @@ public class DiscAppController {
         Application app = applicationService.get(appId);
         model.addAttribute("appName", app.getName());
         model.addAttribute("appId", appId);
+        model.addAttribute("newThreadViewModel", newThreadViewModel);
 
-        //model.addAttribute("submitter", newThreadViewModel.getSubmitter());
-        //model.addAttribute("subject", newThreadViewModel.getSubject());
-        //model.addAttribute("body", newThreadViewModel.getBody());
         model.addAttribute("editButtonText", configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message"));
         model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
         model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
@@ -143,7 +159,7 @@ public class DiscAppController {
 
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
                 logger.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
-                //return new RedirectView("/indices/" + appId);
+
                 return new ModelAndView("redirect:/indices/" + appId);
 
             } else if (newThreadViewModel.getPreviewArticle() != null && !newThreadViewModel.getPreviewArticle().isEmpty()) {
@@ -157,14 +173,21 @@ public class DiscAppController {
                 logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
                         + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
 
+
+                //gross hack to remove html tags in subject, submitter and email fields if they exist.
+                String subject = newThreadViewModel.getSubject().replaceAll("<[^>]*>", " ");
+                String submitter = newThreadViewModel.getSubmitter().replaceAll("<[^>]*>", " ");
+                String email = newThreadViewModel.getEmail().replaceAll("<[^>]*>", " ");
+
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
                 newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
                 newThread.setDeleted(false);
                 newThread.setCreateDt(new Date());
                 newThread.setModDt(new Date());
-                newThread.setSubject(newThreadViewModel.getSubject());
-                newThread.setSubmitter(newThreadViewModel.getSubmitter());
+                newThread.setSubject(subject);
+                newThread.setSubmitter(submitter);
+                newThread.setEmail(email);
 
                 threadService.createNewThread(newThread, newThreadViewModel.getBody());
             }
@@ -207,6 +230,7 @@ public class DiscAppController {
             threadViewModel.setParentId(currentThread.getParentId().toString());
             threadViewModel.setSubject(currentThread.getSubject());
             threadViewModel.setSubmitter(currentThread.getSubmitter());
+            threadViewModel.setEmail(currentThread.getEmail());
 
             Application app = applicationService.get(appId);
             model.addAttribute("appName", app.getName());
@@ -242,7 +266,7 @@ public class DiscAppController {
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
 
-                return createNewThread(appId, threadViewModel, model);
+                return createNewThread(appId, threadViewModel, null, model);
             }
         }
 

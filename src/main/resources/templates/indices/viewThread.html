@@ -33,18 +33,19 @@
 
         <div class="message">
             <div class="headers">
-                <div class="header"><span class="author_header" th:text="${threadViewModel.getSubmitter()}"></span>
-                </div>
+                <div class="header"><span class="author_header" th:text="${threadViewModel.getSubmitter()}"></span></div>
+                <div class="header"><span class="email_header" th:text="${threadViewModel.getEmail()}"></span></div>
                 <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
                 <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}"></span></div>
                 <div class="header"><span class="ip_header" th:text="${threadViewModel.getIpAddress()}"></span></div>
             </div>
             <br>
             <div class="message_text" th:utext="${threadViewModel.getBody()}"></div>
-            </FORM><br>
+            <br>
             <div class="buttons">
                 <form method="post" th:action="@{|/discussion.cgi?disc=${threadViewModel.getAppId()}|}"
-                      th:object="${threadViewModel}" enctype="multipart/form-data">
+                      th:object="${threadViewModel}" enctype="multipart/form-data" action="submit">
+
                     <input type="hidden" name="disc" th:value="${threadViewModel.getAppId()}"/>
                     <input type="hidden" name="parent" th:value="${threadViewModel.getParentId()}"/>
                     <input type="hidden" name="id" th:value="${threadViewModel.getId()}"/>
@@ -63,7 +64,7 @@
             <div style="clear:left;"></div>
         </div>
 
-        <div class="responses" th:utext="${subThreadsHtml}"/>
+        <div class="responses" th:utext="${subThreadsHtml}"></div>
 
         <div style="font-size:smaller; padding-top:6px;"><a
                 th:href="@{|http://disc.yourwebapps.com/disc-list-subscribe.cgi?id=${threadViewModel.getAppId()}|}">Click here to receive daily

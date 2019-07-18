@@ -32,7 +32,7 @@ div.message_preview { width:30em; }
     static prototyping placeholder
 </div>
 
-<form method="get" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}" enctype="multipart/form-data">
+<form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}" enctype="multipart/form-data">
     <input type="hidden" name="disc" th:value="${appId}"/>
     <div id="post_button" style="text-align:center; margin-top:1em;">
         <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>

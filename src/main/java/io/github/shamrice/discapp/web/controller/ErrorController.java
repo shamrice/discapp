@@ -21,10 +21,15 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         Exception exception = (Exception) request.getAttribute("javax.servlet.error.exception");
 
-        logger.error("Error: status code: " + statusCode + " : " + exception.getMessage(), exception);
+        String errorText = "";
+        if (exception != null) {
+            errorText = exception.getMessage();
+        }
+
+        logger.error("Error: status code: " + statusCode + " : " + errorText, exception);
 
         model.addAttribute("errorStatusCode", statusCode);
-        model.addAttribute("errorText", exception.getMessage());
+        model.addAttribute("errorText", errorText);
         return "error/error";
 
     }
