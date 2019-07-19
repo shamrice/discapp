@@ -50,6 +50,7 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.THREAD_BREAK_TEXT, " <hr /> ");
         configsToSet.put(ConfigurationProperty.ENTRY_BREAK_TEXT, " - ");
         configsToSet.put(ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, "50");
+        configsToSet.put(ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, "25");
         configsToSet.put(ConfigurationProperty.HEADER_TEXT, "");
         configsToSet.put(ConfigurationProperty.FOOTER_TEXT, "");
         configsToSet.put(ConfigurationProperty.FAVICON_URL, "/favicon.ico");
@@ -94,6 +95,23 @@ public class ConfigurationService {
 
         logger.info("Unable to find configuration property: " + configurationProperty.getPropName()
                 + " for appid: " + applicationId + ". Returning default value of: " + defaultValue);
+        return defaultValue;
+    }
+
+    public int getIntegerValue(long applicationId, ConfigurationProperty configurationProperty, int defaultValue) {
+        String foundStrVal = getStringValue(applicationId, configurationProperty, "");
+
+        if (foundStrVal != null && !foundStrVal.isEmpty()) {
+            try {
+                return Integer.parseInt(foundStrVal);
+            } catch (NumberFormatException ex) {
+                logger.error("Unable to parse found config value for " + configurationProperty.getPropName()
+                        + " : value: " + foundStrVal + " + for appId: " + applicationId, ex);
+            }
+        }
+
+        logger.info("Failed to find configuration value. Returning default value of: " + defaultValue
+                + " : for appId: " + applicationId);
         return defaultValue;
     }
 

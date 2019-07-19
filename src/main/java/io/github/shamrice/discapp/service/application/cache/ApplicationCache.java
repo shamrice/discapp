@@ -1,6 +1,5 @@
 package io.github.shamrice.discapp.service.application.cache;
 
-import io.github.shamrice.discapp.data.model.Prologue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

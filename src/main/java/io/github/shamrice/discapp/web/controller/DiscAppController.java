@@ -52,8 +52,9 @@ public class DiscAppController {
 
                 model.addAttribute("postMessageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
 
-                //TODO : limit should be pulled from database configuration
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 10);
+                //get threads
+                int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads);
                 List<String> threadTreeHtml = new ArrayList<>();
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 

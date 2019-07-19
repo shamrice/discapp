@@ -123,6 +123,9 @@ insert into configuration
 (application_id, name, value)
 values (46108, 'favicon.url', 'http://nukementerprises.puckdroppersplace.us/favicon.ico');
 
+insert into configuration
+(application_id, name, value)
+values (46108, 'page.index.thread.count.max', '25');
 
 
 

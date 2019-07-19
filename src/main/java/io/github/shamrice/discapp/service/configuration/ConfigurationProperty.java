@@ -22,6 +22,7 @@ public enum ConfigurationProperty {
     THREAD_BREAK_TEXT ("thread.break.text"),
     ENTRY_BREAK_TEXT ("thread.entry.break.text"),
     THREAD_DEPTH_ON_INDEX_PAGE ("page.index.thread.depth"),
+    MAX_THREADS_ON_INDEX_PAGE ("page.index.thread.count.max"),
     HEADER_TEXT ("page.header.text"),
     FOOTER_TEXT ("page.footer.text"),
     FAVICON_URL ("favicon.url");
