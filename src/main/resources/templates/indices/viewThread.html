@@ -54,21 +54,12 @@
                     <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
                            style="float:left;"/>
                 </form>
-                <!-- todo : fix url... or remove this functionality... -->
-                <form method="post"
-                      action="http://www.addthis.com/bookmark.php?url=http%3A%2F%2Fdisc.yourwebapps.com%2Fdiscussion.cgi%3Fdisc%3D46108%3Barticle%3D21012&amp;title=N.E.M.B.%20%20-%20123456789012345678901234567890123456789012345678901234567890&amp;pub=brunnock"
-                      enctype="multipart/form-data"><input type="submit" name="share"
-                                                           th:value="${shareButtonText}" class="button"
-                                                           id="share" style="float:left;"/></form>
             </div>
             <div style="clear:left;"></div>
         </div>
 
         <div class="responses" th:utext="${subThreadsHtml}"></div>
 
-        <div style="font-size:smaller; padding-top:6px;"><a
-                th:href="@{|http://disc.yourwebapps.com/disc-list-subscribe.cgi?id=${threadViewModel.getAppId()}|}">Click here to receive daily
-            updates</a></div>
     </div>
 
     <div th:utext="${footerText}"></div>
