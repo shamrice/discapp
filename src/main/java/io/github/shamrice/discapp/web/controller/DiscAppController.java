@@ -191,7 +191,10 @@ public class DiscAppController {
                 newThread.setSubject(subject);
                 newThread.setSubmitter(submitter);
                 newThread.setEmail(email);
-                newThread.setShowEmail(newThreadViewModel.isShowEmail());
+
+                //only use input from checkbox if there's an email address entered
+                newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
+
 
                 threadService.createNewThread(newThread, newThreadViewModel.getBody());
             }
