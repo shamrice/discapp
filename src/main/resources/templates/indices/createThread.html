@@ -59,7 +59,7 @@
 
             <div id="message_text_entry_box">
                 <div><span class="entries_header" th:text="${bodyLabel}">  (16 KB max)</span></div>
-                <div><textarea name="body" rows="12" cols="60" wrap="soft" th:utext="${body}"></textarea></div>
+                <div><textarea name="body" rows="12" cols="60" wrap="soft" th:utext="${body}" maxlength="16384"></textarea></div>
             </div>
 
             <input type="hidden" name="postcode" value="20zs7YlBa7nf."/>
