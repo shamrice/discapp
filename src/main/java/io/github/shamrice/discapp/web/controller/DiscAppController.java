@@ -103,11 +103,13 @@ public class DiscAppController {
             model.addAttribute("subject", newThreadViewModel.getSubject());
             model.addAttribute("email", newThreadViewModel.getEmail());
             model.addAttribute("body", newThreadViewModel.getBody());
+            model.addAttribute("showEmail", newThreadViewModel.isShowEmail());
 
             if (newThreadViewModel.getParentId() != null) {
                 try {
                     parentId = Long.parseLong(newThreadViewModel.getParentId());
                 } catch (NumberFormatException ex) {
+                    parentId = 0L;
                     logger.error("Unable to parse parent id from returned new thread model from preview page. appId: " + appId
                             + " : attempted parentId: " + newThreadViewModel.getParentId());
                 }
@@ -189,6 +191,7 @@ public class DiscAppController {
                 newThread.setSubject(subject);
                 newThread.setSubmitter(submitter);
                 newThread.setEmail(email);
+                newThread.setShowEmail(newThreadViewModel.isShowEmail());
 
                 threadService.createNewThread(newThread, newThreadViewModel.getBody());
             }
@@ -231,7 +234,13 @@ public class DiscAppController {
             threadViewModel.setParentId(currentThread.getParentId().toString());
             threadViewModel.setSubject(currentThread.getSubject());
             threadViewModel.setSubmitter(currentThread.getSubmitter());
-            threadViewModel.setEmail(currentThread.getEmail());
+            if (currentThread.getEmail() != null && !currentThread.getEmail().isEmpty()) {
+                threadViewModel.setEmail(currentThread.getEmail());
+                threadViewModel.setShowEmail(currentThread.getShowEmail());
+            } else {
+                //don't attempt to show a null or empty email regardless what was selected.
+                threadViewModel.setShowEmail(false);
+            }
 
             Application app = applicationService.get(appId);
             model.addAttribute("appName", app.getName());

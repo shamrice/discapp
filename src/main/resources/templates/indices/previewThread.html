@@ -31,14 +31,7 @@
 
     <div class="message_and_thread">
 
-        <!--form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"
-              enctype="multipart/form-data"-->
-
         <div class="message">
-
-            <!-- todo : this is not submitting the data from the view model to the controller on submit... -->
-
-
 
             <div class="headers">
                 <div class="header"><span class="author_header" name="submitter" th:text="${newThreadViewModel.getSubmitter()}"></span>
@@ -51,8 +44,6 @@
             <br>
             <div class="buttons">
 
-
-
                 <form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data" action="submit">
 
                     <input type="hidden" name="submitter" th:value="${newThreadViewModel.getSubmitter()}"/>
@@ -61,6 +52,7 @@
                     <input type="hidden" name="body" th:value="${newThreadViewModel.getBody()}"/>
                     <input type="hidden" name="parentId" th:value="${newThreadViewModel.getParentId()}"/>
                     <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
+                    <input type="hidden" name="showEmail" th:value="${newThreadViewModel.isShowEmail()}"/>
 
                     <input type="submit" name="editMessage" th:value="${editButtonText}" class="button" id="editMessage" style="float:left;" />
 
@@ -75,7 +67,7 @@
                     <input type="hidden" name="body" th:value="${newThreadViewModel.getBody()}"/>
                     <input type="hidden" name="parentId" th:value="${newThreadViewModel.getParentId()}"/>
                     <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
-
+                    <input type="hidden" name="showEmail" th:value="${newThreadViewModel.isShowEmail()}"/>
 
                     <input type="submit" name="submitNewThread" th:value="${postButtonText}" class="button" id="submitNewThread"
                            style="float:left;"/>

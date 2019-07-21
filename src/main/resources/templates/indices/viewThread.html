@@ -33,8 +33,16 @@
 
         <div class="message">
             <div class="headers">
-                <div class="header"><span class="author_header" th:text="${threadViewModel.getSubmitter()}"></span></div>
-                <div class="header"><span class="email_header" th:text="${threadViewModel.getEmail()}"></span></div>
+
+                <div th:if="${threadViewModel.isShowEmail()}" class="header">
+                    <span class="author_header">
+                        <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
+                    </span>
+                </div>
+                <div th:unless="${threadViewModel.isShowEmail()}" class="header">
+                    <span class="author_header" th:text="${threadViewModel.getSubmitter()}">
+                    </span>
+                </div>
                 <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
                 <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}"></span></div>
                 <div class="header"><span class="ip_header" th:text="${threadViewModel.getIpAddress()}"></span></div>

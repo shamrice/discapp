@@ -45,9 +45,10 @@
 
                 <tr>
                     <td class="entries_header" th:text="${emailLabel}"></td>
-                    <td><input type="text" name="email" size="30" maxlength="60" th:value="${email}"/> <label><input type="checkbox"
-                                                                                                 name="show_email"
-                                                                                                 value="on"/>Show email address?</label></td>
+                    <td>
+                        <input type="text" name="email" size="30" maxlength="60" th:value="${email}"/>
+                        <label><input type="checkbox" name="showEmail" th:checked="${showEmail}"/>Show email address?</label>
+                    </td>
                 </tr>
 
                 <tr>

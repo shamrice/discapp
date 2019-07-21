@@ -65,6 +65,7 @@ CREATE TABLE thread (
     ip_address varchar(64),
     subject varchar(65) NOT NULL,
     deleted bool NOT NULL default false,
+    show_email bool NOT NULL default false,
     parent_id int NOT NULL DEFAULT 0,
     create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),

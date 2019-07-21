@@ -20,6 +20,7 @@ public class Thread {
     private String email;
     private String ipAddress;
     private String subject;
+    private boolean showEmail;
     private Boolean deleted;
     private Long parentId;
     private Date createDt;
@@ -103,5 +104,13 @@ public class Thread {
 
     public void setModDt(Date modDt) {
         this.modDt = modDt;
+    }
+
+    public boolean getShowEmail() {
+        return showEmail;
+    }
+
+    public void setShowEmail(boolean showEmail) {
+        this.showEmail = showEmail;
     }
 }

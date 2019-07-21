@@ -12,6 +12,7 @@ public class NewThreadViewModel {
     private String submitNewThread;
     private String returnToApp;
     private String previewArticle;
+    private boolean showEmail;
 
     public String getAppId() {
         return appId;
@@ -91,5 +92,13 @@ public class NewThreadViewModel {
 
     public void setPreviewArticle(String previewArticle) {
         this.previewArticle = previewArticle;
+    }
+
+    public boolean isShowEmail() {
+        return showEmail;
+    }
+
+    public void setShowEmail(boolean showEmail) {
+        this.showEmail = showEmail;
     }
 }

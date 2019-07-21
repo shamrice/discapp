@@ -14,6 +14,7 @@ public class ThreadViewModel {
     private String modDt;
     private String returnToApp;
     private String postResponse;
+    private boolean showEmail;
 
     public String getId() {
         return id;
@@ -109,5 +110,13 @@ public class ThreadViewModel {
 
     public void setPostResponse(String postResponse) {
         this.postResponse = postResponse;
+    }
+
+    public boolean isShowEmail() {
+        return showEmail;
+    }
+
+    public void setShowEmail(boolean showEmail) {
+        this.showEmail = showEmail;
     }
 }
