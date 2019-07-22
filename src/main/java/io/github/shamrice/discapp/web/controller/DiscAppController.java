@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -156,8 +157,9 @@ public class DiscAppController {
 
     @PostMapping("/postThread")
     public ModelAndView postNewThread(@RequestParam(name = "disc") Long appId,
-                                @ModelAttribute NewThreadViewModel newThreadViewModel,
-                                Model model) {
+                                      @ModelAttribute NewThreadViewModel newThreadViewModel,
+                                      Model model,
+                                      HttpServletRequest request) {
         if (newThreadViewModel != null) {
 
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
@@ -191,6 +193,15 @@ public class DiscAppController {
                 newThread.setSubject(subject);
                 newThread.setSubmitter(submitter);
                 newThread.setEmail(email);
+
+                if (request != null) {
+                    //check forwarded header for proxy users, if not found, use ip provided.
+                    String ipAddress = request.getHeader("X-FORWARDED-FOR");
+                    if (ipAddress == null || ipAddress.isEmpty()) {
+                        ipAddress = request.getRemoteAddr();
+                    }
+                    newThread.setIpAddress(ipAddress);
+                }
 
                 //only use input from checkbox if there's an email address entered
                 newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
