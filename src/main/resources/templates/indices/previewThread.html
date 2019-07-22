@@ -40,7 +40,7 @@
                 <div class="header"><span class="subject_header" name="subject" th:text="${newThreadViewModel.getSubject()}"></span></div>
             </div>
             <br>
-            <div class="message_text" name="body" th:utext="${newThreadViewModel.getBody()}"></div>
+            <div class="message_text" name="formatted_body" th:utext="${newThreadViewModel.getHtmlBody()}"></div>
             <br>
             <div class="buttons">
 

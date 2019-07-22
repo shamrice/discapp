@@ -13,6 +13,7 @@ public class NewThreadViewModel {
     private String returnToApp;
     private String previewArticle;
     private boolean showEmail;
+    private String htmlBody;
 
     public String getAppId() {
         return appId;
@@ -100,5 +101,13 @@ public class NewThreadViewModel {
 
     public void setShowEmail(boolean showEmail) {
         this.showEmail = showEmail;
+    }
+
+    public String getHtmlBody() {
+        return htmlBody;
+    }
+
+    public void setHtmlBody(String htmlBody) {
+        this.htmlBody = htmlBody;
     }
 }
