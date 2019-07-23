@@ -63,6 +63,9 @@
             </div>
 
             <input type="hidden" name="postcode" value="20zs7YlBa7nf."/>
+            <input type="hidden" name="parentThreadSubmitter" th:value="${parentThreadSubmitter}"/>
+            <input type="hidden" name="parentThreadSubject" th:value="${parentThreadSubject}"/>
+            <input type="hidden" name="parentThreadBody" th:value="${parentThreadBody}"/>
 
             <div class="buttons">
                 <input type="submit" name="previewArticle" th:value="${previewButtonText}" class="button"
@@ -73,6 +76,15 @@
                 <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
                        style/>
             </div>
+        </div>
+
+        <div class="message_and_thread">
+            <div class="headers">
+                <div th:text="${parentThreadSubmitter}"></div>
+                <div th:text="${parentThreadSubject}"></div>
+            </div>
+            <br />
+            <div class="message_text" th:utext="${parentThreadBody}"></div>
         </div>
 
         <div th:utext="${footerText}"></div>

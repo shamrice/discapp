@@ -94,6 +94,9 @@ public class DiscAppController {
         if (threadViewModel != null && threadViewModel.getId() != null) {
             try {
                 parentId = Long.parseLong(threadViewModel.getId());
+                model.addAttribute("parentThreadSubmitter", threadViewModel.getSubmitter());
+                model.addAttribute("parentThreadSubject", threadViewModel.getSubject());
+                model.addAttribute("parentThreadBody", threadViewModel.getBody());
             } catch (NumberFormatException ex) {
                 logger.error("Unable to parse parent id from view thread model. appId: " + appId
                         + " : attempted parentId: " + threadViewModel.getId());
@@ -107,6 +110,9 @@ public class DiscAppController {
             model.addAttribute("email", newThreadViewModel.getEmail());
             model.addAttribute("body", newThreadViewModel.getBody());
             model.addAttribute("showEmail", newThreadViewModel.isShowEmail());
+            model.addAttribute("parentThreadSubmitter", newThreadViewModel.getParentThreadSubmitter());
+            model.addAttribute("parentThreadSubject", newThreadViewModel.getParentThreadSubject());
+            model.addAttribute("parentThreadBody", newThreadViewModel.getParentThreadBody());
 
             if (newThreadViewModel.getParentId() != null) {
                 try {
@@ -167,6 +173,7 @@ public class DiscAppController {
     @PostMapping("/postThread")
     public ModelAndView postNewThread(@RequestParam(name = "disc") Long appId,
                                       @ModelAttribute NewThreadViewModel newThreadViewModel,
+                                      ThreadViewModel threadViewModel,
                                       Model model,
                                       HttpServletRequest request) {
         if (newThreadViewModel != null) {

@@ -55,8 +55,12 @@
                       th:object="${threadViewModel}" enctype="multipart/form-data" action="submit">
 
                     <input type="hidden" name="disc" th:value="${threadViewModel.getAppId()}"/>
-                    <input type="hidden" name="parent" th:value="${threadViewModel.getParentId()}"/>
+                    <input type="hidden" name="parentId" th:value="${threadViewModel.getParentId()}"/>
                     <input type="hidden" name="id" th:value="${threadViewModel.getId()}"/>
+                    <input type="hidden" name="subject" th:value="${threadViewModel.getSubject()}"/>
+                    <input type="hidden" name="submitter" th:value="${threadViewModel.getSubmitter()}"/>
+                    <input type="hidden" name="body" th:value="${threadViewModel.getBody()}"/>
+
                     <input type="submit" name="postResponse" th:value="${replyButtonText}" class="button" id="postResponse"
                            style="float:left;"/>
                     <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"

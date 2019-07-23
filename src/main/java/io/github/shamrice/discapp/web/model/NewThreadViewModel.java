@@ -14,6 +14,9 @@ public class NewThreadViewModel {
     private String previewArticle;
     private boolean showEmail;
     private String htmlBody;
+    private String parentThreadSubmitter;
+    private String parentThreadSubject;
+    private String parentThreadBody;
 
     public String getAppId() {
         return appId;
@@ -109,5 +112,29 @@ public class NewThreadViewModel {
 
     public void setHtmlBody(String htmlBody) {
         this.htmlBody = htmlBody;
+    }
+
+    public String getParentThreadSubmitter() {
+        return parentThreadSubmitter;
+    }
+
+    public void setParentThreadSubmitter(String parentThreadSubmitter) {
+        this.parentThreadSubmitter = parentThreadSubmitter;
+    }
+
+    public String getParentThreadSubject() {
+        return parentThreadSubject;
+    }
+
+    public void setParentThreadSubject(String parentThreadSubject) {
+        this.parentThreadSubject = parentThreadSubject;
+    }
+
+    public String getParentThreadBody() {
+        return parentThreadBody;
+    }
+
+    public void setParentThreadBody(String parentThreadBody) {
+        this.parentThreadBody = parentThreadBody;
     }
 }
