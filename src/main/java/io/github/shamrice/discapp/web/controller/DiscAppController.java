@@ -8,7 +8,6 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
-import io.github.shamrice.discapp.web.model.SearchViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -63,7 +61,8 @@ public class DiscAppController {
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
                 for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>", entryBreakString, false) + "</ul>");
+                    threadTreeHtml.add(getAppViewThreadHtml(threadTreeNode, "<ul>", entryBreakString,
+                            false, -1) + "</ul>");
                 }
 
                 model.addAttribute("threadNodeList", threadTreeHtml);
@@ -253,12 +252,28 @@ public class DiscAppController {
 
         Thread currentThread = threadService.getThread(threadId);
         if (currentThread != null) {
-            ThreadTreeNode subThreadNode = threadService.getFullThreadTree(currentThread.getId());
+
+            //default reply thread values
+            long grandparentId = currentThread.getParentId();
+            boolean skipCurrent = false;
+            String currentHtml = "<ul>";
+
+            //if viewing top level thread, replies are formatted slightly differently.
+            if (grandparentId == 0) {
+                grandparentId = currentThread.getId();
+                skipCurrent = true;
+                currentHtml = "";
+            }
+
+            ThreadTreeNode subThreadNode = threadService.getFullThreadTree(grandparentId);
 
             List<String> subThreadsHtml = new ArrayList<>();
+
             if (subThreadNode != null) {
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
-                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, "", entryBreakString, true) + "</ul>");
+
+                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
+                        skipCurrent, currentThread.getId()) + "</ul>");
             }
 
             String threadBody = threadService.getThreadBodyText(threadId);
@@ -407,21 +422,26 @@ public class DiscAppController {
      * @param currentHtml Current html string. This is the the string that is built and returned
      * @return built HTML list structure for thread
      */
-    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString, boolean skipCurrentNode) {
-
+    private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
+                                        boolean skipCurrentNode, long currentlyViewedId) {
 
         if (!skipCurrentNode) {
             currentHtml += " <li>"
                     + " <div class=\"first_message_div\">"
                     + " <div class=\"first_message_header\">"
-                    + "    <span class=\"first_message_span\">"
-                    + "        <a class=\"article_link\""
-                    + " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
-                    + "&article=" + currentNode.getCurrent().getId() + "\""
-                    + " name=\"" + currentNode.getCurrent().getId() + "\">"
-                    + currentNode.getCurrent().getSubject()
-                    + "        </a>  "
-                    + "        " + entryBreakString
+                    + "    <span class=\"first_message_span\">";
+
+            if (currentNode.getCurrent().getId() != currentlyViewedId) {
+                currentHtml += "        <a class=\"article_link\""
+                        + " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
+                        + "&article=" + currentNode.getCurrent().getId() + "\""
+                        + " name=\"" + currentNode.getCurrent().getId() + "\">"
+                        + currentNode.getCurrent().getSubject()
+                        + "        </a>  ";
+            } else {
+                currentHtml += currentNode.getCurrent().getSubject();
+            }
+            currentHtml += "        " + entryBreakString
                     + "        <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> "
                     + "        <span class=\"date_cell\"> " + currentNode.getCurrent().getCreateDt() + "</span> "
                     + "    </span> "
@@ -431,7 +451,7 @@ public class DiscAppController {
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false);
+            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false, currentlyViewedId);
             currentHtml += "</ul>";
         }
 

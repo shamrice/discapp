@@ -33,7 +33,7 @@
 
         <div th:utext="${searchResults}"></div>
 
-        <form method="post" th:action="@{|~/search?disc=${appId}|}" th:object="${searchViewModel}" enctype="multipart/form-data">
+        <form method="post" th:action="@{|~/search?disc=${appId}|}" enctype="multipart/form-data">
             <input type="hidden" name="appId" th:value="${appId}"  />
             <input type="text" name="searchTerm" th:value="${searchTerm}" />
 
