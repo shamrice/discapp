@@ -8,6 +8,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
+import io.github.shamrice.discapp.web.model.SearchViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -320,11 +321,93 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
+    @PostMapping("/search")
+    public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
+                                      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+                                      @RequestParam(name = "returnToApp", required = false) String returnToApp,
+                                      Model model) {
+
+        //TODO : search view model is not getting set correctly.... so search fails.
+
+        /*
+        if (searchViewModel == null
+                || (searchViewModel.getSearchText() != null && searchViewModel.getSearchText().isEmpty())
+                || (searchViewModel.getReturnToApp() != null && !searchViewModel.getReturnToApp().isEmpty()
+                || searchTerm == null || searchTerm.isEmpty())
+        ) {
+
+         */
+        if (searchTerm == null || searchTerm.isEmpty() || returnToApp != null) {
+            logger.info("Empty search term entered for appId: " + appId + " : returning to app view page.");
+            return new ModelAndView("redirect:/indices/" + appId);
+        }
+
+        try {
+            Application app = applicationService.get(appId);
+
+            if (app != null) {
+
+                model.addAttribute("appName", app.getName());
+                model.addAttribute("appId", app.getId());
+
+                //get search results
+                List<Thread> foundThreads = threadService.searchThreads(appId, searchTerm);
+                String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+                model.addAttribute("searchResults", getSearchThreadHtml(foundThreads, entryBreakString));
+                model.addAttribute("searchTerm", searchTerm);
+
+                model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
+
+                return new ModelAndView("indices/search", "model", model);
+
+            } else {
+                model.addAttribute("error", "Disc app with id " + appId + " returned null.");
+                logger.info("Disc app with application id of " + appId + " does not exist. Returning null.");
+            }
+        } catch (Exception ex) {
+            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
+        }
+
+        return new ModelAndView("redirect:/indices/" + appId);
+    }
+
     @GetMapping("/styles/disc_{applicationId}.css")
     public String getAppStyleSheet(@PathVariable(name = "applicationId") String appId) {
         return "styles/disc_" + appId + ".css";
     }
 
+
+    private String getSearchThreadHtml(List<Thread> threads, String entryBreakString) {
+        String currentHtml = "<ul>";
+
+        for (Thread thread : threads) {
+
+            currentHtml += " <li>"
+                    + " <div class=\"first_message_div\">"
+                    + " <div class=\"first_message_header\">"
+                    + "    <span class=\"first_message_span\">"
+                    + "        <a class=\"article_link\""
+                    + " href=\"/discussion.cgi?disc=" + thread.getApplicationId()
+                    + "&article=" + thread.getId() + "\""
+                    + " name=\"" + thread.getId() + "\">"
+                    + thread.getSubject()
+                    + "        </a>  "
+                    + "        " + entryBreakString
+                    + "        <span class=\"author_cell\"> " + thread.getSubmitter() + ",</span> "
+                    + "        <span class=\"date_cell\"> " + thread.getCreateDt() + "</span> "
+                    + "    </span> "
+                    + "</div> "
+                    + "</div>"
+                    + "</li>";
+
+        }
+
+        currentHtml += "</ul>";
+        return currentHtml;
+    }
 
     /**
      * Recursive function that builds HTML for each thread in the app.

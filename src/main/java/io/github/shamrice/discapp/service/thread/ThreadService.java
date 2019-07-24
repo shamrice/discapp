@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ThreadService {
@@ -51,6 +52,21 @@ public class ThreadService {
 
     public List<Thread> getThreads(Long applicationId) {
         return threadRepository.findByApplicationId(applicationId);
+    }
+
+    public List<Thread> searchThreads(Long applicationId, String searchText) {
+        List<Thread> foundThreads = threadRepository.findByApplicationIdAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
+
+        List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
+
+        for (ThreadBody threadBody : resultsInBody) {
+            Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
+            if (foundThread.isPresent()) {
+                foundThreads.add(foundThread.get());
+            }
+        }
+
+        return foundThreads;
     }
 
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int numThreads) {
