@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App Not Found</title>
+</head>
+<body>
+
+<div>
+    The disc app you requested does not exist. Please check the index number and try again.
+</div>
+
+<div th:text="${errorText}"></div>
+
+<div>
+    <br />
+    <form>
+        <input onclick="history.back()" type="button" value="Click here to return to previous page">
+    </form>
+</div>
+
+</body>
+</html>

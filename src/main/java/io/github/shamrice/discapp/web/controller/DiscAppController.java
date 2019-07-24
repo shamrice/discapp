@@ -71,6 +71,8 @@ public class DiscAppController {
                 model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
                 model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
 
+                return new ModelAndView("indices/appView");
+
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");
                 logger.info("Disc app with application id of " + appId + " does not exist. Returning null.");
@@ -80,7 +82,7 @@ public class DiscAppController {
             logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
-        return new ModelAndView("indices/appView");
+        return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
     }
 
     @PostMapping("/createThread")
@@ -327,16 +329,6 @@ public class DiscAppController {
                                       @RequestParam(name = "returnToApp", required = false) String returnToApp,
                                       Model model) {
 
-        //TODO : search view model is not getting set correctly.... so search fails.
-
-        /*
-        if (searchViewModel == null
-                || (searchViewModel.getSearchText() != null && searchViewModel.getSearchText().isEmpty())
-                || (searchViewModel.getReturnToApp() != null && !searchViewModel.getReturnToApp().isEmpty()
-                || searchTerm == null || searchTerm.isEmpty())
-        ) {
-
-         */
         if (searchTerm == null || searchTerm.isEmpty() || returnToApp != null) {
             logger.info("Empty search term entered for appId: " + appId + " : returning to app view page.");
             return new ModelAndView("redirect:/indices/" + appId);

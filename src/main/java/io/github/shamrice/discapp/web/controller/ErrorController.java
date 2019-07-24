@@ -34,6 +34,12 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
     }
 
+    @RequestMapping(value = "/error/notfound")
+    public String getNotFoundView(String errorText, Model model) {
+        model.addAttribute("errorText", errorText);
+        return "error/notFound";
+    }
+
     public String getErrorPath() {
         return "/error";
     }
