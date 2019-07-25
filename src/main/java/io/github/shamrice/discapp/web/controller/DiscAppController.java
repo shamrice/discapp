@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -280,7 +281,6 @@ public class DiscAppController {
 
             ThreadViewModel threadViewModel = new ThreadViewModel();
             threadViewModel.setBody(threadBody);
-            threadViewModel.setCreateDt(currentThread.getCreateDt().toString());
             threadViewModel.setModDt(currentThread.getModDt().toString());
             threadViewModel.setAppId(appId.toString());
             threadViewModel.setId(threadId.toString());
@@ -295,6 +295,8 @@ public class DiscAppController {
                 //don't attempt to show a null or empty email regardless what was selected.
                 threadViewModel.setShowEmail(false);
             }
+            //adjust date in view to current timezone and proper formatting
+            threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, currentThread.getCreateDt(), true));
 
             Application app = applicationService.get(appId);
             model.addAttribute("appName", app.getName());
@@ -443,7 +445,12 @@ public class DiscAppController {
             }
             currentHtml += "        " + entryBreakString
                     + "        <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> "
-                    + "        <span class=\"date_cell\"> " + currentNode.getCurrent().getCreateDt() + "</span> "
+                    + "        <span class=\"date_cell\"> "
+                    + getAdjustedDateStringForConfiguredTimeZone(
+                            currentNode.getCurrent().getApplicationId(),
+                            currentNode.getCurrent().getCreateDt(),
+                            false)
+                    + "</span> "
                     + "    </span> "
                     + "</div> "
                     + "</div>";
@@ -480,5 +487,23 @@ public class DiscAppController {
 
         matcher.appendTail(stringBuffer);
         return stringBuffer.toString();
+    }
+
+    private String getAdjustedDateStringForConfiguredTimeZone(long appId, Date date, boolean includeComma) {
+
+        String dateFormatPattern = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
+        String timeZoneLocation = configurationService.getStringValue(appId, ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
+
+        DateFormat dateFormat = new SimpleDateFormat(dateFormatPattern);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(timeZoneLocation));
+
+        //am and pm should be lowercase.
+        String formattedString = dateFormat.format(date).replace("AM", "am").replace("PM", "pm");
+
+        if (!includeComma) {
+            formattedString = formattedString.replace(",", "");
+        }
+
+        return formattedString;
     }
 }

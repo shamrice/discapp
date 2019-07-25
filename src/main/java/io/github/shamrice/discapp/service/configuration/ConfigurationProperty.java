@@ -25,7 +25,9 @@ public enum ConfigurationProperty {
     MAX_THREADS_ON_INDEX_PAGE ("page.index.thread.count.max"),
     HEADER_TEXT ("page.header.text"),
     FOOTER_TEXT ("page.footer.text"),
-    FAVICON_URL ("favicon.url");
+    FAVICON_URL ("favicon.url"),
+    TIMEZONE_LOCATION ("timezone.location"),
+    DATE_FORMAT_PATTERN ("date.format.pattern");
 
     private final String propName;
 

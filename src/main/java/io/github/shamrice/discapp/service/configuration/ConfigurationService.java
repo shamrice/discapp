@@ -54,6 +54,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.HEADER_TEXT, "");
         configsToSet.put(ConfigurationProperty.FOOTER_TEXT, "");
         configsToSet.put(ConfigurationProperty.FAVICON_URL, "/favicon.ico");
+        configsToSet.put(ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
+        configsToSet.put(ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
 
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
