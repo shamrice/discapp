@@ -47,7 +47,9 @@ div.message_preview { width:30em; }
     static prototyping placeholder
 </div>
 
-<a th:href="@{|~/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
+<!-- TODO : this next two lines should be removed -->
+<div th:text="${username}"></div>
+<a th:href="@{|~/admin/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
 
 <div th:utext="${footerText}"></div>
 </body>

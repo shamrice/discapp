@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
@@ -12,6 +13,9 @@ import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +45,16 @@ public class DiscAppController {
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
+
+        //TODO : remove debug only
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+
+            if (auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
+                model.addAttribute("username", principal.getUsername());
+            }
+        }
 
         try {
             Application app = applicationService.get(appId);

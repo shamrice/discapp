@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.repository.DiscappUserRepository;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,10 @@ public class DiscAppMaintenanceController {
     @Autowired
     private ApplicationService applicationService;
 
-    @GetMapping("/disc-maint.cgi")
+    @Autowired
+    private DiscappUserRepository discappUserRepository;
+
+    @GetMapping("/admin/disc-maint.cgi")
     public String getMaintenanceView(@RequestParam( name = "id") String appId, Model model) {
 
         try {

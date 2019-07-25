@@ -29,9 +29,17 @@ CREATE TABLE owner (
     PRIMARY KEY (id)
 );
 
-
-commit;
-
+CREATE TABLE discapp_user (
+    id serial NOT NULL,
+    username varchar(20) UNIQUE NOT NULL,
+    password varchar(255) NOT NULL,
+    owner_id int,
+    enabled bool NOT NULL DEFAULT TRUE,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (owner_id) REFERENCES owner(id)
+);
 
 CREATE TABLE application (
     id serial NOT NULL,
@@ -42,9 +50,6 @@ CREATE TABLE application (
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES owner(id)
 );
-
-commit;
-
 
 CREATE TABLE configuration (
     id serial NOT NULL,
