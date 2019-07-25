@@ -7,6 +7,7 @@ CREATE DATABASE IF NOT EXISTS discapp;
 
 USE discapp;
 
+DROP TABLE IF EXISTS discapp_user;
 DROP TABLE IF EXISTS prologue;
 DROP TABLE IF EXISTS epilogue;
 DROP TABLE IF EXISTS thread_body;
@@ -33,6 +34,8 @@ CREATE TABLE discapp_user (
     id serial NOT NULL,
     username varchar(20) UNIQUE NOT NULL,
     password varchar(255) NOT NULL,
+    email varchar(255) UNIQUE NOT NULL,
+    show_email bool NOT NULL DEFAULT FALSE,
     owner_id int,
     enabled bool NOT NULL DEFAULT TRUE,
     is_admin bool NOT NULL DEFAULT FALSE,
@@ -73,6 +76,7 @@ CREATE TABLE thread (
     deleted bool NOT NULL default false,
     show_email bool NOT NULL default false,
     parent_id int NOT NULL DEFAULT 0,
+    discapp_user_id int DEFAULT NULL,
     create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),

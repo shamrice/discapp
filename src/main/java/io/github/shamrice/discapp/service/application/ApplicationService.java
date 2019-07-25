@@ -145,6 +145,7 @@ public class ApplicationService {
                 List<Application> ownedApps = applicationRepository.findByOwnerId(owner.getId());
                 for (Application application : ownedApps) {
                     if (application.getId() != null && application.getId() == appId) {
+                        logger.info("User: " + username + " is owner of appId: " + appId + " :: returning true.");
                         return true;
                     }
                 }

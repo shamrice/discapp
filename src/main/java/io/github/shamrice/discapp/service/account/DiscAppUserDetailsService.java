@@ -33,6 +33,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return new DiscAppUserPrincipal(user);
     }
 
+    public DiscAppUser getByUsername(String username) {
+        return discappUserRepository.findByUsername(username);
+    }
+
     public Long getOwnerIdForUsername(String username) {
         DiscAppUser user = discappUserRepository.findByUsername(username);
         if (user != null) {

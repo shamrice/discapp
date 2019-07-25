@@ -4,6 +4,7 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.web.util.AccountHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class DiscAppMaintenanceController {
         try {
             //long id = Long.parseLong(appId);
             Application app = applicationService.get(appId);
-            String username = getLoggedInUserName();
+            String username = new AccountHelper().getLoggedInUserName();
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -46,7 +47,8 @@ public class DiscAppMaintenanceController {
 
         return "admin/disc-maint";
     }
-
+/*
+    //todo : move to utilities class as it will be used by multiple controllers.
     private String getLoggedInUserName() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
@@ -55,7 +57,8 @@ public class DiscAppMaintenanceController {
                 return principal.getUsername();
             }
         }
-
         return null;
     }
+
+ */
 }

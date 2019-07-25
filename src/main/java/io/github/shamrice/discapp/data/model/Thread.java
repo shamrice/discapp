@@ -23,6 +23,7 @@ public class Thread {
     private boolean showEmail;
     private Boolean deleted;
     private Long parentId;
+    private Long discappUserId;
     private Date createDt;
     private Date modDt;
 
@@ -112,5 +113,13 @@ public class Thread {
 
     public void setShowEmail(boolean showEmail) {
         this.showEmail = showEmail;
+    }
+
+    public Long getDiscappUserId() {
+        return discappUserId;
+    }
+
+    public void setDiscappUserId(Long discappUserId) {
+        this.discappUserId = discappUserId;
     }
 }

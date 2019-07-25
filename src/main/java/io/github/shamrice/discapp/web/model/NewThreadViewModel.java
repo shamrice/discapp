@@ -13,6 +13,7 @@ public class NewThreadViewModel {
     private String returnToApp;
     private String previewArticle;
     private boolean showEmail;
+    private boolean isLoggedIn;
     private String htmlBody;
     private String parentThreadSubmitter;
     private String parentThreadSubject;
@@ -136,5 +137,13 @@ public class NewThreadViewModel {
 
     public void setParentThreadBody(String parentThreadBody) {
         this.parentThreadBody = parentThreadBody;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
     }
 }

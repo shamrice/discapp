@@ -1,7 +1,9 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
@@ -10,6 +12,7 @@ import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
+import io.github.shamrice.discapp.web.util.AccountHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,9 @@ public class DiscAppController {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
@@ -107,6 +113,7 @@ public class DiscAppController {
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
+
         //if coming from view page
         if (threadViewModel != null && threadViewModel.getId() != null) {
             try {
@@ -140,6 +147,16 @@ public class DiscAppController {
                             + " : attempted parentId: " + newThreadViewModel.getParentId());
                 }
             }
+        }
+
+        //pre-fill form with user info if they are logged in
+        AccountHelper accountHelper = new AccountHelper();
+        if (accountHelper.isLoggedIn()) {
+            model.addAttribute("isLoggedIn", "true");
+            DiscAppUser user = discAppUserDetailsService.getByUsername(accountHelper.getLoggedInUserName());
+            model.addAttribute("submitter", user.getUsername());
+            model.addAttribute("email", user.getEmail());
+            model.addAttribute("showEmail", user.getShowEmail());
         }
 
         model.addAttribute("appName", app.getName());
@@ -217,6 +234,9 @@ public class DiscAppController {
                 String submitter = newThreadViewModel.getSubmitter().replaceAll("<[^>]*>", " ");
                 String email = newThreadViewModel.getEmail().replaceAll("<[^>]*>", " ");
 
+
+
+
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
                 newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
@@ -224,9 +244,27 @@ public class DiscAppController {
                 newThread.setCreateDt(new Date());
                 newThread.setModDt(new Date());
                 newThread.setSubject(subject);
-                newThread.setSubmitter(submitter);
-                newThread.setEmail(email);
 
+
+                //set values for logged in user, if not logged in... use form data.
+                AccountHelper accountHelper = new AccountHelper();
+                String username = accountHelper.getLoggedInUserName();
+                DiscAppUser discAppUser = discAppUserDetailsService.getByUsername(username);
+                if (discAppUser != null) {
+                    newThread.setDiscappUserId(discAppUser.getId());
+                    newThread.setSubmitter(discAppUser.getUsername());
+                    newThread.setEmail(discAppUser.getEmail());
+                    newThread.setShowEmail(discAppUser.getShowEmail());
+
+                } else {
+                    newThread.setSubmitter(submitter);
+                    newThread.setEmail(email);
+
+                    //only use input from checkbox if there's an email address entered
+                    newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
+                }
+
+                //set ip address
                 if (request != null) {
                     //check forwarded header for proxy users, if not found, use ip provided.
                     String ipAddress = request.getHeader("X-FORWARDED-FOR");
@@ -235,9 +273,6 @@ public class DiscAppController {
                     }
                     newThread.setIpAddress(ipAddress);
                 }
-
-                //only use input from checkbox if there's an email address entered
-                newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
 
                 String body = newThreadViewModel.getBody();
                 if (body != null && !body.isEmpty()) {

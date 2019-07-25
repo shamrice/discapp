@@ -21,6 +21,7 @@
 
             /* ]]> */-->
 
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 </head>
@@ -30,36 +31,59 @@
     <div th:utext="${headerText}"></div>
 
     <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"
-          enctype="multipart/form-data"  action="submit">
+          enctype="multipart/form-data" action="submit">
 
         <input type="hidden" name="appId" th:value="${appId}"/>
         <input type="hidden" name="parentId" th:value="${parentThreadId}"/>
+
         <div class="post_message_form">
             <table>
-                <tr>
-                    <td class="entries_header" th:text="${submitterLabel}"></td>
-                    <td><input type="text" name="submitter" size="30" maxlength="50" th:value="${submitter}"/> <a
-                            href="https://yourwebapps.com/Accounts/login.cgi?return_url=http%3A%2F%2Fdisc.yourwebapps.com%2Fdiscussion.cgi%3Fdisc%3D46108%3Barticle%3D0;return_label=N.E.M.B.%20">login</a>
-                    </td>
-                </tr>
+                <div th:if="${isLoggedIn}">
+                    <tr>
 
-                <tr>
-                    <td class="entries_header" th:text="${emailLabel}"></td>
-                    <td>
-                        <input type="text" name="email" size="30" maxlength="60" th:value="${email}"/>
-                        <label><input type="checkbox" name="showEmail" th:checked="${showEmail}"/>Show email address?</label>
-                    </td>
-                </tr>
+                        <td colspan="2">
+                            <label id="personal_account" th:text="${submitter}"></label>
+                            <a style="font-size:smaller;" href="/logout">Change Settings</a>
+
+                            <input type="hidden" name="showEmail" th:value="${showEmail}"/>
+                            <input type="hidden" name="email" size="30" maxlength="60" th:value="${email}"/>
+                            <input type="hidden" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
+                        </td>
+
+                    </tr>
+
+                </div>
+                <div th:unless="${isLoggedIn}">
+                    <tr>
+                        <td class="entries_header" th:text="${submitterLabel}"></td>
+                        <td><input type="text" name="submitter" size="30" maxlength="50" th:value="${submitter}"/> <a
+                                href="/login">login</a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="entries_header" th:text="${emailLabel}"></td>
+                        <td>
+                            <input type="text" name="email" size="30" maxlength="60" th:value="${email}"/>
+                            <label>
+                                <input type="checkbox" name="showEmail" th:checked="${showEmail}"/>
+                                Show email address?
+                            </label>
+                        </td>
+                    </tr>
+                </div>
 
                 <tr>
                     <td class="entries_header" th:text="${subjectLabel}"></td>
                     <td><input type="text" name="subject" size="30" maxlength="60" th:value="${subject}"/></td>
                 </tr>
+
             </table>
 
             <div id="message_text_entry_box">
                 <div><span class="entries_header" th:text="${bodyLabel}">  (16 KB max)</span></div>
-                <div><textarea name="body" rows="12" cols="60" wrap="soft" th:utext="${body}" maxlength="16384"></textarea></div>
+                <div><textarea name="body" rows="12" cols="60" wrap="soft" th:utext="${body}"
+                               maxlength="16384"></textarea></div>
             </div>
 
             <input type="hidden" name="postcode" value="20zs7YlBa7nf."/>
@@ -83,7 +107,7 @@
                 <div th:text="${parentThreadSubmitter}"></div>
                 <div th:text="${parentThreadSubject}"></div>
             </div>
-            <br />
+            <br/>
             <div class="message_text" th:utext="${parentThreadBody}"></div>
         </div>
 

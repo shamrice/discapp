@@ -16,6 +16,9 @@ public class DiscAppUser {
     @Column(nullable = false)
     private String password;
 
+    private String email;
+    private Boolean showEmail;
+
     private Long ownerId;
 
     private Boolean enabled;
@@ -87,5 +90,21 @@ public class DiscAppUser {
 
     public void setAdmin(Boolean admin) {
         isAdmin = admin;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Boolean getShowEmail() {
+        return showEmail;
+    }
+
+    public void setShowEmail(Boolean showEmail) {
+        this.showEmail = showEmail;
     }
 }
