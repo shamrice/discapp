@@ -1,17 +1,16 @@
 package io.github.shamrice.discapp.service.account.principal;
 
-import io.github.shamrice.discapp.data.model.DiscappUser;
+import io.github.shamrice.discapp.data.model.DiscAppUser;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 public class DiscAppUserPrincipal implements UserDetails {
 
-    private DiscappUser user;
+    private DiscAppUser user;
 
-    public DiscAppUserPrincipal(DiscappUser user) {
+    public DiscAppUserPrincipal(DiscAppUser user) {
         this.user = user;
     }
 

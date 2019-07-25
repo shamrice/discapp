@@ -1,7 +1,7 @@
 package io.github.shamrice.discapp.service.account;
 
-import io.github.shamrice.discapp.data.model.DiscappUser;
-import io.github.shamrice.discapp.data.repository.DiscappUserRepository;
+import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,15 +14,16 @@ import org.springframework.stereotype.Service;
 public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private DiscappUserRepository discappUserRepository;
+    private DiscAppUserRepository discappUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        DiscappUser user = discappUserRepository.findByUsername(username);
+        DiscAppUser user = discappUserRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
 
+        //principal is returned back and verified by "spring magic"
         return new DiscAppUserPrincipal(user);
     }
 }

@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "discapp_user")
-public class DiscappUser {
+public class DiscAppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
