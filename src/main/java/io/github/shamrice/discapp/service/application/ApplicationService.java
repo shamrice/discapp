@@ -2,10 +2,14 @@ package io.github.shamrice.discapp.service.application;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.Epilogue;
+import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.model.Prologue;
 import io.github.shamrice.discapp.data.repository.ApplicationRepository;
 import io.github.shamrice.discapp.data.repository.EpilogueRepository;
+import io.github.shamrice.discapp.data.repository.OwnerRepository;
 import io.github.shamrice.discapp.data.repository.PrologueRepository;
+import io.github.shamrice.discapp.service.account.AccountService;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ApplicationService {
@@ -28,6 +33,13 @@ public class ApplicationService {
 
     @Autowired
     private EpilogueRepository epilogueRepository;
+
+    @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
+
+    @Autowired
+    private AccountService accountService;
+
 
     private ApplicationCache<Prologue> prologueCache = new ApplicationCache<>();
     private ApplicationCache<Epilogue> epilogueCache = new ApplicationCache<>();
@@ -122,5 +134,27 @@ public class ApplicationService {
 
     public Application get(Long id) {
         return applicationRepository.getOne(id);
+    }
+
+    public boolean isOwnerOfApp(long appId, String username) {
+        Long ownerIdForUsername = discAppUserDetailsService.getOwnerIdForUsername(username);
+
+        if (ownerIdForUsername != null && ownerIdForUsername > 0) {
+            Owner owner = accountService.getOwnerById(ownerIdForUsername);
+            if (owner != null) {
+                List<Application> ownedApps = applicationRepository.findByOwnerId(owner.getId());
+                for (Application application : ownedApps) {
+                    if (application.getId() != null && application.getId() == appId) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            logger.info("User: " + username + " is not an owner of any applications. Returning false.");
+        }
+
+        logger.info("User: " + username + " does not own application id: " + appId + " :: returning false.");
+        return false;
+
     }
 }

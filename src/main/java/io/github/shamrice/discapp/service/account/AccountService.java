@@ -1,10 +1,13 @@
 package io.github.shamrice.discapp.service.account;
 
+import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.repository.OwnerRepository;
+import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,6 +21,9 @@ public class AccountService {
 
     @Autowired
     private OwnerRepository ownerRepository;
+
+    @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
 
     public List<Owner> listOwners() {
         return ownerRepository.findAll();
@@ -45,4 +51,6 @@ public class AccountService {
         logger.info("No owner record found for owner id: " + ownerId);
         return null;
     }
+
+
 }

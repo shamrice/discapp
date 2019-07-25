@@ -35,6 +35,7 @@ CREATE TABLE discapp_user (
     password varchar(255) NOT NULL,
     owner_id int,
     enabled bool NOT NULL DEFAULT TRUE,
+    is_admin bool NOT NULL DEFAULT FALSE,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

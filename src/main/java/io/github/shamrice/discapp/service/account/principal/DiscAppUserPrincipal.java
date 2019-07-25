@@ -2,11 +2,17 @@ package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DiscAppUserPrincipal implements UserDetails {
+
+    private static final String ROLE_PEFIX = "ROLE_";
 
     private DiscAppUser user;
 
@@ -16,7 +22,12 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
+        if (user.getAdmin()) {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PEFIX + "ADMIN"));
+        }
+
+        return grantedAuthorityList;
     }
 
     @Override
@@ -47,5 +58,13 @@ public class DiscAppUserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.getEnabled();
+    }
+
+    public Long getOwnerId() {
+        return user.getOwnerId();
+    }
+
+    public Boolean isAdmin() {
+        return user.getAdmin();
     }
 }

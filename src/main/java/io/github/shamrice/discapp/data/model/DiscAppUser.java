@@ -20,6 +20,8 @@ public class DiscAppUser {
 
     private Boolean enabled;
 
+    private Boolean isAdmin;
+
     private Date createDt;
     private Date modDt;
 
@@ -77,5 +79,13 @@ public class DiscAppUser {
 
     public void setModDt(Date modDt) {
         this.modDt = modDt;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
     }
 }
