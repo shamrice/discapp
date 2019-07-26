@@ -6,8 +6,8 @@
     <title th:text="${appName}"></title>
     <meta name="robots" content="index" />
 
-    <!-- TODO: favicon from config for all views! -->
-    <link th:href="${favicon}" rel="shortcut icon" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="${faviconUrl}" type="image/x-icon">
+    <link rel="icon" th:href="${faviconUrl}" type="image/x-icon">
     <link rel="stylesheet" type="text/css" th:href="@{|~/styles/disc_${appId}.css|}"/>
     <style type="text/css">
          <!--/* <![CDATA[ */
