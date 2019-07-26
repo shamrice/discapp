@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+</head>
+<body>
+
+<!-- TODO : to be styled correctly in later ticket -->
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+</style>
+
+<center>
+    <h1 id="banner">Logout of Disc App Service</h1>
+    <form name="f" th:action="@{/logout}" method="post">
+        <table>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Click Here To Log Out">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <a th:href="${redirectUrl}" th:text="@{|Return to ${appName}|}"></a>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+
+</center>
+
+</body>
+</html>

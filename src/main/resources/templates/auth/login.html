@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+</head>
+<body>
+
+<!-- TODO : to be styled correctly in later ticket -->
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+</style>
+
+<center>
+    <h1 id="banner">Login to Disc App Service</h1>
+    <form name="f" th:action="@{/login}" method="post">
+        <table>
+
+            <div th:if="${param.error}" class="alert alert-error">
+                Invalid Username and Password
+            </div>
+
+            <div th:if="${param.logout}" class="alert alert-success">
+                You have been logged out.
+            </div>
+
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" id="username" name="username"/></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="password" name="password"></td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Login">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <a th:href="${redirectUrl}" th:text="@{|Return to ${appName}|}"></a>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</center>
+
+</body>
+</html>

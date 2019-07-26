@@ -105,6 +105,12 @@ public class DiscAppController {
         return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
     }
 
+    @GetMapping("/createThread")
+    public ModelAndView getCreateNewThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
+        logger.debug("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
+        return new ModelAndView("redirect:/indices/" + appId);
+    }
+
     @PostMapping("/createThread")
     public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
                                         @ModelAttribute ThreadViewModel threadViewModel,
