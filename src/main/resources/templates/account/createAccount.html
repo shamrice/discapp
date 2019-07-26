@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Create Account</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- TODO : to be styled correctly in later ticket -->
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+</style>
+
+<center>
+    <h1 id="banner">Login to Disc App Service</h1>
+    <form name="f" th:action="@{/account/create}" method="post" th:object="${newAccountViewModel}">
+        <table>
+
+            <div th:if="${newAccountViewModel.getErrorMessage()}" class="alert alert-error" th:text="${newAccountViewModel.getErrorMessage()}">
+            </div>
+
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" id="username" name="username" th:value="${newAccountViewModel.getUsername()}"/></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="password" name="password" th:value="${newAccountViewModel.getPassword()}"></td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" id="email" name="email" th:value="${newAccountViewModel.getEmail()}"></td>
+            </tr>
+            <tr>
+                <td>Show Email:</td>
+                <td>
+                    <input type="checkbox" name="showEmail" th:checked="${showEmail}"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Create Account">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <a th:href="${redirectUrl}" th:text="@{|Return to ${redirectUrl}|}"></a>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</center>
+
+</body>
+</html>

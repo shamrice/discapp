@@ -3,12 +3,16 @@ package io.github.shamrice.discapp.service.account;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,6 +22,8 @@ import java.util.List;
 
 @Service
 public class DiscAppUserDetailsService implements UserDetailsService {
+
+    Logger logger = LoggerFactory.getLogger(DiscAppUserDetailsService.class);
 
     @Autowired
     private DiscAppUserRepository discappUserRepository;
@@ -43,5 +49,28 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             return user.getOwnerId();
         }
         else return null;
+    }
+
+    public boolean saveDiscAppUser(DiscAppUser user) {
+
+        //TODO : add logging
+        if (user != null) {
+
+            try {
+                String plainPassword = user.getPassword();
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(15);
+                String encodedPassword = passwordEncoder.encode(plainPassword);
+                user.setPassword(encodedPassword);
+
+                DiscAppUser createdUser = discappUserRepository.save(user);
+                if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
+                    return true;
+                }
+            } catch (Exception ex) {
+                logger.error("Failed to save disc app user: " + ex.getMessage(), ex);
+            }
+        }
+
+        return false;
     }
 }

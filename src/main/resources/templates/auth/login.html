@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Login Page</title>
+    <title>Disc App - Login Page</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
@@ -48,6 +48,11 @@
                 <td colspan="2" style="text-align:center;">
                     <input name="submit" type="submit" value="Login">&nbsp;
                     <input name="reset" type="reset">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <a th:href="@{|/account/create?redirect=${redirectUrl}|}">Click Here to Create A New Account</a>
                 </td>
             </tr>
             <tr>

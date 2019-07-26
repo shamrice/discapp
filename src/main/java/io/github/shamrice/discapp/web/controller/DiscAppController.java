@@ -243,9 +243,6 @@ public class DiscAppController {
                 String submitter = newThreadViewModel.getSubmitter().replaceAll("<[^>]*>", " ");
                 String email = newThreadViewModel.getEmail().replaceAll("<[^>]*>", " ");
 
-
-
-
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
                 newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
