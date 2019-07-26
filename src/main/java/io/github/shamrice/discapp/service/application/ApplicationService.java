@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 public class ApplicationService {
 
-    private static Logger logger = LoggerFactory.getLogger(ApplicationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 
     @Autowired
     private ApplicationRepository applicationRepository;

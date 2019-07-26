@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AccountHelper {
 
-    private final static String ANONYMOUS_USER = "anonymousUser";
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     public boolean isLoggedIn() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

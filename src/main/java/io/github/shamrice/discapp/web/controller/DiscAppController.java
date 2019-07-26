@@ -16,7 +16,6 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -27,7 +26,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +33,7 @@ import java.util.regex.Pattern;
 @Controller
 public class DiscAppController {
 
-    private static Logger logger = LoggerFactory.getLogger(DiscAppController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscAppController.class);
 
     @Autowired
     private ApplicationService applicationService;

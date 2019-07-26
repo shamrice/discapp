@@ -1,6 +1,8 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.web.util.AccountHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class AuthenticationController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @GetMapping("/login")
     public ModelAndView login(@RequestParam(required = false) String redirect,

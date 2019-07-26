@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ConfigurationCache {
 
-    private static Logger logger = LoggerFactory.getLogger(ConfigurationCache.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationCache.class);
 
     private Map<Long, Map<ConfigurationProperty, Configuration>> configurationCacheMap = new ConcurrentHashMap<>();
     private Map<Long, Date> configIdLastRefreshDateList = new ConcurrentHashMap<>();

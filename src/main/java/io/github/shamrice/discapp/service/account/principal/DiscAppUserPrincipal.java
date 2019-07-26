@@ -7,12 +7,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DiscAppUserPrincipal implements UserDetails {
 
-    private static final String ROLE_PEFIX = "ROLE_";
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private DiscAppUser user;
 
@@ -24,7 +23,7 @@ public class DiscAppUserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         if (user.getAdmin()) {
-            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PEFIX + "ADMIN"));
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + "ADMIN"));
         }
 
         return grantedAuthorityList;

@@ -16,7 +16,7 @@ import java.util.*;
 @Service
 public class ThreadService {
 
-    private static Logger logger = LoggerFactory.getLogger(ThreadService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ThreadService.class);
 
     @Autowired
     private ThreadRepository threadRepository;

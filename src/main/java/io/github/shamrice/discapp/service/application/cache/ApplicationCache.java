@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ApplicationCache<T> {
 
-    private static Logger logger = LoggerFactory.getLogger(ApplicationCache.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationCache.class);
 
     private Map<Long, T> cacheMap = new ConcurrentHashMap<>();
     private Map<Long, Date> refreshDateList = new ConcurrentHashMap<>();
