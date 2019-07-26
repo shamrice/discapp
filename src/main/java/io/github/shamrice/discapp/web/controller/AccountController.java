@@ -30,6 +30,10 @@ public class AccountController {
                                          @RequestParam(required = false) String redirect,
                                          ModelMap modelMap) {
 
+        if (redirect == null || redirect.isEmpty()) {
+            redirect = "/login";
+        }
+
         modelMap.addAttribute("redirectUrl", redirect);
         return new ModelAndView("account/createAccount", "newAccountViewModel", newAccountViewModel);
     }
