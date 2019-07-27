@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Modify Account</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- TODO : to be styled correctly in later ticket -->
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+
+
+</style>
+
+<center>
+    <div>
+        <h1 id="account_banner">Modify Account</h1>
+        <form name="f" th:action="@{/account/modify/account}" method="post" th:object="${accountViewModel}">
+            <table>
+
+                <div th:if="${accountViewModel.getErrorMessage()}" class="alert alert-error"
+                     th:text="${accountViewModel.getErrorMessage()}">
+                </div>
+
+                <tr>
+                    <td>Username:</td>
+                    <td th:text="${accountViewModel.getUsername()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Member Since:</td>
+                    <td th:text="${accountViewModel.getCreateDt()}"></td>
+                </tr>
+                <tr>
+                    <td>Last Modified:</td>
+                    <td th:text="${accountViewModel.getModDt()}"></td>
+                </tr>
+                <tr>
+                    <td>Email Address:</td>
+                    <td><input type="email" id="email" name="email" th:value="${accountViewModel.getEmail()}"/></td>
+                </tr>
+
+                <tr>
+                    <td>Show Email:</td>
+                    <td>
+                        <input type="checkbox" name="showEmail" th:checked="${accountViewModel.isShowEmail()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password:</td>
+                    <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+    <div th:if="${accountViewModel.isOwner()}">
+
+        <h1 id="application_banner">Modify Application Information</h1>
+        <form name="app_form" th:action="@{/account/modify/application}" method="post" th:object="${accountViewModel}">
+            <table>
+                <tr>
+                    <td>
+                        Application Index:
+                    </td>
+                    <td th:text="${accountViewModel.getApplicationId()}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Application Name:
+                    </td>
+                    <td>
+                        <input type="text" id="applicationName" name="applicationName"
+                               th:value="${accountViewModel.getApplicationName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input type="hidden" name="applicationId" id="applicationId" th:value="${accountViewModel.getApplicationId()}" />
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+
+        <h1 id="owner_banner">Modify Application Owner Information</h1>
+        <form name="app_form" th:action="@{/account/modify/owner}" method="post" th:object="${accountViewModel}">
+            <table>
+                <tr>
+                    <td>
+                        First Name:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerFirstName" name="ownerFirstName"
+                               th:value="${accountViewModel.getOwnerFirstName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Last Name:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerLastName" name="ownerLastName"
+                               th:value="${accountViewModel.getOwnerLastName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Email:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerEmail" name="ownerEmail"
+                               th:value="${accountViewModel.getOwnerEmail()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Phone Number:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerPhone" name="ownerPhone"
+                               th:value="${accountViewModel.getOwnerPhone()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div th:unless="${accountViewModel.isOwner()}">
+
+        <h1 id="create_application_banner">Add Disc App To Account</h1>
+        <form name="app_form" th:action="@{/account/add/application}" method="post" th:object="${accountViewModel}">
+            <table>
+                <tr>
+                    <td>
+                        Application Name:
+                    </td>
+                    <td>
+                        <input type="text" id="applicationName" name="applicationName"
+                               th:value="${accountViewModel.getApplicationName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        First Name:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerFirstName" name="ownerFirstName"
+                               th:value="${accountViewModel.getOwnerFirstName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Last Name:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerLastName" name="ownerLastName"
+                               th:value="${accountViewModel.getOwnerLastName()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Email:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerEmail" name="ownerEmail"
+                               th:value="${accountViewModel.getOwnerEmail()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Phone Number:
+                    </td>
+                    <td>
+                        <input type="text" id="ownerPhone" name="ownerPhone"
+                               th:value="${accountViewModel.getOwnerPhone()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password:</td>
+                    <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+    <table>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <a th:href="${redirectUrl}" th:text="@{|Return to ${redirectUrl}|}"></a>
+            </td>
+        </tr>
+    </table>
+
+</center>
+
+</body>
+</html>

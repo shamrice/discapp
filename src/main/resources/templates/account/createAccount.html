@@ -22,23 +22,23 @@
 
 <center>
     <h1 id="banner">Login to Disc App Service</h1>
-    <form name="f" th:action="@{/account/create}" method="post" th:object="${newAccountViewModel}">
+    <form name="f" th:action="@{/account/create}" method="post" th:object="${accountViewModel}">
         <table>
 
-            <div th:if="${newAccountViewModel.getErrorMessage()}" class="alert alert-error" th:text="${newAccountViewModel.getErrorMessage()}">
+            <div th:if="${accountViewModel.getErrorMessage()}" class="alert alert-error" th:text="${accountViewModel.getErrorMessage()}">
             </div>
 
             <tr>
                 <td>Username:</td>
-                <td><input type="text" id="username" name="username" th:value="${newAccountViewModel.getUsername()}"/></td>
+                <td><input type="text" id="username" name="username" th:value="${accountViewModel.getUsername()}"/></td>
             </tr>
             <tr>
                 <td>Password:</td>
-                <td><input type="password" id="password" name="password" th:value="${newAccountViewModel.getPassword()}"></td>
+                <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"></td>
             </tr>
             <tr>
                 <td>Email:</td>
-                <td><input type="email" id="email" name="email" th:value="${newAccountViewModel.getEmail()}"></td>
+                <td><input type="email" id="email" name="email" th:value="${accountViewModel.getEmail()}"></td>
             </tr>
             <tr>
                 <td>Show Email:</td>

@@ -44,6 +44,11 @@ public class ApplicationService {
     private ApplicationCache<Prologue> prologueCache = new ApplicationCache<>();
     private ApplicationCache<Epilogue> epilogueCache = new ApplicationCache<>();
 
+
+    public Application save(Application application) {
+        return applicationRepository.save(application);
+    }
+
     public Application saveApplication(Application application, Prologue prologue, Epilogue epilogue) {
 
         Application savedApplication;
@@ -157,5 +162,9 @@ public class ApplicationService {
         logger.info("User: " + username + " does not own application id: " + appId + " :: returning false.");
         return false;
 
+    }
+
+    public List<Application> getByOwnerId(long ownerId) {
+        return applicationRepository.findByOwnerId(ownerId);
     }
 }

@@ -49,10 +49,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         if (user != null) {
 
             try {
-                String plainPassword = user.getPassword();
-                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(15);
-                String encodedPassword = passwordEncoder.encode(plainPassword);
-                user.setPassword(encodedPassword);
+                if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                    String plainPassword = user.getPassword();
+                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(15);
+                    String encodedPassword = passwordEncoder.encode(plainPassword);
+                    user.setPassword(encodedPassword);
+                }
 
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
