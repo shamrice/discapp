@@ -320,6 +320,7 @@ public class AccountController {
                         newOwner.setLastName(accountViewModel.getOwnerLastName());
                         newOwner.setEmail(accountViewModel.getOwnerEmail());
                         newOwner.setPhone(accountViewModel.getOwnerPhone());
+                        newOwner.setEnabled(true);
                         newOwner.setCreateDt(new Date());
                         newOwner.setModDt(new Date());
 
