@@ -27,10 +27,24 @@ public class AuthenticationController {
 
         //get redirect from referer header if not in query param.
         if (redirect == null || redirect.isEmpty()) {
-            redirect = request.getHeader("Referer");
-            if (redirect == null || redirect.isEmpty()) {
-                //if still empty... default to modify account.
-                redirect = "/account/modify";
+
+            //attempt from cookie first...
+            boolean foundInCookie = false;
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equalsIgnoreCase("redirect_url")) {
+                    redirect = cookie.getValue();
+                    foundInCookie = true;
+                    break;
+                }
+            }
+
+            //follow up attempt by referrer and then default.
+            if (!foundInCookie) {
+                redirect = request.getHeader("Referer");
+                if (redirect == null || redirect.isEmpty()) {
+                    //if still empty... default to modify account.
+                    redirect = "/account/modify";
+                }
             }
         }
 
