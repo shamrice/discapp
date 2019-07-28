@@ -393,7 +393,7 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @PostMapping("/search")
+    @PostMapping("/indices/search")
     public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
                                       @RequestParam(name = "searchTerm", required = false) String searchTerm,
                                       @RequestParam(name = "returnToApp", required = false) String returnToApp,

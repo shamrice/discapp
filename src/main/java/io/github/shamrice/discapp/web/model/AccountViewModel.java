@@ -25,6 +25,7 @@ public class AccountViewModel {
     private Long applicationId;
     private String applicationName;
 
+    private String redirect;
 
     public String getUsername() {
         return username;
@@ -172,5 +173,13 @@ public class AccountViewModel {
 
     public void setInfoMessage(String infoMessage) {
         this.infoMessage = infoMessage;
+    }
+
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
     }
 }

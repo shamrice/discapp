@@ -100,9 +100,19 @@ public class AccountController {
                                          @RequestParam(required = false) String redirect,
                                          ModelMap modelMap) {
 
+        //todo : not too happy with this flow for the redirect....
+        if (accountViewModel != null && accountViewModel.getRedirect() != null && !accountViewModel.getRedirect().isEmpty()) {
+            redirect = accountViewModel.getRedirect();
+        }
+
         if (redirect == null || redirect.isEmpty()) {
             redirect = "/logout";
         }
+
+        if (accountViewModel != null && (accountViewModel.getRedirect() == null || accountViewModel.getRedirect().isEmpty())) {
+            accountViewModel.setRedirect(redirect);
+        }
+
         modelMap.addAttribute("redirectUrl", redirect);
 
         AccountHelper accountHelper = new AccountHelper();
@@ -154,6 +164,8 @@ public class AccountController {
 
         if (accountViewModel != null) {
 
+            accountViewModel.setRedirect(redirect);
+
             if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
                     && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
                     && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()) {
@@ -196,6 +208,8 @@ public class AccountController {
                                               ModelMap modelMap) {
 
         if (accountViewModel != null) {
+
+            accountViewModel.setRedirect(redirect);
 
             if (accountViewModel.getApplicationName() != null && !accountViewModel.getApplicationName().isEmpty()) {
 
@@ -241,7 +255,10 @@ public class AccountController {
     public ModelAndView postOwnerModify(@ModelAttribute AccountViewModel accountViewModel,
                                         @RequestParam(required = false) String redirect,
                                         ModelMap modelMap) {
+
         if (accountViewModel != null) {
+
+            accountViewModel.setRedirect(redirect);
 
             AccountHelper accountHelper = new AccountHelper();
             String username = accountHelper.getLoggedInUserName();
@@ -283,6 +300,9 @@ public class AccountController {
                                            ModelMap modelMap) {
 
         if (accountViewModel != null) {
+
+            accountViewModel.setRedirect(redirect);
+
             if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
                     && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
                     && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()) {

@@ -20,13 +20,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
+
+        //TODO : see https://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/html5/#csrf-include-csrf-token-ajax
+        //TODO : _csrf token is not getting passed in the search function. One option is to include it, one to switch
+        //TODO : search page to a GET mapping. Currently csrf is disabled and POST mappings are allowed
+
         httpSecurity
+                .csrf()
+                    .disable()
                 .authorizeRequests()
+                    .antMatchers("/indices/**").permitAll()
+                    .antMatchers("/styles/**").permitAll()
+                    .antMatchers("/*").permitAll()
                     .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                     .antMatchers("/account/modify").authenticated()
                     .antMatchers("/account/modify/**").authenticated()
                     .antMatchers("/account/add/**").authenticated()
-                    .antMatchers("/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()
@@ -39,6 +48,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessHandler(logoutSuccessHandler())
                     .permitAll();
+
+
 
     }
 

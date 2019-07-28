@@ -25,7 +25,7 @@
 <center>
     <div>
         <h1 id="account_banner">Modify Account</h1>
-        <form name="f" th:action="@{/account/modify/account}" method="post" th:object="${accountViewModel}">
+        <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
             <table>
 
                 <div th:if="${accountViewModel.getErrorMessage()}" class="alert alert-error"
@@ -34,7 +34,7 @@
 
                 <tr>
                     <td>Username:</td>
-                    <td th:text="${accountViewModel.getUsername()}"/>
+                    <td th:text="${accountViewModel.getUsername()}">
                     </td>
                 </tr>
                 <tr>
@@ -81,7 +81,7 @@
     <div th:if="${accountViewModel.isOwner()}">
 
         <h1 id="application_banner">Modify Application Information</h1>
-        <form name="app_form" th:action="@{/account/modify/application}" method="post" th:object="${accountViewModel}">
+        <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
                     <td>
@@ -111,7 +111,7 @@
 
 
         <h1 id="owner_banner">Modify Application Owner Information</h1>
-        <form name="app_form" th:action="@{/account/modify/owner}" method="post" th:object="${accountViewModel}">
+        <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
                     <td>
@@ -162,7 +162,7 @@
     <div th:unless="${accountViewModel.isOwner()}">
 
         <h1 id="create_application_banner">Add Disc App To Account</h1>
-        <form name="app_form" th:action="@{/account/add/application}" method="post" th:object="${accountViewModel}">
+        <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
                     <td>

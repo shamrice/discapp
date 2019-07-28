@@ -44,18 +44,5 @@ public class DiscAppMaintenanceController {
 
         return "admin/disc-maint";
     }
-/*
-    //todo : move to utilities class as it will be used by multiple controllers.
-    private String getLoggedInUserName() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            if (auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
-                return principal.getUsername();
-            }
-        }
-        return null;
-    }
 
- */
 }

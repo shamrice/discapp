@@ -45,7 +45,7 @@
 
                         <td colspan="2">
                             <label id="personal_account" th:text="${submitter}"></label>
-                            <a style="font-size:smaller;" th:href="@{|/logout?redirect=/indices/${appId}&appName=${appName}|}">Change Settings</a>
+                            <a style="font-size:smaller;" th:href="@{|/account/modify?redirect=/indices/${appId}&appName=${appName}|}">Change Settings</a>
 
                             <input type="hidden" name="showEmail" th:value="${showEmail}"/>
                             <input type="hidden" name="email" size="30" maxlength="60" th:value="${email}"/>
