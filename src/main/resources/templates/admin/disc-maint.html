@@ -6,8 +6,326 @@
 </head>
 <body>
 
-    Disc app maintenance page for id
-    <p th:text="${appId}"/>
+<!-- TODO : to be styled correctly in later ticket -->
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+
+</style>
+
+<center>
+
+    <div th:if="${maintenanceViewModel.getInfoMessage()}" class="alert alert-error"
+         th:text="${maintenanceViewModel.getInfoMessage()}">
+    </div>
+
+    <div th:if="${maintenanceViewModel.getApplicationId()}">
+        <h1 id="account_banner">Modify Disc App</h1>
+        <form name="f" th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
+              th:object="${maintenanceViewModel}">
+            <table>
+
+                <tr>
+                    <td>Disc App Id:</td>
+                    <td th:text="${maintenanceViewModel.getApplicationId()}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Created:</td>
+                    <td th:text="${maintenanceViewModel.getApplicationCreateDt()}"></td>
+                </tr>
+                <tr>
+                    <td>Last Modified:</td>
+                    <td th:text="${maintenanceViewModel.getApplicationModDt()}"></td>
+                </tr>
+                <tr>
+                    <td>Disc App Name:</td>
+                    <td><input type="text" id="applicationName" name="applicationName"
+                               th:value="${maintenanceViewModel.getApplicationName()}"/></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+    <div th:if="${maintenanceViewModel.getApplicationId()}">
+        <h1 id="prologue_epilogue_account_banner">Prologue and Epilogue Configuration </h1>
+        <form name="f" th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
+              th:object="${maintenanceViewModel}">
+            <table>
+                <tr>
+                    <td>Prologue Text:</td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea name="prologueText" rows="24" cols="120" wrap="soft"
+                                  th:utext="${maintenanceViewModel.getPrologueText()}" maxlength="16384"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Prologue Last Modified:
+                        <label th:text="${maintenanceViewModel.getPrologueModDt()}"></label>
+                </tr>
+                <tr>
+                    <td>
+                        <hr />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Epilogue Text:</td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea name="epilogueText" rows="24" cols="120" wrap="soft"
+                                  th:utext="${maintenanceViewModel.getEpilogueText()}" maxlength="16384"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Epilogue Last Modified:
+                        <label th:text="${maintenanceViewModel.getEpilogueModDt()}"></label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+    <!--
+    <form name="f" th:action="@{|/admin/modify?redirect=${maintenanceViewModel.getRedirect()}|}" method="post" th:object="${maintenanceViewModel}">
+        <table>
+
+            <div th:if="${maintenanceViewModel.getErrorMessage()}" class="alert alert-error"
+                 th:text="${maintenanceViewModel.getErrorMessage()}">
+            </div>
+
+            <tr>
+                <td>Disc App Id:</td>
+                <td th:text="${maintenanceViewModel.getApplicationId()}">
+                </td>
+            </tr>
+            <tr>
+                <td>Created:</td>
+                <td th:text="${maintenanceViewModel.getCreateDt()}"></td>
+            </tr>
+            <tr>
+                <td>Last Modified:</td>
+                <td th:text="${maintenanceViewModel.getModDt()}"></td>
+            </tr>
+            <tr>
+                <td>Disc App Name:</td>
+                <td><input type="text" id="applicationName" name="applicationName" th:value="${maintenanceViewModel.getApplicationName()}"/></td>
+            </tr>
+
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
+            </tr>
+            <tr>
+                <td>Confirm Password:</td>
+                <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+
+<div th:if="${accountViewModel.isOwner()}">
+
+    <h1 id="application_banner">Modify Application Information</h1>
+    <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <table>
+            <tr>
+                <td>
+                    Application Index:
+                </td>
+                <td th:text="${accountViewModel.getApplicationId()}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Application Name:
+                </td>
+                <td>
+                    <input type="text" id="applicationName" name="applicationName"
+                           th:value="${accountViewModel.getApplicationName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input type="hidden" name="applicationId" id="applicationId" th:value="${accountViewModel.getApplicationId()}" />
+                    <input name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+
+    <h1 id="owner_banner">Modify Application Owner Information</h1>
+    <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <table>
+            <tr>
+                <td>
+                    First Name:
+                </td>
+                <td>
+                    <input type="text" id="ownerFirstName" name="ownerFirstName"
+                           th:value="${accountViewModel.getOwnerFirstName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Last Name:
+                </td>
+                <td>
+                    <input type="text" id="ownerLastName" name="ownerLastName"
+                           th:value="${accountViewModel.getOwnerLastName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Email:
+                </td>
+                <td>
+                    <input type="text" id="ownerEmail" name="ownerEmail"
+                           th:value="${accountViewModel.getOwnerEmail()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Phone Number:
+                </td>
+                <td>
+                    <input type="text" id="ownerPhone" name="ownerPhone"
+                           th:value="${accountViewModel.getOwnerPhone()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div th:unless="${accountViewModel.isOwner()}">
+
+    <h1 id="create_application_banner">Add Disc App To Account</h1>
+    <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <table>
+            <tr>
+                <td>
+                    Application Name:
+                </td>
+                <td>
+                    <input type="text" id="applicationName" name="applicationName"
+                           th:value="${accountViewModel.getApplicationName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    First Name:
+                </td>
+                <td>
+                    <input type="text" id="ownerFirstName" name="ownerFirstName"
+                           th:value="${accountViewModel.getOwnerFirstName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Last Name:
+                </td>
+                <td>
+                    <input type="text" id="ownerLastName" name="ownerLastName"
+                           th:value="${accountViewModel.getOwnerLastName()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Email:
+                </td>
+                <td>
+                    <input type="text" id="ownerEmail" name="ownerEmail"
+                           th:value="${accountViewModel.getOwnerEmail()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Phone Number:
+                </td>
+                <td>
+                    <input type="text" id="ownerPhone" name="ownerPhone"
+                           th:value="${accountViewModel.getOwnerPhone()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
+            </tr>
+            <tr>
+                <td>Confirm Password:</td>
+                <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+-->
+
+    <table>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <a th:href="${maintenanceViewModel.getRedirect()}"
+                   th:text="@{|Return to ${maintenanceViewModel.getRedirect()}|}"></a>
+            </td>
+        </tr>
+    </table>
+
+</center>
 
 </body>
 </html>

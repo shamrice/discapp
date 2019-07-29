@@ -167,4 +167,89 @@ public class ApplicationService {
     public List<Application> getByOwnerId(long ownerId) {
         return applicationRepository.findByOwnerId(ownerId);
     }
+
+    public Prologue getPrologue(long applicationId, boolean useCache) {
+
+        if (useCache) {
+            Prologue cachedPrologue = prologueCache.getFromCache(applicationId);
+            if (cachedPrologue != null && cachedPrologue.getText() != null) {
+                logger.info("Found prologue in cache for application id: " + applicationId);
+                return cachedPrologue;
+            }
+        }
+
+        Prologue prologue = prologueRepository.findOneByApplicationId(applicationId);
+        if (prologue != null) {
+            logger.info("Found prologue  in database for application id: " + applicationId);
+            prologueCache.updateCache(applicationId, prologue);
+            return prologue;
+        }
+        logger.info("No prologue set yet for account id " + applicationId + ". Returning null.");
+        return null;
+    }
+
+    public Epilogue getEpilogue(long applicationId, boolean useCache) {
+
+        if (useCache) {
+            Epilogue cachedEpilogue = epilogueCache.getFromCache(applicationId);
+            if (cachedEpilogue != null && cachedEpilogue.getText() != null) {
+                logger.info("Found epilogue in cache for application id: " + applicationId);
+                return cachedEpilogue;
+            }
+        }
+
+        Epilogue epilogue = epilogueRepository.findOneByApplicationId(applicationId);
+        if (epilogue != null) {
+            logger.info("Found epilogue  in database for application id: " + applicationId);
+            epilogueCache.updateCache(applicationId, epilogue);
+            return epilogue;
+        }
+        logger.info("No epilogue set yet for account id " + applicationId + ". Returning null.");
+        return null;
+    }
+
+    public Prologue savePrologue(Prologue prologue) {
+
+        Prologue savedPrologue = null;
+
+        if (prologue != null && prologue.getApplicationId() != null) {
+
+            if (prologue.getCreateDt() == null) {
+                prologue.setCreateDt(new Date());
+            }
+            if (prologue.getModDt() == null) {
+                prologue.setModDt(new Date());
+            }
+
+            savedPrologue = prologueRepository.save(prologue);
+            if (savedPrologue != null) {
+                logger.info("Saved epilogue for appId: " + prologue.getApplicationId());
+                prologueCache.updateCache(prologue.getApplicationId(), prologue);
+            }
+        }
+        return savedPrologue;
+    }
+
+    public Epilogue saveEpilogue(Epilogue epilogue) {
+
+        Epilogue savedEpilogue = null;
+
+        if (epilogue != null && epilogue.getApplicationId() != null) {
+
+            if (epilogue.getCreateDt() == null) {
+                epilogue.setCreateDt(new Date());
+            }
+            if (epilogue.getModDt() == null) {
+                epilogue.setModDt(new Date());
+            }
+
+            savedEpilogue = epilogueRepository.save(epilogue);
+            if (savedEpilogue != null) {
+                logger.info("Saved epilogue for appId: " + epilogue.getApplicationId());
+                epilogueCache.updateCache(epilogue.getApplicationId(), epilogue);
+            }
+        }
+        return savedEpilogue;
+    }
+
 }
