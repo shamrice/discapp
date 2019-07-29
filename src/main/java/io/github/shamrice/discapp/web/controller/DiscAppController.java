@@ -442,19 +442,6 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    /**
-    @GetMapping("/styles/disc_{applicationId}.css")
-    public String getAppStyleSheet(@PathVariable(name = "applicationId") String appId) {
-        return "styles/disc_" + appId + ".css";
-    }
-
-    @GetMapping("/styles/{style_name}")
-    public String getNamedAppStyleStheet(@PathVariable(name = "style_name") String styleSheetName) {
-        return "/styles/" + styleSheetName;
-    }
-    */
-
-
     private String getSearchThreadHtml(List<Thread> threads, String entryBreakString) {
         String currentHtml = "<ul>";
 
