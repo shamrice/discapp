@@ -1,0 +1,181 @@
+BODY {	padding-top: 3%;
+	font-family: Helvetica; }
+
+div#body {
+   max-width:50em;
+   margin:auto; }
+
+INPUT { background-color: white;
+        border:         1px solid black;
+	font-family: Helvetica;
+	font-size: 100%; }
+
+textarea { width:90% }
+
+INPUT:HOVER { background-color: #CFF; }
+
+UL {	list-style-position: outside;
+	list-style-type:  none;
+	padding:0;
+	margin:0;
+	margin-left:2em; }
+
+li.nested_list {display:inline;}
+
+A:HOVER {	background-color:#EFF;  }
+
+DIV.responses A:HOVER {	background-color:#FFF;}
+
+#entries_table {
+	margin-top: 5px;
+	width: 100%; }
+
+TH.entries_header { padding: 5px;
+	border: 1px black solid;
+	font-family: Helvetica; }
+
+TD.entries_header {	text-align: right; }
+
+TR.entry_row {	background-color: #8FF; }
+
+tr.entry_row td { padding-top:2px; padding-bottom:3px; }
+
+TD.link_cell {	padding-left:1em; padding-right:1em;
+		text-align: left;}
+
+.author_cell {	background-color: #8FF;
+	font-size: 80%;
+	padding-left: 2px;
+	margin-left: 3px;
+	margin-right: 3px; }
+
+TD.author_cell {text-align: center;}
+
+.date_cell {	font-size: 80%;}
+
+TD.date_cell {	font-size: 80%;
+	padding-left: 2em;
+	padding-right: 1em; }
+
+
+DIV.first_message {	font-size: 75%;
+	width: 80%;
+	text-align: left;
+	margin-left: 1em;
+	margin-bottom: 1em; }
+
+DIV.first_message_header {	padding: 5px;
+	background-color: #8FF;
+	margin-bottom: .5em; }
+
+DIV.thread {
+	border: 1px solid black;
+	margin:1em;
+	text-align: left; }
+
+DIV.thread DIV.responses {
+	border: 1px dashed black;
+	font-size: 80%;
+	margin: 1em;
+	padding: .5em;
+	background-color: #EFF; }
+
+DIV.responses UL {  margin-left:1em; }
+DIV.thread DIV.responses LI { margin-top:4px; }
+
+DIV.message_and_thread DIV.responses {  font-size: 80% }
+
+DIV.message_and_thread DIV.responses LI.message_entry {
+ background-color: #eff;
+ margin-top: .75em;
+ width: 30em;
+ border: 1px dashed black;
+ padding: 1ex; }
+
+DIV.message_and_thread DIV.responses LI.current_entry {
+	margin:1em;
+	font-size:125%; }
+
+DIV.message_and_thread DIV.responses span.current_entry  {
+  background-color:#fff;
+  font-style: italic; }
+
+
+DIV.message_preview {
+ padding-top: 1ex;
+ padding-left: 1ex;
+ overflow:hidden; }
+
+
+DIV.message_and_thread {
+	border: 1px solid black;
+	text-align: left;
+	padding: 1em; }
+
+
+DIV.message_text {	margin: 1em; }
+
+DIV.headers {	padding: 2px;
+	margin-bottom: 0;
+	font-size: smaller;
+	width: 31em;
+	background-color: #AFF; }
+
+DIV.header {	margin: 4px;	width: 30em; }
+
+.author_header {	font-weight: bold;	font-size:   120%; }
+
+span.subject_header {	margin-left: 1em;  }
+
+span.date_header {	margin-left: 1em;  }
+
+span.ip_header {	margin-left: 1em;  }
+
+DIV.buttons {	margin-top: 1em;
+	padding-bottom: 1em;
+	text-align: center;
+	width: 80%; }
+
+INPUT.button {	margin-top:	5px;
+	margin-bottom:	5px; }
+
+span.parent_entry {	background-color: #FEE; }
+
+DIV.post_message_form {
+	text-align: left;
+	margin: 1em;
+	padding: 1em;
+	background-color: #AFF; }
+
+DIV.message_input {	margin-top: .5em;}
+
+DIV.textarea_and_label {
+	margin-top : .5em;
+	margin-bottom : 1em; }
+
+.textarea {	border: 1px solid black;}
+
+a.new_message, span.new_message {	background-color: #FFB;}
+
+
+DIV.search_results {
+	border:1px solid black;
+	padding:1em; }
+
+DIV.search_results UL {        text-align:left;}
+
+DIV.search_results LI {
+        padding:2px;
+        margin:2px;
+	background-color: #DFF; }
+
+DIV.search_results span.author {
+        font-size:smaller;
+	margin-left: 2em; }
+
+DIV.search_results span.date {
+        font-size:smaller;
+	margin-left: 1em; }
+
+body#widget {font-size:smaller; }
+table#widget_table {margin:auto;}

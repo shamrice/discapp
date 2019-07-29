@@ -117,7 +117,7 @@ public class ConfigurationService {
         return defaultValue;
     }
 
-    public void saveConfiguration(ConfigurationProperty configurationProperty, Configuration configuration) {
+    public boolean saveConfiguration(ConfigurationProperty configurationProperty, Configuration configuration) {
         if (configuration != null) {
             if (configuration.getName().equalsIgnoreCase(configurationProperty.getPropName())) {
                 logger.info("Saving valid configuration " + configurationProperty.getPropName() + " : "
@@ -129,15 +129,27 @@ public class ConfigurationService {
                     configuration.setCreateDt(new Date());
                 }
 
-                configurationRepository.save(configuration);
-                return;
+                Configuration savedConfig = configurationRepository.save(configuration);
+                if (savedConfig != null) {
+                    configurationCache.updateCache(savedConfig.getApplicationId(), configurationProperty, savedConfig);
+                    return true;
+                } else {
+                    logger.error("Failed to save configuration. Value returned was null from save.");
+                    return false;
+                }
+
             } else {
                 logger.error("Configuration property: " + configurationProperty.getPropName()
                         + " does not match property name set in configuration to save: " + configuration.getName()
                         + " for appId: " + configuration.getApplicationId());
-                return;
+                return false;
             }
         }
         logger.error("Cannot save null configuration value.");
+        return false;
+    }
+
+    public Configuration getConfiguration(long applicationId, String configurationName) {
+        return configurationRepository.findOneByApplicationIdAndName(applicationId, configurationName);
     }
 }

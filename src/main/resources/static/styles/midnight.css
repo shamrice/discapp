@@ -1,0 +1,177 @@
+BODY {	margin: 3%;
+	text-align: center;
+	font-family: Arial, Charcoal;
+	background-color: #000;
+	color: #f8f;
+}
+
+img {
+    max-width:100%;
+    max-height:100%;
+}
+
+
+INPUT { background-color: #777;
+        border-style: none;
+	font-family: Arial, Charcoal;
+	font-weight: bold;
+	font-size:100%;
+	padding: 5px;
+}
+
+INPUT:HOVER {  background-color: #999; }
+
+TEXTAREA { background-color: #777;
+	padding: 4px;
+	width:90%;
+	font-family: Arial, Charcoal;
+	border:none;
+}
+
+UL {	list-style-position: outside;
+	list-style-type:  none;
+	padding:0;
+	margin:0;
+}
+
+UL UL {	margin-left:2em;  }
+
+A { color: #66f; }
+
+A:VISITED { color: #C0C; }
+
+A:HOVER {  	background-color:#ddd;  }
+
+DIV.prologue {	text-align: left;
+	width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+	margin-bottom: 1em;
+}
+
+DIV.epilogue {	text-align: left;
+	width: 70%;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+#entries_table { margin-top: 5px;
+        margin-left: auto;
+        margin-right: auto;
+	width: 70%;
+}
+
+table#widget_table { margin:auto; }
+
+TH.entries_header {	padding: 5px;
+	font-family: Arial, Charcoal;
+	background-color: #777;
+	color: #000;
+}
+
+TD.entries_header { text-align: right; }
+
+TR.entry_row {		padding: 1%;  }
+
+TD.link_cell {	text-align: left;  	padding: 3px;  }
+
+.author_cell {
+	padding-left: 2px;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+TD.author_cell { text-align: center; }
+
+TD.date_cell {		padding-left: 1em; }
+
+DIV.first_message {	font-size: 80%;
+	width: 80%;
+	text-align: left;
+	margin-left: 1em;
+	margin-bottom: 1em;
+}
+
+
+DIV.thread {	width: 70%;
+	margin:1em;
+        margin-left: auto;
+        margin-right: auto;
+	padding-bottom: 1em;
+	text-align: left;
+	border-bottom: 1px solid #888;
+}
+
+DIV.responses {
+	font-size: 80%;
+	margin-left: 2em;
+	padding-bottom:1em;
+}
+
+DIV.message_and_thread DIV.responses UL {	margin-left:1em; }
+
+DIV.message_and_thread DIV.responses LI {
+ margin-top: .75em;
+ width: 30em;
+ padding: 1ex;
+}
+
+DIV.message_and_thread {
+	width: 70%;
+	padding: 1em;
+        margin-left: auto;
+        margin-right: auto;
+	margin-top: 1em;
+	text-align: left;
+}
+
+DIV.message_text {	margin: 1em;  }
+
+DIV.headers {	padding: 2px;
+	margin-bottom: 0;
+	font-size: 80%;
+	width: 31em;
+	background-color: #777;
+	color: #000;
+}
+
+DIV.header {	margin: 4px;	width: 30em; }
+
+.author_header {	font-weight: bold;	font-size:   120%; }
+
+span.subject_header {	margin-left: 1em;  }
+
+span.date_header {	margin-left: 1em;  }
+
+span.ip_header {	margin-left: 1em;  }
+
+DIV.buttons {	margin-top: 1em;	padding-bottom: 1ex; }
+
+INPUT.button {	margin-top:	5px;
+	margin-bottom:	5px;
+	margin-left: 2px;
+}
+
+LI.current_entry { margin: .5em;  }
+
+span.current_entry { color:#888; }
+
+DIV.post_message_form {	text-align: left;
+	margin: 1em;
+	padding: 1em;
+	width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+a.new_message, span.new_message {	background-color: #EE0; }
+
+DIV.search_results {        width: 40em;        margin:auto;  }
+DIV.search_results UL {        text-align:left;  }
+DIV.search_results LI {        padding:2px;  }
+
+DIV.search_results span.author {        font-size:smaller;	margin-left: 2em;  }
+DIV.search_results span.date {        font-size:smaller;	margin-left: 1em;   }
+
+body#widget {font-size:smaller; }
+table#widget_table {margin:auto;}

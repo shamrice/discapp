@@ -1,17 +1,15 @@
 package io.github.shamrice.discapp.web.controller;
 
-import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.Epilogue;
-import io.github.shamrice.discapp.data.model.Prologue;
+import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +30,9 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private DiscAppUserRepository discappUserRepository;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
 
 
@@ -70,6 +71,9 @@ public class DiscAppMaintenanceController {
                     maintenanceViewModel.setEpilogueText(epilogue.getText());
                 }
 
+                String styleSheetUrl = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "");
+                maintenanceViewModel.setStyleSheetUrl(styleSheetUrl);
+
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
@@ -90,6 +94,13 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/modify/prologue-epilogue")
     public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId,
+                                                  @RequestParam(name = "redirect", required = false) String redirect) {
+
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
+    @GetMapping("/admin/modify/stylesheet")
+    public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId,
                                                   @RequestParam(name = "redirect", required = false) String redirect) {
 
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
@@ -137,6 +148,48 @@ public class DiscAppMaintenanceController {
 
         return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
 
+    }
+
+    @PostMapping("/admin/modify/stylesheet")
+    public ModelAndView postModifyStyleSheet(@RequestParam(name = "id") long appId,
+                                             @RequestParam(name = "redirect", required = false) String redirect,
+                                             @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                             Model model) {
+
+        if (maintenanceViewModel.getStyleSheetUrl() == null || maintenanceViewModel.getStyleSheetUrl().isEmpty()) {
+            maintenanceViewModel.setInfoMessage("Style sheet URL cannot be empty. Settings not saved.");
+            return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        }
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+            Configuration styleSheetConfig = configurationService.getConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL.getPropName());
+
+            if (styleSheetConfig == null) {
+                logger.info("Creating new style sheet configuration for appId: " + appId);
+                styleSheetConfig = new Configuration();
+                styleSheetConfig.setName(ConfigurationProperty.STYLE_SHEET_URL.getPropName());
+                styleSheetConfig.setApplicationId(app.getId());
+            }
+
+            styleSheetConfig.setValue(maintenanceViewModel.getStyleSheetUrl());
+
+            if (!configurationService.saveConfiguration(ConfigurationProperty.STYLE_SHEET_URL, styleSheetConfig)) {
+                logger.warn("Failed to update style sheet url of appId: " + appId);
+                maintenanceViewModel.setInfoMessage("Failed to update Style Sheet URL.");
+            } else {
+                logger.info("Updated style sheet url for appId: " + appId + " to " + maintenanceViewModel.getStyleSheetUrl());
+                maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
+            }
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
     }
 
     @PostMapping("/admin/modify/prologue-epilogue")

@@ -89,6 +89,7 @@ public class DiscAppController {
                 model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
                 model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
                 model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
                 return new ModelAndView("indices/appView");
 
@@ -176,6 +177,7 @@ public class DiscAppController {
         model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
         model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
         model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
         model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
         model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
@@ -204,6 +206,7 @@ public class DiscAppController {
         model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
         model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
         model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
         model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
         model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
@@ -360,6 +363,7 @@ public class DiscAppController {
             model.addAttribute("replyButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply"));
             model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
             model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+            model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
             model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
             model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
@@ -422,6 +426,7 @@ public class DiscAppController {
                 model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
                 model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
                 model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
                 return new ModelAndView("indices/search", "model", model);
 
@@ -437,10 +442,17 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
+    /**
     @GetMapping("/styles/disc_{applicationId}.css")
     public String getAppStyleSheet(@PathVariable(name = "applicationId") String appId) {
         return "styles/disc_" + appId + ".css";
     }
+
+    @GetMapping("/styles/{style_name}")
+    public String getNamedAppStyleStheet(@PathVariable(name = "style_name") String styleSheetName) {
+        return "/styles/" + styleSheetName;
+    }
+    */
 
 
     private String getSearchThreadHtml(List<Thread> threads, String entryBreakString) {

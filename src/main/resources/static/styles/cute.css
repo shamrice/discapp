@@ -1,0 +1,94 @@
+body{
+	background-image: url(/images/floral_back6.jpg);
+	margin-top: 3%;
+	margin-left: 15%;
+	margin-right: 15%;
+	font-family: Utopia;
+	font-style: italic;
+	font-size: 110%;
+	color: #111;
+	text-align: center;
+}
+
+a { color: #111; }
+a:hover { background-color: #FCC; }
+
+img {
+    max-width:100%;
+    max-height:100%;
+}
+
+input {
+	font-family: Utopia;
+	font-style: italic;
+}
+
+textarea { width:90% }
+
+div.prologue, div.epilogue { text-align:left; }
+
+div.buttons {	margin-top:1ex;   padding-bottom:1ex;  }
+
+table#entries_table {  margin:auto;   margin-top:1em; }
+table#widget_table { margin:auto; }
+
+table#entries_table td {  padding-left:1ex;  padding-right:1ex; }
+
+th { font-weight: normal; text-decoration: underline; padding-bottom:1ex; }
+
+tr.entry_row td {  border-bottom:1px solid #ebe;  }
+tr.entry_row td.link_cell {  text-align:left;  }
+td.link_cell a {  text-decoration:none;  color:#111;  }
+
+ul {  margin-top:0;  margin-bottom:0;  padding-top:0; list-style-type:none;  }
+li.nested_list {  list-style-type:none;  display:inline;  }
+div.thread li.message_entry {  margin-top:2px;  }
+
+div.thread {
+	padding: 1em;
+	margin-top:1em;
+	border: 1px solid #EBE;
+	text-align: left;
+}
+
+div.first_message_div {
+}
+
+span.author_cell {  margin-left:2px;  margin-right:2px;  }
+span.date_cell {  font-size:smaller;  }
+a.new_message, span.new_message {  background-color:#fdd;  }
+span.current_entry {  font-style:italic; font-weight:bold; }
+
+div.first_message {
+	font-size: 80%;
+	font-style: italic;
+	text-align: left;
+	max-width: 40em;
+}
+
+div.responses {
+	border-top: 1px #EBE solid;
+	font-size: 80%;
+	margin-top:1ex;
+	padding-top:1ex;
+}
+
+
+DIV.message_and_thread {
+	border: 1px solid #EBE;
+	text-align: left;
+	margin: 1em;
+	padding: 1em;
+}
+
+div.message_and_thread li.message_entry { margin:1em; }
+div.message_and_thread div.message_preview { font-size:90%; }
+
+div.post_message_form {
+  text-align:left;
+  width:35em;
+  margin:auto;
+}
+
+body#widget {font-size:smaller; }
+table#widget_table {margin:auto;}

@@ -1,0 +1,174 @@
+body {	background-image: url(/images/paper_texture.gif);
+	margin-top: 3%;
+	font-family: Utopia;
+	color: #111;
+	text-align: center;  }
+
+a { color: #000; }
+a:visited { color: #888; }
+a:hover { background-color: #FFB; }
+
+img {
+    max-width:100%;
+    max-height:100%;
+}
+
+textarea { width:90% }
+
+div.prologue, div.epilogue {	text-align: left;
+	width: 70%;
+	margin: 1em;
+        margin-left: auto;
+        margin-right: auto;  }
+
+#entries_table {
+ 	margin-top:1em;
+	margin-left:auto;
+	margin-right:auto;
+	width: 70%  }
+
+
+.entries_header {
+	border-style: none;
+	font-family: Utopia;
+	font-weight: normal;
+	font-size: 120%;   }
+
+td.entries_header { text-align: right; }
+
+td.link_cell {	border-bottom: 1px solid gray;	text-align: left; }
+
+td.link_cell a {	text-decoration: none;	color: #111; }
+
+td.link_cell a:hover {	text-decoration: none; }
+
+.author_cell {	font-style: italic;}
+
+span.author_cell {	margin-right: 4px;	margin-left: 4px; }
+
+td.author_cell {	text-align: center;	border-bottom: 1px solid gray;  }
+
+td.date_cell {	font-size: 80%;	border-bottom: 1px solid gray; }
+
+div.first_message {
+	font-size: 80%;
+	font-style: italic;
+	text-align: left;
+	margin: 1em;
+	width: 80%   }
+
+div.thread {
+	width: 70%;
+	border: 1px solid #888;
+	text-align: left;
+	margin: 1em;
+	padding: 1em;
+        margin-left: auto;
+        margin-right: auto;
+	overflow:hidden;
+}
+
+div.responses {  font-size:90%; }
+
+div.thread div.responses a {  text-decoration:none; }
+
+div.thread ul {  list-style-type:  none; }
+div.thread li {   }
+
+div.message_and_thread ul { list-style-type:none; margin-left:0; padding-left:0; }
+
+div.message_and_thread ul ul { margin-left:3ex; }
+
+div.message_and_thread li.current_entry { font-size:133%; }
+
+/*div.message_and_thread li.message_entry {*/
+div.message_and_thread li {
+ border-top: 1px solid #888;
+ width: 40em;
+ padding-top:1em;
+}
+
+div.message_preview {
+  margin-left:3ex;
+  padding-top:1ex;
+  font-size:90%;
+  overflow:hidden;
+}
+
+div.message_and_thread div.responses {  margin-bottom:1em;  }
+
+INPUT { font-family: Utopia; }
+input.button { font-size: larger}
+
+div.message_and_thread {
+	width: 70%;
+	border: 1px solid #888;
+	text-align: left;
+	margin: 1em;
+	padding: 1em;
+        margin-left: auto;
+        margin-right: auto;
+	overflow:hidden;
+}
+
+div.message_text {	padding-left: 1em;  }
+
+div.headers {
+	font-size: 80%;
+	width: 31em;
+	background-color: #FFD;
+	padding: 1em;
+}
+
+div.header {	width: 30em;}
+
+.author_header {	font-size:   120%; }
+
+span.current_entry {	color: #888;  }
+a.new_message, span.new_message {	background-color: #ffb; }
+
+div.post_message_form {
+	width: 70%;
+	text-align: left;
+	margin: 1em;
+        margin-left: auto;
+        margin-right: auto;
+}
+
+div.buttons {
+	margin-top: 1em;
+	padding-bottom: 1ex;
+	text-align: center;
+	width: 30em;
+}
+
+OPTION { font-size: smaller;}
+
+div.textarea {
+	border: 1px solid #888;
+	padding: .5em;
+	width: 35em;
+	margin-bottom: 1em;
+}
+
+div.search_results {
+        width: 40em;
+        margin:auto;
+}
+
+div.search_results ul {        text-align:left;}
+
+div.search_results li {        padding:2px;}
+
+div.search_results span.author {
+        font-size:smaller;
+	margin-left: 2em;
+}
+
+div.search_results span.date {
+        font-size:smaller;
+	margin-left: 1em;  }
+
+
+body#widget {font-size:smaller; }
+table#widget_table {margin:auto;}

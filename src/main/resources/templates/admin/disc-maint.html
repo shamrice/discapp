@@ -63,6 +63,72 @@
         </form>
     </div>
 
+    <div th:if="${maintenanceViewModel.getApplicationId()}">
+
+        <script type="text/javascript">
+            function setStyleSheetUrl(url) {
+                document.getElementById("styleSheetUrl").value = url;
+            }
+        </script>
+
+        <h1 id="style_sheet_banner">Modify Style Sheet</h1>
+        <form name="f" th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
+              th:object="${maintenanceViewModel}">
+            <table>
+
+                <tr>
+                    <td>Style Sheet URL:</td>
+                    <td> <input type="text" name="styleSheetUrl" id="styleSheetUrl" th:value="${maintenanceViewModel.getStyleSheetUrl()}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">Or pick one of the following:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <ul>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/graph2.css')">Graph</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/ocean.css')">Ocean</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/cute.css')">Cute</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/cyan2.css')">Cyan</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/forest.css')">Forest</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/midnight.css')">Midnight</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/steely.css')">Steely</a>
+                            </li>
+                            <li>
+                                <a href="#" onclick="setStyleSheetUrl('/styles/traditional.css')">Traditional</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
 
     <div th:if="${maintenanceViewModel.getApplicationId()}">
         <h1 id="prologue_epilogue_account_banner">Prologue and Epilogue Configuration </h1>

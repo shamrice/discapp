@@ -14,6 +14,7 @@ public class MaintenanceViewModel {
     private String epilogueText;
     private Date prologueModDt;
     private Date epilogueModDt;
+    private String styleSheetUrl;
 
 
 
@@ -96,5 +97,13 @@ public class MaintenanceViewModel {
 
     public void setEpilogueModDt(Date epilogueModDt) {
         this.epilogueModDt = epilogueModDt;
+    }
+
+    public String getStyleSheetUrl() {
+        return styleSheetUrl;
+    }
+
+    public void setStyleSheetUrl(String styleSheetUrl) {
+        this.styleSheetUrl = styleSheetUrl;
     }
 }
