@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ public class AccountController {
 
     @Autowired
     private ApplicationService applicationService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @GetMapping("/account/create")
     public ModelAndView getCreateAccount(@ModelAttribute AccountViewModel accountViewModel,
@@ -338,6 +342,9 @@ public class AccountController {
                                 user.setOwnerId(newOwner.getId());
                                 user.setPassword(accountViewModel.getPassword());
                                 discAppUserDetailsService.saveDiscAppUser(user);
+
+                                //save default configuration values for new app.
+                                configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
 
                                 logger.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
                                 accountViewModel.setErrorMessage("Successfully created new owner and application for user.");
