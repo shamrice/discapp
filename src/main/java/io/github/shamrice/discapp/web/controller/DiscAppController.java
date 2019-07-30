@@ -75,18 +75,20 @@ public class DiscAppController {
 
                 //get threads
                 int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);
+                boolean showTopLevelPreview = configurationService.getBooleanValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, true);
+
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads);
                 List<String> threadTreeHtml = new ArrayList<>();
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
                 for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
 
-                    String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString);
+                    String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview);
 
                     //get replies if they exist and add on HTML.
                     if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
                         currentHtml += "<div class=\"responses\">";
-                        currentHtml += getAppViewThreadHtml(threadTreeNode, "", entryBreakString, true, -1, true);
+                        currentHtml += getAppViewThreadHtml(threadTreeNode, "", entryBreakString, true, -1, false);
                         currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
                         currentHtml += "</div>";
                     }
@@ -339,11 +341,11 @@ public class DiscAppController {
             if (subThreadNode != null) {
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
-                subThreadsHtml.add(getThreadViewReplyHtml(subThreadNode, currentHtml, entryBreakString,
-                        skipCurrent, currentThread.getId(), true) + "</ul>");
-
-                //subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
+                //subThreadsHtml.add(getThreadViewReplyHtml(subThreadNode, currentHtml, entryBreakString,
                 //        skipCurrent, currentThread.getId(), true) + "</ul>");
+
+                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
+                        skipCurrent, currentThread.getId(), true) + "</ul>");
             }
 
             String threadBody = threadService.getThreadBodyText(threadId);
@@ -461,21 +463,18 @@ public class DiscAppController {
         for (Thread thread : threads) {
 
             currentHtml += " <li>"
-                    + " <div class=\"first_message_div\">"
-                    + " <div class=\"first_message_header\">"
-                    + "    <span class=\"first_message_span\">"
-                    + "        <a class=\"article_link\""
+                    + "        <a "
                     + " href=\"/discussion.cgi?disc=" + thread.getApplicationId()
                     + "&article=" + thread.getId() + "\""
                     + " name=\"" + thread.getId() + "\">"
                     + thread.getSubject()
-                    + "        </a>  "
-                    + "        " + entryBreakString
-                    + "        <span class=\"author_cell\"> " + thread.getSubmitter() + ",</span> "
-                    + "        <span class=\"date_cell\"> " + thread.getCreateDt() + "</span> "
-                    + "    </span> "
-                    + "</div> "
-                    + "</div>"
+                    + "</a>  "
+                    + "        <span class=\"author\"> " + thread.getSubmitter() + "</span> "
+                    + "        <span class=\"date\"> " +
+                            getAdjustedDateStringForConfiguredTimeZone(
+                                thread.getApplicationId(),
+                                thread.getCreateDt(), true) +
+                    "</span> "
                     + "</li>";
 
         }
@@ -484,68 +483,13 @@ public class DiscAppController {
         return currentHtml;
     }
 
-    private String getThreadViewReplyHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
-                                          boolean skipCurrentNode, long currentlyViewedId, boolean isFirstIteration) {
-
-        String messageDivText = "first_message_div";
-        String messageHeaderText = "first_message_header";
-        String messageSpanText = "first_message_span";
-
-        if (!isFirstIteration) {
-            messageDivText = "responses";
-            messageHeaderText = "response_headers";
-            messageSpanText = "response_headers";
-
-        }
-
-        if (!skipCurrentNode) {
-            currentHtml += " <li>"
-                    + " <div class=\"" + messageDivText + "\">"
-                    + " <div class=\"" + messageHeaderText + "\">"
-                    + "    <span class=\"" + messageSpanText + "\">";
-
-            if (currentNode.getCurrent().getId() != currentlyViewedId) {
-                currentHtml += "        <a class=\"article_link\""
-                        + " href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId()
-                        + "&article=" + currentNode.getCurrent().getId() + "\""
-                        + " name=\"" + currentNode.getCurrent().getId() + "\">"
-                        + currentNode.getCurrent().getSubject()
-                        + "        </a>  ";
-            } else {
-                currentHtml += currentNode.getCurrent().getSubject();
-            }
-            currentHtml += "        " + entryBreakString
-                    + "        <span class=\"author_cell\"> " + currentNode.getCurrent().getSubmitter() + ",</span> "
-                    + "        <span class=\"date_cell\"> "
-                    + getAdjustedDateStringForConfiguredTimeZone(
-                    currentNode.getCurrent().getApplicationId(),
-                    currentNode.getCurrent().getCreateDt(),
-                    false)
-                    + "</span> "
-                    + "    </span> "
-                    + "</div> "
-                    + "</div>";
-        }
-        //recursively generate reply tree structure
-        for (ThreadTreeNode node : currentNode.getSubThreads()) {
-            currentHtml += "<ul>";
-            currentHtml = getThreadViewReplyHtml(node, currentHtml, entryBreakString, false, currentlyViewedId, false);
-            currentHtml += "</ul>";
-        }
-
-        currentHtml += " </li>";
-
-        return currentHtml;
-    }
-
-
-    private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString) {
+    private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString, boolean showPreviewText) {
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
         String messageSpanText = "first_message_span";
 
 
-        return "" +
+        String topThreadHtml = "" +
                 "        <div class=\"" + messageDivText + "\">" +
                 "            <div class=\"" + messageHeaderText + "\">" +
                 "               <span class=\"" + messageSpanText + "\">" +
@@ -565,7 +509,21 @@ public class DiscAppController {
                 "            </div>" +
                 "        </div>";
 
+        if (showPreviewText) {
+            String previewText = currentNode.getCurrent().getBody();
+            if (previewText != null && !previewText.isEmpty()) {
+                if (previewText.length() > 320) {
+                    previewText = previewText.substring(0, 320); //todo configurable length
+                    previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                            "&article=" + currentNode.getCurrent().getId() + "\"" +
+                            " name=\"" + currentNode.getCurrent().getId() + "\">" +
+                            " more</a> ";
+                }
+                topThreadHtml += "<div class=\"first_message\">" + previewText + "</div>";
+            }
+        }
 
+        return topThreadHtml;
     }
 
     /**
@@ -575,19 +533,27 @@ public class DiscAppController {
      * @return built HTML list structure for thread
      */
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
-                                        boolean skipCurrentNode, long currentlyViewedId, boolean isFirstIteration
-                                        ) {
+                                        boolean skipCurrentNode, long currentlyViewedId,
+                                        boolean showPreviewText) {
 
         if (!skipCurrentNode) {
 
             currentHtml += "<li class=\"message_entry\">" +
                     " <div class=\"response_headers\">" +
-                    "   <span class=\"response_headers\">" +
-                    "      <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                    "&article=" + currentNode.getCurrent().getId() + "\"" +
-                    " name=\"" + currentNode.getCurrent().getId() + "\">" +
-                    currentNode.getCurrent().getSubject() +
-                    "</a> " + entryBreakString +
+                    "   <span class=\"response_headers\">";
+
+            //if rendering current thread, subject line should not have an anchor tag.
+            if (currentNode.getCurrent().getId().equals(currentlyViewedId)) {
+                currentHtml += currentNode.getCurrent().getSubject();
+            } else {
+                currentHtml += "      <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                        "&article=" + currentNode.getCurrent().getId() + "\"" +
+                        " name=\"" + currentNode.getCurrent().getId() + "\">" +
+                        currentNode.getCurrent().getSubject() +
+                        "</a> ";
+            }
+
+            currentHtml += entryBreakString +
                     "      <span class=\"author_cell\">" + currentNode.getCurrent().getSubmitter() + ",</span> " +
                     "      <span class=\"date_cell\">" +
                     getAdjustedDateStringForConfiguredTimeZone(
@@ -596,14 +562,30 @@ public class DiscAppController {
                             false) +
                     "       </span>" +
                     "   </span>" +
-                    "</div></li>";
+                    "</div>";
+
+            if (showPreviewText) {
+                String previewText = currentNode.getCurrent().getBody();
+                if (previewText != null && !previewText.isEmpty()) {
+                    if (previewText.length() > 200) {
+                        previewText = previewText.substring(0, 200); //todo configurable length
+                        previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                                "&article=" + currentNode.getCurrent().getId() + "\"" +
+                                " name=\"" + currentNode.getCurrent().getId() + "\">" +
+                                " more</a> ";
+                    }
+                    currentHtml += "<div class=\"message_preview\">" + previewText + "</div>";
+                }
+            }
+
+            currentHtml += "</li>";
         }
 
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
 
             currentHtml += "<li class=\"nested_list\"><ul>";
-            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false, currentlyViewedId, false);
+            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false, currentlyViewedId, showPreviewText);
             currentHtml += "</li>";
         }
 

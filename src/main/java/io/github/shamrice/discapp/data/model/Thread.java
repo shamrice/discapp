@@ -1,16 +1,16 @@
 package io.github.shamrice.discapp.data.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "thread")
+@SecondaryTable(name = "thread_body", pkJoinColumns = @PrimaryKeyJoinColumn(name = "thread_id", referencedColumnName = "id"))
 public class Thread {
 
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+    @Column(updatable = false, nullable = false)
     private Long id;
 
     @Column(name = "application_id")
@@ -26,6 +26,9 @@ public class Thread {
     private Long discappUserId;
     private Date createDt;
     private Date modDt;
+
+    @Column(table = "thread_body")
+    private String body;
 
     public Long getId() {
         return id;
@@ -121,5 +124,13 @@ public class Thread {
 
     public void setDiscappUserId(Long discappUserId) {
         this.discappUserId = discappUserId;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

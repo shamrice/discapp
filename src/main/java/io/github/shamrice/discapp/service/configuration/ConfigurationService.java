@@ -100,6 +100,23 @@ public class ConfigurationService {
         return defaultValue;
     }
 
+    public boolean getBooleanValue(long applicationId, ConfigurationProperty configurationProperty, boolean defaultValue) {
+        String foundStrVal = getStringValue(applicationId, configurationProperty, "");
+
+        if (foundStrVal != null && !foundStrVal.isEmpty()) {
+            try {
+                return Boolean.parseBoolean(foundStrVal);
+            } catch (NumberFormatException ex) {
+                logger.error("Unable to parse found config value for " + configurationProperty.getPropName()
+                        + " : value: " + foundStrVal + " + for appId: " + applicationId, ex);
+            }
+        }
+
+        logger.info("Failed to find configuration value. Returning default value of: " + defaultValue
+                + " : for appId: " + applicationId);
+        return defaultValue;
+    }
+
     public int getIntegerValue(long applicationId, ConfigurationProperty configurationProperty, int defaultValue) {
         String foundStrVal = getStringValue(applicationId, configurationProperty, "");
 
