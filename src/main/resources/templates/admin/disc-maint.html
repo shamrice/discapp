@@ -19,6 +19,15 @@
 
 </style>
 
+<script type="text/javascript">
+function switchElements(element1,element2) {
+    // hide the first element and show the second
+    document.getElementById(element1).style.display = "none";
+    document.getElementById(element2).style.display = "block";
+}
+
+</script>
+
 <center>
 
     <div th:if="${maintenanceViewModel.getInfoMessage()}" class="alert alert-error"
@@ -55,7 +64,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input name="submit" type="submit" value="Change Name">&nbsp;
                         <input name="reset" type="reset">
                     </td>
                 </tr>
@@ -63,7 +72,17 @@
         </form>
     </div>
 
-    <div th:if="${maintenanceViewModel.getApplicationId()}">
+    <div id="css_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
+        <center>
+            <h2>
+                <a href="#" onclick="switchElements('css_configuration_closed', 'css_configuration_open')">
+                    Style Sheet +
+                </a>
+            </h2>
+        </center>
+    </div>
+
+    <div id="css_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
 
         <script type="text/javascript">
             function setStyleSheetUrl(url) {
@@ -72,6 +91,15 @@
         </script>
 
         <h1 id="style_sheet_banner">Modify Style Sheet</h1>
+
+        <div id="css_close_link" style="text-align:center;">
+            <b>
+                <a href="#" onclick="switchElements('css_configuration_open', 'css_configuration_closed')">
+                    close
+                </a>
+            </b>
+        </div>
+
         <form name="f" th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
               th:object="${maintenanceViewModel}">
             <table>
@@ -129,9 +157,27 @@
     </div>
 
 
+    <div id="prologue_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
+        <center>
+            <h2>
+                <a href="#" onclick="switchElements('prologue_configuration_closed', 'prologue_configuration_open')">
+                    Prologue/Epilogue +
+                </a>
+            </h2>
+        </center>
+    </div>
 
-    <div th:if="${maintenanceViewModel.getApplicationId()}">
+    <div id="prologue_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
+
         <h1 id="prologue_epilogue_account_banner">Prologue and Epilogue Configuration </h1>
+        <div id="prologue_close_link" style="text-align:center;">
+            <b>
+                <a href="#" onclick="switchElements('prologue_configuration_open', 'prologue_configuration_closed')">
+                    close
+                </a>
+            </b>
+        </div>
+
         <form name="f" th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
               th:object="${maintenanceViewModel}">
             <table>
