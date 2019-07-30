@@ -5,11 +5,9 @@
 <body>
 <div class="threads" th:fragment="threads">
 
-    <div class="thread" th:if="${not #lists.isEmpty(threadNodeList)}">
-        <div th:each="threadHtml : ${threadNodeList}">
-            <div th:utext="${threadHtml}"/>
-            <div th:utext="${threadSeparator}"/>
-        </div>
+    <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
+        <div class="thread" th:utext="${threadHtml}"></div>
+        <div th:utext="${threadSeparator}"/></div>
     </div>
 
 </div>
