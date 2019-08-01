@@ -53,11 +53,13 @@ public class DiscAppMaintenanceController {
                 model.addAttribute("appName", app.getName());
                 model.addAttribute("appId", app.getId());
 
+                //app config
                 maintenanceViewModel.setApplicationCreateDt(app.getCreateDt());
                 maintenanceViewModel.setApplicationModDt(app.getModDt());
                 maintenanceViewModel.setApplicationId(app.getId());
                 maintenanceViewModel.setApplicationName(app.getName());
 
+                //prologue / epilogue config
                 Prologue prologue = applicationService.getPrologue(appId, false);
                 if (prologue != null) {
                     maintenanceViewModel.setPrologueModDt(prologue.getModDt());
@@ -70,9 +72,11 @@ public class DiscAppMaintenanceController {
                     maintenanceViewModel.setEpilogueText(epilogue.getText());
                 }
 
+                //stylesheet config
                 String styleSheetUrl = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "");
                 maintenanceViewModel.setStyleSheetUrl(styleSheetUrl);
 
+                //threads config
                 String sortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, "creation");
                 maintenanceViewModel.setThreadSortOrder(sortOrder);
 
@@ -94,11 +98,53 @@ public class DiscAppMaintenanceController {
                 int threadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 15);
                 maintenanceViewModel.setThreadDepth(threadDepth);
 
+                //header footer configs
                 String headerText = configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, "");
                 maintenanceViewModel.setHeader(headerText);
 
                 String footerText = configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, "");
                 maintenanceViewModel.setFooter(footerText);
+
+                //label configs
+                String authorHeader = configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Author");
+                maintenanceViewModel.setAuthorHeader(authorHeader);
+
+                String dateHeader = configurationService.getStringValue(appId, ConfigurationProperty.DATE_LABEL_TEXT, "Date");
+                maintenanceViewModel.setDateHeader(dateHeader);
+
+                String emailHeader = configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email");
+                maintenanceViewModel.setEmailHeader(emailHeader);
+
+                String subjectHeader = configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject");
+                maintenanceViewModel.setSubjectHeader(subjectHeader);
+
+                String messageHeader = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BODY_LABEL_TEXT, "Message");
+                maintenanceViewModel.setMessageHeader(messageHeader);
+
+                //buttons config
+                String shareButton = configurationService.getStringValue(appId, ConfigurationProperty.SHARE_BUTTON_TEXT, "Share");
+                maintenanceViewModel.setShareButton(shareButton);
+
+                String editButton = configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit");
+                maintenanceViewModel.setEditButton(editButton);
+
+                String returnButton = configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages");
+                maintenanceViewModel.setReturnButton(returnButton);
+
+                String previewButton = configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview");
+                maintenanceViewModel.setPreviewButton(previewButton);
+
+                String postButton = configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message");
+                maintenanceViewModel.setPostButton(postButton);
+
+                String nextPageButton = configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page");
+                maintenanceViewModel.setNextPageButton(nextPageButton);
+
+                String replyButton = configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply");
+                maintenanceViewModel.setReplyButton(replyButton);
+
+
+
 
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
@@ -146,6 +192,12 @@ public class DiscAppMaintenanceController {
     @GetMapping("/admin/modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId,
                                               @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
+    @GetMapping("/admin/modify/buttons")
+    public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId,
+                                        @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -402,6 +454,41 @@ public class DiscAppMaintenanceController {
     }
 
 
+    @PostMapping("/admin/modify/buttons")
+    public ModelAndView postModifyButtons(@RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "redirect", required = false) String redirect,
+                                         @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                         Model model) {
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+            boolean shareButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
+            boolean editButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EDIT_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getEditButton()));
+            boolean returnButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
+            boolean previewButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
+            boolean postButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
+            boolean nextPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
+            boolean replyButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
+
+            if (shareButtonSaved && editButtonSaved && returnButtonSaved && previewButtonSaved && postButtonSaved
+                    && nextPageButtonSaved && replyButtonSaved) {
+
+                maintenanceViewModel.setInfoMessage("Successfully saved changes to buttons.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save changes to buttons.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
     private boolean saveUpdatedConfiguration(long appId, ConfigurationProperty property, String value) {
 
         Configuration configToUpdate = configurationService.getConfiguration(appId, property.getPropName());
@@ -424,5 +511,7 @@ public class DiscAppMaintenanceController {
 
         return true;
     }
+
+
 
 }

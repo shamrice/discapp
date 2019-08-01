@@ -42,6 +42,15 @@ public class MaintenanceViewModel {
     private String subjectHeader;
     private String messageHeader;
 
+    //buttons config
+    private String shareButton;
+    private String editButton;
+    private String returnButton;
+    private String previewButton;
+    private String postButton;
+    private String nextPageButton;
+    private String replyButton;
+
 
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
@@ -258,5 +267,61 @@ public class MaintenanceViewModel {
 
     public void setMessageHeader(String messageHeader) {
         this.messageHeader = messageHeader;
+    }
+
+    public String getShareButton() {
+        return shareButton;
+    }
+
+    public void setShareButton(String shareButton) {
+        this.shareButton = shareButton;
+    }
+
+    public String getEditButton() {
+        return editButton;
+    }
+
+    public void setEditButton(String editButton) {
+        this.editButton = editButton;
+    }
+
+    public String getReturnButton() {
+        return returnButton;
+    }
+
+    public void setReturnButton(String returnButton) {
+        this.returnButton = returnButton;
+    }
+
+    public String getPreviewButton() {
+        return previewButton;
+    }
+
+    public void setPreviewButton(String previewButton) {
+        this.previewButton = previewButton;
+    }
+
+    public String getPostButton() {
+        return postButton;
+    }
+
+    public void setPostButton(String postButton) {
+        this.postButton = postButton;
+    }
+
+    public String getNextPageButton() {
+        return nextPageButton;
+    }
+
+    public void setNextPageButton(String nextPageButton) {
+        this.nextPageButton = nextPageButton;
+    }
+
+    public String getReplyButton() {
+        return replyButton;
+    }
+
+    public void setReplyButton(String replyButton) {
+        this.replyButton = replyButton;
     }
 }

@@ -447,12 +447,91 @@ function switchElements(element1,element2) {
                 </td>
             </tr>
         </table>
-        <input type="submit" name="ChangeFieldHeaders" value="Change Labels" class="button" /> </form>
+        <input type="submit" name="ChangeFieldHeaders" value="Change Labels" class="button" />
+    </form>
 </div>
 
 
 
-<!-- TODO : BUTTONS -->
+
+<div class="grey_box closed" id="buttonbox_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
+    <span class="toggle" onclick="switchElements('buttonbox_closed', 'buttonbox_open');" title="Show button controls">Buttons +</span>
+</div>
+
+<div class="grey_box" id="buttonbox_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
+
+    <div class="toggle" id="buttonbox_close_toggle">
+        <span class="toggle close" onclick="switchElements('buttonbox_open', 'buttonbox_closed');" title="Hide button controls">close</span>
+    </div>
+
+    <form method="post"
+          th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          th:object="${maintenanceViewModel}"
+          enctype="multipart/form-data">
+
+        <input type="hidden" name="id" value="46108" />
+        <p>Here, you can change the appearance of the various buttons in your DiscussionApp. In each textbox, you can specify the text for the corresponding button or you can enter the URL of a graphic image instead.</p>
+        <table>
+            <tr>
+                <th>
+                    <label for="share_button">Share</label>
+                </th>
+                <td>
+                    <input type="text" name="shareButton" th:value="${maintenanceViewModel.getShareButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="edit_button">Edit</label>
+                </th>
+                <td>
+                    <input type="text" name="editButton" th:value="${maintenanceViewModel.getEditButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="return_button">Return</label>
+                </th>
+                <td>
+                    <input type="text" name="returnButton" th:value="${maintenanceViewModel.getReturnButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="preview_button">Preview</label>
+                </th>
+                <td>
+                    <input type="text" name="previewButton" th:value="${maintenanceViewModel.getPreviewButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="post_button">Post</label>
+                </th>
+                <td>
+                    <input type="text" name="postButton" th:value="${maintenanceViewModel.getPostButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="next_button">Next Page</label>
+                </th>
+                <td>
+                    <input type="text" name="nextPageButton" th:value="${maintenanceViewModel.getNextPageButton()}" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="reply_button">Reply</label>
+                </th>
+                <td>
+                    <input type="text" name="replyButton" th:value="${maintenanceViewModel.getReplyButton()}" />
+                </td>
+            </tr>
+        </table>
+        <input type="submit" name="ChangeButtons" value="Change Buttons" class="button" />
+    </form>
+</div>
 
 <!-- TODO : FAVICON -->
 
