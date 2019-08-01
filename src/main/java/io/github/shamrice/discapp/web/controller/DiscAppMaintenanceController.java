@@ -35,9 +35,8 @@ public class DiscAppMaintenanceController {
     private ConfigurationService configurationService;
 
 
-
     @GetMapping("/admin/disc-maint.cgi")
-    public ModelAndView getMaintenanceView(@RequestParam( name = "id") long appId,
+    public ModelAndView getMaintenanceView(@RequestParam(name = "id") long appId,
                                            @RequestParam(name = "redirect", required = false) String redirect,
                                            @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                            Model model) {
@@ -95,6 +94,12 @@ public class DiscAppMaintenanceController {
                 int threadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 15);
                 maintenanceViewModel.setThreadDepth(threadDepth);
 
+                String headerText = configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, "");
+                maintenanceViewModel.setHeader(headerText);
+
+                String footerText = configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, "");
+                maintenanceViewModel.setFooter(footerText);
+
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
@@ -122,13 +127,19 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId,
-                                                  @RequestParam(name = "redirect", required = false) String redirect) {
+                                            @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/threads")
     public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId,
-                                            @RequestParam(name = "redirect", required = false) String redirect) {
+                                         @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
+    @GetMapping("/admin/modify/header-footer")
+    public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId,
+                                              @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -321,6 +332,36 @@ public class DiscAppMaintenanceController {
 
         return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
     }
+
+    @PostMapping("/admin/modify/header-footer")
+    public ModelAndView postModifyHeaderFooter(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "redirect", required = false) String redirect,
+                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                               Model model) {
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+
+            boolean headerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HEADER_TEXT, maintenanceViewModel.getHeader());
+            boolean footerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
+
+            if (headerSaved && footerSaved) {
+                maintenanceViewModel.setInfoMessage("Successfully saved changes to header and footer.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save changes to header and footer.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
 
     private boolean saveUpdatedConfiguration(long appId, ConfigurationProperty property, String value) {
 

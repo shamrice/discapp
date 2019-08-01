@@ -115,7 +115,9 @@
                 </tr>
             </table>
         </form>
+    </div>
 
+    <div class="grey_box" th:if="${accountViewModel.isOwner()}">
 
         <h1 id="owner_banner">Modify Application Owner Information</h1>
         <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">

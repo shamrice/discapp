@@ -33,11 +33,13 @@ public class AuthenticationController {
             if (request != null) {
                 //attempt from cookie first...
                 boolean foundInCookie = false;
-                for (Cookie cookie : request.getCookies()) {
-                    if (cookie.getName().equalsIgnoreCase("redirect_url")) {
-                        redirect = cookie.getValue();
-                        foundInCookie = true;
-                        break;
+                if (request.getCookies() != null) {
+                    for (Cookie cookie : request.getCookies()) {
+                        if (cookie.getName().equalsIgnoreCase("redirect_url")) {
+                            redirect = cookie.getValue();
+                            foundInCookie = true;
+                            break;
+                        }
                     }
                 }
 

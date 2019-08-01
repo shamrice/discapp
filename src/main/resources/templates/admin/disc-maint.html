@@ -32,6 +32,7 @@
 
 
 
+
 </style>
 
 <script type="text/javascript">
@@ -40,6 +41,7 @@ function switchElements(element1,element2) {
     document.getElementById(element1).style.display = "none";
     document.getElementById(element2).style.display = "block";
 }
+
 
 
 
@@ -73,7 +75,7 @@ function switchElements(element1,element2) {
 
             <tr>
                 <td><label>Disc App Id:</label></td>
-                <td class="value-label"  th:text="${maintenanceViewModel.getApplicationId()}">
+                <td class="value-label" th:text="${maintenanceViewModel.getApplicationId()}">
                 </td>
             </tr>
             <tr>
@@ -124,6 +126,7 @@ function switchElements(element1,element2) {
             function setStyleSheetUrl(url) {
                 document.getElementById("styleSheetUrl").value = url;
             }
+
 
 
     </script>
@@ -299,7 +302,27 @@ function switchElements(element1,element2) {
 </div>
 
 
-<!-- TODO : HEADER/FOOTER -->
+<div class="grey_box closed" id="headerbox_closed" style="display:block;" th:if="${maintenanceViewModel.getApplicationId()}">
+    <span class="toggle" onclick="switchElements('headerbox_closed', 'headerbox_open');" title="Show header controls">Header/Footer +</span>
+</div>
+
+<div class="grey_box" id="headerbox_open" style="display:none;" th:if="${maintenanceViewModel.getApplicationId()}">
+    <div class="toggle" id="headerbox_close_toggle">
+        <span class="toggle close" onclick="switchElements('headerbox_open', 'headerbox_closed');"
+              title="Hide header controls">close</span>
+    </div>
+    <form th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceViewModel}" enctype="multipart/form-data">
+
+        <p><b>Header</b> (Text that appears at the top of every page):
+            <input type="text" name="header" th:value="${maintenanceViewModel.getHeader()}" size="35" maxlength="128"/>
+        </p>
+        <p><b>Footer</b> (Text that appears at the bottom of every page):
+            <input type="text" name="footer" th:value="${maintenanceViewModel.getFooter()}" size="35" maxlength="128"/>
+        </p>
+        <input type="submit" name="ChangePageHeader" value="Submit Changes" class="button"/></form>
+</div>
 
 
 <div class="grey_box closed" id="prologue_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"

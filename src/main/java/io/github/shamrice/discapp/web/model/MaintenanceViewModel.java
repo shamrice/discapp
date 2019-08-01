@@ -31,6 +31,10 @@ public class MaintenanceViewModel {
     private String entryBreak;
     private int threadDepth;
 
+    //header/footer config
+    private String header;
+    private String footer;
+
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
         return threadDepth == dropDownValue;
@@ -190,5 +194,21 @@ public class MaintenanceViewModel {
 
     public String getThreadSortOrder() {
         return this.threadSortOrder;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getFooter() {
+        return footer;
+    }
+
+    public void setFooter(String footer) {
+        this.footer = footer;
     }
 }
