@@ -323,7 +323,9 @@ function switchElements(element1,element2) {
           th:object="${maintenanceViewModel}">
         <table>
             <tr>
-                <td>Prologue Text:</td>
+                <td>
+                    <b>Prologue</b> (Text to appear above the list of messages.)
+                </td>
             </tr>
             <tr>
                 <td>
@@ -332,7 +334,7 @@ function switchElements(element1,element2) {
                 </td>
             </tr>
             <tr>
-                <td>Prologue Last Modified:
+                <td><b>Prologue Last Modified:</b>
                     <label th:text="${maintenanceViewModel.getPrologueModDt()}"></label>
             </tr>
             <tr>
@@ -342,7 +344,9 @@ function switchElements(element1,element2) {
             </tr>
 
             <tr>
-                <td>Epilogue Text:</td>
+                <td>
+                    <b>Epilogue Text</b> (Text to appear below the list of messages.)
+                </td>
             </tr>
             <tr>
                 <td>
@@ -352,7 +356,7 @@ function switchElements(element1,element2) {
             </tr>
             <tr>
                 <td>
-                    Epilogue Last Modified:
+                    <b>Epilogue Last Modified:</b>
                     <label th:text="${maintenanceViewModel.getEpilogueModDt()}"></label>
                 </td>
             </tr>
