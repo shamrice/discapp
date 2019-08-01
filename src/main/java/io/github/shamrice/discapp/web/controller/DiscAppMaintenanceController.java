@@ -143,7 +143,9 @@ public class DiscAppMaintenanceController {
                 String replyButton = configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply");
                 maintenanceViewModel.setReplyButton(replyButton);
 
-
+                //favicon config
+                String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
+                maintenanceViewModel.setFavicon(favicon);
 
 
             } else {
@@ -198,6 +200,12 @@ public class DiscAppMaintenanceController {
     @GetMapping("/admin/modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
+    @GetMapping("/admin/modify/favicon")
+    public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -488,6 +496,55 @@ public class DiscAppMaintenanceController {
 
         return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
     }
+
+
+    @PostMapping("/admin/modify/favicon")
+    public ModelAndView postModifyFavicon(@RequestParam(name = "id") long appId,
+                                             @RequestParam(name = "redirect", required = false) String redirect,
+                                             @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                             Model model) {
+
+        //default used if field is blank
+        String favicon = "/favicon.ico";
+
+        //get form value if not null.
+        if (maintenanceViewModel.getFavicon() != null && !maintenanceViewModel.getFavicon().trim().isEmpty()) {
+            favicon = maintenanceViewModel.getFavicon();
+        }
+
+        //if entered something like "www.somesite.com/favicon.ico", attempt to add http in front
+        if (!favicon.startsWith("http://") &&
+                !favicon.startsWith("https://") &&
+                !favicon.startsWith("/")) {
+
+            //if just want default favicon, add front slash, otherwise attempt to add http
+            if (favicon.equalsIgnoreCase("favicon.ico")) {
+                favicon = "/favicon.ico";
+            } else {
+                favicon = "http://" + favicon;
+            }
+        }
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+            if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
+                maintenanceViewModel.setInfoMessage("Failed to update Favicon.");
+            } else {
+                maintenanceViewModel.setFavicon(favicon);
+                maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
 
     private boolean saveUpdatedConfiguration(long appId, ConfigurationProperty property, String value) {
 

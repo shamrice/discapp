@@ -533,7 +533,17 @@ function switchElements(element1,element2) {
     </form>
 </div>
 
-<!-- TODO : FAVICON -->
+<div class="grey_box">
+    <form method="post"
+          th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          th:object="${maintenanceViewModel}"
+          enctype="multipart/form-data">
+
+        <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon URL</a>
+        <input type="text" name="favicon" th:value="${maintenanceViewModel.getFavicon()}" size="40" maxlength="128" />
+        <input type="submit" name="ChangeFavicon" value="Change Favicon" class="button" />
+</div>
+</form>
 
 <table>
     <tr>

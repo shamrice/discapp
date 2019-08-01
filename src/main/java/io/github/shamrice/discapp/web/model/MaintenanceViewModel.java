@@ -51,6 +51,8 @@ public class MaintenanceViewModel {
     private String nextPageButton;
     private String replyButton;
 
+    //favicon config
+    private String favicon;
 
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
@@ -323,5 +325,13 @@ public class MaintenanceViewModel {
 
     public void setReplyButton(String replyButton) {
         this.replyButton = replyButton;
+    }
+
+    public String getFavicon() {
+        return favicon;
+    }
+
+    public void setFavicon(String favicon) {
+        this.favicon = favicon;
     }
 }
