@@ -30,19 +30,19 @@
             </div>
 
             <tr>
-                <td>Username:</td>
+                <td><label>Username:</label></td>
                 <td><input type="text" id="username" name="username" th:value="${accountViewModel.getUsername()}"/></td>
             </tr>
             <tr>
-                <td>Password:</td>
+                <td><label>Password:</label></td>
                 <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"></td>
             </tr>
             <tr>
-                <td>Email:</td>
+                <td><label>Email:</label></td>
                 <td><input type="email" id="email" name="email" th:value="${accountViewModel.getEmail()}"></td>
             </tr>
             <tr>
-                <td>Show Email:</td>
+                <td><label>Show Email:</label></td>
                 <td>
                     <input type="checkbox" name="showEmail" th:checked="${showEmail}"/>
                 </td>

@@ -44,7 +44,7 @@ fieldset { border:1px solid #888;
 
 legend { color:#000; }
 
-label{ font-weight:bold; }
+label{ font-weight:bold; text-align:right;}
 
 input.button { border:1px solid #000;  background-color:#fff; }
 input:hover { background-color:#ccf; }
@@ -116,3 +116,5 @@ span.tab { background-color:#ccf;
        	color:#00f;  }
 
 a.tab:hover { background-color:#88f; color:#eee; }
+
+.value-label {text-align: left;}

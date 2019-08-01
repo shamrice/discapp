@@ -31,6 +31,7 @@
 
 
 
+
 </style>
 
 <script type="text/javascript">
@@ -71,20 +72,20 @@ function switchElements(element1,element2) {
         <table>
 
             <tr>
-                <td>Disc App Id:</td>
-                <td th:text="${maintenanceViewModel.getApplicationId()}">
+                <td><label>Disc App Id:</label></td>
+                <td class="value-label"  th:text="${maintenanceViewModel.getApplicationId()}">
                 </td>
             </tr>
             <tr>
-                <td>Created:</td>
-                <td th:text="${maintenanceViewModel.getApplicationCreateDt()}"></td>
+                <td><label>Created:</label></td>
+                <td class="value-label" th:text="${maintenanceViewModel.getApplicationCreateDt()}"></td>
             </tr>
             <tr>
-                <td>Last Modified:</td>
-                <td th:text="${maintenanceViewModel.getApplicationModDt()}"></td>
+                <td><label>Last Modified:</label></td>
+                <td class="value-label" th:text="${maintenanceViewModel.getApplicationModDt()}"></td>
             </tr>
             <tr>
-                <td>Disc App Name:</td>
+                <td><label>Disc App Name:</label></td>
                 <td><input type="text" id="applicationName" name="applicationName"
                            th:value="${maintenanceViewModel.getApplicationName()}"/></td>
             </tr>
