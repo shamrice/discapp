@@ -1,0 +1,118 @@
+body {	font-family:Arial,Helvetica;
+	background-image: url(/images/graph.png);
+	color:black;  padding:1%; }
+
+form { margin:0; padding:0; }
+
+pre, p { text-align:left; }
+
+pre.code {      background-color:#fff;
+                border:1px dashed #000;
+                padding:1em; }
+
+table { margin:auto; margin-bottom:1ex; }
+
+caption { text-align:center; font-weight:bold; margin:auto; }
+
+th { text-align:right; padding-right:3px; font-size:90%; }
+
+td { padding:0;}
+
+ul { text-align:left; }
+
+img { border:0; }
+
+h3,h4 { text-align:center; margin:auto; padding:1ex; }
+
+a:hover { background-color:yellow; }
+
+hr { border:0; color:#000;
+     background-color:#000;
+     height:1px; margin:1em;
+     margin-left:0; }
+
+div.grey_box {	margin:auto; margin-top:1em; margin-bottom:1em;
+		text-align:center;
+		background-color:#dde;
+		padding:1em;  }
+
+div.pad { margin-top:1em; margin-bottom:1em; }
+
+fieldset { border:1px solid #888;
+	   text-align:left;
+	   padding:1ex; }
+
+legend { color:#000; }
+
+label{ font-weight:bold; }
+
+input.button { border:1px solid #000;  background-color:#fff; }
+input:hover { background-color:#ccf; }
+
+div.buttons { text-align:center; }
+div.buttons input { border:1px solid #000;  background-color:#fff; }
+div.buttons input:hover { background-color:#ccf; }
+
+textarea { width:90%; }
+
+tr.hidden_text th a,
+a.hidden_text { position:relative; }
+
+tr.hidden_text th a p,
+a.hidden_text p,
+a.hidden_text span  { display:none; }
+
+tr.hidden_text th a:hover p,
+a.hidden_text:hover p,
+a.hidden_text:hover span     {
+
+   display: block;
+   position:absolute;
+   left:-9em; top:1em;
+   border: 1px solid black;
+   width: 20em;
+   background-color:#EEE;
+   padding:1em;
+   text-decoration:none; }
+
+
+table.colored { border:1px solid black;
+	        margin-top:1em; margin-bottom:1em; }
+
+table.colored th { text-align:center; }
+
+table.colored td { background-color: #eef;
+		   padding:2px;
+		   padding-left:1ex;
+		   padding-right:1ex;
+		   text-align:right;   }
+
+
+table.record th { background-color:#dde; }
+
+table.record td { background-color:#dde;
+                  padding:1ex; padding-top:2px; padding-bottom:2px; }
+
+
+div#account {  position:absolute; top:0; right:0;
+		font-size:smaller; }
+
+div#account a { margin:2px; padding:2px; }
+
+
+
+div#tabs { text-align:center;
+           padding-bottom:3px;
+           border-bottom:3px solid #66f;
+           margin-bottom:2em; margin-top:2em;  }
+
+a.tab,
+span.tab { background-color:#ccf;
+	border:3px outset #ccf;
+       	font-size:100%;
+       	padding:4px;
+       	padding-left:1ex; padding-right:1ex;
+       	text-decoration:none;
+       	color:#00f;  }
+
+a.tab:hover { background-color:#88f; color:#eee; }
