@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Disc App - Login Page</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
@@ -20,7 +21,7 @@
 
 </style>
 
-<center>
+<div class="grey_box">
     <h1 id="banner">Login to Disc App Service</h1>
     <form name="f" th:action="@{/login}" method="post">
         <table>
@@ -46,8 +47,8 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input name="submit" type="submit" value="Login">&nbsp;
-                    <input name="reset" type="reset">
+                    <input class="button" name="submit" type="submit" value="Login">&nbsp;
+                    <input class="button" name="reset" type="reset">
                 </td>
             </tr>
             <tr>
@@ -63,7 +64,7 @@
         </table>
     </form>
 
-</center>
+</div>
 
 </body>
 </html>

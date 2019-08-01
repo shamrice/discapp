@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Disc App - Login Page</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
@@ -19,13 +20,13 @@
     }
 </style>
 
-<center>
+<div class="grey_box">
     <h1 id="banner">Logout of Disc App Service</h1>
     <form name="f" th:action="@{/logout}" method="post">
         <table>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input name="submit" type="submit" value="Click Here To Log Out">
+                    <input class="button" name="submit" type="submit" value="Click Here To Log Out">
                 </td>
             </tr>
             <tr>
@@ -37,7 +38,7 @@
     </form>
 
 
-</center>
+</div>
 
 </body>
 </html>

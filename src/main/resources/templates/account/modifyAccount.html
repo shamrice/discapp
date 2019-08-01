@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Disc App - Modify Account</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
@@ -22,8 +23,8 @@
 
 </style>
 
-<center>
-    <div>
+
+    <div class="grey_box">
         <h1 id="account_banner">Modify Account</h1>
         <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
             <table>
@@ -69,8 +70,8 @@
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
+                        <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input class="button" name="reset" type="reset">
                     </td>
                 </tr>
             </table>
@@ -78,7 +79,7 @@
     </div>
 
 
-    <div th:if="${accountViewModel.isOwner()}">
+    <div class="grey_box" th:if="${accountViewModel.isOwner()}">
 
         <h1 id="application_banner">Modify Application Information</h1>
         <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
@@ -102,8 +103,8 @@
                 <tr>
                     <td colspan="2" style="text-align:center;">
                         <input type="hidden" name="applicationId" id="applicationId" th:value="${accountViewModel.getApplicationId()}" />
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
+                        <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input class="button" name="reset" type="reset">
                     </td>
                 </tr>
                 <tr>
@@ -157,15 +158,15 @@
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
+                        <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input class="button" name="reset" type="reset">
                     </td>
                 </tr>
             </table>
         </form>
     </div>
 
-    <div th:unless="${accountViewModel.isOwner()}">
+    <div class="grey_box" th:unless="${accountViewModel.isOwner()}">
 
         <h1 id="create_application_banner">Add Disc App To Account</h1>
         <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
@@ -225,8 +226,8 @@
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
+                        <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input class="button" name="reset" type="reset">
                     </td>
                 </tr>
             </table>
@@ -242,7 +243,7 @@
         </tr>
     </table>
 
-</center>
+
 
 </body>
 </html>
