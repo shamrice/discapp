@@ -399,7 +399,58 @@ function switchElements(element1,element2) {
 </div>
 
 
-<!-- TODO : LABELS -->
+
+<div class="grey_box closed" id="labelbox_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
+    <span class="toggle" onclick="switchElements('labelbox_closed', 'labelbox_open');" title="Show label controls">Labels +</span>
+</div>
+<div class="grey_box" id="labelbox_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
+
+    <div class="toggle" id="labelbox_close_toggle">
+        <span class="toggle close" onclick="switchElements('labelbox_open', 'labelbox_closed');" title="Hide label controls">close</span>
+    </div>
+
+    <form method="post"
+          th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          th:object="${maintenanceViewModel}"
+          enctype="multipart/form-data">
+
+        <p>The following labels appear when posting a message to your DiscussionApp and also as column headers when using collapsed threads.</p>
+        <table>
+            <tr>
+                <th>Author</th>
+                <td>
+                    <input type="text" name="authorHeader" th:value="${maintenanceViewModel.getAuthorHeader()}" size="32" maxlength="32" />
+                </td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>
+                    <input type="text" name="dateHeader" th:value="${maintenanceViewModel.getDateHeader()}" size="32" maxlength="32" />
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>
+                    <input type="text" name="emailHeader" th:value="${maintenanceViewModel.getEmailHeader()}" size="32" maxlength="32" />
+                </td>
+            </tr>
+            <tr>
+                <th>Subject</th>
+                <td>
+                    <input type="text" name="subjectHeader" th:value="${maintenanceViewModel.getSubjectHeader()}" size="32" maxlength="32" />
+                </td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>
+                    <input type="text" name="messageHeader" th:value="${maintenanceViewModel.getMessageHeader()}" size="32" maxlength="32" />
+                </td>
+            </tr>
+        </table>
+        <input type="submit" name="ChangeFieldHeaders" value="Change Labels" class="button" /> </form>
+</div>
+
+
 
 <!-- TODO : BUTTONS -->
 

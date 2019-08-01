@@ -35,6 +35,14 @@ public class MaintenanceViewModel {
     private String header;
     private String footer;
 
+    //label config
+    private String authorHeader;
+    private String dateHeader;
+    private String emailHeader;
+    private String subjectHeader;
+    private String messageHeader;
+
+
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
         return threadDepth == dropDownValue;
@@ -210,5 +218,45 @@ public class MaintenanceViewModel {
 
     public void setFooter(String footer) {
         this.footer = footer;
+    }
+
+    public String getAuthorHeader() {
+        return authorHeader;
+    }
+
+    public void setAuthorHeader(String authorHeader) {
+        this.authorHeader = authorHeader;
+    }
+
+    public String getDateHeader() {
+        return dateHeader;
+    }
+
+    public void setDateHeader(String dateHeader) {
+        this.dateHeader = dateHeader;
+    }
+
+    public String getEmailHeader() {
+        return emailHeader;
+    }
+
+    public void setEmailHeader(String emailHeader) {
+        this.emailHeader = emailHeader;
+    }
+
+    public String getSubjectHeader() {
+        return subjectHeader;
+    }
+
+    public void setSubjectHeader(String subjectHeader) {
+        this.subjectHeader = subjectHeader;
+    }
+
+    public String getMessageHeader() {
+        return messageHeader;
+    }
+
+    public void setMessageHeader(String messageHeader) {
+        this.messageHeader = messageHeader;
     }
 }

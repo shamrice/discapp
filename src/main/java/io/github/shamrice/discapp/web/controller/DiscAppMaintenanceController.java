@@ -143,6 +143,12 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
+    @GetMapping("/admin/modify/labels")
+    public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId,
+                                              @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
     @PostMapping("/admin/modify/application")
     public ModelAndView postModifyApplication(@RequestParam(name = "id") long appId,
                                               @RequestParam(name = "redirect", required = false) String redirect,
@@ -353,6 +359,39 @@ public class DiscAppMaintenanceController {
                 maintenanceViewModel.setInfoMessage("Successfully saved changes to header and footer.");
             } else {
                 maintenanceViewModel.setInfoMessage("Failed to save changes to header and footer.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
+
+    @PostMapping("/admin/modify/labels")
+    public ModelAndView postModifyLabels(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "redirect", required = false) String redirect,
+                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                               Model model) {
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+
+            boolean authorHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBMITTER_LABEL_TEXT, maintenanceViewModel.getAuthorHeader());
+            boolean dateHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_LABEL_TEXT, String.valueOf(maintenanceViewModel.getDateHeader()));
+            boolean emailSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EMAIL_LABEL_TEXT, String.valueOf(maintenanceViewModel.getEmailHeader()));
+            boolean subjectSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBJECT_LABEL_TEXT, String.valueOf(maintenanceViewModel.getSubjectHeader()));
+            boolean messageSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
+
+            if (authorHeaderSaved && dateHeaderSaved && emailSaved && subjectSaved && messageSaved) {
+                maintenanceViewModel.setInfoMessage("Successfully saved changes to labels.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save changes to labels.");
             }
 
         } else {
