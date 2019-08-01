@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -16,6 +19,17 @@
         color: green;
     }
 
+ div.style_buttons input { padding:3px; background-color:#fff; border:1px solid #000;}
+ div.style_buttons input:hover { background-color:#aaf; }
+ table#app_prefs th { width:18em; background:#ccf; padding:1ex; }
+ table#app_prefs td { background:#e8e8e8; width:6em; text-align:left; padding-left:1ex; }
+ span.toggle { font-weight:bold; color:blue; }
+ span.toggle:hover { background-color:yellow; cursor:pointer; }
+ div.toggle { text-align:right; font-size:smaller; /*display:none;*/ }
+ div.closed { /*display:none;*/ text-align:right; padding-right:35%; }
+ span.close { text-decoration:underline; }
+
+
 
 </style>
 
@@ -26,217 +40,35 @@ function switchElements(element1,element2) {
     document.getElementById(element2).style.display = "block";
 }
 
+
+
 </script>
 
-<center>
+<div th:if="${maintenanceViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceViewModel.getInfoMessage()}">
+</div>
 
-    <div th:if="${maintenanceViewModel.getInfoMessage()}" class="alert alert-error"
-         th:text="${maintenanceViewModel.getInfoMessage()}">
+
+<div class="grey_box closed" id="app_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:block;">
+    <span class="toggle" onclick="switchElements('app_configuration_closed', 'app_configuration_open');"
+          title="Show application controls">Application +</span>
+</div>
+
+
+<div class="grey_box" id="app_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:none;">
+
+    <div class="toggle" id="app_close_toggle">
+        <span class="toggle close" onclick="switchElements('app_configuration_open', 'app_configuration_closed');"
+              title="Hide application controls">close</span>
     </div>
 
-    <div th:if="${maintenanceViewModel.getApplicationId()}">
-        <h1 id="account_banner">Modify Disc App</h1>
-        <form name="f" th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
-              th:object="${maintenanceViewModel}">
-            <table>
-
-                <tr>
-                    <td>Disc App Id:</td>
-                    <td th:text="${maintenanceViewModel.getApplicationId()}">
-                    </td>
-                </tr>
-                <tr>
-                    <td>Created:</td>
-                    <td th:text="${maintenanceViewModel.getApplicationCreateDt()}"></td>
-                </tr>
-                <tr>
-                    <td>Last Modified:</td>
-                    <td th:text="${maintenanceViewModel.getApplicationModDt()}"></td>
-                </tr>
-                <tr>
-                    <td>Disc App Name:</td>
-                    <td><input type="text" id="applicationName" name="applicationName"
-                               th:value="${maintenanceViewModel.getApplicationName()}"/></td>
-                </tr>
-
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Change Name">&nbsp;
-                        <input name="reset" type="reset">
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-
-    <div id="css_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
-        <center>
-            <h2>
-                <a href="#" onclick="switchElements('css_configuration_closed', 'css_configuration_open')">
-                    Style Sheet +
-                </a>
-            </h2>
-        </center>
-    </div>
-
-    <div id="css_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
-
-        <script type="text/javascript">
-            function setStyleSheetUrl(url) {
-                document.getElementById("styleSheetUrl").value = url;
-            }
-        </script>
-
-        <h1 id="style_sheet_banner">Modify Style Sheet</h1>
-
-        <div id="css_close_link" style="text-align:center;">
-            <b>
-                <a href="#" onclick="switchElements('css_configuration_open', 'css_configuration_closed')">
-                    close
-                </a>
-            </b>
-        </div>
-
-        <form name="f" th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
-              th:object="${maintenanceViewModel}">
-            <table>
-
-                <tr>
-                    <td>Style Sheet URL:</td>
-                    <td> <input type="text" name="styleSheetUrl" id="styleSheetUrl" th:value="${maintenanceViewModel.getStyleSheetUrl()}" />
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">Or pick one of the following:</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <ul>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/graph2.css')">Graph</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/ocean.css')">Ocean</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/cute.css')">Cute</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/cyan2.css')">Cyan</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/forest.css')">Forest</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/midnight.css')">Midnight</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/steely.css')">Steely</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/traditional.css')">Traditional</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-
-
-    <div id="prologue_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}" style="display:block;">
-        <center>
-            <h2>
-                <a href="#" onclick="switchElements('prologue_configuration_closed', 'prologue_configuration_open')">
-                    Prologue/Epilogue +
-                </a>
-            </h2>
-        </center>
-    </div>
-
-    <div id="prologue_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
-
-        <h1 id="prologue_epilogue_account_banner">Prologue and Epilogue Configuration </h1>
-        <div id="prologue_close_link" style="text-align:center;">
-            <b>
-                <a href="#" onclick="switchElements('prologue_configuration_open', 'prologue_configuration_closed')">
-                    close
-                </a>
-            </b>
-        </div>
-
-        <form name="f" th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}" method="post"
-              th:object="${maintenanceViewModel}">
-            <table>
-                <tr>
-                    <td>Prologue Text:</td>
-                </tr>
-                <tr>
-                    <td>
-                        <textarea name="prologueText" rows="24" cols="120" wrap="soft"
-                                  th:utext="${maintenanceViewModel.getPrologueText()}" maxlength="16384"></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Prologue Last Modified:
-                        <label th:text="${maintenanceViewModel.getPrologueModDt()}"></label>
-                </tr>
-                <tr>
-                    <td>
-                        <hr />
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Epilogue Text:</td>
-                </tr>
-                <tr>
-                    <td>
-                        <textarea name="epilogueText" rows="24" cols="120" wrap="soft"
-                                  th:utext="${maintenanceViewModel.getEpilogueText()}" maxlength="16384"></textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Epilogue Last Modified:
-                        <label th:text="${maintenanceViewModel.getEpilogueModDt()}"></label>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="text-align:center;">
-                        <input name="submit" type="submit" value="Save Changes">&nbsp;
-                        <input name="reset" type="reset">
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-
-
-    <!--
-    <form name="f" th:action="@{|/admin/modify?redirect=${maintenanceViewModel.getRedirect()}|}" method="post" th:object="${maintenanceViewModel}">
+    <form name="f"
+          th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceViewModel}">
         <table>
-
-            <div th:if="${maintenanceViewModel.getErrorMessage()}" class="alert alert-error"
-                 th:text="${maintenanceViewModel.getErrorMessage()}">
-            </div>
 
             <tr>
                 <td>Disc App Id:</td>
@@ -245,32 +77,25 @@ function switchElements(element1,element2) {
             </tr>
             <tr>
                 <td>Created:</td>
-                <td th:text="${maintenanceViewModel.getCreateDt()}"></td>
+                <td th:text="${maintenanceViewModel.getApplicationCreateDt()}"></td>
             </tr>
             <tr>
                 <td>Last Modified:</td>
-                <td th:text="${maintenanceViewModel.getModDt()}"></td>
+                <td th:text="${maintenanceViewModel.getApplicationModDt()}"></td>
             </tr>
             <tr>
                 <td>Disc App Name:</td>
-                <td><input type="text" id="applicationName" name="applicationName" th:value="${maintenanceViewModel.getApplicationName()}"/></td>
+                <td><input type="text" id="applicationName" name="applicationName"
+                           th:value="${maintenanceViewModel.getApplicationName()}"/></td>
             </tr>
 
-            <tr>
-                <td>Password:</td>
-                <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
-            </tr>
-            <tr>
-                <td>Confirm Password:</td>
-                <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
-            </tr>
             <tr>
                 <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input name="reset" type="reset">
+                    <input class="button" name="submit" type="submit" value="Change Name">&nbsp;
+                    <input class="button" name="reset" type="reset">
                 </td>
             </tr>
         </table>
@@ -278,166 +103,288 @@ function switchElements(element1,element2) {
 </div>
 
 
-<div th:if="${accountViewModel.isOwner()}">
+<div class="grey_box closed" id="css_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:block;">
+    <span class="toggle" onclick="switchElements('css_configuration_closed', 'css_configuration_open');"
+          title="Show css controls">Style Sheet +</span>
+</div>
 
-    <h1 id="application_banner">Modify Application Information</h1>
-    <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+
+<div class="grey_box" id="css_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:none;">
+
+    <div class="toggle" id="css_close_toggle">
+        <span class="toggle close" onclick="switchElements('css_configuration_open', 'css_configuration_closed');"
+              title="Hide css controls">close</span>
+    </div>
+
+
+    <script type="text/javascript">
+            function setStyleSheetUrl(url) {
+                document.getElementById("styleSheetUrl").value = url;
+            }
+
+
+    </script>
+
+
+    <form name="f"
+          th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceViewModel}">
         <table>
+
             <tr>
-                <td>
-                    Application Index:
-                </td>
-                <td th:text="${accountViewModel.getApplicationId()}">
+                <td>Style Sheet URL:</td>
+                <td><input type="text" name="styleSheetUrl" id="styleSheetUrl"
+                           th:value="${maintenanceViewModel.getStyleSheetUrl()}"/>
                 </td>
             </tr>
             <tr>
-                <td>
-                    Application Name:
+                <td colspan="2">Or pick one of the following:</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <ul>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/graph2.css')">Graph</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/ocean.css')">Ocean</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/cute.css')">Cute</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/cyan2.css')">Cyan</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/forest.css')">Forest</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/midnight.css')">Midnight</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/steely.css')">Steely</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="setStyleSheetUrl('/styles/traditional.css')">Traditional</a>
+                        </li>
+                    </ul>
                 </td>
-                <td>
-                    <input type="text" id="applicationName" name="applicationName"
-                           th:value="${accountViewModel.getApplicationName()}"/>
-                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input type="hidden" name="applicationId" id="applicationId" th:value="${accountViewModel.getApplicationId()}" />
-                    <input name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input name="reset" type="reset">
-                </td>
-            </tr>
-        </table>
-    </form>
-
-
-    <h1 id="owner_banner">Modify Application Owner Information</h1>
-    <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
-        <table>
-            <tr>
-                <td>
-                    First Name:
-                </td>
-                <td>
-                    <input type="text" id="ownerFirstName" name="ownerFirstName"
-                           th:value="${accountViewModel.getOwnerFirstName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Last Name:
-                </td>
-                <td>
-                    <input type="text" id="ownerLastName" name="ownerLastName"
-                           th:value="${accountViewModel.getOwnerLastName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Email:
-                </td>
-                <td>
-                    <input type="text" id="ownerEmail" name="ownerEmail"
-                           th:value="${accountViewModel.getOwnerEmail()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Phone Number:
-                </td>
-                <td>
-                    <input type="text" id="ownerPhone" name="ownerPhone"
-                           th:value="${accountViewModel.getOwnerPhone()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <input name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input name="reset" type="reset">
+                    <input class="button" name="submit" type="submit" value="Change Style Sheet">&nbsp;
+                    <input class="button" name="reset" type="reset">
                 </td>
             </tr>
         </table>
     </form>
 </div>
 
-<div th:unless="${accountViewModel.isOwner()}">
 
-    <h1 id="create_application_banner">Add Disc App To Account</h1>
-    <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+<div class="grey_box closed" id="thread_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:block;">
+    <span class="toggle" onclick="switchElements('thread_configuration_closed', 'thread_configuration_open');"
+          title="Show thread controls">Threads +</span>
+</div>
+
+<div class="grey_box" id="thread_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:none;">
+
+    <div class="toggle" id="threadbox_close_toggle">
+        <span class="toggle close" onclick="switchElements('thread_configuration_open', 'thread_configuration_closed');"
+              title="Hide thread controls">close</span>
+    </div>
+
+    <form name="f"
+          th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceViewModel}">
+        <input type="hidden" name="id" value="46108"/>
+        <table id="app_prefs" style="">
+            <tr>
+                <th>Sort threads in order of</th>
+                <td>
+                    <label>
+                        <input type="radio" name="threadSortOrder" value="creation"
+                               th:checked="${maintenanceViewModel.isThreadSortOrderCreation()}"/>creation</label>
+                    <label>
+                        <input type="radio" name="threadSortOrder" value="activity"
+                               th:checked="${maintenanceViewModel.isThreadSortOrderActivity()}"/>activity</label>
+                </td>
+            </tr>
+            <tr>
+                <th>Expand threads on index pages?</th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="expandThreadsOnIndex"
+                               th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}" id="expandThreadsOnIndex"/>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Preview the first message in a thread on the index page?</th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="previewFirstMessageOnIndex"
+                               th:checked="${maintenanceViewModel.isPreviewFirstMessageOnIndex()}"
+                               id="previewFirstMessageOnIndex"/>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th>Highlight new messages? <a class="hidden_text"
+                                               href="/Documentation/HTML/discussionapps_expanded.html"
+                                               target="_blank">(more)<span>If you enable this option, then replies posted in the past 24 hours will be highlighted (that is, replies to threads that are over a day old).<br><br>If you use your own style sheet, then you'll have to add a rule for LI.new_message or SPAN.new_message.</span></a>
+                </th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="highlightNewMessages"
+                               th:checked="${maintenanceViewModel.isHighlightNewMessages()}"
+                               id="highlightNewMessages"/>
+                    </label>
+                </td>
+            </tr>
+        </table>
+        <p><b>Thread Break</b> (Text that appears between expanded threads)
+            <input type="text" name="threadBreak"
+                   th:value="${maintenanceViewModel.getThreadBreak()}"
+                   size="35" maxlength="128"/>
+        </p>
+        <p><b>Entry Break</b> (Text that appears between subject and author in the list of messages)
+            <input type="text" name="entryBreak" th:value="${maintenanceViewModel.getEntryBreak()}" size="35"
+                   maxlength="128"/>
+        </p>
+        <p><b>Thread Depth</b> (Number of indented replies before presenting a "# more comments" link)
+            <select name="threadDepth" class="button" style="border:1px solid black;">
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(3)}" value="3">3</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(4)}" value="4">4</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(5)}" value="5">5</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(6)}" value="6">6</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(7)}" value="7">7</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(8)}" value="8">8</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(9)}" value="9">9</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(10)}" value="10">10</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(11)}" value="11">11</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(12)}" value="12">12</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(13)}" value="13">13</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(14)}" value="14">14</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(15)}" value="15">15</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(16)}" value="16">16</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(17)}" value="17">17</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(18)}" value="18">18</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(19)}" value="19">19</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(20)}" value="20">20</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(21)}" value="21">21</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(22)}" value="22">22</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(23)}" value="23">23</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(24)}" value="24">24</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(25)}" value="25">25</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(26)}" value="26">26</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(27)}" value="27">27</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(28)}" value="28">28</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(29)}" value="29">29</option>
+                <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(30)}" value="30">30</option>
+            </select>
+        </p>
+        <input type="submit" name="ChangeThreads" value="Change Threads" class="button"/>
+    </form>
+</div>
+
+
+<!-- TODO : HEADER/FOOTER -->
+
+
+<div class="grey_box closed" id="prologue_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:block;">
+    <span class="toggle" onclick="switchElements('prologue_configuration_closed', 'prologue_configuration_open');"
+          title="Show prologue/epilogue controls">Prologue/Epilogue +</span>
+</div>
+
+
+<div class="grey_box" id="prologue_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
+     style="display:none;">
+
+    <div class="toggle" id="prologue_close_toggle">
+        <span class="toggle close"
+              onclick="switchElements('prologue_configuration_open', 'prologue_configuration_closed');"
+              title="Hide prologue/epilogue controls">close</span>
+    </div>
+
+    <form name="f"
+          th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceViewModel}">
         <table>
             <tr>
+                <td>Prologue Text:</td>
+            </tr>
+            <tr>
                 <td>
-                    Application Name:
+                        <textarea name="prologueText" rows="24" cols="120" wrap="soft"
+                                  th:utext="${maintenanceViewModel.getPrologueText()}" maxlength="16384"></textarea>
                 </td>
+            </tr>
+            <tr>
+                <td>Prologue Last Modified:
+                    <label th:text="${maintenanceViewModel.getPrologueModDt()}"></label>
+            </tr>
+            <tr>
                 <td>
-                    <input type="text" id="applicationName" name="applicationName"
-                           th:value="${accountViewModel.getApplicationName()}"/>
+                    <hr/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Epilogue Text:</td>
+            </tr>
+            <tr>
+                <td>
+                        <textarea name="epilogueText" rows="24" cols="120" wrap="soft"
+                                  th:utext="${maintenanceViewModel.getEpilogueText()}" maxlength="16384"></textarea>
                 </td>
             </tr>
             <tr>
                 <td>
-                    First Name:
-                </td>
-                <td>
-                    <input type="text" id="ownerFirstName" name="ownerFirstName"
-                           th:value="${accountViewModel.getOwnerFirstName()}"/>
+                    Epilogue Last Modified:
+                    <label th:text="${maintenanceViewModel.getEpilogueModDt()}"></label>
                 </td>
             </tr>
+
             <tr>
-                <td>
-                    Last Name:
-                </td>
-                <td>
-                    <input type="text" id="ownerLastName" name="ownerLastName"
-                           th:value="${accountViewModel.getOwnerLastName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Email:
-                </td>
-                <td>
-                    <input type="text" id="ownerEmail" name="ownerEmail"
-                           th:value="${accountViewModel.getOwnerEmail()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Phone Number:
-                </td>
-                <td>
-                    <input type="text" id="ownerPhone" name="ownerPhone"
-                           th:value="${accountViewModel.getOwnerPhone()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>Password:</td>
-                <td><input type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
-            </tr>
-            <tr>
-                <td>Confirm Password:</td>
-                <td><input type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input name="reset" type="reset">
+                    <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input class="button" name="reset" type="reset">
                 </td>
             </tr>
         </table>
     </form>
 </div>
--->
 
-    <table>
-        <tr>
-            <td colspan="2" style="text-align:center;">
-                <a th:href="${maintenanceViewModel.getRedirect()}"
-                   th:text="@{|Return to ${maintenanceViewModel.getRedirect()}|}"></a>
-            </td>
-        </tr>
-    </table>
 
-</center>
+<!-- TODO : LABELS -->
+
+<!-- TODO : BUTTONS -->
+
+<!-- TODO : FAVICON -->
+
+<table>
+    <tr>
+        <td colspan="2" style="text-align:center;">
+            <a th:href="${maintenanceViewModel.getRedirect()}"
+               th:text="@{|Return to ${maintenanceViewModel.getRedirect()}|}"></a>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

@@ -6,16 +6,44 @@ public class MaintenanceViewModel {
 
     private String redirect;
     private String infoMessage;
+
+    //application config
     private Long applicationId;
     private String applicationName;
     private Date applicationCreateDt;
     private Date applicationModDt;
+
+    //prologue / epilogue config
     private String prologueText;
     private String epilogueText;
     private Date prologueModDt;
     private Date epilogueModDt;
+
+    //style sheet config
     private String styleSheetUrl;
 
+    // thread config
+    private String threadSortOrder;
+    private boolean expandThreadsOnIndex;
+    private boolean previewFirstMessageOnIndex;
+    private boolean highlightNewMessages;
+    private String threadBreak;
+    private String entryBreak;
+    private int threadDepth;
+
+
+    public boolean isSelectedThreadDepth(int dropDownValue) {
+        return threadDepth == dropDownValue;
+    }
+
+    public boolean isThreadSortOrderCreation() {
+        return threadSortOrder.equalsIgnoreCase("creation");
+    }
+
+
+    public boolean isThreadSortOrderActivity() {
+        return threadSortOrder.equalsIgnoreCase("activity");
+    }
 
 
     public String getRedirect() {
@@ -105,5 +133,62 @@ public class MaintenanceViewModel {
 
     public void setStyleSheetUrl(String styleSheetUrl) {
         this.styleSheetUrl = styleSheetUrl;
+    }
+
+    public boolean isExpandThreadsOnIndex() {
+        return expandThreadsOnIndex;
+    }
+
+    public void setExpandThreadsOnIndex(boolean expandThreadsOnIndex) {
+        this.expandThreadsOnIndex = expandThreadsOnIndex;
+    }
+
+    public boolean isPreviewFirstMessageOnIndex() {
+        return previewFirstMessageOnIndex;
+    }
+
+    public void setPreviewFirstMessageOnIndex(boolean previewFirstMessageOnIndex) {
+        this.previewFirstMessageOnIndex = previewFirstMessageOnIndex;
+    }
+
+    public boolean isHighlightNewMessages() {
+        return highlightNewMessages;
+    }
+
+    public void setHighlightNewMessages(boolean highlightNewMessages) {
+        this.highlightNewMessages = highlightNewMessages;
+    }
+
+    public String getThreadBreak() {
+        return threadBreak;
+    }
+
+    public void setThreadBreak(String threadBreak) {
+        this.threadBreak = threadBreak;
+    }
+
+    public String getEntryBreak() {
+        return entryBreak;
+    }
+
+    public void setEntryBreak(String entryBreak) {
+        this.entryBreak = entryBreak;
+    }
+
+    public int getThreadDepth() {
+        return threadDepth;
+    }
+
+    public void setThreadDepth(int threadDepth) {
+        this.threadDepth = threadDepth;
+    }
+
+
+    public void setThreadSortOrder(String threadSortOrder) {
+        this.threadSortOrder = threadSortOrder;
+    }
+
+    public String getThreadSortOrder() {
+        return this.threadSortOrder;
     }
 }

@@ -74,6 +74,27 @@ public class DiscAppMaintenanceController {
                 String styleSheetUrl = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "");
                 maintenanceViewModel.setStyleSheetUrl(styleSheetUrl);
 
+                String sortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, "creation");
+                maintenanceViewModel.setThreadSortOrder(sortOrder);
+
+                boolean expandThreadsOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
+                maintenanceViewModel.setExpandThreadsOnIndex(expandThreadsOnIndex);
+
+                boolean previewFirstMessageOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, false);
+                maintenanceViewModel.setPreviewFirstMessageOnIndex(previewFirstMessageOnIndex);
+
+                boolean highlightNewMessages = configurationService.getBooleanValue(appId, ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, false);
+                maintenanceViewModel.setHighlightNewMessages(highlightNewMessages);
+
+                String threadBreak = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />");
+                maintenanceViewModel.setThreadBreak(threadBreak);
+
+                String entryBreak = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+                maintenanceViewModel.setEntryBreak(entryBreak);
+
+                int threadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 15);
+                maintenanceViewModel.setThreadDepth(threadDepth);
+
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
@@ -102,7 +123,12 @@ public class DiscAppMaintenanceController {
     @GetMapping("/admin/modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId,
                                                   @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
 
+    @GetMapping("/admin/modify/threads")
+    public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId,
+                                            @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -167,24 +193,12 @@ public class DiscAppMaintenanceController {
         if (applicationService.isOwnerOfApp(appId, username)) {
             Application app = applicationService.get(appId);
 
-            Configuration styleSheetConfig = configurationService.getConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL.getPropName());
-
-            if (styleSheetConfig == null) {
-                logger.info("Creating new style sheet configuration for appId: " + appId);
-                styleSheetConfig = new Configuration();
-                styleSheetConfig.setName(ConfigurationProperty.STYLE_SHEET_URL.getPropName());
-                styleSheetConfig.setApplicationId(app.getId());
-            }
-
-            styleSheetConfig.setValue(maintenanceViewModel.getStyleSheetUrl());
-
-            if (!configurationService.saveConfiguration(ConfigurationProperty.STYLE_SHEET_URL, styleSheetConfig)) {
-                logger.warn("Failed to update style sheet url of appId: " + appId);
+            if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, maintenanceViewModel.getStyleSheetUrl())) {
                 maintenanceViewModel.setInfoMessage("Failed to update Style Sheet URL.");
             } else {
-                logger.info("Updated style sheet url for appId: " + appId + " to " + maintenanceViewModel.getStyleSheetUrl());
                 maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
             }
+
         } else {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
@@ -271,6 +285,64 @@ public class DiscAppMaintenanceController {
 
         return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
 
+    }
+
+
+    @PostMapping("/admin/modify/threads")
+    public ModelAndView postModifyThreads(@RequestParam(name = "id") long appId,
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model) {
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+
+            boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
+            boolean expandSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
+            boolean previewSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isPreviewFirstMessageOnIndex()));
+            boolean highlightSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, String.valueOf(maintenanceViewModel.isHighlightNewMessages()));
+            boolean threadBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
+            boolean entryBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
+            boolean threadDepthSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
+
+            if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved && threadDepthSaved) {
+                maintenanceViewModel.setInfoMessage("Successfully saved changes to threads.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save changes to threads.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
+    private boolean saveUpdatedConfiguration(long appId, ConfigurationProperty property, String value) {
+
+        Configuration configToUpdate = configurationService.getConfiguration(appId, property.getPropName());
+
+        if (configToUpdate == null) {
+            logger.info("Creating new configuration prop: " + property.getPropName() + " for appId: " + appId);
+            configToUpdate = new Configuration();
+            configToUpdate.setName(property.getPropName());
+            configToUpdate.setApplicationId(appId);
+        }
+
+        configToUpdate.setValue(value);
+
+        if (!configurationService.saveConfiguration(property, configToUpdate)) {
+            logger.warn("Failed to update configuration " + property.getPropName() + " of appId: " + appId);
+            return false;
+        } else {
+            logger.info("Updated " + property.getPropName() + " for appId: " + appId + " to " + value);
+        }
+
+        return true;
     }
 
 }
