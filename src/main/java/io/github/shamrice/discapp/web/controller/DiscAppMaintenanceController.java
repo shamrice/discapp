@@ -397,6 +397,9 @@ public class DiscAppMaintenanceController {
         if (applicationService.isOwnerOfApp(appId, username)) {
             Application app = applicationService.get(appId);
 
+            if (maintenanceViewModel.getThreadSortOrder() == null || maintenanceViewModel.getThreadSortOrder().isEmpty()) {
+                maintenanceViewModel.setThreadSortOrder("creation");
+            }
 
             boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
             boolean expandSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
