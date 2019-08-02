@@ -336,16 +336,15 @@ public class DiscAppController {
 
             ThreadTreeNode subThreadNode = threadService.getFullThreadTree(grandparentId);
 
-            List<String> subThreadsHtml = new ArrayList<>();
+            String subThreadsHtml = "";
 
             if (subThreadNode != null) {
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
-                //subThreadsHtml.add(getThreadViewReplyHtml(subThreadNode, currentHtml, entryBreakString,
-                //        skipCurrent, currentThread.getId(), true) + "</ul>");
+                currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
+                                skipCurrent, currentThread.getId(), true) ;
 
-                subThreadsHtml.add(getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                        skipCurrent, currentThread.getId(), true) + "</ul>");
+                subThreadsHtml += currentHtml;
             }
 
             String threadBody = threadService.getThreadBodyText(threadId);

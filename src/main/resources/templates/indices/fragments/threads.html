@@ -7,7 +7,7 @@
 
     <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
         <div class="thread" th:utext="${threadHtml}"></div>
-        <div th:utext="${threadSeparator}"/></div>
+        <div th:utext="${threadSeparator}"></div>
     </div>
 
 </div>
