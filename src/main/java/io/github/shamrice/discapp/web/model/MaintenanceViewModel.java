@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class MaintenanceViewModel {
 
@@ -54,6 +55,15 @@ public class MaintenanceViewModel {
     //favicon config
     private String favicon;
 
+    //date and time config
+    private List<String> timezones;
+    private String selectedTimezone;
+    private String dateFormat;
+
+
+    public boolean isCurrentTimezone(String timezone) {
+        return this.selectedTimezone.equalsIgnoreCase(timezone);
+    }
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
         return threadDepth == dropDownValue;
@@ -333,5 +343,29 @@ public class MaintenanceViewModel {
 
     public void setFavicon(String favicon) {
         this.favicon = favicon;
+    }
+
+    public List<String> getTimezones() {
+        return timezones;
+    }
+
+    public void setTimezones(List<String> timezones) {
+        this.timezones = timezones;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public String getSelectedTimezone() {
+        return selectedTimezone;
+    }
+
+    public void setSelectedTimezone(String selectedTimezone) {
+        this.selectedTimezone = selectedTimezone;
     }
 }

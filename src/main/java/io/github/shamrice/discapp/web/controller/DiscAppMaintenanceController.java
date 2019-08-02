@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 @Controller
 public class DiscAppMaintenanceController {
@@ -147,6 +150,17 @@ public class DiscAppMaintenanceController {
                 String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
                 maintenanceViewModel.setFavicon(favicon);
 
+                //time and date config
+                String timezone = configurationService.getStringValue(appId, ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
+                maintenanceViewModel.setSelectedTimezone(timezone);
+
+                String dateFormat = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
+                maintenanceViewModel.setDateFormat(dateFormat);
+
+                String[] timezoneIds = TimeZone.getAvailableIDs();
+                List<String> timezones = Arrays.asList(timezoneIds);
+                maintenanceViewModel.setTimezones(timezones);
+
 
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
@@ -205,6 +219,12 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/modify/favicon")
     public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "redirect", required = false) String redirect) {
+        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+    }
+
+    @GetMapping("/admin/modify/time")
+    public ModelAndView getModifyTime(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
     }
@@ -536,6 +556,39 @@ public class DiscAppMaintenanceController {
             } else {
                 maintenanceViewModel.setFavicon(favicon);
                 maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
+            }
+
+        } else {
+            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+        }
+
+        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+    }
+
+    @PostMapping("/admin/modify/time")
+    public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model) {
+
+        if (maintenanceViewModel.getDateFormat() == null || maintenanceViewModel.getDateFormat().trim().isEmpty()) {
+            maintenanceViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
+        }
+
+        AccountHelper accountHelper = new AccountHelper();
+        String username = accountHelper.getLoggedInUserName();
+
+        if (applicationService.isOwnerOfApp(appId, username)) {
+            Application app = applicationService.get(appId);
+
+            boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceViewModel.getSelectedTimezone());
+            boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, String.valueOf(maintenanceViewModel.getDateFormat()));
+
+            if (timezoneSaved && dateFormatSaved) {
+                logger.info("Saved date and time settings for appId: " + appId);
+                maintenanceViewModel.setInfoMessage("Successfully saved changes to Date and Time.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save changes to Date and Time.");
             }
 
         } else {
