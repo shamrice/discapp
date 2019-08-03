@@ -22,6 +22,11 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
+
+        if (username == null || username.trim().isEmpty()) {
+            throw new UsernameNotFoundException("Username cannot be blank");
+        }
+
         DiscAppUser user = discappUserRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
@@ -56,8 +61,11 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                     user.setPassword(encodedPassword);
                 }
 
+                user.setUsername(user.getUsername().trim());
+
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
+                    logger.info("Created new user: " + createdUser.getUsername());
                     return true;
                 }
             } catch (Exception ex) {
