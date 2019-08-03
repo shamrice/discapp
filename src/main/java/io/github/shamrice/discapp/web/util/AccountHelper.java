@@ -17,6 +17,18 @@ public class AccountHelper {
         return false;
     }
 
+    public String getLoggedInEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            if (auth.isAuthenticated() && !auth.getPrincipal().equals(ANONYMOUS_USER)) {
+                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
+                return principal.getEmail();
+            }
+        }
+        return null;
+    }
+
+    /*
     public String getLoggedInUserName() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
@@ -27,5 +39,7 @@ public class AccountHelper {
         }
         return null;
     }
+
+     */
 
 }

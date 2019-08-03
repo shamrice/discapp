@@ -12,4 +12,7 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
     @Query(value = "SELECT u FROM discapp_user u WHERE lower(u.username) = lower(:username)")
     DiscAppUser findByUsername(@Param("username") String username);
 
+
+    @Query(value = "SELECT u FROM discapp_user u WHERE lower(u.email) = lower(:email)")
+    DiscAppUser findByEmail(@Param("email") String email);
 }

@@ -171,7 +171,8 @@ public class DiscAppController {
         AccountHelper accountHelper = new AccountHelper();
         if (accountHelper.isLoggedIn()) {
             model.addAttribute("isLoggedIn", "true");
-            DiscAppUser user = discAppUserDetailsService.getByUsername(accountHelper.getLoggedInUserName());
+            //DiscAppUser user = discAppUserDetailsService.getByUsername(accountHelper.getLoggedInUserName());
+            DiscAppUser user = discAppUserDetailsService.getByEmail(accountHelper.getLoggedInEmail());
             model.addAttribute("submitter", user.getUsername());
             model.addAttribute("email", user.getEmail());
             model.addAttribute("showEmail", user.getShowEmail());
@@ -267,8 +268,10 @@ public class DiscAppController {
 
                 //set values for logged in user, if not logged in... use form data.
                 AccountHelper accountHelper = new AccountHelper();
-                String username = accountHelper.getLoggedInUserName();
-                DiscAppUser discAppUser = discAppUserDetailsService.getByUsername(username);
+                //String username = accountHelper.getLoggedInUserName();
+                //DiscAppUser discAppUser = discAppUserDetailsService.getByUsername(username);
+                String userEmail = accountHelper.getLoggedInEmail();
+                DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(userEmail);
                 if (discAppUser != null) {
                     newThread.setDiscappUserId(discAppUser.getId());
                     newThread.setSubmitter(discAppUser.getUsername());

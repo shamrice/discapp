@@ -141,25 +141,25 @@ public class ApplicationService {
         return applicationRepository.getOne(id);
     }
 
-    public boolean isOwnerOfApp(long appId, String username) {
-        Long ownerIdForUsername = discAppUserDetailsService.getOwnerIdForUsername(username);
+    public boolean isOwnerOfApp(long appId, String email) {
+        Long ownerIdForEmail = discAppUserDetailsService.getOwnerIdForEmail(email);
 
-        if (ownerIdForUsername != null && ownerIdForUsername > 0) {
-            Owner owner = accountService.getOwnerById(ownerIdForUsername);
+        if (ownerIdForEmail != null && ownerIdForEmail > 0) {
+            Owner owner = accountService.getOwnerById(ownerIdForEmail);
             if (owner != null) {
                 List<Application> ownedApps = applicationRepository.findByOwnerId(owner.getId());
                 for (Application application : ownedApps) {
                     if (application.getId() != null && application.getId() == appId) {
-                        logger.info("User: " + username + " is owner of appId: " + appId + " :: returning true.");
+                        logger.info("User: " + email + " is owner of appId: " + appId + " :: returning true.");
                         return true;
                     }
                 }
             }
         } else {
-            logger.info("User: " + username + " is not an owner of any applications. Returning false.");
+            logger.info("User: " + email     + " is not an owner of any applications. Returning false.");
         }
 
-        logger.info("User: " + username + " does not own application id: " + appId + " :: returning false.");
+        logger.info("User: " + email + " does not own application id: " + appId + " :: returning false.");
         return false;
 
     }

@@ -66,4 +66,8 @@ public class DiscAppUserPrincipal implements UserDetails {
     public Boolean isAdmin() {
         return user.getAdmin();
     }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
 }

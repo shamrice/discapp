@@ -21,27 +21,31 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     private DiscAppUserRepository discappUserRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String email) {
 
-        if (username == null || username.trim().isEmpty()) {
-            throw new UsernameNotFoundException("Username cannot be blank");
+        if (email == null || email.trim().isEmpty()) {
+            throw new UsernameNotFoundException("Email cannot be blank");
         }
 
-        DiscAppUser user = discappUserRepository.findByUsername(username);
+        //DiscAppUser user = discappUserRepository.findByUsername(username);
+        DiscAppUser user = discappUserRepository.findByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException(email);
         }
 
         //principal is returned back and verified by "spring magic"
         return new DiscAppUserPrincipal(user);
     }
 
-    public DiscAppUser getByUsername(String username) {
-        return discappUserRepository.findByUsername(username);
+    public DiscAppUser getByEmail(String email) {
+        if (email != null && !email.trim().isEmpty()) {
+            return discappUserRepository.findByEmail(email);
+        }
+        return null;
     }
 
-    public Long getOwnerIdForUsername(String username) {
-        DiscAppUser user = discappUserRepository.findByUsername(username);
+    public Long getOwnerIdForEmail(String email) {
+        DiscAppUser user = discappUserRepository.findByEmail(email);
         if (user != null) {
             return user.getOwnerId();
         }
@@ -62,14 +66,16 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                 }
 
                 user.setUsername(user.getUsername().trim());
+                user.setEmail(user.getEmail().trim());
 
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
-                    logger.info("Created new user: " + createdUser.getUsername());
+                    logger.info("Saved disc app user: " + createdUser.getEmail() + " : username: "
+                            + createdUser.getUsername());
                     return true;
                 }
             } catch (Exception ex) {
-                logger.error("Failed to save disc app user: " + ex.getMessage(), ex);
+                logger.error("Failed to save disc app user: " + user.getEmail() + " :: " + ex.getMessage(), ex);
             }
         }
 

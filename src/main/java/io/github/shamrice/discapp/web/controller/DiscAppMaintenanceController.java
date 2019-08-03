@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
@@ -32,7 +33,7 @@ public class DiscAppMaintenanceController {
     private ApplicationService applicationService;
 
     @Autowired
-    private DiscAppUserRepository discappUserRepository;
+    private DiscAppUserDetailsService discAppUserDetailsService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -49,7 +50,8 @@ public class DiscAppMaintenanceController {
         try {
 
             Application app = applicationService.get(appId);
-            String username = new AccountHelper().getLoggedInUserName();
+            //String username = new AccountHelper().getLoggedInUserName();
+            String username = new AccountHelper().getLoggedInEmail();
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -242,10 +244,11 @@ public class DiscAppMaintenanceController {
         }
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (username != null && !username.isEmpty()) {
-            DiscAppUser user = discappUserRepository.findByUsername(username);
+        if (email != null && !email.trim().isEmpty()) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
             if (user != null) {
                 Application app = applicationService.get(appId);
                 if (app != null && app.getOwnerId().equals(user.getOwnerId())) {
@@ -285,9 +288,10 @@ public class DiscAppMaintenanceController {
         }
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
             if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, maintenanceViewModel.getStyleSheetUrl())) {
@@ -310,10 +314,11 @@ public class DiscAppMaintenanceController {
                                                     Model model) {
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (username != null && !username.isEmpty()) {
-            DiscAppUser user = discappUserRepository.findByUsername(username);
+        if (email != null && !email.trim().isEmpty()) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
             if (user != null) {
                 Application app = applicationService.get(appId);
                 if (app != null && app.getOwnerId().equals(user.getOwnerId())) {
@@ -392,9 +397,10 @@ public class DiscAppMaintenanceController {
                                           Model model) {
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
             if (maintenanceViewModel.getThreadSortOrder() == null || maintenanceViewModel.getThreadSortOrder().isEmpty()) {
@@ -429,9 +435,10 @@ public class DiscAppMaintenanceController {
                                                Model model) {
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
 
@@ -459,9 +466,10 @@ public class DiscAppMaintenanceController {
                                                Model model) {
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
 
@@ -492,9 +500,10 @@ public class DiscAppMaintenanceController {
                                          Model model) {
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
             boolean shareButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
@@ -549,9 +558,10 @@ public class DiscAppMaintenanceController {
         }
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
             if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
@@ -579,9 +589,10 @@ public class DiscAppMaintenanceController {
         }
 
         AccountHelper accountHelper = new AccountHelper();
-        String username = accountHelper.getLoggedInUserName();
+        //String username = accountHelper.getLoggedInUserName();
+        String email = accountHelper.getLoggedInEmail();
 
-        if (applicationService.isOwnerOfApp(appId, username)) {
+        if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
             boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceViewModel.getSelectedTimezone());

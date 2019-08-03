@@ -18,7 +18,7 @@ public class ConfigurationService {
     @Autowired
     private ConfigurationRepository configurationRepository;
 
-    ConfigurationCache configurationCache = new ConfigurationCache();
+    private ConfigurationCache configurationCache = new ConfigurationCache();
 
     public List<Configuration> list() {
         return configurationRepository.findAll();
