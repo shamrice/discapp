@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,21 +16,29 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
 
     @RequestMapping(value = "/error", produces = "text/html")
-    public String getErrorView(HttpServletRequest request, Model model) {
+    public ModelAndView getErrorView(HttpServletRequest request, Model model) {
 
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         Exception exception = (Exception) request.getAttribute("javax.servlet.error.exception");
+
 
         String errorText = "";
         if (exception != null) {
             errorText = exception.getMessage();
         }
 
+
+        if (statusCode.equals(403)) {
+            logger.info("Status code 403 " + errorText, exception);
+            return new ModelAndView("redirect:/login?relogin=true&" + request.getQueryString());
+        }
+
         logger.error("Error: status code: " + statusCode + " : " + errorText, exception);
 
         model.addAttribute("errorStatusCode", statusCode);
         model.addAttribute("errorText", errorText);
-        return "error/error";
+
+        return new ModelAndView("error/error", "model", model);
 
     }
 

@@ -25,6 +25,7 @@ public class AuthenticationController {
     @GetMapping("/login")
     public ModelAndView login(@RequestParam(required = false) String redirect,
                               @RequestParam(required = false) String appName,
+                              @RequestParam(required = false) String relogin,
                               HttpServletRequest request,
                               HttpServletResponse response,
                               ModelMap modelMap) {
@@ -40,9 +41,11 @@ public class AuthenticationController {
                 if (request.getCookies() != null) {
                     for (Cookie cookie : request.getCookies()) {
                         if (cookie.getName().equalsIgnoreCase("redirect_url")) {
-                            redirect = cookie.getValue();
-                            foundInCookie = true;
-                            break;
+                            if (!cookie.getValue().toLowerCase().contains("logout")) {
+                                redirect = cookie.getValue();
+                                foundInCookie = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -51,7 +54,9 @@ public class AuthenticationController {
                 if (!foundInCookie) {
                     String headerRdirect = request.getHeader("Referer");
                     if (headerRdirect != null && !headerRdirect.isEmpty()) {
-                        redirect = headerRdirect;
+                        if (!headerRdirect.toLowerCase().contains("logout")) {
+                            redirect = headerRdirect;
+                        }
                     }
                 }
             }
@@ -63,7 +68,7 @@ public class AuthenticationController {
         }
 
         //if account is already logged in, bring them to the log out page
-        if (accountHelper.isLoggedIn()) {
+        if (accountHelper.isLoggedIn() && (relogin == null || relogin.isEmpty())) {
             return logout(redirect, appName, request, response, modelMap);
         }
 

@@ -374,6 +374,7 @@ public class AccountController {
 
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
+                                accountViewModel.setRedirect("/account/modify");
 
                                 logger.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
                                 accountViewModel.setErrorMessage("Successfully created new owner and application for user.");
