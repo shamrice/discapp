@@ -13,6 +13,7 @@ import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class DiscAppController {
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
+
+    @Autowired
+    private AccountHelper accountHelper;
+
+    @Autowired
+    private InputHelper inputHelper;
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
@@ -168,10 +175,9 @@ public class DiscAppController {
         }
 
         //pre-fill form with user info if they are logged in
-        AccountHelper accountHelper = new AccountHelper();
         if (accountHelper.isLoggedIn()) {
             model.addAttribute("isLoggedIn", "true");
-            //DiscAppUser user = discAppUserDetailsService.getByUsername(accountHelper.getLoggedInUserName());
+
             DiscAppUser user = discAppUserDetailsService.getByEmail(accountHelper.getLoggedInEmail());
             model.addAttribute("submitter", user.getUsername());
             model.addAttribute("email", user.getEmail());
@@ -251,11 +257,9 @@ public class DiscAppController {
                 logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
                         + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
 
-
-                //gross hack to remove html tags in subject, submitter and email fields if they exist.
-                String subject = newThreadViewModel.getSubject().replaceAll("<[^>]*>", " ");
-                String submitter = newThreadViewModel.getSubmitter().replaceAll("<[^>]*>", " ");
-                String email = newThreadViewModel.getEmail().replaceAll("<[^>]*>", " ");
+                String subject = inputHelper.sanitizeInput(newThreadViewModel.getSubject());
+                String submitter = inputHelper.sanitizeInput(newThreadViewModel.getSubmitter());
+                String email = inputHelper.sanitizeInput(newThreadViewModel.getEmail());
 
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
@@ -267,10 +271,8 @@ public class DiscAppController {
 
 
                 //set values for logged in user, if not logged in... use form data.
-                AccountHelper accountHelper = new AccountHelper();
-                //String username = accountHelper.getLoggedInUserName();
-                //DiscAppUser discAppUser = discAppUserDetailsService.getByUsername(username);
                 String userEmail = accountHelper.getLoggedInEmail();
+
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(userEmail);
                 if (discAppUser != null) {
                     newThread.setDiscappUserId(discAppUser.getId());

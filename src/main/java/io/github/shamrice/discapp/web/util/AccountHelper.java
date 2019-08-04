@@ -3,7 +3,9 @@ package io.github.shamrice.discapp.web.util;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AccountHelper {
 
     private static final String ANONYMOUS_USER = "anonymousUser";

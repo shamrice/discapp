@@ -1,13 +1,13 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.*;
-import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,11 @@ public class DiscAppMaintenanceController {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private AccountHelper accountHelper;
+
+    @Autowired
+    private InputHelper inputHelper;
 
     @GetMapping("/admin/disc-maint.cgi")
     public ModelAndView getMaintenanceView(@RequestParam(name = "id") long appId,
@@ -50,8 +55,7 @@ public class DiscAppMaintenanceController {
         try {
 
             Application app = applicationService.get(appId);
-            //String username = new AccountHelper().getLoggedInUserName();
-            String username = new AccountHelper().getLoggedInEmail();
+            String username = accountHelper.getLoggedInEmail();
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -243,8 +247,6 @@ public class DiscAppMaintenanceController {
             return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
         }
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (email != null && !email.trim().isEmpty()) {
@@ -256,7 +258,9 @@ public class DiscAppMaintenanceController {
                     logger.info("Updating application name of id: " + app.getId() + " from: "
                             + maintenanceViewModel.getApplicationName() + " to: " + app.getName());
 
-                    app.setName(maintenanceViewModel.getApplicationName());
+                    String updatedAppName = inputHelper.sanitizeInput(maintenanceViewModel.getApplicationName());
+
+                    app.setName(updatedAppName);
                     app.setModDt(new Date());
 
                     applicationService.save(app);
@@ -287,14 +291,14 @@ public class DiscAppMaintenanceController {
             return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
         }
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
-            if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, maintenanceViewModel.getStyleSheetUrl())) {
+            String styleSheetUrl = inputHelper.sanitizeInput(maintenanceViewModel.getStyleSheetUrl());
+
+            if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl)) {
                 maintenanceViewModel.setInfoMessage("Failed to update Style Sheet URL.");
             } else {
                 maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
@@ -313,8 +317,6 @@ public class DiscAppMaintenanceController {
                                                     @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                     Model model) {
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (email != null && !email.trim().isEmpty()) {
@@ -396,8 +398,6 @@ public class DiscAppMaintenanceController {
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model) {
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
@@ -434,8 +434,6 @@ public class DiscAppMaintenanceController {
                                                @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                Model model) {
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
@@ -465,8 +463,6 @@ public class DiscAppMaintenanceController {
                                                @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                Model model) {
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
@@ -499,8 +495,6 @@ public class DiscAppMaintenanceController {
                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                          Model model) {
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
@@ -541,7 +535,7 @@ public class DiscAppMaintenanceController {
 
         //get form value if not null.
         if (maintenanceViewModel.getFavicon() != null && !maintenanceViewModel.getFavicon().trim().isEmpty()) {
-            favicon = maintenanceViewModel.getFavicon();
+            favicon = inputHelper.sanitizeInput(maintenanceViewModel.getFavicon());
         }
 
         //if entered something like "www.somesite.com/favicon.ico", attempt to add http in front
@@ -557,8 +551,6 @@ public class DiscAppMaintenanceController {
             }
         }
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
@@ -588,15 +580,15 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
         }
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
+            String dateFormat = inputHelper.sanitizeInput(maintenanceViewModel.getDateFormat());
+
             boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceViewModel.getSelectedTimezone());
-            boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, String.valueOf(maintenanceViewModel.getDateFormat()));
+            boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, dateFormat);
 
             if (timezoneSaved && dateFormatSaved) {
                 logger.info("Saved date and time settings for appId: " + appId);

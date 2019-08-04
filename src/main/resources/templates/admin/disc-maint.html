@@ -81,7 +81,9 @@ function switchElements(element1,element2) {
 
             <tr>
                 <td><label>Disc App Id:</label></td>
-                <td class="value-label" th:text="${maintenanceViewModel.getApplicationId()}">
+                <td class="value-label">
+                    <a th:href="@{|/indices/${maintenanceViewModel.getApplicationId()}|}"
+                       th:text="${maintenanceViewModel.getApplicationId()}"></a>
                 </td>
             </tr>
             <tr>
@@ -776,6 +778,17 @@ function switchElements(element1,element2) {
 </form>
 
 <table>
+    <tr>
+        <td colspan="2" style="text-align:center;">
+            <a th:href="@{|/indices/${maintenanceViewModel.getApplicationId()}|}"
+               th:text="@{|Go to ${maintenanceViewModel.getApplicationName()}|}"></a>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center;">
+            <a href="/account/modify">Modify Account Page</a>
+        </td>
+    </tr>
     <tr>
         <td colspan="2" style="text-align:center;">
             <a th:href="${maintenanceViewModel.getRedirect()}"

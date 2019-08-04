@@ -9,6 +9,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,12 @@ public class AccountController {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private AccountHelper accountHelper;
+
+    @Autowired
+    private InputHelper inputHelper;
+
     @GetMapping("/account/create")
     public ModelAndView getCreateAccount(@ModelAttribute AccountViewModel accountViewModel,
                                          @RequestParam(required = false) String redirect,
@@ -56,29 +63,25 @@ public class AccountController {
         if (accountViewModel != null) {
             logger.info("Attempting to create new account with username: " + accountViewModel.getUsername());
 
-            //gross hack to remove html tags in subject, submitter and email fields if they exist.
-            /* TODO : use below to reject any input that attempts to contain HTML
-            String subject = newThreadViewModel.getSubject().replaceAll("<[^>]*>", " ");
-            String submitter = newThreadViewModel.getSubmitter().replaceAll("<[^>]*>", " ");
-            String email = newThreadViewModel.getEmail().replaceAll("<[^>]*>", " ");
-            */
 
-            //TODO : much more error checking
+            String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
+            String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
 
+            if (!accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
+                    || !accountViewModel.getPassword().equals(password)) {
 
-            if (!accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())) {
-                accountViewModel.setErrorMessage("Passwords do not match.");
+                accountViewModel.setErrorMessage("Passwords do not match or contain invalid characters.");
                 return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
             }
 
-            if (accountViewModel.getPassword().length() < 8) {
+            if (password.length() < 8) {
                 accountViewModel.setErrorMessage("Passwords must be at least eight characters in length.");
                 return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
             }
 
             DiscAppUser newUser = new DiscAppUser();
-            newUser.setUsername(accountViewModel.getUsername());
-            newUser.setPassword(accountViewModel.getPassword());
+            newUser.setUsername(username);
+            newUser.setPassword(password);
             newUser.setAdmin(accountViewModel.isAdmin());
             newUser.setEmail(accountViewModel.getEmail());
             newUser.setShowEmail(accountViewModel.isShowEmail());
@@ -126,8 +129,6 @@ public class AccountController {
 
         modelMap.addAttribute("redirectUrl", redirect);
 
-        AccountHelper accountHelper = new AccountHelper();
-        //String username = accountHelper.getLoggedInUserName();
         String email = accountHelper.getLoggedInEmail();
 
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
@@ -178,21 +179,24 @@ public class AccountController {
 
             accountViewModel.setRedirect(redirect);
 
+            String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
+            String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
+
             if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
                     && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
-                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()) {
+                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()
+                    && password.equals(accountViewModel.getPassword())) {
 
-                AccountHelper accountHelper = new AccountHelper();
                 String email = accountHelper.getLoggedInEmail();
 
                 DiscAppUser user = discAppUserDetailsService.getByEmail(email);
                 if (user != null) {
-                    if (accountViewModel.getUsername() != null && !accountViewModel.getUsername().trim().isEmpty()) {
-                        user.setUsername(accountViewModel.getUsername());
+                    if (username != null && !username.isEmpty()) {
+                        user.setUsername(username);
                     }
                     user.setShowEmail(accountViewModel.isShowEmail());
                     user.setModDt(new Date());
-                    user.setPassword(accountViewModel.getPassword());
+                    user.setPassword(password);
 
                     if (!discAppUserDetailsService.saveDiscAppUser(user)) {
                         logger.error("Failed to update user : " + email + ". Changes will not be saved.");
@@ -225,8 +229,6 @@ public class AccountController {
 
             if (accountViewModel.getApplicationName() != null && !accountViewModel.getApplicationName().isEmpty()) {
 
-                AccountHelper accountHelper = new AccountHelper();
-                //String username = accountHelper.getLoggedInUserName();
                 String email = accountHelper.getLoggedInEmail();
 
                 if (email != null && !email.trim().isEmpty()) {
@@ -237,7 +239,10 @@ public class AccountController {
 
                         for (Application app : ownedApps) {
                             if (app.getId().equals(accountViewModel.getApplicationId())) {
-                                app.setName(accountViewModel.getApplicationName());
+
+                                String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
+
+                                app.setName(appName);
                                 app.setModDt(new Date());
 
                                 if (applicationService.save(app) != null) {
@@ -273,7 +278,6 @@ public class AccountController {
 
             accountViewModel.setRedirect(redirect);
 
-            AccountHelper accountHelper = new AccountHelper();
             String email = accountHelper.getLoggedInEmail();
 
             if (email != null && !email.trim().isEmpty()) {
@@ -284,9 +288,14 @@ public class AccountController {
                     Owner owner = accountService.getOwnerById(user.getOwnerId());
 
                     if (owner != null) {
-                        owner.setFirstName(accountViewModel.getOwnerFirstName());
-                        owner.setLastName(accountViewModel.getOwnerLastName());
-                        owner.setPhone(accountViewModel.getOwnerPhone());
+
+                        String firstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
+                        String lastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
+                        String phone = inputHelper.sanitizeInput(accountViewModel.getOwnerPhone());
+
+                        owner.setFirstName(firstName);
+                        owner.setLastName(lastName);
+                        owner.setPhone(phone);
                         owner.setModDt(new Date());
 
                         if (accountService.saveOwner(owner) != null) {
@@ -316,12 +325,14 @@ public class AccountController {
 
             accountViewModel.setRedirect(redirect);
 
+            String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
+
             if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
                     && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
-                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()) {
+                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()
+                    && password.equals(accountViewModel.getPassword())) {
 
 
-                AccountHelper accountHelper = new AccountHelper();
                 String email = accountHelper.getLoggedInEmail();
 
                 if (email != null && !email.trim().isEmpty()) {
@@ -329,19 +340,26 @@ public class AccountController {
                     DiscAppUser user = discAppUserDetailsService.getByEmail(email);
                     if (user != null) {
 
+                        String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
+                        String ownerLastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
+                        String ownerPhone = inputHelper.sanitizeInput(accountViewModel.getOwnerPhone());
+
                         Owner newOwner = new Owner();
-                        newOwner.setFirstName(accountViewModel.getOwnerFirstName());
-                        newOwner.setLastName(accountViewModel.getOwnerLastName());
+                        newOwner.setFirstName(ownerFirstName);
+                        newOwner.setLastName(ownerLastName);
                         newOwner.setEmail(user.getEmail()); //use same user email
-                        newOwner.setPhone(accountViewModel.getOwnerPhone());
+                        newOwner.setPhone(ownerPhone);
                         newOwner.setEnabled(true);
                         newOwner.setCreateDt(new Date());
                         newOwner.setModDt(new Date());
 
                         Owner savedOwner = accountService.saveOwner(newOwner);
                         if (savedOwner != null) {
+
+                            String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
+
                             Application newApp = new Application();
-                            newApp.setName(accountViewModel.getApplicationName());
+                            newApp.setName(appName);
                             newApp.setOwnerId(savedOwner.getId());
                             newApp.setCreateDt(new Date());
                             newApp.setModDt(new Date());
@@ -350,7 +368,7 @@ public class AccountController {
 
                             if (savedApp != null) {
                                 user.setOwnerId(newOwner.getId());
-                                user.setPassword(accountViewModel.getPassword());
+                                user.setPassword(password);
                                 user.setAdmin(true);
                                 discAppUserDetailsService.saveDiscAppUser(user);
 

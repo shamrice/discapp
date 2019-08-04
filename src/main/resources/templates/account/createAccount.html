@@ -22,7 +22,7 @@
 </style>
 
 <div class="grey_box">
-    <h1 id="banner">Login to Disc App Service</h1>
+    <h1 id="banner">Create Disc App Account</h1>
     <form name="f" th:action="@{/account/create}" method="post" th:object="${accountViewModel}">
         <table>
 
@@ -61,6 +61,11 @@
                 <td colspan="2" style="text-align:center;">
                     <input class="button" name="submit" type="submit" value="Create Account">&nbsp;
                     <input class="button" name="reset" type="reset">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <a th:href="@{|/login?redirect=${redirectUrl}|}">Return to Login Page</a>
                 </td>
             </tr>
             <tr>
