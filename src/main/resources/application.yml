@@ -30,6 +30,16 @@ spring:
           lob:
             non_contextual_creation: true
 
+logging:
+  level:
+    org:
+      springframework:
+        web: WARN
+      hibernate: ERROR
+    io:
+      github:
+        shamrice:
+          discapp: WARN
 
 server:
   port: 8081

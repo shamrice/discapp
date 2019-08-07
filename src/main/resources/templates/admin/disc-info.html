@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        fieldset {
+            background-color: #fff;
+        }
+
+        fieldset a,
+        fieldset span {
+            text-decoration: none;
+            padding: 3px;
+            float: left;
+            font-weight: normal;
+        }
+
+        fieldset a:hover {
+            background-color: #ccf;
+        }
+
+        fieldset img {
+            height: 32px;
+            width: 32px;
+            vertical-align: middle;
+        }
+
+        p {
+            margin-bottom: 3ex;
+        }
+
+    </style>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+
+<body>
+<form method="post" action="/disc-info.cgi?id=46108;" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="46108" />
+
+    <!--todo : break this into it's own fragment -->
+    <div id="account">placeholder@example.com
+        <a href="/account/modify" target="_parent">Control Center</a>
+        <a href="/admin/disc-maint.cgi?id=46108&name=N.E.M.B.%20%20maintenance%20page" target="_parent">Settings</a>
+        <a href="/logout" target="_parent">Logout</a></div>
+
+    <div style="width:32em; margin:auto; text-align:center; margin-top:5%; font-weight:bold;">
+        <!--h3 style="background-color:#fdd;">The DiscussionApp service will end on October 31, 2019.</h3>
+        <h3><a href="/Dumps/disc_46108.sql">Click here to download your DiscApp</a></h3>
+        <h3><a href="?id=46108;dump=1">Click here to dump your DiscApp</a></h3-->
+        <div>Visitors can access your DiscussionApp with the URL </div>
+        <div style="margin-top:1ex; margin-bottom:2em;"><a href="http://disc.yourwebapps.com/Indices/46108.html" target="_blank">http://disc.yourwebapps.com/Indices/46108.html</a></div>
+        <fieldset>
+            <legend>Click on the icons below to modify your DiscussionApp</legend>
+            <table style="border-collapse:collapse;">
+                <tr>
+                    <td>
+                        <a href="/admin/appearance-frameset.cgi?id=46108"><img alt="Appearance" src="/images/palette.png" /> Appearance</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-edit.cgi?id=46108"><img alt="Messages" src="/images/messages.png" /> Messages</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-security.cgi?id=46108"><img alt="Security" src="/images/lock.png" /> Security</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="/admin/disc-list-maint.cgi?id=46108"><img alt="Mailing List" src="/images/envelope.png" /> Mailing list</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-rss-maint.cgi?id=46108"><img alt="RSS icon" src="/images/rss-icon.gif" /> RSS</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-widget-maint.cgi?id=46108"><img alt="Widget icon" src="/images/widget-icon.png" /> Widget</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="/admin/disc-locale.cgi?id=46108"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-stats.cgi?id=46108"><img alt="Stats" src="/images/stats.gif" /> Statistics</a>
+                    </td>
+                    <td>
+                        <a href="/admin/disc-twitter-maint.cgi?id=46108" title="Twitter"><img alt="Twitter" src="/images/twitter-36x36.png"> Twitter</img>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="/indices/1"><img alt="Help icon" src="/images/help.png" /> Questions</a>
+                    </td>
+                    <td><span><img alt="Info icon" src="/images/info.png" /> This page</span></td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+</form>
+</body>
+
+</html>

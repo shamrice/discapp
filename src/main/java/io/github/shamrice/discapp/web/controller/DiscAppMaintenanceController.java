@@ -44,18 +44,65 @@ public class DiscAppMaintenanceController {
     @Autowired
     private InputHelper inputHelper;
 
+    @Autowired
+    private DiscAppController discAppController;
+
     @GetMapping("/admin/disc-maint.cgi")
-    public ModelAndView getMaintenanceView(@RequestParam(name = "id") long appId,
+    public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
+                                                  Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+        return new ModelAndView("admin/disc-maint");
+    }
+
+    @GetMapping("/admin/disc-toolbar.cgi")
+    public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
+                                               Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+        return new ModelAndView("admin/disc-toolbar");
+    }
+
+    @GetMapping("/admin/disc-info.cgi")
+    public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
+                                               Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+        return new ModelAndView("admin/disc-info");
+    }
+
+    @GetMapping("/admin/appearance-frameset.cgi")
+    public ModelAndView getAppearanceFramesetView(@RequestParam(name = "id") long appId,
+                                          Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+        return new ModelAndView("admin/appearance-frameset");
+    }
+
+    @GetMapping("/admin/appearance-preview.cgi")
+    public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
+                                                 Model model) {
+        //return new ModelAndView("redirect:/indices/" + appId);
+        //TODO : change this?
+        return discAppController.getAppView(appId, model);
+    }
+
+    @GetMapping("/admin/appearance-forms.cgi")
+    public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
                                            @RequestParam(name = "redirect", required = false) String redirect,
                                            @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                            Model model) {
 
         maintenanceViewModel.setRedirect(redirect);
+        model.addAttribute("appId", appId);
 
         try {
 
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -176,63 +223,63 @@ public class DiscAppMaintenanceController {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
         }
 
-        return new ModelAndView("admin/disc-maint", "maintenanceViewModel", maintenanceViewModel);
+        return new ModelAndView("admin/appearance-forms", "maintenanceViewModel", maintenanceViewModel);
     }
 
     @GetMapping("/admin/modify/application")
     public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId,
                                              @RequestParam(name = "redirect", required = false) String redirect) {
 
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/prologue-epilogue")
     public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId,
                                                   @RequestParam(name = "redirect", required = false) String redirect) {
 
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId,
                                             @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/threads")
     public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/header-footer")
     public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId,
                                               @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId,
                                               @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/favicon")
     public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/disc-maint.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @PostMapping("/admin/modify/application")
@@ -244,7 +291,7 @@ public class DiscAppMaintenanceController {
         if (maintenanceViewModel.getApplicationName() == null || maintenanceViewModel.getApplicationName().isEmpty()) {
             logger.warn("Cannot update application name to an empty string");
             maintenanceViewModel.setInfoMessage("Cannot update disc app name to an empty value.");
-            return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+            return getAppearanceView(appId, redirect, maintenanceViewModel, model);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -276,7 +323,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
 
     }
 
@@ -288,7 +335,7 @@ public class DiscAppMaintenanceController {
 
         if (maintenanceViewModel.getStyleSheetUrl() == null || maintenanceViewModel.getStyleSheetUrl().isEmpty()) {
             maintenanceViewModel.setInfoMessage("Style sheet URL cannot be empty. Settings not saved.");
-            return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+            return getAppearanceView(appId, redirect, maintenanceViewModel, model);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -308,7 +355,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
     @PostMapping("/admin/modify/prologue-epilogue")
@@ -387,7 +434,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
 
     }
 
@@ -425,7 +472,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
     @PostMapping("/admin/modify/header-footer")
@@ -453,7 +500,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
 
@@ -485,7 +532,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
 
@@ -520,7 +567,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
 
@@ -567,7 +614,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
     @PostMapping("/admin/modify/time")
@@ -601,7 +648,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getMaintenanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
     }
 
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName} - Appearance|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+</head>
+
+
+<frameset cols="50%,50%">
+
+
+
+    <frame name="forms" th:src="@{|/admin/appearance-forms.cgi?id=${appId}|}">
+    <frame name="preview" src="/admin/appearance-preview.cgi?id=46108">
+    <!--frame name="preview" th:src="@{|/indices/${appId}|}"-->
+
+</frameset>
+
+
+</html>
+

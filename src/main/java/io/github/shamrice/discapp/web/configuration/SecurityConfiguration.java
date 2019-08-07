@@ -26,6 +26,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //TODO : search page to a GET mapping. Currently csrf is disabled and POST mappings are allowed
 
         httpSecurity
+                .headers()
+                    .frameOptions().disable()
+                    .and()
                 .csrf()
                     .disable()
                 .authorizeRequests()
