@@ -40,13 +40,13 @@
 </head>
 
 <body>
-<form method="post" action="/disc-info.cgi?id=46108;" enctype="multipart/form-data">
-    <input type="hidden" name="id" value="46108" />
+<form method="post" th:action="@{|/disc-info.cgi?id=${appId}|}" enctype="multipart/form-data">
+    <input type="hidden" name="id" th:value="${appId}" />
 
     <!--todo : break this into it's own fragment -->
     <div id="account">placeholder@example.com
         <a href="/account/modify" target="_parent">Control Center</a>
-        <a href="/admin/disc-maint.cgi?id=46108&name=N.E.M.B.%20%20maintenance%20page" target="_parent">Settings</a>
+        <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
         <a href="/logout" target="_parent">Logout</a></div>
 
     <div style="width:32em; margin:auto; text-align:center; margin-top:5%; font-weight:bold;">
@@ -54,22 +54,22 @@
         <h3><a href="/Dumps/disc_46108.sql">Click here to download your DiscApp</a></h3>
         <h3><a href="?id=46108;dump=1">Click here to dump your DiscApp</a></h3-->
         <div>Visitors can access your DiscussionApp with the URL </div>
-        <div style="margin-top:1ex; margin-bottom:2em;"><a href="http://disc.yourwebapps.com/Indices/46108.html" target="_blank">http://disc.yourwebapps.com/Indices/46108.html</a></div>
+        <div style="margin-top:1ex; margin-bottom:2em;"><a th:href="@{|/indices/${appId}|}" target="_blank" th:text="@{|indices/${appId}|}"></a></div>
         <fieldset>
             <legend>Click on the icons below to modify your DiscussionApp</legend>
             <table style="border-collapse:collapse;">
                 <tr>
                     <td>
-                        <a href="/admin/appearance-frameset.cgi?id=46108"><img alt="Appearance" src="/images/palette.png" /> Appearance</a>
+                        <a th:href="@{|/admin/appearance-frameset.cgi?id=${appId}|}"><img alt="Appearance" src="/images/palette.png" /> Appearance</a>
                     </td>
-                    <td>
+                    <!--td>
                         <a href="/admin/disc-edit.cgi?id=46108"><img alt="Messages" src="/images/messages.png" /> Messages</a>
                     </td>
                     <td>
                         <a href="/admin/disc-security.cgi?id=46108"><img alt="Security" src="/images/lock.png" /> Security</a>
-                    </td>
+                    </td-->
                 </tr>
-                <tr>
+                <!--tr>
                     <td>
                         <a href="/admin/disc-list-maint.cgi?id=46108"><img alt="Mailing List" src="/images/envelope.png" /> Mailing list</a>
                     </td>
@@ -79,8 +79,8 @@
                     <td>
                         <a href="/admin/disc-widget-maint.cgi?id=46108"><img alt="Widget icon" src="/images/widget-icon.png" /> Widget</a>
                     </td>
-                </tr>
-                <tr>
+                </tr-->
+                <!--tr>
                     <td>
                         <a href="/admin/disc-locale.cgi?id=46108"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>
                     </td>
@@ -91,12 +91,14 @@
                         <a href="/admin/disc-twitter-maint.cgi?id=46108" title="Twitter"><img alt="Twitter" src="/images/twitter-36x36.png"> Twitter</img>
                         </a>
                     </td>
-                </tr>
+                </tr-->
                 <tr>
                     <td>
                         <a href="/indices/1"><img alt="Help icon" src="/images/help.png" /> Questions</a>
                     </td>
-                    <td><span><img alt="Info icon" src="/images/info.png" /> This page</span></td>
+                    <td>
+                        <span><img alt="Info icon" src="/images/info.png" /> This page</span>
+                    </td>
                 </tr>
             </table>
         </fieldset>

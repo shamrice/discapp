@@ -42,8 +42,8 @@
 </head>
 
 <frameset rows="*,40", border=0>
-    <frame name="dbmain" src="/admin/disc-info.cgi?id=46108">
-    <frame name="toolbar" src="/admin/disc-toolbar.cgi?id=46108" marginheight="1" scrolling="no" noresize="noresize">
+    <frame name="dbmain" th:src="@{|/admin/disc-info.cgi?id=${appId}|}">
+    <frame name="toolbar" th:src="@{|/admin/disc-toolbar.cgi?id=${appId}|}" marginheight="1" scrolling="no" noresize="noresize">
 </frameset>
 
 
