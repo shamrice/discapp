@@ -23,9 +23,9 @@
 
 <div id="body">
 
-    <p th:text="${error}"/>
+    <p th:if="${error}" th:text="${error}"/>
 
-    <div th:utext="${headerText}"></div>
+    <div th:if="${headerText}" th:utext="${headerText}"></div>
 
     <div th:replace="indices/fragments/prologue :: prologue">
         static prototyping placeholder
@@ -47,10 +47,7 @@
         static prototyping placeholder
     </div>
 
-    <!-- TODO : this next two lines should be removed -->
-    <a th:href="@{|~/admin/disc-maint.cgi?id=${appId}|}" th:text="@{|${appName} Admin Page|}"></a>
-
-    <div th:utext="${footerText}"></div>
+    <div th:if="${footerText}" th:utext="${footerText}"></div>
 
 </div>
 </body>
