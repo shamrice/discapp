@@ -327,32 +327,8 @@ public class DiscAppController {
         Thread currentThread = threadService.getThread(threadId);
         if (currentThread != null) {
 
-            //default reply thread values
-            long grandparentId = currentThread.getParentId();
-            boolean skipCurrent = false;
-            String currentHtml = "<ul>";
-
-            //if viewing top level thread, replies are formatted slightly differently.
-            if (grandparentId == 0) {
-                grandparentId = currentThread.getId();
-                skipCurrent = true;
-                currentHtml = "";
-            }
-
-            ThreadTreeNode subThreadNode = threadService.getFullThreadTree(grandparentId);
-
-            String subThreadsHtml = "";
-
-            if (subThreadNode != null) {
-                String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
-
-                currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                                skipCurrent, currentThread.getId(), true) ;
-
-                subThreadsHtml += currentHtml;
-            }
-
             String threadBody = threadService.getThreadBodyText(threadId);
+            String subThreadsHtml = getThreadViewThreadHtml(currentThread);
 
             ThreadViewModel threadViewModel = new ThreadViewModel();
             threadViewModel.setBody(threadBody);
@@ -568,7 +544,8 @@ public class DiscAppController {
                     "   </span>" +
                     "</div>";
 
-            if (showPreviewText) {
+            //only show preview if selected and not currently viewed thread
+            if (showPreviewText && !currentNode.getCurrent().getId().equals(currentlyViewedId)) {
                 String previewText = currentNode.getCurrent().getBody();
                 if (previewText != null && !previewText.isEmpty()) {
                     if (previewText.length() > 200) {
@@ -594,6 +571,67 @@ public class DiscAppController {
         }
 
         currentHtml += "</ul>";
+
+        return currentHtml;
+    }
+
+
+    /**
+     * Generates the thread view reply thread tree HTML by setting up the grandparent id and calling the
+     * getAppViewThreadHtml method. Todo: It's a mess that will later need refactoring...
+     * @param currentThread Current thread being viewed on the view thread page.
+     * @return Returns formatted HTML block for reply threads.
+     */
+    private String getThreadViewThreadHtml(Thread currentThread) {
+
+        //default reply thread values
+        boolean skipCurrent = true;
+        boolean isFirstChild = false;
+        String currentHtml = "";
+        Long grandparentId = 0L;
+
+        //if not top level thread:
+        if (currentThread.getParentId() != null && currentThread.getParentId() != 0L) {
+
+            Thread parentThread = threadService.getThread(currentThread.getParentId());
+            if (parentThread != null) {
+
+                //if grandparent is not top level thread.
+                if (parentThread.getParentId() != 0L) {
+                    grandparentId = parentThread.getParentId();
+                } else {
+                    //if grandparent is top level thread... set to parent
+                    grandparentId = parentThread.getId();
+                    skipCurrent = false;
+                    isFirstChild = true;
+
+                }
+            } else {
+                grandparentId = currentThread.getId();
+            }
+        }
+
+        //if viewing top level thread, replies are formatted slightly differently.
+        if (grandparentId == null || grandparentId == 0L) {
+            grandparentId = currentThread.getId();
+        }
+
+        //get thread tree starting at grandparent id determined above
+        ThreadTreeNode subThreadNode = threadService.getFullThreadTree(grandparentId);
+
+        if (subThreadNode != null) {
+            String entryBreakString = configurationService.getStringValue(currentThread.getApplicationId(), ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+
+            currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
+                    skipCurrent, currentThread.getId(), true) ;
+
+            //first child thread needs additional html tags added
+            if (isFirstChild) {
+                currentHtml = "<div class=\"nested_list\"><ul>" + currentHtml + "</div>";
+            } else {
+                currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
+            }
+        }
 
         return currentHtml;
     }
