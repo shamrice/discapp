@@ -15,7 +15,7 @@
 
 
     <frame name="forms" th:src="@{|/admin/appearance-forms.cgi?id=${appId}|}">
-    <frame name="preview" src="/admin/appearance-preview.cgi?id=46108">
+    <frame name="preview" th:src="@{|/admin/appearance-preview.cgi?id=${appId}|}">
     <!--frame name="preview" th:src="@{|/indices/${appId}|}"-->
 
 </frameset>
