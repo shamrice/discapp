@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.shamrice.discapp</groupId>
-    <artifactId>web</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>discapp-web</artifactId>
+    <version>0.1.1-SNAPSHOT</version>
     <!--packaging>war</packaging-->
 
     <parent>
