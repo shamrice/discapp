@@ -36,8 +36,8 @@
 
 <body>
 <div style="height:40px; width:440px; margin:auto; ">
-    <a target="dbmain" href="/admin/disc-info.cgi?id=46108" title="Main Page"><img alt="Info" src="/images/info.png" /></a>
-    <a target="dbmain" href="/admin/appearance-frameset.cgi?id=46108" title="Appearance"><img alt="Appearance" src="/images/palette.png" /></a>
+    <a target="dbmain" th:href="@{|/admin/disc-info.cgi?id=${appId}|}" title="Main Page"><img alt="Info" src="/images/info.png" /></a>
+    <a target="dbmain" th:href="@{|/admin/appearance-frameset.cgi?id=${appId}|}" title="Appearance"><img alt="Appearance" src="/images/palette.png" /></a>
     <!--
     <a target="dbmain" href="/admin/disc-locale.cgi?id=46108" title="Timezone &amp; Language"><img alt="Time" src="/images/globe.png" /></a>
     <a target="dbmain" href="/admin/disc-edit.cgi?id=46108" title="Edit Messages"><img alt="Edit Database" src="/images/messages.png" /></a>
