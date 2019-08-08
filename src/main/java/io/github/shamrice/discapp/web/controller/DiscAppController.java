@@ -27,6 +27,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -464,10 +466,14 @@ public class DiscAppController {
     }
 
     private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString, boolean showPreviewText) {
+
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
         String messageSpanText = "first_message_span";
 
+        if (shouldNewMessageBeHighlighted(currentNode)) {
+            messageSpanText += " new_message";
+        }
 
         String topThreadHtml = "" +
                 "        <div class=\"" + messageDivText + "\">" +
@@ -492,6 +498,8 @@ public class DiscAppController {
         if (showPreviewText) {
             String previewText = currentNode.getCurrent().getBody();
             if (previewText != null && !previewText.isEmpty()) {
+
+
                 if (previewText.length() > 320) {
                     previewText = previewText.substring(0, 320); //todo configurable length
                     previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
@@ -519,8 +527,13 @@ public class DiscAppController {
         if (!skipCurrentNode) {
 
             currentHtml += "<li class=\"message_entry\">" +
-                    " <div class=\"response_headers\">" +
-                    "   <span class=\"response_headers\">";
+                    " <div class=\"response_headers\">";
+
+            if (shouldNewMessageBeHighlighted(currentNode)) {
+                currentHtml += "   <span class=\"response_headers new_message\">";
+            } else {
+                currentHtml += "   <span class=\"response_headers\">";
+            }
 
             //if rendering current thread, subject line should not have an anchor tag.
             if (currentNode.getCurrent().getId().equals(currentlyViewedId)) {
@@ -677,5 +690,23 @@ public class DiscAppController {
         }
 
         return formattedString;
+    }
+
+    private boolean shouldNewMessageBeHighlighted(ThreadTreeNode currentNode) {
+
+        if (currentNode != null && currentNode.getCurrent() != null && currentNode.getCurrent().getCreateDt() != null) {
+
+            boolean highlightNewMessages = configurationService.getBooleanValue(
+                    currentNode.getCurrent().getApplicationId(),
+                    ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, false);
+
+            Instant now = Instant.now();
+            Instant currentNodeInstant = currentNode.getCurrent().getCreateDt().toInstant();
+
+            return highlightNewMessages && currentNodeInstant.isAfter(now.minus(24, ChronoUnit.HOURS));
+        }
+
+        logger.warn("Null thread node or create date sent to be checked if highlight functionality should be applied.");
+        return false;
     }
 }
