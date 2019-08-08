@@ -499,6 +499,7 @@ public class DiscAppController {
             String previewText = currentNode.getCurrent().getBody();
             if (previewText != null && !previewText.isEmpty()) {
 
+                previewText = inputHelper.sanitizeInput(previewText); //remove html from thread preview
 
                 if (previewText.length() > 320) {
                     previewText = previewText.substring(0, 320); //todo configurable length
