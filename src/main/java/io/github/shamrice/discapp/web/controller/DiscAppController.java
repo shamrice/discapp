@@ -548,6 +548,9 @@ public class DiscAppController {
             if (showPreviewText && !currentNode.getCurrent().getId().equals(currentlyViewedId)) {
                 String previewText = currentNode.getCurrent().getBody();
                 if (previewText != null && !previewText.isEmpty()) {
+
+                    previewText = inputHelper.sanitizeInput(previewText); //clear HTML from preview thread body
+
                     if (previewText.length() > 200) {
                         previewText = previewText.substring(0, 200); //todo configurable length
                         previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
