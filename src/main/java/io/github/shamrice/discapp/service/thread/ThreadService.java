@@ -18,6 +18,9 @@ public class ThreadService {
 
     private static final Logger logger = LoggerFactory.getLogger(ThreadService.class);
 
+    private static final String NO_MESSAGE_SUBJECT_ANNOTATION = " (nm)";
+    private static final long TOP_LEVEL_THREAD_PARENT_ID = 0L;
+
     @Autowired
     private ThreadRepository threadRepository;
 
@@ -28,7 +31,7 @@ public class ThreadService {
 
         //add (nm) to subjects with no body.
         if (threadBodyText == null || threadBodyText.isEmpty()) {
-            String noBodySubject = newThread.getSubject() + " (nm)";
+            String noBodySubject = newThread.getSubject() + NO_MESSAGE_SUBJECT_ANNOTATION;
             newThread.setSubject(noBodySubject);
         }
 
@@ -53,26 +56,27 @@ public class ThreadService {
 
     public List<Thread> searchThreads(Long applicationId, String searchText) {
         List<Thread> foundThreads = threadRepository.findByApplicationIdAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
-
+           /* if (foundThread.isPresent()) {
+                foundThreads.add(foundThread.get());
+            }*/
         List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
 
         for (ThreadBody threadBody : resultsInBody) {
             Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-            if (foundThread.isPresent()) {
-                foundThreads.add(foundThread.get());
-            }
+            foundThread.ifPresent(foundThreads::add);
         }
 
         return foundThreads;
     }
 
+    //TODO : accept page number.
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int numThreads) {
 
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(0, numThreads);
         List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdOrderByCreateDtDesc(
                 applicationId,
-                0L,
+                TOP_LEVEL_THREAD_PARENT_ID,
                 limit
         );
 
@@ -121,7 +125,8 @@ public class ThreadService {
 
             buildThreadTree(topThreadNode, nextThreads);
 
-            logger.info("Found top level thread id of: " + topLevelThread.getId() + " : subject: " + topLevelThread.getSubject());
+            logger.info("Found top level thread id of: " + topLevelThread.getId() + " : subject: "
+                    + topLevelThread.getSubject());
         }
 
         return topThreadNode;
@@ -130,7 +135,7 @@ public class ThreadService {
 
     private void buildThreadTree(ThreadTreeNode currentNode, List<Thread> nextSubThreads) {
 
-        logger.info("buildThreads : start");
+        logger.debug("buildThreads : start: " + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
 
         for (Thread thread : nextSubThreads) {
             currentNode.addSubThread(new ThreadTreeNode(thread));
@@ -145,7 +150,7 @@ public class ThreadService {
             buildThreadTree(subThread, nextThreads);
         }
 
-        logger.info("buildThreads : end");
+        logger.debug("buildThreads : end" + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
     }
 
 }

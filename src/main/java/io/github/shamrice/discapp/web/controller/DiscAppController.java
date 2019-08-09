@@ -4,7 +4,6 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
-import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
@@ -17,8 +16,6 @@ import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -58,16 +55,6 @@ public class DiscAppController {
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
-
-        //TODO : remove debug only
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-
-            if (auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
-                model.addAttribute("username", principal.getUsername());
-            }
-        }
 
         try {
             Application app = applicationService.get(appId);
@@ -458,7 +445,6 @@ public class DiscAppController {
                                 thread.getCreateDt(), true) +
                     "</span> "
                     + "</li>";
-
         }
 
         currentHtml += "</ul>";
@@ -471,7 +457,7 @@ public class DiscAppController {
         String messageHeaderText = "first_message_header";
         String messageSpanText = "first_message_span";
 
-        if (shouldNewMessageBeHighlighted(currentNode)) {
+        if (isNewMessageHighlighted(currentNode)) {
             messageSpanText += " new_message";
         }
 
@@ -530,7 +516,7 @@ public class DiscAppController {
             currentHtml += "<li class=\"message_entry\">" +
                     " <div class=\"response_headers\">";
 
-            if (shouldNewMessageBeHighlighted(currentNode)) {
+            if (isNewMessageHighlighted(currentNode)) {
                 currentHtml += "   <span class=\"response_headers new_message\">";
             } else {
                 currentHtml += "   <span class=\"response_headers\">";
@@ -653,7 +639,6 @@ public class DiscAppController {
         return currentHtml;
     }
 
-
     /**
      * Adds anchor HTML tags to the text supplied. Does not add anchors for ones only starting with www.
      * Source modified from: https://stackoverflow.com/questions/49425990/replace-url-in-text-with-href-in-java
@@ -693,7 +678,7 @@ public class DiscAppController {
         return formattedString;
     }
 
-    private boolean shouldNewMessageBeHighlighted(ThreadTreeNode currentNode) {
+    private boolean isNewMessageHighlighted(ThreadTreeNode currentNode) {
 
         if (currentNode != null && currentNode.getCurrent() != null && currentNode.getCurrent().getCreateDt() != null) {
 
