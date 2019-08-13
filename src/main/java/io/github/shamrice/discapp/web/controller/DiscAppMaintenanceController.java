@@ -729,6 +729,13 @@ public class DiscAppMaintenanceController {
     }
 
 
+    /**
+     * Saves updated or new configuration for an application
+     * @param appId application id
+     * @param property configuration property to save
+     * @param value values to save for the configuration
+     * @return returns true on success and false on failure.
+     */
     private boolean saveUpdatedConfiguration(long appId, ConfigurationProperty property, String value) {
 
         Configuration configToUpdate = configurationService.getConfiguration(appId, property.getPropName());
@@ -753,6 +760,12 @@ public class DiscAppMaintenanceController {
     }
 
 
+    /**
+     * Generates edit thread HTML for threads view which is a stripped down version of the default view.
+     * @param currentNode Node to create list HTML for
+     * @param currentHtml Current html to be built upon
+     * @return Returns generated HTML
+     */
     private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml) {
         currentHtml +=
                 "<li>" +
@@ -785,6 +798,11 @@ public class DiscAppMaintenanceController {
         return currentHtml;
     }
 
+    /**
+     * Gets HTML string for the edit thread view by date. Threads are sorted by date desc
+     * @param threadTreeNodeList ThreadTreeNode list to use to populate HTML string
+     * @return Generated HTML for node list
+     */
     private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList) {
 
         StringBuilder currentHtml = new StringBuilder("<ul>");
@@ -831,6 +849,12 @@ public class DiscAppMaintenanceController {
         return currentHtml.toString();
     }
 
+    /**
+     * Populates the threadTreeNodeList with all of the sub threads passed into the current parameter as
+     * a flat list.
+     * @param current current ThreadTreeNode to start populating from (will traverse sub nodes)
+     * @param threadTreeNodeList ThreadTreeNode list to add parent and sub nodes too from current node.
+     */
     private void populateFlatThreadList(ThreadTreeNode current, List<ThreadTreeNode> threadTreeNodeList) {
         threadTreeNodeList.add(current);
         for (ThreadTreeNode threadTreeNode : current.getSubThreads()) {
