@@ -1,10 +1,14 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.*;
+import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.model.MaintenanceThreadViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -19,15 +23,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 @Controller
 public class DiscAppMaintenanceController {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscAppMaintenanceController.class);
+
+    private static final String THREAD_TAB = "threads";
+    private static final String DATE_TAB = "date";
+    private static final String SEARCH_TAB = "search";
+    private static final String POST_TAB = "post";
 
     @Autowired
     private ApplicationService applicationService;
@@ -37,6 +43,9 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ThreadService threadService;
 
     @Autowired
     private AccountHelper accountHelper;
@@ -49,7 +58,7 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-maint.cgi")
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
-                                                  Model model) {
+                                               Model model) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
         return new ModelAndView("admin/disc-maint");
@@ -57,7 +66,7 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-toolbar.cgi")
     public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
-                                               Model model) {
+                                           Model model) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
         return new ModelAndView("admin/disc-toolbar");
@@ -65,24 +74,91 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-info.cgi")
     public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
-                                               Model model) {
+                                        Model model) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
         return new ModelAndView("admin/disc-info");
     }
-/*
-    @GetMapping("/admin/appearance-frameset.cgi")
-    public ModelAndView getAppearanceFramesetView(@RequestParam(name = "id") long appId,
-                                          Model model) {
+
+    @PostMapping("/admin/disc-edit.cgi")
+    public ModelAndView postDiscEditView(@RequestParam(name = "id") long appId,
+                                        @RequestParam(name = "tab", required = false) String currentTab,
+                                        @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
+                                        Model model) {
+        maintenanceThreadViewModel.setInfoMessage("DEBUG - Saved!");
+        return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model);
+    }
+
+    @GetMapping("/admin/disc-edit.cgi")
+    public ModelAndView getDiscEditView(@RequestParam(name = "id") long appId,
+                                        @RequestParam(name = "tab", required = false) String currentTab,
+                                        @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
+                                        Model model) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
-        return new ModelAndView("admin/appearance-frameset");
+
+        if (currentTab == null || currentTab.isEmpty()) {
+            currentTab = THREAD_TAB;
+        }
+
+        maintenanceThreadViewModel.setTab(currentTab);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                model.addAttribute("appName", app.getName());
+                model.addAttribute("appId", app.getId());
+                maintenanceThreadViewModel.setApplicationId(app.getId());
+
+                //get edit threads html
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50);
+                List<String> threadTreeHtml = new ArrayList<>();
+
+                if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
+                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+                        String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>");
+                        currentHtml += "</ul>";
+                        threadTreeHtml.add(currentHtml);
+                    }
+                } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
+                    String currentHtml =  getEditThreadListHtml(threadTreeNodeList);
+                    threadTreeHtml.add(currentHtml);
+                }
+
+                maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
+                maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCoundForApplicationId(app.getId()));
+
+
+            } else {
+                //TODO : redirect users who don't have permission to view page to a permission denied page or something.
+                maintenanceThreadViewModel.setInfoMessage("You do not have permission to edit this disc app.");
+                logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
+            }
+        } catch (Exception ex) {
+            logger.error("Error: " + ex.getMessage(), ex);
+            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+        }
+
+
+        return new ModelAndView("admin/disc-edit", "maintenanceThreadViewModel", maintenanceThreadViewModel);
     }
-*/
+
+    /*
+        @GetMapping("/admin/appearance-frameset.cgi")
+        public ModelAndView getAppearanceFramesetView(@RequestParam(name = "id") long appId,
+                                              Model model) {
+            model.addAttribute("appName", "");
+            model.addAttribute("appId", appId);
+            return new ModelAndView("admin/appearance-frameset");
+        }
+    */
     @GetMapping("/admin/appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model) {
-        //return new ModelAndView("redirect:/indices/" + appId);
         //TODO : change this?
         return discAppController.getAppView(appId, model);
     }
@@ -90,9 +166,9 @@ public class DiscAppMaintenanceController {
     //@GetMapping("/admin/appearance-forms.cgi")
     @GetMapping("/admin/appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
-                                           @RequestParam(name = "redirect", required = false) String redirect,
-                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                           Model model) {
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model) {
 
         maintenanceViewModel.setRedirect(redirect);
         model.addAttribute("appId", appId);
@@ -261,13 +337,13 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId,
-                                              @RequestParam(name = "redirect", required = false) String redirect) {
+                                        @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
     @GetMapping("/admin/modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId,
-                                        @RequestParam(name = "redirect", required = false) String redirect) {
+                                         @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -279,7 +355,7 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect) {
+                                      @RequestParam(name = "redirect", required = false) String redirect) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
     }
 
@@ -507,9 +583,9 @@ public class DiscAppMaintenanceController {
 
     @PostMapping("/admin/modify/labels")
     public ModelAndView postModifyLabels(@RequestParam(name = "id") long appId,
-                                               @RequestParam(name = "redirect", required = false) String redirect,
-                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                               Model model) {
+                                         @RequestParam(name = "redirect", required = false) String redirect,
+                                         @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                         Model model) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -539,9 +615,9 @@ public class DiscAppMaintenanceController {
 
     @PostMapping("/admin/modify/buttons")
     public ModelAndView postModifyButtons(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect,
-                                         @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                         Model model) {
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -574,9 +650,9 @@ public class DiscAppMaintenanceController {
 
     @PostMapping("/admin/modify/favicon")
     public ModelAndView postModifyFavicon(@RequestParam(name = "id") long appId,
-                                             @RequestParam(name = "redirect", required = false) String redirect,
-                                             @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                             Model model) {
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model) {
 
         //default used if field is blank
         String favicon = "/favicon.ico";
@@ -620,9 +696,9 @@ public class DiscAppMaintenanceController {
 
     @PostMapping("/admin/modify/time")
     public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
-                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model) {
+                                       @RequestParam(name = "redirect", required = false) String redirect,
+                                       @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                       Model model) {
 
         if (maintenanceViewModel.getDateFormat() == null || maintenanceViewModel.getDateFormat().trim().isEmpty()) {
             maintenanceViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
@@ -676,6 +752,91 @@ public class DiscAppMaintenanceController {
         return true;
     }
 
+
+    private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml) {
+        currentHtml +=
+                "<li>" +
+                        "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                        "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
+                        currentNode.getCurrent().getSubject() +
+                        "</a> " +
+
+                        "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
+                        "    <span style=\"font-size:smaller;\">" +
+                        "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
+                        currentNode.getCurrent().getSubmitter() + " " +
+                        currentNode.getCurrent().getCreateDt() +
+                        "        </span>" +
+                        "    </span>" +
+                        "</label>" +
+                        "<label>" +
+                        "    <input type=\"checkbox\" name=\"selected\" value=\"" + currentNode.getCurrent().getId() +
+                        "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\"/>" +
+                        "</label>" +
+                        "</li>";
+
+        //recursively generate reply tree structure
+        for (ThreadTreeNode node : currentNode.getSubThreads()) {
+            currentHtml += "<ul>";
+            currentHtml = getEditThreadHtml(node, currentHtml);
+            currentHtml += "</ul>";
+        }
+
+        return currentHtml;
+    }
+
+    private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList) {
+
+        StringBuilder currentHtml = new StringBuilder("<ul>");
+
+        List<ThreadTreeNode> allThreads = new ArrayList<>();
+        for (ThreadTreeNode node : threadTreeNodeList) {
+            populateFlatThreadList(node, allThreads);
+        }
+
+        //sort threads by date asc.
+        allThreads.sort((node1, node2) -> {
+            if (node1.getCurrent().getId().equals(node2.getCurrent().getId())) {
+                return 0;
+            }
+            return node1.getCurrent().getId() > node2.getCurrent().getId() ? -1 : 1;
+        });
+
+
+        for (ThreadTreeNode currentNode : allThreads) {
+            currentHtml.append(
+                    "<li>" +
+                            "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                            "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
+                            currentNode.getCurrent().getSubject() +
+                            "</a> " +
+
+                            "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
+                            "    <span style=\"font-size:smaller;\">" +
+                            "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
+                            currentNode.getCurrent().getSubmitter() + " " +
+                            currentNode.getCurrent().getCreateDt() +
+                            "        </span>" +
+                            "    </span>" +
+                            "</label>" +
+                            "<label>" +
+                            "    <input type=\"checkbox\" name=\"selected\" value=\"" + currentNode.getCurrent().getId() +
+                            "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\"/>" +
+                            "</label>" +
+                            "</li>"
+            );
+
+        }
+        currentHtml.append("</ul>");
+        return currentHtml.toString();
+    }
+
+    private void populateFlatThreadList(ThreadTreeNode current, List<ThreadTreeNode> threadTreeNodeList) {
+        threadTreeNodeList.add(current);
+        for (ThreadTreeNode threadTreeNode : current.getSubThreads()) {
+            populateFlatThreadList(threadTreeNode, threadTreeNodeList);
+        }
+    }
 
 
 }

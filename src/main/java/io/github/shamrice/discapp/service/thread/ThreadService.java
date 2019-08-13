@@ -27,6 +27,10 @@ public class ThreadService {
     @Autowired
     private ThreadBodyRepository threadBodyRepository;
 
+    public long getTotalThreadCoundForApplicationId(long applicationId) {
+        return threadRepository.countByApplicationId(applicationId);
+    }
+
     public void createNewThread(Thread newThread, String threadBodyText) {
 
         //add (nm) to subjects with no body.

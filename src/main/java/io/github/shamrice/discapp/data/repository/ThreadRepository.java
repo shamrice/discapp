@@ -19,4 +19,5 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
 
     List<Thread> findByApplicationIdAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, String subject);
 
+    long countByApplicationId(Long applicationId);
 }

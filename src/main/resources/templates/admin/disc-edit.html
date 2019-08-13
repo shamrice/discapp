@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+    /*
+        fieldset {
+            background-color: #fff;
+        }
+
+        fieldset a,
+        fieldset span {
+            text-decoration: none;
+            padding: 3px;
+            float: left;
+            font-weight: normal;
+        }
+
+        fieldset a:hover {
+            background-color: #ccf;
+        }
+
+        fieldset img {
+            height: 32px;
+            width: 32px;
+            vertical-align: middle;
+        }
+
+        p {
+            margin-bottom: 3ex;
+        }
+*/
+
+        label{font-weight:normal;}
+
+    </style>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+
+<body>
+
+<div th:if="${maintenanceThreadViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceThreadViewModel.getInfoMessage()}">
+</div>
+
+<div th:if="${maintenanceThreadViewModel.getApplicationId()}">
+
+    <form method="post"
+          th:action="@{|/admin/disc-edit.cgi?id=${maintenanceThreadViewModel.getApplicationId()}&tab=${maintenanceThreadViewModel.getTab()}|}"
+          enctype="multipart/form-data"
+          th:object="${maintenanceThreadViewModel}">
+
+        <input type="hidden" name="id" th:value="${appId}"/>
+        <input type="hidden" name="tab" th:value="${maintenanceThreadViewModel.getTab()}"/>
+
+        <div id="account">
+            <div th:text="${username}"></div>
+            <a href="/account/modify" target="_top">Control Center</a>
+            <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
+            <a href="/logout" target="_top">Logout</a>
+        </div>
+
+        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('threads')}">
+        <span class="tab" style="background-color:#fff; color:#00f;
+              border:3px solid blue; border-bottom-color:#fff;"
+               >View by Thread</span>
+            <a class="tab" th:href="@{|?id=${appId}&tab=date|}">View by Date</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=search|}">Search</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=post|}">Post</a>
+        </div>
+
+        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('date')}">
+            <a class="tab" th:href="@{|?id=${appId}&tab=threads|}">View by Thread</a>
+            <span class="tab" style="background-color:#fff; color:#00f;
+              border:3px solid blue; border-bottom-color:#fff;">View by Date</span>
+            <a class="tab" th:href="@{|?id=${appId}&tab=search|}">Search</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=post|}">Post</a>
+        </div>
+
+        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('search')}">
+            <a class="tab" th:href="@{|?id=${appId}&tab=threads|}">View by Thread</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=date|}">View by Date</a>
+            <span class="tab" style="background-color:#fff; color:#00f;
+              border:3px solid blue; border-bottom-color:#fff;">Search</span>
+            <a class="tab" th:href="@{|?id=${appId}&tab=post|}">Post</a>
+        </div>
+
+        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('post')}">
+            <a class="tab" th:href="@{|?id=${appId}&tab=threads|}">View by Thread</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=date|}">View by Date</a>
+            <a class="tab" th:href="@{|?id=${appId}&tab=search|}">Search</a>
+            <span class="tab" style="background-color:#fff; color:#00f;
+              border:3px solid blue; border-bottom-color:#fff;">Post</span>
+        </div>
+
+
+        <div style="padding-left:1em;">
+
+            <p style="text-align:center;" th:text="@{|There are ${maintenanceThreadViewModel.getNumberOfMessages()} messages.|}"></p>
+
+            <div class="buttons">
+                <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
+                <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                       class="button"/>
+                <input type="submit" name="reportAsAbuse" value="Report as Abuse" class="button"/>
+            </div>
+
+            <div th:replace="admin/fragments/edit-threads :: edit-threads">
+                static thread prototyping placeholder
+            </div>
+
+            <div class="buttons">
+                <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
+                <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                       class="button"/>
+                <input type="submit" name="reportAsAbuse" value="Report as Abuse" class="button"/>
+                <input type="hidden" name="nextPageStart" th:value="${maintenanceThreadViewModel.getNextPageStart()}"/>
+                <input type="submit" name="nextPage" value="Next Page" class="button"/>
+            </div>
+            <div>
+                <input type="hidden" name=".cgifields" value="selected"/>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div class="edit-threads" th:fragment="edit-threads">
+
+    <div th:if="${not #lists.isEmpty(maintenanceThreadViewModel.getEditThreadTreeHtml())}" th:each="threadHtml : ${maintenanceThreadViewModel.getEditThreadTreeHtml()}">
+        <div class="thread" th:utext="${threadHtml}"></div>
+        <hr th:if="${maintenanceThreadViewModel.getTab().equals('threads')}" />
+    </div>
+</div>
+</body>
+</html>
