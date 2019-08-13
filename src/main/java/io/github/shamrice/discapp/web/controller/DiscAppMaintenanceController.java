@@ -70,7 +70,7 @@ public class DiscAppMaintenanceController {
         model.addAttribute("appId", appId);
         return new ModelAndView("admin/disc-info");
     }
-
+/*
     @GetMapping("/admin/appearance-frameset.cgi")
     public ModelAndView getAppearanceFramesetView(@RequestParam(name = "id") long appId,
                                           Model model) {
@@ -78,7 +78,7 @@ public class DiscAppMaintenanceController {
         model.addAttribute("appId", appId);
         return new ModelAndView("admin/appearance-frameset");
     }
-
+*/
     @GetMapping("/admin/appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model) {
@@ -87,7 +87,8 @@ public class DiscAppMaintenanceController {
         return discAppController.getAppView(appId, model);
     }
 
-    @GetMapping("/admin/appearance-forms.cgi")
+    //@GetMapping("/admin/appearance-forms.cgi")
+    @GetMapping("/admin/appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
                                            @RequestParam(name = "redirect", required = false) String redirect,
                                            @ModelAttribute MaintenanceViewModel maintenanceViewModel,
