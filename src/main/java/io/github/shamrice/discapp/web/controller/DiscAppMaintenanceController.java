@@ -84,8 +84,58 @@ public class DiscAppMaintenanceController {
     public ModelAndView postDiscEditView(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "tab", required = false) String currentTab,
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
-                                        Model model) {
-        maintenanceThreadViewModel.setInfoMessage("DEBUG - Saved!");
+                                         Model model) {
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                if (maintenanceThreadViewModel.getDeleteArticles() != null && !maintenanceThreadViewModel.getDeleteArticles().isEmpty()) {
+
+                    boolean deleteThreadsSuccess = true;
+
+                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                        long threadId = Long.parseLong(threadIdStr);
+                        if (!threadService.deleteThread(app.getId(), threadId, false)) {
+                            logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
+                            deleteThreadsSuccess = false;
+                        }
+                    }
+
+                    if (deleteThreadsSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
+                    }
+                }
+
+                if (maintenanceThreadViewModel.getDeleteArticlesAndReplies() != null && !maintenanceThreadViewModel.getDeleteArticlesAndReplies().isEmpty()) {
+
+                    boolean deleteThreadsAndRepliesSuccess = true;
+
+                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                        long threadId = Long.parseLong(threadIdStr);
+                        if (!threadService.deleteThread(app.getId(), threadId, true)) {
+                            logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
+                            deleteThreadsAndRepliesSuccess = false;
+                        }
+                    }
+
+                    if (deleteThreadsAndRepliesSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages and replies.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
+                    }
+                }
+
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            maintenanceThreadViewModel.setInfoMessage("Error has occurred. Please try again.");
+        }
+
         return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model);
     }
 
@@ -130,7 +180,7 @@ public class DiscAppMaintenanceController {
                 }
 
                 maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
-                maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCoundForApplicationId(app.getId()));
+                maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCountForApplicationId(app.getId()));
 
 
             } else {
@@ -783,7 +833,7 @@ public class DiscAppMaintenanceController {
                         "    </span>" +
                         "</label>" +
                         "<label>" +
-                        "    <input type=\"checkbox\" name=\"selected\" value=\"" + currentNode.getCurrent().getId() +
+                        "    <input type=\"checkbox\" name=\"selectThreadCheckbox\" value=\"" + currentNode.getCurrent().getId() +
                         "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\"/>" +
                         "</label>" +
                         "</li>";
@@ -838,8 +888,8 @@ public class DiscAppMaintenanceController {
                             "    </span>" +
                             "</label>" +
                             "<label>" +
-                            "    <input type=\"checkbox\" name=\"selected\" value=\"" + currentNode.getCurrent().getId() +
-                            "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\"/>" +
+                            "    <input type=\"checkbox\" name=\"selectThreadCheckbox\" value=\"" + currentNode.getCurrent().getId() +
+                            "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\" \"/>" +
                             "</label>" +
                             "</li>"
             );

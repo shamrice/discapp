@@ -11,13 +11,13 @@ import java.util.List;
 @Repository
 public interface ThreadRepository extends JpaRepository<Thread, Long> {
 
-    List<Thread> findByApplicationId(Long applicationId);
-    List<Thread> findByApplicationIdAndParentId(Long applicationId, Long parentId);
+    List<Thread> findByApplicationIdAndDeleted(Long applicationId, Boolean deleted);
+    List<Thread> findByApplicationIdAndParentIdAndDeleted(Long applicationId, Long parentId, Boolean deleted);
     List<Thread> findByApplicationIdAndParentIdAndCreateDtBetween(Long applicationId, Long parentId, Date createDtStart,Date createDtEnd);
 
-    List<Thread> findByApplicationIdAndParentIdOrderByCreateDtDesc(Long applicationId, Long parentId, Pageable pageable);
+    List<Thread> findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(Long applicationId, Long parentId, Boolean deleted, Pageable pageable);
 
-    List<Thread> findByApplicationIdAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, String subject);
+    List<Thread> findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, String subject);
 
-    long countByApplicationId(Long applicationId);
+    long countByApplicationIdAndDeleted(Long applicationId, Boolean deleted);
 }

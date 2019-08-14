@@ -27,8 +27,56 @@ public class ThreadService {
     @Autowired
     private ThreadBodyRepository threadBodyRepository;
 
-    public long getTotalThreadCoundForApplicationId(long applicationId) {
-        return threadRepository.countByApplicationId(applicationId);
+    public long getTotalThreadCountForApplicationId(long applicationId) {
+        return threadRepository.countByApplicationIdAndDeleted(applicationId, false);
+    }
+
+    public boolean deleteThread(long applicationId, long threadId, boolean deleteSubThreads) {
+
+        Thread threadToDelete = threadRepository.getOne(threadId);
+        List<Thread> subThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(applicationId, threadToDelete.getId(), false);
+
+        for (Thread subThread : subThreads) {
+            if (deleteSubThreads) {
+
+                logger.info("Thread to deleted: " + threadToDelete.getId() + " : Deleting all sub threads recursively.");
+                deleteThread(applicationId, subThread.getId(), true);
+            } else {
+
+                logger.info("Thread to deleted: " + threadToDelete.getId()
+                        + " : Setting parent id of sub threads to parent id= " + threadToDelete.getParentId()
+                        + " of thread to delete.");
+
+                subThread.setParentId(threadToDelete.getParentId());
+                subThread.setModDt(new Date());
+            }
+        }
+
+        List<Thread> savedSubThreads = threadRepository.saveAll(subThreads);
+
+        if (savedSubThreads != null && savedSubThreads.size() == subThreads.size()) {
+            threadToDelete.setModDt(new Date());
+            threadToDelete.setDeleted(true);
+
+            Thread savedThread = threadRepository.save(threadToDelete);
+
+            if (savedThread != null && savedThread.getId().equals(threadToDelete.getId())) {
+
+                logger.info("Successfully deleted thread id: " + threadToDelete.getId() + " for applicationId: " + applicationId);
+                return true;
+
+            } else {
+                logger.error("Failed to delete thread: " + threadToDelete + " for appid: " + applicationId
+                        + " :: sub threads have been updated. Please retry this action.");
+            }
+
+        } else {
+            logger.error("Failed to update all sub threads of thread to delete: " + threadToDelete.getId()
+                    + " :: not deleting thread. Check for errors and/or orphaned sub threads");
+        }
+
+        return false;
+
     }
 
     public void createNewThread(Thread newThread, String threadBodyText) {
@@ -55,19 +103,18 @@ public class ThreadService {
     }
 
     public List<Thread> getThreads(Long applicationId) {
-        return threadRepository.findByApplicationId(applicationId);
+        return threadRepository.findByApplicationIdAndDeleted(applicationId, false);
     }
 
     public List<Thread> searchThreads(Long applicationId, String searchText) {
-        List<Thread> foundThreads = threadRepository.findByApplicationIdAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
-           /* if (foundThread.isPresent()) {
-                foundThreads.add(foundThread.get());
-            }*/
+        List<Thread> foundThreads = threadRepository.findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, searchText);
         List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
 
         for (ThreadBody threadBody : resultsInBody) {
             Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-            foundThread.ifPresent(foundThreads::add);
+            if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false)) {
+                foundThread.ifPresent(foundThreads::add);
+            }
         }
 
         return foundThreads;
@@ -78,9 +125,10 @@ public class ThreadService {
 
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(0, numThreads);
-        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdOrderByCreateDtDesc(
+        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
                 applicationId,
                 TOP_LEVEL_THREAD_PARENT_ID,
+                false,
                 limit
         );
 
@@ -94,7 +142,8 @@ public class ThreadService {
     }
 
     public Thread getThread(Long threadId) {
-        return threadRepository.getOne(threadId);
+        Thread foundThread = threadRepository.getOne(threadId);
+        return foundThread.getDeleted() ? null : foundThread;
     }
 
     public ThreadBody getThreadBody(Long threadId) {
@@ -116,21 +165,21 @@ public class ThreadService {
         logger.info("Building full thread tree for top level thread id: " + topLevelThreadId);
 
         ThreadTreeNode topThreadNode = null;
+        Optional<Thread> topLevelThread = threadRepository.findById(topLevelThreadId);
 
-        if (threadRepository.findById(topLevelThreadId).isPresent()) {
-            Thread topLevelThread = threadRepository.findById(topLevelThreadId).get();
-            topThreadNode = new ThreadTreeNode(topLevelThread);
+        if (topLevelThread.isPresent() && topLevelThread.get().getDeleted().equals(false)) {
+            topThreadNode = new ThreadTreeNode(topLevelThread.get());
 
-
-            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentId(
-                    topLevelThread.getApplicationId(),
-                    topLevelThread.getId()
+            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(
+                    topLevelThread.get().getApplicationId(),
+                    topLevelThread.get().getId(),
+                    false
             );
 
             buildThreadTree(topThreadNode, nextThreads);
 
-            logger.info("Found top level thread id of: " + topLevelThread.getId() + " : subject: "
-                    + topLevelThread.getSubject());
+            logger.info("Found top level thread id of: " + topLevelThread.get().getId() + " : subject: "
+                    + topLevelThread.get().getSubject());
         }
 
         return topThreadNode;
@@ -146,9 +195,10 @@ public class ThreadService {
         }
 
         for (ThreadTreeNode subThread :  currentNode.getSubThreads()) {
-            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentId(
+            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(
                     subThread.getCurrent().getApplicationId(),
-                    subThread.getCurrent().getId()
+                    subThread.getCurrent().getId(),
+                    false
             );
 
             buildThreadTree(subThread, nextThreads);

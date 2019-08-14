@@ -17,6 +17,8 @@ public class MaintenanceThreadViewModel {
     private String nextPage;
     private long nextPageStart;
 
+    private String[] selectThreadCheckbox;
+
 
     public long getApplicationId() {
         return applicationId;
@@ -96,5 +98,14 @@ public class MaintenanceThreadViewModel {
 
     public void setNextPageStart(long nextPageStart) {
         this.nextPageStart = nextPageStart;
+    }
+
+
+    public String[] getSelectThreadCheckbox() {
+        return selectThreadCheckbox;
+    }
+
+    public void setSelectThreadCheckbox(String[] selectThreadCheckbox) {
+        this.selectThreadCheckbox = selectThreadCheckbox;
     }
 }
