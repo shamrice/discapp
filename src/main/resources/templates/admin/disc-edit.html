@@ -107,7 +107,7 @@
                 <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
                 <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                        class="button"/>
-                <input type="submit" name="reportAsAbuse" value="Report as Abuse" class="button"/>
+                <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
             </div>
 
             <div th:replace="admin/fragments/edit-threads :: edit-threads">
@@ -118,7 +118,7 @@
                 <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
                 <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                        class="button"/>
-                <input type="submit" name="reportAsAbuse" value="Report as Abuse" class="button"/>
+                <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
                 <input type="hidden" name="nextPageStart" th:value="${maintenanceThreadViewModel.getNextPageStart()}"/>
                 <input type="submit" name="nextPage" value="Next Page" class="button"/>
             </div>

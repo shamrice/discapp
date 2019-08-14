@@ -130,6 +130,26 @@ public class DiscAppMaintenanceController {
                     }
                 }
 
+                if (maintenanceThreadViewModel.getReportAbuse() != null && !maintenanceThreadViewModel.getReportAbuse().isEmpty()) {
+                    DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+
+                    boolean threadsReportedSuccess = true;
+
+                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                        long threadId = Long.parseLong(threadIdStr);
+                        if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
+                            logger.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
+                            threadsReportedSuccess = false;
+                        }
+                    }
+
+                    if (threadsReportedSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully reported and deleted messages.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
+                    }
+                }
+
             }
         } catch (Exception ex) {
             logger.error("Thread administration action failed: " + ex.getMessage(), ex);

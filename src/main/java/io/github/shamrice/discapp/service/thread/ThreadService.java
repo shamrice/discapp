@@ -1,7 +1,9 @@
 package io.github.shamrice.discapp.service.thread;
 
+import io.github.shamrice.discapp.data.model.ReportedAbuse;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.model.ThreadBody;
+import io.github.shamrice.discapp.data.repository.ReportedAbuseRepository;
 import io.github.shamrice.discapp.data.repository.ThreadBodyRepository;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
 import org.slf4j.Logger;
@@ -26,6 +28,39 @@ public class ThreadService {
 
     @Autowired
     private ThreadBodyRepository threadBodyRepository;
+
+    @Autowired
+    private ReportedAbuseRepository reportedAbuseRepository;
+
+    public boolean reportThreadForAbuse(long applicationId, long threadId, long reporterDiscAppUserId) {
+        Thread abuseThread = threadRepository.getOne(threadId);
+
+        if (!abuseThread.getApplicationId().equals(applicationId)) {
+            logger.warn("Attempted to report thread id: " + threadId + " for abuse when application id is not from " + applicationId);
+            return false;
+        }
+
+        ReportedAbuse newAbuseReport = new ReportedAbuse();
+        newAbuseReport.setApplicationId(applicationId);
+        newAbuseReport.setIpAddress(abuseThread.getIpAddress());
+        newAbuseReport.setThreadId(abuseThread.getId());
+        newAbuseReport.setReportedBy(reporterDiscAppUserId);
+        newAbuseReport.setModDt(new Date());
+        newAbuseReport.setCreateDt(new Date());
+
+        ReportedAbuse savedReport = reportedAbuseRepository.save(newAbuseReport);
+        if (savedReport != null) {
+            logger.info("Saved new abuse report for application_id: " + applicationId
+                    + " : thread_id: " + threadId + " :: Marking thread for deletion.");
+
+            return deleteThread(applicationId, abuseThread.getId(), false);
+
+        } else {
+            logger.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
+        }
+
+        return false;
+    }
 
     public long getTotalThreadCountForApplicationId(long applicationId) {
         return threadRepository.countByApplicationIdAndDeleted(applicationId, false);

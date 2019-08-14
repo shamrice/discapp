@@ -115,6 +115,20 @@ CREATE TABLE epilogue (
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
+CREATE TABLE reported_abuse (
+    id serial NOT NULL,
+    application_id int NOT NULL,
+    thread_id int NOT NULL,
+    ip_address varchar(64),
+    reported_by int NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (thread_id) REFERENCES thread(id),
+    FOREIGN KEY (reported_by) REFERENCES discapp_user(id)
+);
+
 commit;
 
 
