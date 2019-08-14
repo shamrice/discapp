@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div class="search-threads" th:fragment="search-threads">
+
+    <div style="padding-left:1em;">
+        <table class="record">
+            <tr>
+                <th>Author</th>
+                <td>
+                    <input type="text" name="authorSearch" th:value="${maintenanceThreadViewModel.getAuthorSearch()}" size="30"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>
+                    <input type="text" name="emailSearch" th:value="${maintenanceThreadViewModel.getEmailSearch()}" size="30"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Subject</th>
+                <td>
+                    <input type="text" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}" size="30"/>
+                </td>
+            </tr>
+            <tr>
+                <th>IP</th>
+                <td>
+                    <input type="text" name="ipSearch" th:value="${maintenanceThreadViewModel.getIpSearch()}" size="30"/>
+                </td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>
+                    <input type="text" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}" size="30"/>
+                </td>
+            </tr>
+            <!-- TODO: ADD LATER tr>
+                <th>Status</th>
+                <td>
+                    <label>
+                        <input type="radio" name="approvedSearch" value="approved" checked="checked"/>approved</label>
+                    <label>
+                        <input type="radio" name="approvedSearch" value="unapproved"/>unapproved</label>
+                </td>
+            </tr -->
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input type="submit" name="findMessages" value="Find Messages" class="button"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

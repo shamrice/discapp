@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.data.repository;
 import io.github.shamrice.discapp.data.model.Thread;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -18,6 +19,12 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
     List<Thread> findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(Long applicationId, Long parentId, Boolean deleted, Pageable pageable);
 
     List<Thread> findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, String subject);
+
+    List<Thread> findByApplicationIdAndDeletedAndSubmitterContainingIgnoreCase(Long applicationId, Boolean deleted, String submitter);
+    List<Thread> findByApplicationIdAndDeletedAndIpAddressContainingIgnoreCase(Long applicationId, Boolean deleted, String ipAddress);
+    List<Thread> findByApplicationIdAndDeletedAndEmailContainingIgnoreCase(Long applicationId, Boolean deleted, String email);
+
+    //todo add approved
 
     long countByApplicationIdAndDeleted(Long applicationId, Boolean deleted);
 }

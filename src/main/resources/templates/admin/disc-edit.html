@@ -40,6 +40,10 @@
 
     </style>
 
+    <script type="text/javascript">
+
+    </script>
+
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
 
@@ -99,7 +103,8 @@
         </div>
 
 
-        <div style="padding-left:1em;">
+        <div th:if="${maintenanceThreadViewModel.getTab().equals('threads') || maintenanceThreadViewModel.getTab().equals('date') || (maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isSearchSubmitted())}"
+             style="padding-left:1em;">
 
             <p style="text-align:center;" th:text="@{|There are ${maintenanceThreadViewModel.getNumberOfMessages()} messages.|}"></p>
 
@@ -108,6 +113,7 @@
                 <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                        class="button"/>
                 <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.getTab().equals('search')}" type="submit" name="searchAgain" value="Search Again" class="button"/>
             </div>
 
             <div th:replace="admin/fragments/edit-threads :: edit-threads">
@@ -120,11 +126,21 @@
                        class="button"/>
                 <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
                 <input type="hidden" name="nextPageStart" th:value="${maintenanceThreadViewModel.getNextPageStart()}"/>
-                <input type="submit" name="nextPage" value="Next Page" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.getTab().equals('search')}" type="submit" name="searchAgain" value="Search Again" class="button"/>
+                <input th:if="${!maintenanceThreadViewModel.getTab().equals('search')}" type="submit" name="nextPage" value="Next Page" class="button"/>
             </div>
             <div>
                 <input type="hidden" name=".cgifields" value="selected"/>
             </div>
+        </div>
+
+        <div th:if="${maintenanceThreadViewModel.getTab().equals('search') && !maintenanceThreadViewModel.isSearchSubmitted()}"
+             style="padding-left:1em;">
+
+            <div th:replace="admin/fragments/search-threads :: search-threads">
+                static thread prototyping placeholder
+            </div>
+
         </div>
     </form>
 

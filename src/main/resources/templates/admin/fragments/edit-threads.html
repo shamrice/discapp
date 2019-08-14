@@ -5,9 +5,18 @@
 <body>
 <div class="edit-threads" th:fragment="edit-threads">
 
-    <div th:if="${not #lists.isEmpty(maintenanceThreadViewModel.getEditThreadTreeHtml())}" th:each="threadHtml : ${maintenanceThreadViewModel.getEditThreadTreeHtml()}">
+    <div th:if="${not #lists.isEmpty(maintenanceThreadViewModel.getEditThreadTreeHtml())}"
+         th:each="threadHtml : ${maintenanceThreadViewModel.getEditThreadTreeHtml()}">
         <div class="thread" th:utext="${threadHtml}"></div>
-        <hr th:if="${maintenanceThreadViewModel.getTab().equals('threads')}" />
+        <hr th:if="${maintenanceThreadViewModel.getTab().equals('threads')}"/>
+    </div>
+
+    <div th:if="${maintenanceThreadViewModel.getTab().equals('search')}">
+        <input type="hidden" name="authorSearch" th:value="${maintenanceThreadViewModel.getAuthorSearch()}" size="30"/>
+        <input type="hidden" name="emailSearch" th:value="${maintenanceThreadViewModel.getEmailSearch()}" size="30"/>
+        <input type="hidden" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}" size="30"/>
+        <input type="hidden" name="ipSearch" th:value="${maintenanceThreadViewModel.getIpSearch()}" size="30"/>
+        <input type="hidden" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}" size="30"/>
     </div>
 </div>
 </body>

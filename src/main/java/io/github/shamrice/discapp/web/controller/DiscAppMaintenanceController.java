@@ -96,18 +96,20 @@ public class DiscAppMaintenanceController {
 
                     boolean deleteThreadsSuccess = true;
 
-                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                        long threadId = Long.parseLong(threadIdStr);
-                        if (!threadService.deleteThread(app.getId(), threadId, false)) {
-                            logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
-                            deleteThreadsSuccess = false;
+                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                            long threadId = Long.parseLong(threadIdStr);
+                            if (!threadService.deleteThread(app.getId(), threadId, false)) {
+                                logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
+                                deleteThreadsSuccess = false;
+                            }
                         }
-                    }
 
-                    if (deleteThreadsSuccess) {
-                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages.");
-                    } else {
-                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
+                        if (deleteThreadsSuccess) {
+                            maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages.");
+                        } else {
+                            maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
+                        }
                     }
                 }
 
@@ -115,18 +117,20 @@ public class DiscAppMaintenanceController {
 
                     boolean deleteThreadsAndRepliesSuccess = true;
 
-                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                        long threadId = Long.parseLong(threadIdStr);
-                        if (!threadService.deleteThread(app.getId(), threadId, true)) {
-                            logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
-                            deleteThreadsAndRepliesSuccess = false;
+                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                            long threadId = Long.parseLong(threadIdStr);
+                            if (!threadService.deleteThread(app.getId(), threadId, true)) {
+                                logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
+                                deleteThreadsAndRepliesSuccess = false;
+                            }
                         }
-                    }
 
-                    if (deleteThreadsAndRepliesSuccess) {
-                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages and replies.");
-                    } else {
-                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
+                        if (deleteThreadsAndRepliesSuccess) {
+                            maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages and replies.");
+                        } else {
+                            maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
+                        }
                     }
                 }
 
@@ -135,19 +139,45 @@ public class DiscAppMaintenanceController {
 
                     boolean threadsReportedSuccess = true;
 
-                    for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                        long threadId = Long.parseLong(threadIdStr);
-                        if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
-                            logger.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
-                            threadsReportedSuccess = false;
+                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                            long threadId = Long.parseLong(threadIdStr);
+                            if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
+                                logger.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
+                                threadsReportedSuccess = false;
+                            }
+                        }
+
+                        if (threadsReportedSuccess) {
+                            maintenanceThreadViewModel.setInfoMessage("Successfully reported and deleted messages.");
+                        } else {
+                            maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
                         }
                     }
+                }
 
-                    if (threadsReportedSuccess) {
-                        maintenanceThreadViewModel.setInfoMessage("Successfully reported and deleted messages.");
-                    } else {
-                        maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
-                    }
+                if (maintenanceThreadViewModel.getFindMessages() != null && !maintenanceThreadViewModel.getFindMessages().isEmpty()) {
+
+                    List<Thread> searchResults = threadService.searchThreadsByFields(
+                            app.getId(),
+                            maintenanceThreadViewModel.getAuthorSearch(),
+                            maintenanceThreadViewModel.getEmailSearch(),
+                            maintenanceThreadViewModel.getSubjectSearch(),
+                            maintenanceThreadViewModel.getIpSearch(),
+                            maintenanceThreadViewModel.getMessageSearch()
+                    );
+
+                    String searchResultsHtml = getSearchThreadHtml(searchResults);
+                    List<String> threadHtml = new ArrayList<>();
+                    threadHtml.add(searchResultsHtml);
+                    maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
+                    maintenanceThreadViewModel.setNumberOfMessages(searchResults.size());
+                    maintenanceThreadViewModel.setSearchSubmitted(true);
+                }
+
+                if (maintenanceThreadViewModel.getSearchAgain() != null && !maintenanceThreadViewModel.getSearchAgain().isEmpty()) {
+                    maintenanceThreadViewModel.setSearchSubmitted(false);
+                    maintenanceThreadViewModel.setTab(SEARCH_TAB);
                 }
 
             }
@@ -184,24 +214,27 @@ public class DiscAppMaintenanceController {
                 model.addAttribute("appId", app.getId());
                 maintenanceThreadViewModel.setApplicationId(app.getId());
 
-                //get edit threads html
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50);
-                List<String> threadTreeHtml = new ArrayList<>();
 
-                if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
-                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                        String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>");
-                        currentHtml += "</ul>";
+
+                if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
+                    //get edit threads html
+                    List<String> threadTreeHtml = new ArrayList<>();
+                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50);
+
+                    if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
+                        for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+                            String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>");
+                            currentHtml += "</ul>";
+                            threadTreeHtml.add(currentHtml);
+                        }
+                    } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
+                        String currentHtml = getEditThreadListHtml(threadTreeNodeList);
                         threadTreeHtml.add(currentHtml);
                     }
-                } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
-                    String currentHtml =  getEditThreadListHtml(threadTreeNodeList);
-                    threadTreeHtml.add(currentHtml);
+
+                    maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
+                    maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCountForApplicationId(app.getId()));
                 }
-
-                maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
-                maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCountForApplicationId(app.getId()));
-
 
             } else {
                 //TODO : redirect users who don't have permission to view page to a permission denied page or something.
@@ -933,4 +966,32 @@ public class DiscAppMaintenanceController {
     }
 
 
+    private String getSearchThreadHtml(List<Thread> threads) {
+        String currentHtml = "<ul>";
+
+        for (Thread thread : threads) {
+
+            currentHtml += "<li>" +
+                    "<a href=\"/admin/edit-thread.cgi?disc=" + thread.getApplicationId() +
+                    "&amp;article=" + thread.getId() + "\">" +
+                    thread.getSubject() +
+                    "</a> " +
+
+                    "<label for=\"checkbox_" + thread.getId() + "\">" +
+                    "    <span style=\"font-size:smaller;\">" +
+                    "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
+                    thread.getSubmitter() + " " +
+                    thread.getCreateDt() +
+                    "        </span>" +
+                    "    </span>" +
+                    "</label>" +
+                    "<label>" +
+                    "    <input type=\"checkbox\" name=\"selectThreadCheckbox\" value=\"" + thread.getId() +
+                    "\" id=\"checkbox_" + thread.getId() + "\" \"/>" +
+                    "</label>" +
+                    "</li>";
+        }
+        currentHtml += "</ul>";
+        return currentHtml;
+    }
 }

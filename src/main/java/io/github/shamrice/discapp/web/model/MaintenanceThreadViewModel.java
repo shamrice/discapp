@@ -19,6 +19,16 @@ public class MaintenanceThreadViewModel {
 
     private String[] selectThreadCheckbox;
 
+    private String findMessages;
+    private String authorSearch = "";
+    private String emailSearch = "";
+    private String subjectSearch = "";
+    private String ipSearch = "";
+    private String messageSearch = "";
+    private String approvedSearch = "";
+    private boolean searchSubmitted;
+    private String searchAgain;
+
 
     public long getApplicationId() {
         return applicationId;
@@ -107,5 +117,77 @@ public class MaintenanceThreadViewModel {
 
     public void setSelectThreadCheckbox(String[] selectThreadCheckbox) {
         this.selectThreadCheckbox = selectThreadCheckbox;
+    }
+
+    public String getFindMessages() {
+        return findMessages;
+    }
+
+    public void setFindMessages(String findMessages) {
+        this.findMessages = findMessages;
+    }
+
+    public String getAuthorSearch() {
+        return authorSearch;
+    }
+
+    public void setAuthorSearch(String authorSearch) {
+        this.authorSearch = authorSearch;
+    }
+
+    public String getEmailSearch() {
+        return emailSearch;
+    }
+
+    public void setEmailSearch(String emailSearch) {
+        this.emailSearch = emailSearch;
+    }
+
+    public String getSubjectSearch() {
+        return subjectSearch;
+    }
+
+    public void setSubjectSearch(String subjectSearch) {
+        this.subjectSearch = subjectSearch;
+    }
+
+    public String getIpSearch() {
+        return ipSearch;
+    }
+
+    public void setIpSearch(String ipSearch) {
+        this.ipSearch = ipSearch;
+    }
+
+    public String getMessageSearch() {
+        return messageSearch;
+    }
+
+    public void setMessageSearch(String messageSearch) {
+        this.messageSearch = messageSearch;
+    }
+
+    public String getApprovedSearch() {
+        return approvedSearch;
+    }
+
+    public void setApprovedSearch(String approvedSearch) {
+        this.approvedSearch = approvedSearch;
+    }
+
+    public boolean isSearchSubmitted() {
+        return searchSubmitted;
+    }
+
+    public void setSearchSubmitted(boolean searchSubmitted) {
+        this.searchSubmitted = searchSubmitted;
+    }
+
+    public String getSearchAgain() {
+        return searchAgain;
+    }
+
+    public void setSearchAgain(String searchAgain) {
+        this.searchAgain = searchAgain;
     }
 }

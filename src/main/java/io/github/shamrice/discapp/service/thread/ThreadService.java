@@ -161,6 +161,75 @@ public class ThreadService {
         return foundThreads;
     }
 
+    public List<Thread> searchThreadsByFields(long applicationId, String submitter, String email, String subject, String ipAddress, String messageBody) {
+
+        //todo : refactor this so the query is on an "and" instead of querying each and then trimming
+
+        List<Thread> foundThreads = new ArrayList<>();
+
+        //search
+        if (subject != null && !subject.trim().isEmpty()) {
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, subject));
+        }
+
+        if (messageBody != null && !messageBody.trim().isEmpty()) {
+
+            List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, messageBody);
+
+            for (ThreadBody threadBody : resultsInBody) {
+                Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
+                if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false)) {
+                    foundThread.get().setBody(threadBody.getBody());
+                    foundThread.ifPresent(foundThreads::add);
+                }
+            }
+        }
+
+        if (submitter != null && !submitter.trim().isEmpty()) {
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndSubmitterContainingIgnoreCase(applicationId, false, submitter));
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndEmailContainingIgnoreCase(applicationId, false, email));
+        }
+
+        if (ipAddress != null && !ipAddress.trim().isEmpty()) {
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIpAddressContainingIgnoreCase(applicationId, false, ipAddress));
+        }
+
+        if (subject == null) subject = "";
+        if (messageBody == null) messageBody = "";
+        if (submitter == null) submitter = "";
+        if (email == null) email = "";
+        if (ipAddress == null) ipAddress = "";
+
+        //remove duplicates and gross way to make sure threads are searched as "and" instead of "or"...
+        List<Thread> uniqueThreadList = new ArrayList<>();
+        for (Thread thread : foundThreads) {
+            if (!uniqueThreadList.contains(thread)) {
+
+                if (thread.getSubmitter().toLowerCase().contains(submitter.toLowerCase())
+                        && thread.getSubject().toLowerCase().contains(subject.toLowerCase())
+                        && thread.getEmail().toLowerCase().contains(email.toLowerCase())
+                        && thread.getIpAddress().contains(ipAddress)
+                        && (thread.getBody() == null || thread.getBody().toLowerCase().contains(messageBody.toLowerCase()))) {
+
+                    uniqueThreadList.add(thread);
+                }
+            }
+        }
+
+        //sort threads
+        uniqueThreadList.sort((t1, t2) -> {
+            if (t1.getId().equals(t2.getId())) {
+                return 0;
+            }
+            return t1.getId() > t2.getId() ? -1 : 1;
+        });
+
+        return uniqueThreadList;
+    }
+
     //TODO : accept page number.
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int numThreads) {
 
