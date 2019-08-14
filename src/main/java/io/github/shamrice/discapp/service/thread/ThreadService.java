@@ -34,6 +34,12 @@ public class ThreadService {
     public boolean deleteThread(long applicationId, long threadId, boolean deleteSubThreads) {
 
         Thread threadToDelete = threadRepository.getOne(threadId);
+
+        if (!threadToDelete.getApplicationId().equals(applicationId)) {
+            logger.warn("Attempted to delete thread id: " + threadId + " which belongs to a different application id than " + applicationId);
+            return false;
+        }
+
         List<Thread> subThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(applicationId, threadToDelete.getId(), false);
 
         for (Thread subThread : subThreads) {

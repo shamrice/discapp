@@ -132,7 +132,7 @@ public class DiscAppMaintenanceController {
 
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error("Thread administration action failed: " + ex.getMessage(), ex);
             maintenanceThreadViewModel.setInfoMessage("Error has occurred. Please try again.");
         }
 
