@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
@@ -81,9 +82,10 @@ public class DiscAppMaintenanceController {
     }
 
     @PostMapping("/admin/disc-edit.cgi")
-    public ModelAndView postDiscEditView(@RequestParam(name = "id") long appId,
-                                        @RequestParam(name = "tab", required = false) String currentTab,
-                                        @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
+    public ModelAndView postDiscEditView(HttpServletRequest request,
+                                         @RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "tab", required = false) String currentTab,
+                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                          Model model) {
 
         try {
@@ -180,6 +182,52 @@ public class DiscAppMaintenanceController {
                     maintenanceThreadViewModel.setTab(SEARCH_TAB);
                 }
 
+                if (maintenanceThreadViewModel.getPostArticle() != null && !maintenanceThreadViewModel.getPostArticle().isEmpty()) {
+
+                    DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+
+                    if (user != null && maintenanceThreadViewModel.getNewThreadSubject() != null && !maintenanceThreadViewModel.getNewThreadSubject().trim().isEmpty()) {
+
+                        String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getNewThreadSubject());
+
+                        Thread newThread = new Thread();
+                        newThread.setSubmitter(user.getUsername());
+                        newThread.setDiscappUserId(user.getId());
+                        newThread.setParentId(0L);
+                        newThread.setShowEmail(user.getShowEmail());
+                        newThread.setEmail(user.getEmail());
+                        newThread.setDeleted(false);
+                        newThread.setApplicationId(app.getId());
+                        newThread.setSubject(subject);
+                        newThread.setModDt(new Date());
+                        newThread.setCreateDt(new Date());
+
+                        //set ip address
+                        if (request != null) {
+                            //check forwarded header for proxy users, if not found, use ip provided.
+                            String ipAddress = request.getHeader("X-FORWARDED-FOR");
+                            if (ipAddress == null || ipAddress.isEmpty()) {
+                                ipAddress = request.getRemoteAddr();
+                            }
+                            newThread.setIpAddress(ipAddress);
+                        }
+
+                        String body = maintenanceThreadViewModel.getNewThreadMessage();
+                        if (body != null && !body.isEmpty()) {
+                            body = body.replaceAll("\r", "<br />");
+
+                            body = inputHelper.addUrlHtmlLinksToString(body);
+                        }
+
+                        threadService.createNewThread(newThread, body);
+
+                    }
+
+                    //return to thread tab.
+                    maintenanceThreadViewModel.setTab(THREAD_TAB);
+                    currentTab = THREAD_TAB;
+                }
+
             }
         } catch (Exception ex) {
             logger.error("Thread administration action failed: " + ex.getMessage(), ex);
@@ -214,7 +262,8 @@ public class DiscAppMaintenanceController {
                 model.addAttribute("appId", app.getId());
                 maintenanceThreadViewModel.setApplicationId(app.getId());
 
-
+                DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+                model.addAttribute("postingUsername", user.getUsername());
 
                 if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                     //get edit threads html

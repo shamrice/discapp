@@ -140,8 +140,14 @@
             <div th:replace="admin/fragments/search-threads :: search-threads">
                 static thread prototyping placeholder
             </div>
-
         </div>
+
+        <div th:if="${maintenanceThreadViewModel.getTab().equals('post')}">
+            <div th:replace="admin/fragments/post-thread :: post-thread">
+                static thread prototyping placeholder
+            </div>
+        </div>
+
     </form>
 
 </div>

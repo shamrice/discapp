@@ -4,6 +4,8 @@ import java.util.List;
 
 public class MaintenanceThreadViewModel {
 
+    //aka 'GOD' view...
+
     private long applicationId;
 
     private String tab;
@@ -28,6 +30,10 @@ public class MaintenanceThreadViewModel {
     private String approvedSearch = "";
     private boolean searchSubmitted;
     private String searchAgain;
+
+    private String newThreadSubject;
+    private String newThreadMessage;
+    private String postArticle;
 
 
     public long getApplicationId() {
@@ -189,5 +195,29 @@ public class MaintenanceThreadViewModel {
 
     public void setSearchAgain(String searchAgain) {
         this.searchAgain = searchAgain;
+    }
+
+    public String getNewThreadSubject() {
+        return newThreadSubject;
+    }
+
+    public void setNewThreadSubject(String newThreadSubject) {
+        this.newThreadSubject = newThreadSubject;
+    }
+
+    public String getNewThreadMessage() {
+        return newThreadMessage;
+    }
+
+    public void setNewThreadMessage(String newThreadMessage) {
+        this.newThreadMessage = newThreadMessage;
+    }
+
+    public String getPostArticle() {
+        return postArticle;
+    }
+
+    public void setPostArticle(String postArticle) {
+        this.postArticle = postArticle;
     }
 }

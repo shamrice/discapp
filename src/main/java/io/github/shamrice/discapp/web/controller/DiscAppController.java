@@ -291,7 +291,7 @@ public class DiscAppController {
                 if (body != null && !body.isEmpty()) {
                     body = body.replaceAll("\r", "<br />");
 
-                    body = addUrlHtmlLinksToString(body);
+                    body = inputHelper.addUrlHtmlLinksToString(body);
                 }
 
                 threadService.createNewThread(newThread, body);
@@ -639,26 +639,7 @@ public class DiscAppController {
         return currentHtml;
     }
 
-    /**
-     * Adds anchor HTML tags to the text supplied. Does not add anchors for ones only starting with www.
-     * Source modified from: https://stackoverflow.com/questions/49425990/replace-url-in-text-with-href-in-java
-     * @param text text to add anchors to
-     * @return returns text with html anchor tags added where found.
-     */
-    private String addUrlHtmlLinksToString(String text) {
-        String urlRegex = "(https?|ftp):\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[A-Za-z]{2,6}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)*(?:\\/|\\b)";
-        Pattern pattern = Pattern.compile(urlRegex);
-        Matcher matcher = pattern.matcher(text);
 
-        StringBuffer stringBuffer = new StringBuffer();
-        while (matcher.find()) {
-            String foundUrl = matcher.group(0);
-            matcher.appendReplacement(stringBuffer, "<a href=\"" + foundUrl + "\">" + foundUrl + "</a>");
-        }
-
-        matcher.appendTail(stringBuffer);
-        return stringBuffer.toString();
-    }
 
     private String getAdjustedDateStringForConfiguredTimeZone(long appId, Date date, boolean includeComma) {
 
