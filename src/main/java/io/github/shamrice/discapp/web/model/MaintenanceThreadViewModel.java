@@ -35,6 +35,22 @@ public class MaintenanceThreadViewModel {
     private String newThreadMessage;
     private String postArticle;
 
+    //todo break these into sub views inside master view.
+    private boolean onEditMessage;
+    private String editArticle;
+    private Long editArticleId;
+    private String pagemark;
+    private String editArticleSubmitter;
+    private String editArticleEmail;
+    private String editArticleSubject;
+    private String editArticleCreateDt;
+    private String editArticleModDt;
+    private String editArticleIpAddress;
+    private String editArticleUserAgent;
+    private String editArticleMessage;
+    private String editArticleReplyThreadsHtml;
+
+
 
     public long getApplicationId() {
         return applicationId;
@@ -219,5 +235,110 @@ public class MaintenanceThreadViewModel {
 
     public void setPostArticle(String postArticle) {
         this.postArticle = postArticle;
+    }
+
+    public boolean isOnEditMessage() {
+        return onEditMessage;
+    }
+
+    public void setOnEditMessage(boolean onEditMessage) {
+        this.onEditMessage = onEditMessage;
+    }
+
+    public String getEditArticle() {
+        return editArticle;
+    }
+
+    public void setEditArticle(String editArticle) {
+        this.editArticle = editArticle;
+    }
+
+    public Long getEditArticleId() {
+        return editArticleId;
+    }
+
+    public void setEditArticleId(Long editArticleId) {
+        this.editArticleId = editArticleId;
+    }
+
+    public String getPagemark() {
+        return pagemark;
+    }
+
+    public void setPagemark(String pagemark) {
+        this.pagemark = pagemark;
+    }
+
+    public String getEditArticleSubmitter() {
+        return editArticleSubmitter;
+    }
+
+    public void setEditArticleSubmitter(String editArticleSubmitter) {
+        this.editArticleSubmitter = editArticleSubmitter;
+    }
+
+    public String getEditArticleEmail() {
+        return editArticleEmail;
+    }
+
+    public void setEditArticleEmail(String editArticleEmail) {
+        this.editArticleEmail = editArticleEmail;
+    }
+
+    public String getEditArticleSubject() {
+        return editArticleSubject;
+    }
+
+    public void setEditArticleSubject(String editArticleSubject) {
+        this.editArticleSubject = editArticleSubject;
+    }
+
+    public String getEditArticleCreateDt() {
+        return editArticleCreateDt;
+    }
+
+    public void setEditArticleCreateDt(String editArticleCreateDt) {
+        this.editArticleCreateDt = editArticleCreateDt;
+    }
+
+    public String getEditArticleModDt() {
+        return editArticleModDt;
+    }
+
+    public void setEditArticleModDt(String editArticleModDt) {
+        this.editArticleModDt = editArticleModDt;
+    }
+
+
+    public String getEditArticleUserAgent() {
+        return editArticleUserAgent;
+    }
+
+    public void setEditArticleUserAgent(String editArticleUserAgent) {
+        this.editArticleUserAgent = editArticleUserAgent;
+    }
+
+    public String getEditArticleMessage() {
+        return editArticleMessage;
+    }
+
+    public void setEditArticleMessage(String editArticleMessage) {
+        this.editArticleMessage = editArticleMessage;
+    }
+
+    public String getEditArticleReplyThreadsHtml() {
+        return editArticleReplyThreadsHtml;
+    }
+
+    public void setEditArticleReplyThreadsHtml(String editArticleReplyThreadsHtml) {
+        this.editArticleReplyThreadsHtml = editArticleReplyThreadsHtml;
+    }
+
+    public String getEditArticleIpAddress() {
+        return editArticleIpAddress;
+    }
+
+    public void setEditArticleIpAddress(String editArticleIpAddress) {
+        this.editArticleIpAddress = editArticleIpAddress;
     }
 }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div class="edit-thread" th:fragment="edit-thread">
+
+    <!-- TODO : finish working on this -->
+
+    <form method="post"
+          th:action="@{|/admin/disc-edit.cgi?id=${maintenanceThreadViewModel.getApplicationId()}&tab=${maintenanceThreadViewModel.getTab()}&pagemark=${maintenanceThreadViewModel.getPagemark()}|}"
+          enctype="multipart/form-data"
+          th:object="${maintenanceThreadViewModel}">
+
+    <!--form method="post" action="/disc-edit.cgi?id=46108;article=21046;pagemark=0;" enctype="multipart/form-data"-->
+
+        <div style="padding-left:1em;">
+            <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
+            <input type="hidden" name="onEditMessage" th:value="${maintenanceThreadViewModel.isOnEditMessage()}"/>
+            <input type="hidden" name="selected" value="21046"/>
+            <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
+            <div class="buttons" style="margin-bottom:1em;">
+                <input type="submit" name="editArticle" value="Edit Message" class="button"/>
+                <input type="submit" name="deleteArticles" value="Delete Message" class="button"/>
+                <input type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
+                <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                <input type="submit" name="returnToList" value="Return to Messages" class="button"/>
+            </div>
+        </div>
+
+
+        <table style="margin:1em; border-spacing:3px;">
+            <tr>
+                <th>Author</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleSubmitter()}">
+                    <!-- TODO : add this for threads from accounts! span style="background-color:#8ff; padding:4px; margin-left:1em; font-size:smaller; ">Account ID:29139  <select
+                        name="new_perm" class="button" style="border:1px solid black;">
+<option value="r">Read</option>
+<option value="rf">Reply</option>
+<option selected="selected" value="rfp">Post</option>
+<option value="rfph">Hold</option>
+</select> <input type="submit" name="ChangePerm" value="Change Perm" class="button"/></span-->
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>
+                    <a th:href="@{|mailto:${maintenanceThreadViewModel.getEditArticleEmail()}|}" th:text="${maintenanceThreadViewModel.getEditArticleEmail()}"></a>
+                </td>
+            </tr>
+            <tr>
+                <th>Subject</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleSubject()}"></td>
+            </tr>
+            <tr>
+                <th>Create Date</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleCreateDt()}"></td>
+            </tr>
+            <tr>
+                <th>Modification Date</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleModDt()}"></td>
+            </tr>
+            <tr>
+                <th>IP</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleIpAddress()}"></td>
+            </tr>
+            <!-- TODO : Add later tr>
+                <th>User Agent</th>
+                <td th:text="${maintenanceThreadViewModel.getEditArticleUserAgent()}">Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0</td>
+            </tr -->
+        </table>
+        <div><b>Message</b></div>
+        <div style="padding-bottom:1em; border-bottom:1px dashed gray;"
+             th:text="${maintenanceThreadViewModel.getEditArticleMessage()}">
+        </div>
+        <div th:utext="${maintenanceThreadViewModel.getEditArticleReplyThreadsHtml()}"></div>
+        <!--ul>
+            <li><a href="disc-edit.cgi?id=46108;article=21048;pagemark=0;">Hm... Maybe that was the way it had to
+                work?</a>
+                <label for="checkbox_21048"><span style="font-size:smaller;"><span
+                        style="font-style:italic; margin-left:1ex; margin-right:1ex;">Puckdropper</span> Wed Aug 14 14:19</span>
+                </label>
+            </li>
+            <ul></ul>
+        </ul-->
+    </form>
+</div>
+
+</body>
+
+</html>
