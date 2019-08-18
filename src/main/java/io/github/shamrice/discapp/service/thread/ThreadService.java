@@ -232,7 +232,7 @@ public class ThreadService {
 
                 if (thread.getSubmitter().toLowerCase().contains(submitter.toLowerCase())
                         && thread.getSubject().toLowerCase().contains(subject.toLowerCase())
-                        && thread.getEmail().toLowerCase().contains(email.toLowerCase())
+                        && (thread.getEmail() == null || thread.getEmail().toLowerCase().contains(email.toLowerCase()))
                         && thread.getIpAddress().contains(ipAddress)
                         && (thread.getBody() == null || thread.getBody().toLowerCase().contains(messageBody.toLowerCase()))) {
 
