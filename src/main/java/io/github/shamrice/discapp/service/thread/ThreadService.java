@@ -120,27 +120,49 @@ public class ThreadService {
 
     }
 
-    public void createNewThread(Thread newThread, String threadBodyText) {
+    public boolean saveThread(Thread thread, String threadBodyText) {
 
-        //add (nm) to subjects with no body.
-        if (threadBodyText == null || threadBodyText.isEmpty()) {
-            String noBodySubject = newThread.getSubject() + NO_MESSAGE_SUBJECT_ANNOTATION;
-            newThread.setSubject(noBodySubject);
-        }
+        if (thread != null) {
 
-        if (newThread != null) {
-            Thread createThread = threadRepository.save(newThread);
-            if (threadBodyText != null && !threadBodyText.isEmpty() && createThread != null) {
-                ThreadBody newThreadBody = new ThreadBody();
-                newThreadBody.setApplicationId(createThread.getApplicationId());
-                newThreadBody.setBody(threadBodyText);
-                newThreadBody.setThreadId(createThread.getId());
-                newThreadBody.setCreateDt(new Date());
-                newThreadBody.setModDt(new Date());
-
-                threadBodyRepository.save(newThreadBody);
+            //add (nm) to subjects with no body.
+            if (!thread.getSubject().contains(NO_MESSAGE_SUBJECT_ANNOTATION) && (threadBodyText == null || threadBodyText.isEmpty())) {
+                String noBodySubject = thread.getSubject() + NO_MESSAGE_SUBJECT_ANNOTATION;
+                thread.setSubject(noBodySubject);
             }
+
+            Thread createThread = threadRepository.save(thread);
+            ThreadBody threadBody = threadBodyRepository.findByThreadId(createThread.getId());
+
+            //new thread body that's not blank
+            if (threadBody == null && threadBodyText != null && !threadBodyText.isEmpty()) {
+
+                threadBody = new ThreadBody();
+                threadBody.setApplicationId(createThread.getApplicationId());
+                threadBody.setBody(threadBodyText);
+                threadBody.setThreadId(createThread.getId());
+                threadBody.setCreateDt(new Date());
+                threadBody.setModDt(new Date());
+                threadBodyRepository.save(threadBody);
+
+            } else if (threadBody != null) {
+                //update existing thread body even to blank text
+                threadBody.setBody(threadBodyText);
+                threadBody.setModDt(new Date());
+                threadBodyRepository.save(threadBody);
+            }
+
+
+
+            if (createThread != null) {
+                logger.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
+                return true;
+            }
+
+        } else {
+            logger.error("Tried to create a null new thread.");
         }
+
+        return false;
     }
 
     public List<Thread> getThreads(Long applicationId) {
@@ -304,7 +326,7 @@ public class ThreadService {
             currentNode.addSubThread(new ThreadTreeNode(thread));
         }
 
-        for (ThreadTreeNode subThread :  currentNode.getSubThreads()) {
+        for (ThreadTreeNode subThread : currentNode.getSubThreads()) {
             List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(
                     subThread.getCurrent().getApplicationId(),
                     subThread.getCurrent().getId(),

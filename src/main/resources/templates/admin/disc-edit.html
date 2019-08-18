@@ -104,7 +104,7 @@
         </div>
 
 
-        <div th:if="${maintenanceThreadViewModel.isOnEditMessage()}">
+        <div th:if="${maintenanceThreadViewModel.isOnEditMessage() || maintenanceThreadViewModel.isOnEditModifyMessage()}">
             <div th:replace="admin/fragments/edit-thread :: edit-thread">
                 static thread prototyping placeholder
             </div>

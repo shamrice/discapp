@@ -294,7 +294,7 @@ public class DiscAppController {
                     body = inputHelper.addUrlHtmlLinksToString(body);
                 }
 
-                threadService.createNewThread(newThread, body);
+                threadService.saveThread(newThread, body);
             }
         }
         logger.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
@@ -638,8 +638,6 @@ public class DiscAppController {
 
         return currentHtml;
     }
-
-
 
     private String getAdjustedDateStringForConfiguredTimeZone(long appId, Date date, boolean includeComma) {
 

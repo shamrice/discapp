@@ -88,8 +88,6 @@ public class DiscAppMaintenanceController {
                                          @RequestParam(name = "pagemark", required = false) Long pageMark,
                                          @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                          Model model) {
-
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -253,7 +251,7 @@ public class DiscAppMaintenanceController {
                             body = inputHelper.addUrlHtmlLinksToString(body);
                         }
 
-                        threadService.createNewThread(newThread, body);
+                        threadService.saveThread(newThread, body);
 
                     }
 
@@ -262,13 +260,87 @@ public class DiscAppMaintenanceController {
                     currentTab = THREAD_TAB;
                 }
 
+                //selected to modify a single message
+                if (maintenanceThreadViewModel.getEditArticle() != null && !maintenanceThreadViewModel.getEditArticle().isEmpty() && maintenanceThreadViewModel.isOnEditMessage()) {
+
+                    Thread threadToEdit = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+
+                    if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
+                        maintenanceThreadViewModel.setEditArticleSubmitter(threadToEdit.getSubmitter());
+                        maintenanceThreadViewModel.setEditArticleEmail(threadToEdit.getEmail());
+                        maintenanceThreadViewModel.setEditArticleSubject(threadToEdit.getSubject());
+                        maintenanceThreadViewModel.setEditArticleMessage(threadToEdit.getBody());
+                        maintenanceThreadViewModel.setApplicationId(app.getId());
+
+                        String threadBody = threadService.getThreadBodyText(threadToEdit.getId());
+                        maintenanceThreadViewModel.setEditArticleMessage(threadBody);
+
+                        ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
+                        if (subThreads != null) {
+                            String subThreadHtml = getEditThreadHtml(subThreads, "", true, false);
+                            maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
+                        }
+
+                        maintenanceThreadViewModel.setOnEditModifyMessage(true);
+
+                    } else {
+                        logger.warn("Failed to find thread to edit: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                        maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                        maintenanceThreadViewModel.setOnEditMessage(false);
+                        maintenanceThreadViewModel.setInfoMessage("An error occurred loading message to edit. Please try again.");
+                    }
+                }
+
+                //submitted modified message
+                if (maintenanceThreadViewModel.getEditArticleChangeMessage() != null && !maintenanceThreadViewModel.getEditArticleChangeMessage().isEmpty()
+                        && maintenanceThreadViewModel.isOnEditModifyMessage()) {
+
+                    Thread editThread = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+                    if (editThread != null && editThread.getApplicationId().equals(app.getId())) {
+                        String submitter = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubmitter());
+                        String email = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleEmail());
+                        String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubject());
+
+                        editThread.setSubmitter(submitter);
+                        editThread.setEmail(email);
+                        editThread.setSubject(subject);
+                        editThread.setModDt(new Date());
+
+                        String body = maintenanceThreadViewModel.getEditArticleMessage();
+                        if (body != null && !body.isEmpty()) {
+                            body = body.replaceAll("\r", "<br />");
+                        }
+
+                        if (threadService.saveThread(editThread, body)) {
+                            maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
+                        } else {
+                            logger.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                            maintenanceThreadViewModel.setInfoMessage("Failed to update thread.");
+                        }
+
+                        maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                        maintenanceThreadViewModel.setOnEditMessage(false);
+                    }
+
+                }
+
+                //cancel button clicked on edit modify message screen
+                if (maintenanceThreadViewModel.getEditArticleCancelEdit() != null && !maintenanceThreadViewModel.getEditArticleCancelEdit().isEmpty()) {
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
+                }
+
+
             }
         } catch (Exception ex) {
             logger.error("Thread administration action failed: " + ex.getMessage(), ex);
             maintenanceThreadViewModel.setInfoMessage("Error has occurred. Please try again.");
         }
 
-        maintenanceThreadViewModel.setOnEditMessage(false);
+        if (!maintenanceThreadViewModel.isOnEditMessage()) {
+            maintenanceThreadViewModel.setOnEditMessage(false);
+        }
+
         return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model);
     }
 
@@ -307,13 +379,28 @@ public class DiscAppMaintenanceController {
 
                     if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
                         for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                            String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>");
+                            String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>", false, true);
                             currentHtml += "</ul>";
                             threadTreeHtml.add(currentHtml);
                         }
                     } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
                         String currentHtml = getEditThreadListHtml(threadTreeNodeList);
                         threadTreeHtml.add(currentHtml);
+                    }
+
+                    //todo : something wonky going on here. this is set here but the others are set in the above method..?
+                    //todo: setting above does not work.
+                    if (maintenanceThreadViewModel.isOnEditMessage()) {
+                        Thread threadToEdit = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+
+                        if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
+                            ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
+                            if (subThreads != null) {
+                                String subThreadHtml = getEditThreadHtml(subThreads, "", true, false);
+                                maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
+                            }
+                        }
+
                     }
 
                     maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
@@ -983,39 +1070,44 @@ public class DiscAppMaintenanceController {
         return true;
     }
 
-
     /**
      * Generates edit thread HTML for threads view which is a stripped down version of the default view.
      * @param currentNode Node to create list HTML for
      * @param currentHtml Current html to be built upon
      * @return Returns generated HTML
      */
-    private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml) {
-        currentHtml +=
-                "<li>" +
-                        "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                        "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
-                        currentNode.getCurrent().getSubject() +
-                        "</a> " +
+    private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrent, boolean includeCheckBox) {
 
-                        "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
-                        "    <span style=\"font-size:smaller;\">" +
-                        "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
-                        currentNode.getCurrent().getSubmitter() + " " +
-                        currentNode.getCurrent().getCreateDt() +
-                        "        </span>" +
-                        "    </span>" +
-                        "</label>" +
-                        "<label>" +
+        if (!skipCurrent) {
+            currentHtml +=
+                    "<li>" +
+                            "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                            "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
+                            currentNode.getCurrent().getSubject() +
+                            "</a> " +
+
+                            "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
+                            "    <span style=\"font-size:smaller;\">" +
+                            "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
+                            currentNode.getCurrent().getSubmitter() + " " +
+                            currentNode.getCurrent().getCreateDt() +
+                            "        </span>" +
+                            "    </span>" +
+                            "</label>";
+            if (includeCheckBox) {
+                currentHtml += "<label>" +
                         "    <input type=\"checkbox\" name=\"selectThreadCheckbox\" value=\"" + currentNode.getCurrent().getId() +
                         "\" id=\"checkbox_" + currentNode.getCurrent().getId() + "\"/>" +
-                        "</label>" +
-                        "</li>";
+                        "</label>";
+            }
 
+            currentHtml += "</li>";
+
+        }
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getEditThreadHtml(node, currentHtml);
+            currentHtml = getEditThreadHtml(node, currentHtml, false, includeCheckBox);
             currentHtml += "</ul>";
         }
 

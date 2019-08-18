@@ -5,26 +5,24 @@
 <body>
 <div class="edit-thread" th:fragment="edit-thread">
 
-    <!-- TODO : finish working on this -->
-
-    <form method="post"
+    <!--form method="post"
           th:action="@{|/admin/disc-edit.cgi?id=${maintenanceThreadViewModel.getApplicationId()}&tab=${maintenanceThreadViewModel.getTab()}&pagemark=${maintenanceThreadViewModel.getPagemark()}|}"
           enctype="multipart/form-data"
-          th:object="${maintenanceThreadViewModel}">
+          th:object="${maintenanceThreadViewModel}"-->
 
-    <!--form method="post" action="/disc-edit.cgi?id=46108;article=21046;pagemark=0;" enctype="multipart/form-data"-->
-
+    <div th:if="${maintenanceThreadViewModel.isOnEditMessage() && !maintenanceThreadViewModel.isOnEditModifyMessage()}">
         <div style="padding-left:1em;">
             <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
             <input type="hidden" name="onEditMessage" th:value="${maintenanceThreadViewModel.isOnEditMessage()}"/>
-            <input type="hidden" name="selected" value="21046"/>
+            <input type="hidden" name="onEditModifyMessage"
+                   th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>
             <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
             <div class="buttons" style="margin-bottom:1em;">
                 <input type="submit" name="editArticle" value="Edit Message" class="button"/>
                 <input type="submit" name="deleteArticles" value="Delete Message" class="button"/>
                 <input type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
                 <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
-                <input type="submit" name="returnToList" value="Return to Messages" class="button"/>
+                <input type="submit" name="editArticleCancelEdit" value="Return to Messages" class="button"/>
             </div>
         </div>
 
@@ -45,7 +43,8 @@
             <tr>
                 <th>Email</th>
                 <td>
-                    <a th:href="@{|mailto:${maintenanceThreadViewModel.getEditArticleEmail()}|}" th:text="${maintenanceThreadViewModel.getEditArticleEmail()}"></a>
+                    <a th:href="@{|mailto:${maintenanceThreadViewModel.getEditArticleEmail()}|}"
+                       th:text="${maintenanceThreadViewModel.getEditArticleEmail()}"></a>
                 </td>
             </tr>
             <tr>
@@ -83,9 +82,67 @@
             </li>
             <ul></ul>
         </ul-->
-    </form>
-</div>
+    </div>
 
+    <div th:if="${maintenanceThreadViewModel.isOnEditModifyMessage() && maintenanceThreadViewModel.isOnEditMessage()}">
+        <div style="padding-left:1em;">
+
+            <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
+            <input type="hidden" name="onEditMessage" th:value="${maintenanceThreadViewModel.isOnEditMessage()}"/>
+            <input type="hidden" name="onEditModifyMessage"
+                   th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>
+            <input type="hidden" name="editArticleCreateDt"
+                   th:value="${maintenanceThreadViewModel.getEditArticleCreateDt()}"/>
+            <input type="hidden" name="editArticleModDt"
+                   th:value="${maintenanceThreadViewModel.getEditArticleModDt()}"/>
+            <input type="hidden" name="editArticleIpAddress"
+                   th:value="${maintenanceThreadViewModel.getEditArticleIpAddress()}"/>
+            <input type="hidden" name="editArticleUserAgent"
+                   th:value="${maintenanceThreadViewModel.getEditArticleUserAgent()}"/>
+            <input type="hidden" name="editArticleReplyThreadsHtml"
+                   th:value="${maintenanceThreadViewModel.getEditArticleReplyThreadsHtml()}"/>
+            <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
+
+            <table style="margin:1em;">
+                <tr>
+                    <th>Author</th>
+                    <td>
+                        <input type="text" name="editArticleSubmitter"
+                               th:value="${maintenanceThreadViewModel.getEditArticleSubmitter()}" size="30"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>
+                        <input type="text" name="editArticleEmail"
+                               th:value="${maintenanceThreadViewModel.getEditArticleEmail()}" size="30"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Subject</th>
+                    <td>
+                        <input type="text" name="editArticleSubject"
+                               th:value="${maintenanceThreadViewModel.getEditArticleSubject()}" size="30"/>
+                    </td>
+                </tr>
+            </table>
+            <div><b>Message</b></div>
+            <div>
+                <textarea name="editArticleMessage" rows="12" wrap="soft"
+                          th:utext="${maintenanceThreadViewModel.getEditArticleMessage()}"></textarea>
+            </div>
+
+            <div class="buttons">
+                <input type="submit" name="editArticleChangeMessage" value="Change Message" class="button"/>
+                <input type="submit" name="editArticleCancelEdit" value="Cancel" class="button"/>
+            </div>
+
+        </div>
+
+        <!--/form-->
+    </div>
+
+</div>
 </body>
 
 </html>

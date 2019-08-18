@@ -37,7 +37,10 @@ public class MaintenanceThreadViewModel {
 
     //todo break these into sub views inside master view.
     private boolean onEditMessage;
+    private boolean onEditModifyMessage; //todo: maybe move to enum of view name instead of a sea of boolean flags...
     private String editArticle;
+    private String editArticleChangeMessage;
+    private String editArticleCancelEdit;
     private Long editArticleId;
     private String pagemark;
     private String editArticleSubmitter;
@@ -340,5 +343,29 @@ public class MaintenanceThreadViewModel {
 
     public void setEditArticleIpAddress(String editArticleIpAddress) {
         this.editArticleIpAddress = editArticleIpAddress;
+    }
+
+    public boolean isOnEditModifyMessage() {
+        return onEditModifyMessage;
+    }
+
+    public void setOnEditModifyMessage(boolean onEditModifyMessage) {
+        this.onEditModifyMessage = onEditModifyMessage;
+    }
+
+    public String getEditArticleChangeMessage() {
+        return editArticleChangeMessage;
+    }
+
+    public void setEditArticleChangeMessage(String editArticleChangeMessage) {
+        this.editArticleChangeMessage = editArticleChangeMessage;
+    }
+
+    public String getEditArticleCancelEdit() {
+        return editArticleCancelEdit;
+    }
+
+    public void setEditArticleCancelEdit(String editArticleCancelEdit) {
+        this.editArticleCancelEdit = editArticleCancelEdit;
     }
 }
