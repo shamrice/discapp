@@ -129,6 +129,29 @@ CREATE TABLE reported_abuse (
     FOREIGN KEY (reported_by) REFERENCES discapp_user(id)
 );
 
+CREATE TABLE stats (
+  id serial NOT NULL,
+  application_id int NOT NULL,
+  stat_date varchar(64) NOT NULL,
+  unique_ips INT NOT NULL,
+  page_views int NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
+CREATE TABLE stats_unique_ips (
+  id serial NOT NULL,
+  stats_id int NOT NULL,
+  ip_address varchar(64) NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (stats_id) REFERENCES stats(id)
+);
+
+
 commit;
 
 

@@ -1,13 +1,7 @@
 package io.github.shamrice.discapp.service.application;
 
-import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.Epilogue;
-import io.github.shamrice.discapp.data.model.Owner;
-import io.github.shamrice.discapp.data.model.Prologue;
-import io.github.shamrice.discapp.data.repository.ApplicationRepository;
-import io.github.shamrice.discapp.data.repository.EpilogueRepository;
-import io.github.shamrice.discapp.data.repository.OwnerRepository;
-import io.github.shamrice.discapp.data.repository.PrologueRepository;
+import io.github.shamrice.discapp.data.model.*;
+import io.github.shamrice.discapp.data.repository.*;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
@@ -39,7 +33,6 @@ public class ApplicationService {
 
     @Autowired
     private AccountService accountService;
-
 
     private ApplicationCache<Prologue> prologueCache = new ApplicationCache<>();
     private ApplicationCache<Epilogue> epilogueCache = new ApplicationCache<>();

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        fieldset {
+            background-color: #fff;
+        }
+
+        fieldset a,
+        fieldset span {
+            text-decoration: none;
+            padding: 3px;
+            float: left;
+            font-weight: normal;
+        }
+
+        fieldset a:hover {
+            background-color: #ccf;
+        }
+
+        fieldset img {
+            height: 32px;
+            width: 32px;
+            vertical-align: middle;
+        }
+
+        p {
+            margin-bottom: 3ex;
+        }
+
+
+    </style>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+
+<body>
+
+<!-- todo : move this to a fragment. -->
+<div id="account">
+    <div th:text="${username}"></div>
+    <a href="/account/modify" target="_top">Control Center</a>
+    <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
+    <a href="/logout" target="_top">Logout</a>
+</div>
+
+<div th:if="${maintenanceStatsViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceStatsViewModel.getInfoMessage()}">
+</div>
+
+<div th:if="${maintenanceStatsViewModel.getApplicationId()}">
+
+    <table class="colored">
+        <tr>
+            <th>Date</th>
+            <th>Unique IPs</th>
+            <th>Pageviews</th>
+            <th>Pages per IP</th>
+        </tr>
+
+        <tr th:if="${not #lists.isEmpty(maintenanceStatsViewModel.getStatViews())}"
+            th:each="statView : ${maintenanceStatsViewModel.getStatViews()}">
+
+            <td th:text="${statView.getDate()}"></td>
+            <td th:text="${statView.getUniqueIps()}"></td>
+            <td th:text="${statView.getPageViews()}"></td>
+            <td th:text="${statView.getPagesPerIp()}"></td>
+        </tr>
+
+        <tr>
+            <th>Total</th>
+            <td></td>
+            <td th:text="${maintenanceStatsViewModel.getTotalPageViews()}"></td>
+        </tr>
+        <tr>
+            <th>Average</th>
+            <td th:text="${maintenanceStatsViewModel.getAverageUniqueIps()}"></td>
+            <td th:text="${maintenanceStatsViewModel.getAveragePageViews()}"></td>
+            <td th:text="${maintenanceStatsViewModel.getAveragePagesPerIp()}"></td>
+        </tr>
+    </table>
+
+</div>
+</body>
+</html>

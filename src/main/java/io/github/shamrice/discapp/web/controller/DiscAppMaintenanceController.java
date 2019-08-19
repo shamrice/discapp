@@ -6,8 +6,10 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.model.MaintenanceStatsViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceThreadViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -24,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 @Controller
 public class DiscAppMaintenanceController {
@@ -47,6 +51,9 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private ThreadService threadService;
+
+    @Autowired
+    private StatisticsService statisticsService;
 
     @Autowired
     private AccountHelper accountHelper;
@@ -73,11 +80,83 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-toolbar");
     }
 
+    @GetMapping("/admin/disc-stats.cgi")
+    public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
+                                         MaintenanceStatsViewModel maintenanceStatsViewModel,
+                                         Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                long totalPageViews = 0L;
+                long totalUniqueIps = 0L;
+                float totalUniqueIpsPerDay = 0;
+                int numDays = 30;
+
+                List<Stats> pastMonthStats = statisticsService.getLatestStatsForApp(app.getId(), numDays);
+
+                //if there's less than 30 days of data, do calculations on what we actually have.
+                if (pastMonthStats.size() < numDays) {
+                    numDays = pastMonthStats.size();
+                }
+
+                List<MaintenanceStatsViewModel.StatView> statViews = new ArrayList<>();
+                for (Stats dayStat : pastMonthStats) {
+                    MaintenanceStatsViewModel.StatView statView = new MaintenanceStatsViewModel.StatView(
+                            dayStat.getStatDate(),
+                            dayStat.getUniqueIps(),
+                            dayStat.getPageViews()
+                    );
+                    statViews.add(statView);
+
+                    totalPageViews += dayStat.getPageViews();
+                    totalUniqueIps += dayStat.getUniqueIps();
+                    totalUniqueIpsPerDay += statView.getPagesPerIp();
+                }
+
+                maintenanceStatsViewModel.setApplicationId(app.getId());
+                maintenanceStatsViewModel.setStatViews(statViews);
+                maintenanceStatsViewModel.setTotalPageViews(totalPageViews);
+                maintenanceStatsViewModel.setAveragePageViews(totalPageViews / numDays);
+                maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numDays);
+                maintenanceStatsViewModel.setAveragePagesPerIp(totalUniqueIpsPerDay / numDays);
+
+            } else {
+                logger.error("user: " + username + " attempted to view stats of a disc app they don't own. AppId: " + appId);
+                maintenanceStatsViewModel.setInfoMessage("You do not have permission to view these stats.");
+            }
+        } catch (Exception ex) {
+            logger.error("Error getting stats for appId: " + appId + " :: " + ex.getMessage(), ex);
+            maintenanceStatsViewModel.setInfoMessage("Error retrieving statistics.");
+        }
+
+        return new ModelAndView("admin/disc-stats", "maintenanceStatsViewModel", maintenanceStatsViewModel);
+    }
+
     @GetMapping("/admin/disc-info.cgi")
     public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
                                         Model model) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+                model.addAttribute("isAdmin", "true");
+            }
+        } catch (Exception ex) {
+            logger.error("Failed to display landing page for maintenance for appid: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
         return new ModelAndView("admin/disc-info");
     }
 
@@ -469,9 +548,10 @@ public class DiscAppMaintenanceController {
     */
     @GetMapping("/admin/appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
-                                                 Model model) {
+                                                 Model model,
+                                                 HttpServletRequest request) {
         //TODO : change this?
-        return discAppController.getAppView(appId, model);
+        return discAppController.getAppView(appId, model, request);
     }
 
     //@GetMapping("/admin/appearance-forms.cgi")

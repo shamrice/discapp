@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
@@ -48,13 +49,18 @@ public class DiscAppController {
     private DiscAppUserDetailsService discAppUserDetailsService;
 
     @Autowired
+    private StatisticsService statisticsService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @Autowired
     private InputHelper inputHelper;
 
     @GetMapping("/indices/{applicationId}")
-    public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId, Model model) {
+    public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId,
+                                   Model model,
+                                   HttpServletRequest request) {
 
         try {
             Application app = applicationService.get(appId);
@@ -68,6 +74,16 @@ public class DiscAppController {
                 model.addAttribute("epilogueText", applicationService.getEpilogueText(app.getId()));
 
                 model.addAttribute("postMessageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+
+                //get ip address
+                if (request != null) {
+                    //check forwarded header for proxy users, if not found, use ip provided.
+                    String ipAddress = request.getHeader("X-FORWARDED-FOR");
+                    if (ipAddress == null || ipAddress.isEmpty()) {
+                        ipAddress = request.getRemoteAddr();
+                    }
+                    statisticsService.increaseCurrentPageStats(app.getId(), ipAddress);
+                }
 
                 //get threads
                 int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);

@@ -40,14 +40,17 @@
 </head>
 
 <body>
+
+<!--todo : break this into it's own fragment -->
+<div id="account">placeholder@example.com
+    <a href="/account/modify" target="_parent">Control Center</a>
+    <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
+    <a href="/logout" target="_parent">Logout</a></div>
+
+<div th:if="${isAdmin}">
+
 <form method="post" th:action="@{|/disc-info.cgi?id=${appId}|}" enctype="multipart/form-data">
     <input type="hidden" name="id" th:value="${appId}" />
-
-    <!--todo : break this into it's own fragment -->
-    <div id="account">placeholder@example.com
-        <a href="/account/modify" target="_parent">Control Center</a>
-        <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
-        <a href="/logout" target="_parent">Logout</a></div>
 
     <div style="width:32em; margin:auto; text-align:center; margin-top:5%; font-weight:bold;">
         <!--h3 style="background-color:#fdd;">The DiscussionApp service will end on October 31, 2019.</h3>
@@ -80,18 +83,18 @@
                         <a href="/admin/disc-widget-maint.cgi?id=46108"><img alt="Widget icon" src="/images/widget-icon.png" /> Widget</a>
                     </td>
                 </tr-->
-                <!--tr>
-                    <td>
+                <tr>
+                    <!--td>
                         <a href="/admin/disc-locale.cgi?id=46108"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>
-                    </td>
+                    </td-->
                     <td>
-                        <a href="/admin/disc-stats.cgi?id=46108"><img alt="Stats" src="/images/stats.gif" /> Statistics</a>
+                        <a th:href="@{|/admin/disc-stats.cgi?id=${appId}|}"><img alt="Stats" src="/images/stats.gif" /> Statistics</a>
                     </td>
-                    <td>
+                    <!--td>
                         <a href="/admin/disc-twitter-maint.cgi?id=46108" title="Twitter"><img alt="Twitter" src="/images/twitter-36x36.png"> Twitter</img>
                         </a>
-                    </td>
-                </tr-->
+                    </td-->
+                </tr>
                 <tr>
                     <td>
                         <a href="/indices/1"><img alt="Help icon" src="/images/help.png" /> Questions</a>
@@ -104,6 +107,11 @@
         </fieldset>
     </div>
 </form>
+</div>
+
+<div th:unless="${isAdmin}" class="alert alert-error grey_box">
+    You do not have permission to edit this disc app.
+</div>
 </body>
 
 </html>

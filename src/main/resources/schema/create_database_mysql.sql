@@ -2,6 +2,9 @@
 
 Database creation script.
 
+MySQL creation script comes as-is and untested. It is provided simply for the sake of those who may
+want it. Please use the postgres creation script with a postgres database.
+
 */
 CREATE DATABASE IF NOT EXISTS discapp;
 
@@ -117,6 +120,28 @@ CREATE TABLE reported_abuse (
     FOREIGN KEY (application_id) REFERENCES application(id),
     FOREIGN KEY (thread_id) REFERENCES thread(id),
     FOREIGN KEY (reported_by) REFERENCES discapp_user(id)
+);
+
+CREATE TABLE stats (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  application_id int(255) NOT NULL,
+  stat_date varchar(64) NOT NULL,
+  unique_ips INT(255) NOT NULL,
+  page_views int(255) NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
+CREATE TABLE stats_unique_ips (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  stats_id int(255) NOT NULL,
+  ip_address varchar(64) NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (stats_id) REFERENCES stats(id)
 );
 
 

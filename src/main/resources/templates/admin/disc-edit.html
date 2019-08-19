@@ -50,6 +50,13 @@
 
 <body>
 
+<div id="account">
+    <div th:text="${username}"></div>
+    <a href="/account/modify" target="_top">Control Center</a>
+    <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
+    <a href="/logout" target="_top">Logout</a>
+</div>
+
 <div th:if="${maintenanceThreadViewModel.getInfoMessage()}" class="alert alert-error grey_box"
      th:text="${maintenanceThreadViewModel.getInfoMessage()}">
 </div>
@@ -63,12 +70,6 @@
 
         <input type="hidden" name="id" th:value="${appId}"/>
 
-        <div id="account">
-            <div th:text="${username}"></div>
-            <a href="/account/modify" target="_top">Control Center</a>
-            <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
-            <a href="/logout" target="_top">Logout</a>
-        </div>
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('threads')}">
         <span class="tab" style="background-color:#fff; color:#00f;
