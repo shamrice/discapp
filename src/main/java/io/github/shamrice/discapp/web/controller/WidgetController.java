@@ -52,7 +52,7 @@ public class WidgetController {
             );
         }
 
-        List<Thread> latestThreads = threadService.getLatestTopLevelThreads(appId, 5);
+        List<Thread> latestThreads = threadService.getLatestThreads(appId, 5);
 
         if (latestThreads != null && latestThreads.size() > 0) {
             widgetViewModel.setThreadsHtml(
