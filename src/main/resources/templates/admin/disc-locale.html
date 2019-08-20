@@ -18,239 +18,238 @@
 
     div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
 
+
     </style>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 
 </head>
 <body>
 
-    <div id="account">
-        <div th:text="${username}"></div>
-        <a href="/account/modify" target="_top">Control Center</a>
-        <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
-        <a href="/logout" target="_top">Logout</a>
-    </div>
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
 
-    <div th:if="${maintenanceLocaleViewModel.getInfoMessage()}" class="alert alert-error grey_box"
-         th:text="${maintenanceLocaleViewModel.getInfoMessage()}">
-    </div>
+<div th:if="${maintenanceLocaleViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceLocaleViewModel.getInfoMessage()}">
+</div>
 
-    <div class="grey_box" id="time_configuration" th:if="${maintenanceLocaleViewModel.getApplicationId()}" style="width:36em;">
+<div class="grey_box" id="time_configuration" th:if="${maintenanceLocaleViewModel.getApplicationId()}"
+     style="width:36em;">
 
-        <form name="f"
-              th:action="@{|/admin/modify/time?id=${maintenanceLocaleViewModel.getApplicationId()}&redirect=${maintenanceLocaleViewModel.getRedirect()}|}"
-              method="post"
-              th:object="${maintenanceLocaleViewModel}">
+    <form name="f"
+          th:action="@{|/admin/modify/time?id=${maintenanceLocaleViewModel.getApplicationId()}&redirect=${maintenanceLocaleViewModel.getRedirect()}|}"
+          method="post"
+          th:object="${maintenanceLocaleViewModel}">
 
-            <div style="text-align:left;">
-                <label for="selectedTimezone">Timezone</label>
+        <div style="text-align:left;">
+            <label for="selectedTimezone">Timezone</label>
 
-                <select id="selectedTimezone" name="selectedTimezone" class="button" style="border:1px solid black;">
-                    <option th:each="timezone : ${maintenanceLocaleViewModel.getTimezones()}"
-                            th:value="${timezone}"
-                            th:text="${timezone}"
-                            th:selected="${maintenanceLocaleViewModel.isCurrentTimezone(timezone)}">
-                    </option>
-                </select>
+            <select id="selectedTimezone" name="selectedTimezone" class="button" style="border:1px solid black;">
+                <option th:each="timezone : ${maintenanceLocaleViewModel.getTimezones()}"
+                        th:value="${timezone}"
+                        th:text="${timezone}"
+                        th:selected="${maintenanceLocaleViewModel.isCurrentTimezone(timezone)}">
+                </option>
+            </select>
 
-            </div>
-            <div class="offset" th:text="@{|Disc App uses UTC by default.
+        </div>
+        <div class="offset" th:text="@{|Disc App uses UTC by default.
             In this field, you may specify your local time zone to reflect your local timezone. For example,
             if you wanted your DiscApp to reflect CST, you would enter 'US/Central' or a more local location
             in order to set the time for your location.|}">
+        </div>
+
+        <div style="visible=false;display:none;text-align:left;">
+            <!-- TODO : not currently used -->
+
+            <label for="observe_dst">Observe DST</label>
+            <label>
+                <input type="checkbox" name="observe_dst" value="on" checked="checked" id="observe_dst"/>
+            </label>
+            <div class="offset">Disc App observes
+                <a href="http://www.timeanddate.com/time/aboutdst.html" target="_blank">Daylight Saving Time.</a>
+                Our clock will roll forward 1 hour on the second Sunday in March and back 1 hour on the
+                first Sunday in November.
             </div>
+        </div>
 
-            <div style="visible=false;display:none;text-align:left;">
-                <!-- TODO : not currently used -->
+        <div style="text-align:left;">
+            <label for="dateFormat">Date and Time Format</label>
+            <input type="text" name="dateFormat" th:value="${maintenanceLocaleViewModel.getDateFormat()}"
+                   id="dateFormat"/>
+            (Default is 'EEE MMM dd, yyyy h:mma')
 
-                <label for="observe_dst">Observe DST</label>
-                <label>
-                    <input type="checkbox" name="observe_dst" value="on" checked="checked" id="observe_dst"/>
-                </label>
-                <div class="offset">Disc App observes
-                    <a href="http://www.timeanddate.com/time/aboutdst.html" target="_blank">Daylight Saving Time.</a>
-                    Our clock will roll forward 1 hour on the second Sunday in March and back 1 hour on the
-                    first Sunday in November.
-                </div>
+            <div class="offset">
+                <h2>Pattern Syntax</h2>
+
+                <p>
+                    You can use the following symbols in your formatting pattern:
+                </p>
+
+                <table class="dataTable" cellspacing="0">
+                    <tr>
+                        <td>G</td>
+                        <td>Era designator (before christ, after christ)</td>
+                    </tr>
+                    <tr>
+                        <td>y</td>
+                        <td>Year (e.g. 12 or 2012). Use either yy or yyyy.</td>
+                    </tr>
+                    <tr>
+                        <td>M</td>
+                        <td>Month in year. Number of M's determine length of format (e.g. MM, MMM or MMMMM)</td>
+                    </tr>
+                    <tr>
+                        <td>d</td>
+                        <td>Day in month. Number of d's determine length of format (e.g. d or dd)</td>
+                    </tr>
+                    <tr>
+                        <td>h</td>
+                        <td>Hour of day, 1-12 (AM / PM) (normally hh)</td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>Hour of day, 0-23 (normally HH)</td>
+                    </tr>
+                    <tr>
+                        <td>m</td>
+                        <td>Minute in hour, 0-59 (normally mm)</td>
+                    </tr>
+                    <tr>
+                        <td>s</td>
+                        <td>Second in minute, 0-59 (normally ss)</td>
+                    </tr>
+                    <tr>
+                        <td>S</td>
+                        <td>Millisecond in second, 0-999 (normally SSS)</td>
+                    </tr>
+                    <tr>
+                        <td>E</td>
+                        <td>Day in week (e.g Monday, Tuesday etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>Day in year (1-366)</td>
+                    </tr>
+                    <tr>
+                        <td>F</td>
+                        <td>Day of week in month (e.g. 1st Thursday of December)</td>
+                    </tr>
+                    <tr>
+                        <td>w</td>
+                        <td>Week in year (1-53)</td>
+                    </tr>
+                    <tr>
+                        <td>W</td>
+                        <td>Week in month (0-5)</td>
+                    </tr>
+                    <tr>
+                        <td>a</td>
+                        <td>AM / PM marker</td>
+                    </tr>
+                    <tr>
+                        <td>k</td>
+                        <td>Hour in day (1-24, unlike HH's 0-23)</td>
+                    </tr>
+                    <tr>
+                        <td>K</td>
+                        <td>Hour in day, AM / PM (0-11)</td>
+                    </tr>
+                    <tr>
+                        <td>z</td>
+                        <td>Time Zone</td>
+                    </tr>
+                    <tr>
+                        <td>'</td>
+                        <td>Escape for text delimiter</td>
+                    </tr>
+                    <tr>
+                        <td>'</td>
+                        <td>Single quote</td>
+                    </tr>
+                </table>
+
+                <p>
+                    Characters other than these will be treated as normal text to insert into the pattern, and thus
+                    into the
+                    formatted dates.
+                </p>
+
+                <p>
+                    Some characters can be used in different numbers. For instance, you can write either
+                    <code>yy</code>
+                    for a 2-character version of the year (e.g. 12), or you can write <code>yyyy</code> for a
+                    4-character
+                    version of the year (e.g. 2012).
+                    for the <code>SimpleDateFormat</code> class.
+                </p>
+
+                <a name="pattern-examples"></a>
+                <h2>Pattern Examples</h2>
+
+                <p>
+                    Here are a few date pattern examples:
+                </p>
+
+                <table class="dataTable" cellspacing="0">
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>dd-MM-yy</td>
+                        <td>31-01-12</td>
+                    </tr>
+                    <tr>
+                        <td>dd-MM-yyyy</td>
+                        <td>31-01-2012</td>
+                    </tr>
+                    <tr>
+                        <td>MM-dd-yyyy</td>
+                        <td>01-31-2012</td>
+                    </tr>
+                    <tr>
+                        <td>yyyy-MM-dd</td>
+                        <td>2012-01-31</td>
+                    </tr>
+                    <tr>
+                        <td>yyyy-MM-dd HH:mm:ss</td>
+                        <td>2012-01-31 23:59:59</td>
+                    </tr>
+                    <tr>
+                        <td>yyyy-MM-dd HH:mm:ss.SSS</td>
+                        <td>2012-01-31 23:59:59.999</td>
+                    </tr>
+                    <tr>
+                        <td>yyyy-MM-dd HH:mm:ss.SSSZ</td>
+                        <td>2012-01-31 23:59:59.999+0100</td>
+                    </tr>
+                    <tr>
+                        <td>EEEEE MMMMM yyyy HH:mm:ss.SSSZ</td>
+                        <td>Saturday November 2012 10:45:42.720+0100</td>
+                    </tr>
+                </table>
             </div>
-
-            <div style="text-align:left;">
-                <label for="dateFormat">Date and Time Format</label>
-                <input type="text" name="dateFormat" th:value="${maintenanceLocaleViewModel.getDateFormat()}"
-                       id="dateFormat"/>
-                (Default is 'EEE MMM dd, yyyy h:mma')
-
-                <div class="offset">
-                    <h2>Pattern Syntax</h2>
-
-                    <p>
-                        You can use the following symbols in your formatting pattern:
-                    </p>
-
-                    <table class="dataTable" cellspacing="0">
-                        <tr>
-                            <td>G</td>
-                            <td>Era designator (before christ, after christ)</td>
-                        </tr>
-                        <tr>
-                            <td>y</td>
-                            <td>Year (e.g. 12 or 2012). Use either yy or yyyy.</td>
-                        </tr>
-                        <tr>
-                            <td>M</td>
-                            <td>Month in year. Number of M's determine length of format (e.g. MM, MMM or MMMMM)</td>
-                        </tr>
-                        <tr>
-                            <td>d</td>
-                            <td>Day in month. Number of d's determine length of format (e.g. d or dd)</td>
-                        </tr>
-                        <tr>
-                            <td>h</td>
-                            <td>Hour of day, 1-12 (AM / PM) (normally hh)</td>
-                        </tr>
-                        <tr>
-                            <td>H</td>
-                            <td>Hour of day, 0-23 (normally HH)</td>
-                        </tr>
-                        <tr>
-                            <td>m</td>
-                            <td>Minute in hour, 0-59 (normally mm)</td>
-                        </tr>
-                        <tr>
-                            <td>s</td>
-                            <td>Second in minute, 0-59 (normally ss)</td>
-                        </tr>
-                        <tr>
-                            <td>S</td>
-                            <td>Millisecond in second, 0-999 (normally SSS)</td>
-                        </tr>
-                        <tr>
-                            <td>E</td>
-                            <td>Day in week (e.g Monday, Tuesday etc.)</td>
-                        </tr>
-                        <tr>
-                            <td>D</td>
-                            <td>Day in year (1-366)</td>
-                        </tr>
-                        <tr>
-                            <td>F</td>
-                            <td>Day of week in month (e.g. 1st Thursday of December)</td>
-                        </tr>
-                        <tr>
-                            <td>w</td>
-                            <td>Week in year (1-53)</td>
-                        </tr>
-                        <tr>
-                            <td>W</td>
-                            <td>Week in month (0-5)</td>
-                        </tr>
-                        <tr>
-                            <td>a</td>
-                            <td>AM / PM marker</td>
-                        </tr>
-                        <tr>
-                            <td>k</td>
-                            <td>Hour in day (1-24, unlike HH's 0-23)</td>
-                        </tr>
-                        <tr>
-                            <td>K</td>
-                            <td>Hour in day, AM / PM (0-11)</td>
-                        </tr>
-                        <tr>
-                            <td>z</td>
-                            <td>Time Zone</td>
-                        </tr>
-                        <tr>
-                            <td>'</td>
-                            <td>Escape for text delimiter</td>
-                        </tr>
-                        <tr>
-                            <td>'</td>
-                            <td>Single quote</td>
-                        </tr>
-                    </table>
-
-                    <p>
-                        Characters other than these will be treated as normal text to insert into the pattern, and thus
-                        into the
-                        formatted dates.
-                    </p>
-
-                    <p>
-                        Some characters can be used in different numbers. For instance, you can write either
-                        <code>yy</code>
-                        for a 2-character version of the year (e.g. 12), or you can write <code>yyyy</code> for a
-                        4-character
-                        version of the year (e.g. 2012).
-                        for the <code>SimpleDateFormat</code> class.
-                    </p>
-
-                    <a name="pattern-examples"></a>
-                    <h2>Pattern Examples</h2>
-
-                    <p>
-                        Here are a few date pattern examples:
-                    </p>
-
-                    <table class="dataTable" cellspacing="0">
-                        <tr>
-                            <th>Pattern</th>
-                            <th>Example</th>
-                        </tr>
-                        <tr>
-                            <td>dd-MM-yy</td>
-                            <td>31-01-12</td>
-                        </tr>
-                        <tr>
-                            <td>dd-MM-yyyy</td>
-                            <td>31-01-2012</td>
-                        </tr>
-                        <tr>
-                            <td>MM-dd-yyyy</td>
-                            <td>01-31-2012</td>
-                        </tr>
-                        <tr>
-                            <td>yyyy-MM-dd</td>
-                            <td>2012-01-31</td>
-                        </tr>
-                        <tr>
-                            <td>yyyy-MM-dd HH:mm:ss</td>
-                            <td>2012-01-31 23:59:59</td>
-                        </tr>
-                        <tr>
-                            <td>yyyy-MM-dd HH:mm:ss.SSS</td>
-                            <td>2012-01-31 23:59:59.999</td>
-                        </tr>
-                        <tr>
-                            <td>yyyy-MM-dd HH:mm:ss.SSSZ</td>
-                            <td>2012-01-31 23:59:59.999+0100</td>
-                        </tr>
-                        <tr>
-                            <td>EEEEE MMMMM yyyy HH:mm:ss.SSSZ</td>
-                            <td>Saturday November 2012 10:45:42.720+0100</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+        </div>
 
 
-            <div style="visible:false;display:none;">
-                <!-- TODO : not currently used -->
-                <label for="lang">Language Code</label>
-                <input type="text" name="lang" value="en-US" size="5" maxlength="8" id="lang"/>
-                <label for="charset">Character Set</label>
-                <input type="text" name="charset" value="ISO-8859-1" size="10" maxlength="12" id="charset"/>
-            </div>
+        <div style="visible:false;display:none;">
+            <!-- TODO : not currently used -->
+            <label for="lang">Language Code</label>
+            <input type="text" name="lang" value="en-US" size="5" maxlength="8" id="lang"/>
+            <label for="charset">Character Set</label>
+            <input type="text" name="charset" value="ISO-8859-1" size="10" maxlength="12" id="charset"/>
+        </div>
 
-            <input type="submit" name="ChangeLocale" value="Submit Changes" class="button"/>
+        <input type="submit" name="ChangeLocale" value="Submit Changes" class="button"/>
 
-            <div>
-                <input type="hidden" name=".cgifields" value="observe_dst"/>
-                <input type="hidden" name=".cgifields" value="time_format"/>
-            </div>
+        <div>
+            <input type="hidden" name=".cgifields" value="observe_dst"/>
+            <input type="hidden" name=".cgifields" value="time_format"/>
+        </div>
 
-        </form>
-    </div>
+    </form>
+</div>
 
 </body>
 </html>

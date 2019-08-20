@@ -35,18 +35,14 @@
         }
 
     </style>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 </head>
 
 <body>
 
-<!--todo : break this into it's own fragment -->
-<div id="account">
-    [[${username}]]
-    <a href="/account/modify" target="_parent">Control Center</a>
-    <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
-    <a href="/logout" target="_parent">Logout</a></div>
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
 
 <div th:if="${isAdmin}">
 

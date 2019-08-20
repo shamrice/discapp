@@ -42,12 +42,8 @@
 
 <body>
 
-<!-- todo : move this to a fragment. -->
-<div id="account">
-    <div th:text="${username}"></div>
-    <a href="/account/modify" target="_top">Control Center</a>
-    <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_top">Settings</a>
-    <a href="/logout" target="_top">Logout</a>
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
 </div>
 
 <div th:if="${maintenanceStatsViewModel.getInfoMessage()}" class="alert alert-error grey_box"
