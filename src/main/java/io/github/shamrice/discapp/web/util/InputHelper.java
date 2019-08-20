@@ -24,14 +24,17 @@ public class InputHelper {
      * @return returns text with html anchor tags added where found.
      */
     public String addUrlHtmlLinksToString(String text) {
-        String urlRegex = "(https?|ftp):\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[A-Za-z]{2,6}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)*(?:\\/|\\b)";
+        //String urlRegex = "        (https? |ftp):\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[A-Za-z]{2,6}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)*(?:\\/|\\b)";
+        String urlRegex = "((\"https?|https?)|ftp):\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[A-Za-z]{2,6}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&\\/\\/=]*)*(?:\"|\\/|\\b)";
         Pattern pattern = Pattern.compile(urlRegex);
         Matcher matcher = pattern.matcher(text);
 
         StringBuffer stringBuffer = new StringBuffer();
         while (matcher.find()) {
             String foundUrl = matcher.group(0);
-            matcher.appendReplacement(stringBuffer, "<a href=\"" + foundUrl + "\">" + foundUrl + "</a>");
+            if (!foundUrl.startsWith("\"") && !foundUrl.endsWith("\"")) { //ignore already quoted urls
+                matcher.appendReplacement(stringBuffer, "<a target=\"_blank\" href=\"" + foundUrl + "\">" + foundUrl + "</a>");
+            }
         }
 
         matcher.appendTail(stringBuffer);
