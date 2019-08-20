@@ -5,11 +5,6 @@
 <body>
 <div class="edit-thread" th:fragment="edit-thread">
 
-    <!--form method="post"
-          th:action="@{|/admin/disc-edit.cgi?id=${maintenanceThreadViewModel.getApplicationId()}&tab=${maintenanceThreadViewModel.getTab()}&pagemark=${maintenanceThreadViewModel.getPagemark()}|}"
-          enctype="multipart/form-data"
-          th:object="${maintenanceThreadViewModel}"-->
-
     <div th:if="${maintenanceThreadViewModel.isOnEditMessage() && !maintenanceThreadViewModel.isOnEditModifyMessage()}">
         <div style="padding-left:1em;">
             <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
@@ -138,8 +133,6 @@
             </div>
 
         </div>
-
-        <!--/form-->
     </div>
 
 </div>

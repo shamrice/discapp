@@ -77,7 +77,6 @@ function switchElements(element1,element2) {
     document.getElementById(element1).style.display = "none";
     document.getElementById(element2).style.display = "block";
 }
-
 parent.frames.preview.document.location.reload();
 </script>
 
@@ -100,7 +99,6 @@ parent.frames.preview.document.location.reload();
     <span class="toggle" onclick="switchElements('app_configuration_closed', 'app_configuration_open');"
           title="Show application controls">Application +</span>
     </div>
-
 
     <div class="grey_box" id="app_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
          style="display:none;">
@@ -170,8 +168,6 @@ parent.frames.preview.document.location.reload();
             function setStyleSheetUrl(url) {
                 document.getElementById("styleSheetUrl").value = url;
             }
-
-
         </script>
 
         <form name="f"
@@ -445,7 +441,6 @@ parent.frames.preview.document.location.reload();
         </form>
     </div>
 
-
     <div class="grey_box closed" id="labelbox_closed" th:if="${maintenanceViewModel.getApplicationId()}"
          style="display:block;">
         <span class="toggle" onclick="switchElements('labelbox_closed', 'labelbox_open');" title="Show label controls">Labels +</span>
@@ -504,7 +499,6 @@ parent.frames.preview.document.location.reload();
             <input type="submit" name="ChangeFieldHeaders" value="Change Labels" class="button"/>
         </form>
     </div>
-
 
     <div class="grey_box closed" id="buttonbox_closed" th:if="${maintenanceViewModel.getApplicationId()}"
          style="display:block;">
@@ -610,7 +604,6 @@ parent.frames.preview.document.location.reload();
         </form>
     </div>
 
-
     <table>
         <tr>
             <td colspan="2" style="text-align:center;">
@@ -630,7 +623,6 @@ parent.frames.preview.document.location.reload();
             </td>
         </tr>
     </table>
-
 </div>
 </body>
 </html>

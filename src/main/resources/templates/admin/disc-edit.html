@@ -8,43 +8,8 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <style type="text/css">
-    /*
-        fieldset {
-            background-color: #fff;
-        }
-
-        fieldset a,
-        fieldset span {
-            text-decoration: none;
-            padding: 3px;
-            float: left;
-            font-weight: normal;
-        }
-
-        fieldset a:hover {
-            background-color: #ccf;
-        }
-
-        fieldset img {
-            height: 32px;
-            width: 32px;
-            vertical-align: middle;
-        }
-
-        p {
-            margin-bottom: 3ex;
-        }
-*/
-
         label{font-weight:normal;}
-
-
     </style>
-
-    <script type="text/javascript">
-
-    </script>
-
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
 
@@ -66,7 +31,6 @@
           th:object="${maintenanceThreadViewModel}">
 
         <input type="hidden" name="id" th:value="${appId}"/>
-
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('threads')}">
         <span class="tab" style="background-color:#fff; color:#00f;
@@ -100,7 +64,6 @@
             <span class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">Post</span>
         </div>
-
 
         <div th:if="${maintenanceThreadViewModel.isOnEditMessage() || maintenanceThreadViewModel.isOnEditModifyMessage()}">
             <div th:replace="admin/fragments/edit-thread :: edit-thread">
@@ -162,9 +125,7 @@
         </div>
 
     </form>
-
 </div>
 
 </body>
-
 </html>
