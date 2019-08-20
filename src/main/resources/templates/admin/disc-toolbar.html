@@ -38,9 +38,7 @@
 <div style="height:40px; width:440px; margin:auto; ">
     <a target="dbmain" th:href="@{|/admin/disc-info.cgi?id=${appId}|}" title="Main Page"><img alt="Info" src="/images/info.png" /></a>
     <a target="dbmain" th:href="@{|/admin/appearance-frameset.cgi?id=${appId}|}" title="Appearance"><img alt="Appearance" src="/images/palette.png" /></a>
-    <!--
-    <a target="dbmain" href="/admin/disc-locale.cgi?id=46108" title="Timezone &amp; Language"><img alt="Time" src="/images/globe.png" /></a>
-    -->
+    <a target="dbmain" th:href="@{|/admin/disc-locale.cgi?id=${appId}|}" title="Timezone &amp; Language"><img alt="Time" src="/images/globe.png" /></a>
     <a target="dbmain" th:href="@{|/admin/disc-edit.cgi?id=${appId}|}" title="Edit Messages"><img alt="Edit Database" src="/images/messages.png" /></a>
     <!--
     <a target="dbmain" href="/admin/disc-list-maint.cgi?id=46108" title="Mailing List"><img alt="Mailing List" src="/images/envelope.png" /></a>

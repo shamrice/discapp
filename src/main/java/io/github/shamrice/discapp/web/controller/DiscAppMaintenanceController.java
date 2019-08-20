@@ -9,6 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.model.MaintenanceLocaleViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceStatsViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceThreadViewModel;
 import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
@@ -80,6 +81,48 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-toolbar");
     }
 
+    @GetMapping("/admin/disc-locale.cgi")
+    public ModelAndView getDiscLocaleView(@RequestParam(name = "id") long appId,
+                                          @RequestParam(name = "redirect", required = false) String redirect,
+                                          MaintenanceLocaleViewModel maintenanceLocaleViewModel,
+                                          Model model) {
+
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceLocaleViewModel.setApplicationId(app.getId());
+
+                //time and date config
+                String timezone = configurationService.getStringValue(appId, ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
+                maintenanceLocaleViewModel.setSelectedTimezone(timezone);
+
+                String dateFormat = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
+                maintenanceLocaleViewModel.setDateFormat(dateFormat);
+
+                String[] timezoneIds = TimeZone.getAvailableIDs();
+                List<String> timezones = Arrays.asList(timezoneIds);
+                maintenanceLocaleViewModel.setTimezones(timezones);
+
+            } else {
+                maintenanceLocaleViewModel.setInfoMessage("You do not have permission to edit this disc app.");
+                logger.warn("User: " + username + " attempted to edit appId: " + appId + " even though they are not the owner.");
+            }
+        } catch (Exception ex) {
+            logger.error("Error getting locale admin view: " + ex.getMessage(), ex);
+            maintenanceLocaleViewModel.setInfoMessage("An error has occurred. Please try again.");
+        }
+
+        return new ModelAndView("admin/disc-locale", "maintenanceLocaleViewModel", maintenanceLocaleViewModel);
+    }
+
     @GetMapping("/admin/disc-stats.cgi")
     public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
@@ -149,6 +192,8 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
                 model.addAttribute("isAdmin", "true");
@@ -537,15 +582,6 @@ public class DiscAppMaintenanceController {
         return getDiscEditView(appId, THREAD_TAB, maintenanceThreadViewModel, model);
     }
 
-    /*
-        @GetMapping("/admin/appearance-frameset.cgi")
-        public ModelAndView getAppearanceFramesetView(@RequestParam(name = "id") long appId,
-                                              Model model) {
-            model.addAttribute("appName", "");
-            model.addAttribute("appId", appId);
-            return new ModelAndView("admin/appearance-frameset");
-        }
-    */
     @GetMapping("/admin/appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model,
@@ -670,18 +706,6 @@ public class DiscAppMaintenanceController {
                 //favicon config
                 String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
                 maintenanceViewModel.setFavicon(favicon);
-
-                //time and date config
-                String timezone = configurationService.getStringValue(appId, ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
-                maintenanceViewModel.setSelectedTimezone(timezone);
-
-                String dateFormat = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
-                maintenanceViewModel.setDateFormat(dateFormat);
-
-                String[] timezoneIds = TimeZone.getAvailableIDs();
-                List<String> timezones = Arrays.asList(timezoneIds);
-                maintenanceViewModel.setTimezones(timezones);
-
 
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
@@ -1088,11 +1112,11 @@ public class DiscAppMaintenanceController {
     @PostMapping("/admin/modify/time")
     public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
                                        @RequestParam(name = "redirect", required = false) String redirect,
-                                       @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                       @ModelAttribute MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                        Model model) {
 
-        if (maintenanceViewModel.getDateFormat() == null || maintenanceViewModel.getDateFormat().trim().isEmpty()) {
-            maintenanceViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
+        if (maintenanceLocaleViewModel.getDateFormat() == null || maintenanceLocaleViewModel.getDateFormat().trim().isEmpty()) {
+            maintenanceLocaleViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -1100,23 +1124,23 @@ public class DiscAppMaintenanceController {
         if (applicationService.isOwnerOfApp(appId, email)) {
             Application app = applicationService.get(appId);
 
-            String dateFormat = inputHelper.sanitizeInput(maintenanceViewModel.getDateFormat());
+            String dateFormat = inputHelper.sanitizeInput(maintenanceLocaleViewModel.getDateFormat());
 
-            boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceViewModel.getSelectedTimezone());
+            boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceLocaleViewModel.getSelectedTimezone());
             boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, dateFormat);
 
             if (timezoneSaved && dateFormatSaved) {
                 logger.info("Saved date and time settings for appId: " + appId);
-                maintenanceViewModel.setInfoMessage("Successfully saved changes to Date and Time.");
+                maintenanceLocaleViewModel.setInfoMessage("Successfully saved changes to Date and Time.");
             } else {
-                maintenanceViewModel.setInfoMessage("Failed to save changes to Date and Time.");
+                maintenanceLocaleViewModel.setInfoMessage("Failed to save changes to Date and Time.");
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            maintenanceLocaleViewModel.setInfoMessage("You do not have permissions to save these changes.");
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getDiscLocaleView(appId, redirect, maintenanceLocaleViewModel, model);
     }
 
 

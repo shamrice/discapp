@@ -42,7 +42,8 @@
 <body>
 
 <!--todo : break this into it's own fragment -->
-<div id="account">placeholder@example.com
+<div id="account">
+    [[${username}]]
     <a href="/account/modify" target="_parent">Control Center</a>
     <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
     <a href="/logout" target="_parent">Logout</a></div>
@@ -84,9 +85,9 @@
                     </td>
                 </tr-->
                 <tr>
-                    <!--td>
-                        <a href="/admin/disc-locale.cgi?id=46108"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>
-                    </td-->
+                    <td>
+                        <a th:href="@{|/admin/disc-locale.cgi?id=${appId}|}"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>
+                    </td>
                     <td>
                         <a th:href="@{|/admin/disc-stats.cgi?id=${appId}|}"><img alt="Stats" src="/images/stats.gif" /> Statistics</a>
                     </td>
