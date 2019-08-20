@@ -30,7 +30,6 @@ public class StatisticsService {
 
     public void increaseCurrentPageStats(long applicationId, String sourceIpAddress) {
 
-
         String statDate = getCurrentStatDateString();
 
         Stats currentDayStat = statsRepository.findOneByApplicationIdAndStatDate(applicationId, statDate);
@@ -91,6 +90,14 @@ public class StatisticsService {
                 applicationId,
                 limit
         );
+    }
+
+    public Stats getStats(long statsId) {
+        return statsRepository.getOne(statsId);
+    }
+
+    public List<StatsUniqueIps> getUniqueIpsForStatsId(long statsId) {
+        return statsUniqueIpsRepository.findByStatsId(statsId);
     }
 
     private String getCurrentStatDateString() {

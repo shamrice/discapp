@@ -253,6 +253,7 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-stats.cgi")
     public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "selectedStatsId", required = false) Long statsId,
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
                                          Model model) {
         model.addAttribute("appName", "");
@@ -282,6 +283,7 @@ public class DiscAppMaintenanceController {
                 for (Stats dayStat : pastMonthStats) {
                     MaintenanceStatsViewModel.StatView statView = new MaintenanceStatsViewModel.StatView(
                             dayStat.getStatDate(),
+                            dayStat.getId(),
                             dayStat.getUniqueIps(),
                             dayStat.getPageViews()
                     );
@@ -298,6 +300,20 @@ public class DiscAppMaintenanceController {
                 maintenanceStatsViewModel.setAveragePageViews(totalPageViews / numDays);
                 maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numDays);
                 maintenanceStatsViewModel.setAveragePagesPerIp(totalUniqueIpsPerDay / numDays);
+
+                if (statsId != null && statsId > 0L) {
+                    Stats selectedStats = statisticsService.getStats(statsId);
+                    if (selectedStats != null && selectedStats.getApplicationId().equals(app.getId())) {
+
+                        List<StatsUniqueIps> daysUniqueIps = statisticsService.getUniqueIpsForStatsId(selectedStats.getId());
+
+                        maintenanceStatsViewModel.setSelectedStatId(statsId);
+                        maintenanceStatsViewModel.setSelectedDate(selectedStats.getStatDate());
+                        maintenanceStatsViewModel.setUniqueIps(daysUniqueIps);
+                    } else {
+                        maintenanceStatsViewModel.setInfoMessage("Error retrieving statistics.");
+                    }
+                }
 
             } else {
                 logger.error("user: " + username + " attempted to view stats of a disc app they don't own. AppId: " + appId);

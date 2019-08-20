@@ -61,7 +61,10 @@
             th:each="statView : ${maintenanceStatsViewModel.getStatViews()}">
 
             <td th:text="${statView.getDate()}"></td>
-            <td th:text="${statView.getUniqueIps()}"></td>
+            <td>
+              <a th:href="@{|?id=${maintenanceStatsViewModel.getApplicationId()}&amp;selectedStatsId=${statView.getStatId()}#ip_results|}"
+                 th:text="${statView.getUniqueIps()}"></a>
+            </td>
             <td th:text="${statView.getPageViews()}"></td>
             <td th:text="${statView.getPagesPerIp()}"></td>
         </tr>
@@ -78,6 +81,28 @@
             <td th:text="${maintenanceStatsViewModel.getAveragePagesPerIp()}"></td>
         </tr>
     </table>
+
+
+    <div id="ip_results" th:if="${maintenanceStatsViewModel.getSelectedStatId()}">
+
+    <table class="colored">
+        <tr>
+            <th colspan="2" th:text="${maintenanceStatsViewModel.getSelectedDate()}"></th>
+        </tr>
+        <tr>
+            <th>IP</th>
+            <th>First Page Visit of Day</th>
+        </tr>
+
+        <tr th:if="${not #lists.isEmpty(maintenanceStatsViewModel.getUniqueIps())}"
+            th:each="uniqueIp : ${maintenanceStatsViewModel.getUniqueIps()}">
+
+            <td th:text="${uniqueIp.getIpAddress()}"></td>
+            <td th:text="${uniqueIp.getCreateDt()}"></td>
+        </tr>
+    </table>
+    </div>
+
 </div>
 </body>
 </html>

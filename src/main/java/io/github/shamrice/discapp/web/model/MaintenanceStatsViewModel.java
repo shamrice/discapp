@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.model;
 
 import io.github.shamrice.discapp.data.model.Stats;
+import io.github.shamrice.discapp.data.model.StatsUniqueIps;
 
 import java.util.List;
 
@@ -9,12 +10,14 @@ public class MaintenanceStatsViewModel {
     public static class StatView {
 
         private String date;
+        private long statId;
         private long uniqueIps;
         private long pageViews;
         private float pagesPerIp;
 
-        public StatView(String date, long uniqueIps, long pageViews) {
+        public StatView(String date, long statId, long uniqueIps, long pageViews) {
             this.date = date;
+            this.statId = statId;
             this.uniqueIps = uniqueIps;
             this.pageViews = pageViews;
         }
@@ -37,6 +40,10 @@ public class MaintenanceStatsViewModel {
             }
             return pageViews;
         }
+
+        public long getStatId() {
+            return statId;
+        }
     }
 
     private long applicationId;
@@ -46,6 +53,9 @@ public class MaintenanceStatsViewModel {
     private long averageUniqueIps;
     private long averagePageViews;
     private float averagePagesPerIp;
+    private long selectedStatId;
+    private String selectedDate;
+    private List<StatsUniqueIps> uniqueIps;
 
 
     public List<StatView> getStatViews() {
@@ -104,5 +114,27 @@ public class MaintenanceStatsViewModel {
         this.infoMessage = infoMessage;
     }
 
+    public long getSelectedStatId() {
+        return selectedStatId;
+    }
 
+    public void setSelectedStatId(long selectedStatId) {
+        this.selectedStatId = selectedStatId;
+    }
+
+    public List<StatsUniqueIps> getUniqueIps() {
+        return uniqueIps;
+    }
+
+    public void setUniqueIps(List<StatsUniqueIps> uniqueIps) {
+        this.uniqueIps = uniqueIps;
+    }
+
+    public String getSelectedDate() {
+        return selectedDate;
+    }
+
+    public void setSelectedDate(String selectedDate) {
+        this.selectedDate = selectedDate;
+    }
 }
