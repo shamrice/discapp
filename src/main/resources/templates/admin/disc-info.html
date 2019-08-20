@@ -68,17 +68,17 @@
                         <a href="/admin/disc-security.cgi?id=46108"><img alt="Security" src="/images/lock.png" /> Security</a>
                     </td-->
                 </tr>
-                <!--tr>
-                    <td>
+                <tr>
+                    <!--td>
                         <a href="/admin/disc-list-maint.cgi?id=46108"><img alt="Mailing List" src="/images/envelope.png" /> Mailing list</a>
                     </td>
                     <td>
                         <a href="/admin/disc-rss-maint.cgi?id=46108"><img alt="RSS icon" src="/images/rss-icon.gif" /> RSS</a>
-                    </td>
+                    </td-->
                     <td>
-                        <a href="/admin/disc-widget-maint.cgi?id=46108"><img alt="Widget icon" src="/images/widget-icon.png" /> Widget</a>
+                        <a th:href="@{|/admin/disc-widget-maint.cgi?id=${appId}|}"><img alt="Widget icon" src="/images/widget-icon.png" /> Widget</a>
                     </td>
-                </tr-->
+                </tr>
                 <tr>
                     <td>
                         <a th:href="@{|/admin/disc-locale.cgi?id=${appId}|}"><img alt="Locale Settings" src="/images/globe.png" /> Locale</a>

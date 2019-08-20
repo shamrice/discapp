@@ -273,6 +273,23 @@ public class ThreadService {
         return threadList;
     }
 
+    /**
+     * Only returns the latest parent threads. Does not include sub threads.
+     * @param applicationId
+     * @param numThreads
+     * @return
+     */
+    public List<Thread> getLatestTopLevelThreads(long applicationId, int numThreads) {
+        //query to get latest parent threads (parentId = 0L) for an application
+        Pageable limit = PageRequest.of(0, numThreads);
+        return threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
+                applicationId,
+                TOP_LEVEL_THREAD_PARENT_ID,
+                false,
+                limit
+        );
+    }
+
     public Thread getThread(Long threadId) {
         Thread foundThread = threadRepository.getOne(threadId);
         return foundThread.getDeleted() ? null : foundThread;

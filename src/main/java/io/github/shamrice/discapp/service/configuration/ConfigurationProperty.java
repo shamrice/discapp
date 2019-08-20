@@ -27,7 +27,10 @@ public enum ConfigurationProperty {
     FOOTER_TEXT ("page.footer.text"),
     FAVICON_URL ("favicon.url"),
     TIMEZONE_LOCATION ("timezone.location"),
-    DATE_FORMAT_PATTERN ("date.format.pattern");
+    DATE_FORMAT_PATTERN ("date.format.pattern"),
+    WIDGET_SHOW_AUTHOR ("widget.show.author"),
+    WIDGET_SHOW_DATE("widget.show.date"),
+    WIDGET_USE_STYLE_SHEET("widget.use.stylesheet");
 
     private final String propName;
 

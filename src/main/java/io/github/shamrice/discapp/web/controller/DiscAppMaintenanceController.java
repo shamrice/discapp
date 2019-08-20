@@ -9,10 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
-import io.github.shamrice.discapp.web.model.MaintenanceLocaleViewModel;
-import io.github.shamrice.discapp.web.model.MaintenanceStatsViewModel;
-import io.github.shamrice.discapp.web.model.MaintenanceThreadViewModel;
-import io.github.shamrice.discapp.web.model.MaintenanceViewModel;
+import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
@@ -81,6 +78,136 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-toolbar");
     }
 
+    @PostMapping("/admin/disc-widget-maint.cgi")
+    public ModelAndView postDiscMainWidgetView(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "redirect", required = false) String redirect,
+                                               MaintenanceWidgetViewModel maintenanceWidgetViewModel,
+                                               Model model,
+                                               HttpServletRequest request) {
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, String.valueOf(maintenanceWidgetViewModel.isShowStyleSheet()).toLowerCase());
+
+                int width = 20;
+                try {
+                    width = Integer.parseInt(maintenanceWidgetViewModel.getWidgetWidth());
+                } catch (NumberFormatException widthEx) {
+                    logger.warn("Invalid widget width for appId: " + appId
+                            + " : value: " + maintenanceWidgetViewModel.getWidgetWidth() + " :: using default: "
+                            + width + " :: " + widthEx.getMessage());
+                }
+                maintenanceWidgetViewModel.setWidgetWidth(String.valueOf(width));
+
+                int height = 18;
+                try {
+                    height = Integer.parseInt(maintenanceWidgetViewModel.getWidgetHeight());
+                } catch (NumberFormatException heightEx) {
+                    logger.warn("Invalid widget height for appId: " + appId
+                            + " : value: " + maintenanceWidgetViewModel.getWidgetHeight() + " :: using default: "
+                            + height + " :: " + heightEx.getMessage());
+                }
+                maintenanceWidgetViewModel.setWidgetHeight(String.valueOf(height));
+
+            } else {
+                logger.warn("User " + username + " attempted to modify appid: " + appId + " widgets but is not the owner.");
+                maintenanceWidgetViewModel.setInfoMessage("You do not have permission to edit this disc app.");
+            }
+        } catch (Exception ex) {
+            logger.error("Error saving widget settings for appId: " + appId + " :: " + ex.getMessage(), ex);
+            maintenanceWidgetViewModel.setInfoMessage("Unable to save widget settings. Please try again.");
+        }
+
+        return getDiscMaintWidgetView(appId, redirect, maintenanceWidgetViewModel, model, request);
+    }
+
+    @GetMapping("/admin/disc-widget-maint.cgi")
+    public ModelAndView getDiscMaintWidgetView(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "redirect", required =  false) String redirect,
+                                               MaintenanceWidgetViewModel maintenanceWidgetViewModel,
+                                               Model model,
+                                               HttpServletRequest request) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+        model.addAttribute("redirect", redirect);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceWidgetViewModel.setApplicationId(app.getId());
+
+                boolean showAuthor = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, true);
+                boolean showDate = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, false);
+                boolean useStyleSheet = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, true);
+
+                maintenanceWidgetViewModel.setShowAuthor(showAuthor);
+                maintenanceWidgetViewModel.setShowDate(showDate);
+                maintenanceWidgetViewModel.setShowStyleSheet(useStyleSheet);
+
+                if (maintenanceWidgetViewModel.getWidgetHeight() == null || maintenanceWidgetViewModel.getWidgetHeight().isEmpty()) {
+                    maintenanceWidgetViewModel.setWidgetHeight("18");
+                }
+
+                if (maintenanceWidgetViewModel.getWidgetHeightUnit() == null || maintenanceWidgetViewModel.getWidgetHeightUnit().isEmpty()) {
+                    maintenanceWidgetViewModel.setWidgetHeightUnit("em");
+                }
+
+                if (maintenanceWidgetViewModel.getWidgetWidth() == null || maintenanceWidgetViewModel.getWidgetWidth().isEmpty()) {
+                    maintenanceWidgetViewModel.setWidgetWidth("20");
+                }
+
+                if (maintenanceWidgetViewModel.getWidgetWidthUnit() == null || maintenanceWidgetViewModel.getWidgetWidthUnit().isEmpty()) {
+                    maintenanceWidgetViewModel.setWidgetWidthUnit("em");
+                }
+
+                String heightUnitForCode = maintenanceWidgetViewModel.getWidgetHeightUnit();
+                String widthUnitForCode = maintenanceWidgetViewModel.getWidgetWidthUnit();
+
+                if (heightUnitForCode.equalsIgnoreCase("percent")) {
+                    heightUnitForCode = "%";
+                }
+
+                if (widthUnitForCode.equalsIgnoreCase("percent")) {
+                    widthUnitForCode = "%";
+                }
+
+                String baseUrl = getBaseUrl(request);
+
+                maintenanceWidgetViewModel.setCodeHtml(
+                        getWidgetHtml(
+                            Integer.parseInt(maintenanceWidgetViewModel.getWidgetWidth()),
+                            widthUnitForCode,
+                            Integer.parseInt(maintenanceWidgetViewModel.getWidgetHeight()),
+                            heightUnitForCode,
+                            app.getId(),
+                            baseUrl
+                        )
+                );
+
+            } else {
+                logger.warn("User: " + username + " attempted to access widget admin of : " + appId + " which they do not own.");
+                maintenanceWidgetViewModel.setInfoMessage("You do not have permission to access this page.");
+            }
+        } catch (Exception ex) {
+            logger.error("Error getting widget maintenance page for : " + appId + " :: " + ex.getMessage(), ex);
+            maintenanceWidgetViewModel.setInfoMessage("An unexpected error has occurred. Please try again.");
+        }
+
+        return new ModelAndView("admin/disc-widget-maint", "maintenanceWidgetViewModel", maintenanceWidgetViewModel);
+    }
+
     @GetMapping("/admin/disc-locale.cgi")
     public ModelAndView getDiscLocaleView(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
@@ -89,6 +216,7 @@ public class DiscAppMaintenanceController {
 
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
+        model.addAttribute("redirect", redirect);
 
         try {
             Application app = applicationService.get(appId);
@@ -1310,5 +1438,28 @@ public class DiscAppMaintenanceController {
         }
         currentHtml += "</ul>";
         return currentHtml;
+    }
+
+    private String getWidgetHtml(Integer width, String widthUnit, Integer height, String heightUnit, long appId, String baseUrl) {
+        return "<div style=\"width:" + width + widthUnit + "; height:" + height + heightUnit + "; margin:4%; padding:1ex; \n" +
+                "    border:1px solid black; float:right;\">\n" +
+                "\n" +
+                " Here's your widget! Put your header here.\n" +
+                "\n" +
+                "<iframe src=\"" + baseUrl + "/widget/disc-widget.cgi?disc=" + appId + "\" \n" +
+                "        width=\"99%\" height=\"80%\" frameborder=\"no\" scrolling=\"no\">\n" +
+                "</iframe>\n" +
+                "\n" +
+                " Put your footer here.\n" +
+                "\n" +
+                "</div>\n";
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme() + "://";
+        String serverName = request.getServerName();
+        String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
+        String contextPath = request.getContextPath();
+        return scheme + serverName + serverPort + contextPath;
     }
 }

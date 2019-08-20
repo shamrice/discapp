@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${appName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link th:if="${widgetViewModel.getStyleSheetUrl()}" rel="stylesheet" type="text/css" th:href="${widgetViewModel.getStyleSheetUrl()}"/>
+    <link rel="shortcut icon" th:href="${widgetViewModel.getFaviconUrl()}" type="image/x-icon">
+    <link rel="icon" th:href="${widgetViewModel.getFaviconUrl()}" type="image/x-icon">
+</head>
+<body id="widget">
+<table id="widget_table">
+
+    <tr class="entry_row"
+        th:if="${not #lists.isEmpty(widgetViewModel.getThreadsHtml())}"
+        th:each="threadHtml : ${widgetViewModel.getThreadsHtml()}"
+        th:utext="${threadHtml}">
+    </tr>
+</table>
+
+</body>
+</html>
