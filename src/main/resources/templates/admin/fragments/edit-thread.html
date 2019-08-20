@@ -65,7 +65,7 @@
         </table>
         <div><b>Message</b></div>
         <div style="padding-bottom:1em; border-bottom:1px dashed gray;"
-             th:text="${maintenanceThreadViewModel.getEditArticleMessage()}">
+             th:utext="${maintenanceThreadViewModel.getEditArticleMessage()}">
         </div>
         <div th:utext="${maintenanceThreadViewModel.getEditArticleReplyThreadsHtml()}"></div>
         <!--ul>

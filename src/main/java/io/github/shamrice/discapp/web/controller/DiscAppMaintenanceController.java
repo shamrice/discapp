@@ -559,9 +559,6 @@ public class DiscAppMaintenanceController {
                         editThread.setModDt(new Date());
 
                         String body = maintenanceThreadViewModel.getEditArticleMessage();
-                        if (body != null && !body.isEmpty()) {
-                            body = body.replaceAll("\r", "<br />");
-                        }
 
                         if (threadService.saveThread(editThread, body)) {
                             maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
