@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import java.util.List;
 @Controller
 public class TestController {
 
+    //TODO : remove this eventually.
+
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @Autowired
@@ -30,33 +33,36 @@ public class TestController {
     @Autowired
     private ApplicationService applicationService;
 
-    @GetMapping("/test")
+    @Autowired
+    private InputHelper inputHelper;
+
+    @GetMapping("/test/test")
     public String test(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
         model.addAttribute("name", name);
 
         String ownersStr = "";
         for (Owner owner : accountService.listOwners()) {
-            ownersStr += "Id: " + owner.getId() + "\nName: " + owner.getFirstName() + " " + owner.getLastName()
-                    + "\nphone: " + owner.getPhone() + "\nemail: " + owner.getEmail() + "\nenabled: " + owner.getEnabled()
-                    + "\ncreate: " + owner.getCreateDt() + "\nmod: " + owner.getModDt() + "\n\n";
+            ownersStr += "Id: " + owner.getId() + "<br>Name: " + owner.getFirstName() + " " + owner.getLastName()
+                    + "<br>phone: " + owner.getPhone() + "<br>email: " + owner.getEmail() + "<br>enabled: " + owner.getEnabled()
+                    + "<br>create: " + owner.getCreateDt() + "<br>mod: " + owner.getModDt() + "<br /><br />";
         }
         model.addAttribute("owners", ownersStr);
 
         String appStr = "";
         for (Application app : applicationService.list()) {
-            appStr += "Id: " + app.getId() + " Name: " + app.getName()
-                    + " owner_id: " + app.getOwnerId()
-                    + " create: " + app.getCreateDt() + " mod: " + app.getModDt();
+            appStr += "Id: " + app.getId() + "<br> Name: " + app.getName()
+                    + "<br> owner_id: " + app.getOwnerId()
+                    + "<br> create: " + app.getCreateDt() + "<br> mod: " + app.getModDt() + "<br><br>";
         }
         model.addAttribute("apps", appStr);
 
         List<Configuration> configurationList = configurationService.list();
         String configStr = "";
         for (Configuration configuration : configurationList) {
-            configStr += "\nConfig Id: " + configuration.getId() + "\napplication id: " + configuration.getApplicationId()
-                    + "\nConfig Name: " + configuration.getName()
-                    + "\nConfig Value: " + configuration.getValue() + "\nCreate Dt: " + configuration.getCreateDt()
-                    + "\nMod Dt: " + configuration.getModDt() + "\n\n";
+            configStr += "Config Id: " + configuration.getId() + "<br>application id: " + configuration.getApplicationId()
+                    + "<br>Config Name: " + configuration.getName()
+                    + "<br>Config Value: " + inputHelper.sanitizeInput(configuration.getValue()) + "<br>Create Dt: " + configuration.getCreateDt()
+                    + "<br>Mod Dt: " + configuration.getModDt() + "<br><br>";
         }
 
         model.addAttribute("configs", configStr);

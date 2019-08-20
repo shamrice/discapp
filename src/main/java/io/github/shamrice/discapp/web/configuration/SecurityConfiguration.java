@@ -41,6 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/account/modify").authenticated()
                     .antMatchers("/account/modify/**").authenticated()
                     .antMatchers("/account/add/**").authenticated()
+                    .antMatchers("/test/test").authenticated()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()

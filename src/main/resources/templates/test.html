@@ -6,23 +6,22 @@
 </head>
 <body>
 
-    <p th:text="'Hello, ' + ${name} + '!'" />
-
     <h1>Test Debug Page</h1>
-    <br />
-    <br />
-    <h2>Configurations</h2>
-    <p th:text="${configs}"/>
-
-    <br />
-    <br />
-    <h2>Owners</h2>
-    <p th:text="${owners}"/>
 
     <br />
     <br />
     <h2>Applications</h2>
-    <p th:text="${apps}"/>
+    <p th:utext="${apps}"/>
+
+    <br />
+    <br />
+    <h2>Owners</h2>
+    <p th:utext="${owners}"/>
+
+    <br />
+    <br />
+    <h2>Configurations</h2>
+    <p th:utext="${configs}"/>
 
 </body>
 </html>
