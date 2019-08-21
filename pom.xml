@@ -6,7 +6,7 @@
 
     <groupId>io.github.shamrice.discapp</groupId>
     <artifactId>discapp-web</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <!--packaging>war</packaging-->
 
     <parent>
@@ -56,6 +56,13 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency-->
+
+        <!--dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+            <scope>provided</scope>
         </dependency-->
     </dependencies>
 
