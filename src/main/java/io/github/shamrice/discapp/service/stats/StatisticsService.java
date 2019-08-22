@@ -4,8 +4,7 @@ import io.github.shamrice.discapp.data.model.Stats;
 import io.github.shamrice.discapp.data.model.StatsUniqueIps;
 import io.github.shamrice.discapp.data.repository.StatsRepository;
 import io.github.shamrice.discapp.data.repository.StatsUniqueIpsRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +13,11 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@Slf4j
 public class StatisticsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(StatisticsService.class);
     private static final String STATS_DATE_FORMAT = "yyyy-MM-dd";
 
     @Autowired
@@ -35,7 +33,7 @@ public class StatisticsService {
         Stats currentDayStat = statsRepository.findOneByApplicationIdAndStatDate(applicationId, statDate);
 
         if (currentDayStat == null) {
-            logger.warn("Failed to find today's stats for appId: " + applicationId + ". creating new.");
+            log.info("Failed to find today's stats for appId: " + applicationId + ". creating new.");
             Stats newStat = new Stats();
             newStat.setApplicationId(applicationId);
             newStat.setCreateDt(new Date());
@@ -61,7 +59,7 @@ public class StatisticsService {
 
         //add new one if not found
         if (!ipFound) {
-            logger.info("Unique ip page view detected for today in appId: " + applicationId + " : adding to stats ip table.");
+            log.info("Unique ip page view detected for today in appId: " + applicationId + " : adding to stats ip table.");
             StatsUniqueIps newUniqueIp = new StatsUniqueIps();
             newUniqueIp.setIpAddress(sourceIpAddress);
             newUniqueIp.setStatsId(currentDayStat.getId());
@@ -78,7 +76,7 @@ public class StatisticsService {
         currentDayStat.setModDt(new Date());
 
         statsRepository.save(currentDayStat);
-        logger.info("Updated daily stats for appId: " + applicationId + " : currentPage Views = "
+        log.info("Updated daily stats for appId: " + applicationId + " : currentPage Views = "
                 + currentDayStat.getPageViews() + " :: uniqueIps = " + uniqueIpForToday);
     }
 

@@ -1,7 +1,6 @@
 package io.github.shamrice.discapp.web.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,9 +10,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
+@Slf4j
 public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ErrorController.class);
 
     private static final String STATUS_CODE_ATTRIBUTE_NAME = "javax.servlet.error.status_code";
     private static final String ERROR_EXCEPTION_ATTRIBUTE_NAME = "javax.servlet.error.exception";
@@ -34,11 +32,11 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
 
         if (statusCode.equals(HttpStatus.FORBIDDEN.value())) {
-            logger.info("Status code 403 " + errorText, exception);
+            log.info("Status code 403 " + errorText, exception);
             return new ModelAndView("redirect:/login?relogin=true&" + request.getQueryString());
         }
 
-        logger.error("Error: status code: " + statusCode + " : " + errorText + " :: attempted uri: "
+        log.error("Error: status code: " + statusCode + " : " + errorText + " :: attempted uri: "
                 + attemptedUri, exception);
 
         model.addAttribute("errorStatusCode", statusCode);

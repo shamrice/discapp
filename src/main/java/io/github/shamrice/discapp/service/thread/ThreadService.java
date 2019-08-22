@@ -6,8 +6,7 @@ import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.data.repository.ReportedAbuseRepository;
 import io.github.shamrice.discapp.data.repository.ThreadBodyRepository;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ThreadService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ThreadService.class);
 
     private static final String NO_MESSAGE_SUBJECT_ANNOTATION = " (nm)";
     private static final long TOP_LEVEL_THREAD_PARENT_ID = 0L;
@@ -36,7 +34,7 @@ public class ThreadService {
         Thread abuseThread = threadRepository.getOne(threadId);
 
         if (!abuseThread.getApplicationId().equals(applicationId)) {
-            logger.warn("Attempted to report thread id: " + threadId + " for abuse when application id is not from " + applicationId);
+            log.warn("Attempted to report thread id: " + threadId + " for abuse when application id is not from " + applicationId);
             return false;
         }
 
@@ -50,13 +48,13 @@ public class ThreadService {
 
         ReportedAbuse savedReport = reportedAbuseRepository.save(newAbuseReport);
         if (savedReport != null) {
-            logger.info("Saved new abuse report for application_id: " + applicationId
+            log.info("Saved new abuse report for application_id: " + applicationId
                     + " : thread_id: " + threadId + " :: Marking thread for deletion.");
 
             return deleteThread(applicationId, abuseThread.getId(), false);
 
         } else {
-            logger.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
+            log.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
         }
 
         return false;
@@ -71,7 +69,7 @@ public class ThreadService {
         Thread threadToDelete = threadRepository.getOne(threadId);
 
         if (!threadToDelete.getApplicationId().equals(applicationId)) {
-            logger.warn("Attempted to delete thread id: " + threadId + " which belongs to a different application id than " + applicationId);
+            log.warn("Attempted to delete thread id: " + threadId + " which belongs to a different application id than " + applicationId);
             return false;
         }
 
@@ -80,11 +78,11 @@ public class ThreadService {
         for (Thread subThread : subThreads) {
             if (deleteSubThreads) {
 
-                logger.info("Thread to deleted: " + threadToDelete.getId() + " : Deleting all sub threads recursively.");
+                log.info("Thread to deleted: " + threadToDelete.getId() + " : Deleting all sub threads recursively.");
                 deleteThread(applicationId, subThread.getId(), true);
             } else {
 
-                logger.info("Thread to deleted: " + threadToDelete.getId()
+                log.info("Thread to deleted: " + threadToDelete.getId()
                         + " : Setting parent id of sub threads to parent id= " + threadToDelete.getParentId()
                         + " of thread to delete.");
 
@@ -103,16 +101,16 @@ public class ThreadService {
 
             if (savedThread != null && savedThread.getId().equals(threadToDelete.getId())) {
 
-                logger.info("Successfully deleted thread id: " + threadToDelete.getId() + " for applicationId: " + applicationId);
+                log.info("Successfully deleted thread id: " + threadToDelete.getId() + " for applicationId: " + applicationId);
                 return true;
 
             } else {
-                logger.error("Failed to delete thread: " + threadToDelete + " for appid: " + applicationId
+                log.error("Failed to delete thread: " + threadToDelete + " for appid: " + applicationId
                         + " :: sub threads have been updated. Please retry this action.");
             }
 
         } else {
-            logger.error("Failed to update all sub threads of thread to delete: " + threadToDelete.getId()
+            log.error("Failed to update all sub threads of thread to delete: " + threadToDelete.getId()
                     + " :: not deleting thread. Check for errors and/or orphaned sub threads");
         }
 
@@ -151,15 +149,13 @@ public class ThreadService {
                 threadBodyRepository.save(threadBody);
             }
 
-
-
             if (createThread != null) {
-                logger.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
+                log.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
                 return true;
             }
 
         } else {
-            logger.error("Tried to create a null new thread.");
+            log.error("Tried to create a null new thread.");
         }
 
         return false;
@@ -321,13 +317,13 @@ public class ThreadService {
             return threadBody.getBody();
         }
 
-        logger.info("Unable to find thread body for thread id " + threadId + ". returning empty string.");
+        log.info("Unable to find thread body for thread id " + threadId + ". returning empty string.");
         return "";
     }
 
     public ThreadTreeNode getFullThreadTree(Long topLevelThreadId) {
 
-        logger.info("Building full thread tree for top level thread id: " + topLevelThreadId);
+        log.debug("Building full thread tree for top level thread id: " + topLevelThreadId);
 
         ThreadTreeNode topThreadNode = null;
         Optional<Thread> topLevelThread = threadRepository.findById(topLevelThreadId);
@@ -343,7 +339,7 @@ public class ThreadService {
 
             buildThreadTree(topThreadNode, nextThreads);
 
-            logger.info("Found top level thread id of: " + topLevelThread.get().getId() + " : subject: "
+            log.debug("Found top level thread id of: " + topLevelThread.get().getId() + " : subject: "
                     + topLevelThread.get().getSubject());
         }
 
@@ -353,7 +349,7 @@ public class ThreadService {
 
     private void buildThreadTree(ThreadTreeNode currentNode, List<Thread> nextSubThreads) {
 
-        logger.debug("buildThreads : start: " + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
+        log.debug("buildThreads : start: " + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
 
         for (Thread thread : nextSubThreads) {
             currentNode.addSubThread(new ThreadTreeNode(thread));
@@ -369,7 +365,7 @@ public class ThreadService {
             buildThreadTree(subThread, nextThreads);
         }
 
-        logger.debug("buildThreads : end" + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
+        log.debug("buildThreads : end" + currentNode.getCurrent().getId() + " :: " + currentNode.getCurrent().getSubject());
     }
 
 }

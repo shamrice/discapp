@@ -2,8 +2,8 @@ package io.github.shamrice.discapp.service.configuration.cache;
 
 import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -11,9 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Slf4j
 public class ConfigurationCache {
-
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationCache.class);
 
     private Map<Long, Map<ConfigurationProperty, Configuration>> configurationCacheMap = new ConcurrentHashMap<>();
     private Map<Long, Date> configIdLastRefreshDateList = new ConcurrentHashMap<>();
@@ -26,7 +25,7 @@ public class ConfigurationCache {
 
     public Configuration getFromCache(Long applicationId, ConfigurationProperty configurationProperty) {
 
-        logger.info("Attempting to retreive configuration value from cache. appId: " + applicationId
+        log.debug("Attempting to retrieve configuration value from cache. appId: " + applicationId
                 + " : configProperty: " + configurationProperty.getPropName());
 
         Map<ConfigurationProperty, Configuration> appConfigs = configurationCacheMap.get(applicationId);
@@ -38,31 +37,32 @@ public class ConfigurationCache {
                 //make sure value in config cache isn't stale.
                 Date lastRefresh = configIdLastRefreshDateList.get(config.getId());
                 if (lastRefresh != null) {
-                    logger.info("newDate.getTime():       " + new Date().getTime());
-                    logger.info("lastRefresh.getTime():   " + lastRefresh.getTime());
-                    logger.info("maxCacheAgeMilliseconds: " + maxCacheAgeMilliseconds);
+                    log.debug("newDate.getTime():       " + new Date().getTime());
+                    log.debug("lastRefresh.getTime():   " + lastRefresh.getTime());
+                    log.debug("maxCacheAgeMilliseconds: " + maxCacheAgeMilliseconds);
                 }
                 if (lastRefresh != null && (new Date().getTime() - lastRefresh.getTime() > maxCacheAgeMilliseconds)) {
 
-                    logger.info("Config property: " + config.getName() + " for appId: " + applicationId
-                            + " is stale in config and needs to be refreshed. Returning null.");
+                    log.info("Config property: " + config.getName() + " for appId: " + applicationId
+                            + " is stale in cache and needs to be refreshed. Returning null.");
                     return null;
                 }
 
-                logger.info("Found configuration for appId: " + applicationId + " : prop: " + config.getName()
+                log.info("Found cached configuration for appId: " + applicationId + " : prop: " + config.getName()
                         + " = " + config.getValue());
                 return config;
             }
         }
 
-        logger.info("Configuration does not currently exist in the cache. appId: " + applicationId
+        log.info("Configuration does not currently exist in the cache. appId: " + applicationId
                 + " : configProperty: " + configurationProperty.getPropName());
         return null;
     }
 
+    @Synchronized
     public void updateCache(Long applicationId, ConfigurationProperty configurationProperty, Configuration configuration) {
         if (applicationId != null && applicationId > 0 && configuration != null) {
-            logger.info("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
+            log.info("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
                     + configuration.getName() + " = " + configuration.getValue());
 
             Map<ConfigurationProperty, Configuration> configs = configurationCacheMap.get(applicationId);

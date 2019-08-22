@@ -5,19 +5,16 @@ import io.github.shamrice.discapp.data.repository.*;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@Slf4j
 public class ApplicationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 
     @Autowired
     private ApplicationRepository applicationRepository;
@@ -53,11 +50,11 @@ public class ApplicationService {
             application.setModDt(new Date());
             savedApplication = applicationRepository.save(application);
 
-            logger.info("Saved application id: " + savedApplication.getId() + " : owner id: "
+            log.info("Saved application id: " + savedApplication.getId() + " : owner id: "
                     + savedApplication.getOwnerId() + " : name: " + savedApplication.getName());
 
         } else {
-            logger.error("Cannot save null application. Returning null.");
+            log.error("Cannot save null application. Returning null.");
             return null;
         }
 
@@ -68,7 +65,7 @@ public class ApplicationService {
             prologue.setModDt(new Date());
             prologue.setApplicationId(savedApplication.getId());
             Prologue savedPrologue = prologueRepository.save(prologue);
-            logger.info("Saved prologue id: " + savedPrologue.getId() + " for applicationId: " + savedPrologue.getApplicationId()
+            log.info("Saved prologue id: " + savedPrologue.getId() + " for applicationId: " + savedPrologue.getApplicationId()
                     + " : text:" + savedPrologue.getText());
 
             prologueCache.updateCache(prologue.getApplicationId(), prologue);
@@ -81,7 +78,7 @@ public class ApplicationService {
             epilogue.setModDt(new Date());
             epilogue.setApplicationId(savedApplication.getId());
             Epilogue savedEpilogue = epilogueRepository.save(epilogue);
-            logger.info("Saved epilogue id: " + savedEpilogue.getId() + " for applicationId: " + savedEpilogue.getApplicationId()
+            log.info("Saved epilogue id: " + savedEpilogue.getId() + " for applicationId: " + savedEpilogue.getApplicationId()
                     + " : text:" + savedEpilogue.getText());
 
             epilogueCache.updateCache(epilogue.getApplicationId(), epilogue);
@@ -94,17 +91,17 @@ public class ApplicationService {
 
         Prologue cachedPrologue = prologueCache.getFromCache(applicationId);
         if (cachedPrologue != null && cachedPrologue.getText() != null) {
-            logger.info("Found prologue text in cache for application id: " + applicationId);
+            log.info("Found prologue text in cache for application id: " + applicationId);
             return cachedPrologue.getText();
         }
 
         Prologue prologue = prologueRepository.findOneByApplicationId(applicationId);
         if (prologue != null) {
-            logger.info("Found prologue text in database for application id: " + applicationId);
+            log.info("Found prologue text in database for application id: " + applicationId);
             prologueCache.updateCache(applicationId, prologue);
             return prologue.getText();
         }
-        logger.info("No prologue set yet for account id " + applicationId + ". Returning empty string.");
+        log.info("No prologue set yet for account id " + applicationId + ". Returning empty string.");
         return "";
     }
 
@@ -112,17 +109,17 @@ public class ApplicationService {
 
         Epilogue cachedEpilogue = epilogueCache.getFromCache(applicationId);
         if (cachedEpilogue != null && cachedEpilogue.getText() != null) {
-            logger.info("Found epilogue text in cache for application id: " + applicationId);
+            log.info("Found epilogue text in cache for application id: " + applicationId);
             return cachedEpilogue.getText();
         }
 
         Epilogue epilogue = epilogueRepository.findOneByApplicationId(applicationId);
         if (epilogue != null) {
-            logger.info("Found epilogue text in database for application id: " + applicationId);
+            log.info("Found epilogue text in database for application id: " + applicationId);
             epilogueCache.updateCache(applicationId, epilogue);
             return epilogue.getText();
         }
-        logger.info("No epilogue set yet for account id " + applicationId + ". Returning empty string.");
+        log.info("No epilogue set yet for account id " + applicationId + ". Returning empty string.");
         return "";
     }
 
@@ -143,16 +140,16 @@ public class ApplicationService {
                 List<Application> ownedApps = applicationRepository.findByOwnerId(owner.getId());
                 for (Application application : ownedApps) {
                     if (application.getId() != null && application.getId() == appId) {
-                        logger.info("User: " + email + " is owner of appId: " + appId + " :: returning true.");
+                        log.info("User: " + email + " is owner of appId: " + appId + " :: returning true.");
                         return true;
                     }
                 }
             }
         } else {
-            logger.info("User: " + email     + " is not an owner of any applications. Returning false.");
+            log.info("User: " + email     + " is not an owner of any applications. Returning false.");
         }
 
-        logger.info("User: " + email + " does not own application id: " + appId + " :: returning false.");
+        log.info("User: " + email + " does not own application id: " + appId + " :: returning false.");
         return false;
 
     }
@@ -166,18 +163,18 @@ public class ApplicationService {
         if (useCache) {
             Prologue cachedPrologue = prologueCache.getFromCache(applicationId);
             if (cachedPrologue != null && cachedPrologue.getText() != null) {
-                logger.info("Found prologue in cache for application id: " + applicationId);
+                log.info("Found prologue in cache for application id: " + applicationId);
                 return cachedPrologue;
             }
         }
 
         Prologue prologue = prologueRepository.findOneByApplicationId(applicationId);
         if (prologue != null) {
-            logger.info("Found prologue  in database for application id: " + applicationId);
+            log.info("Found prologue  in database for application id: " + applicationId);
             prologueCache.updateCache(applicationId, prologue);
             return prologue;
         }
-        logger.info("No prologue set yet for account id " + applicationId + ". Returning null.");
+        log.info("No prologue set yet for account id " + applicationId + ". Returning null.");
         return null;
     }
 
@@ -186,18 +183,18 @@ public class ApplicationService {
         if (useCache) {
             Epilogue cachedEpilogue = epilogueCache.getFromCache(applicationId);
             if (cachedEpilogue != null && cachedEpilogue.getText() != null) {
-                logger.info("Found epilogue in cache for application id: " + applicationId);
+                log.info("Found epilogue in cache for application id: " + applicationId);
                 return cachedEpilogue;
             }
         }
 
         Epilogue epilogue = epilogueRepository.findOneByApplicationId(applicationId);
         if (epilogue != null) {
-            logger.info("Found epilogue  in database for application id: " + applicationId);
+            log.info("Found epilogue  in database for application id: " + applicationId);
             epilogueCache.updateCache(applicationId, epilogue);
             return epilogue;
         }
-        logger.info("No epilogue set yet for account id " + applicationId + ". Returning null.");
+        log.info("No epilogue set yet for account id " + applicationId + ". Returning null.");
         return null;
     }
 
@@ -216,7 +213,7 @@ public class ApplicationService {
 
             savedPrologue = prologueRepository.save(prologue);
             if (savedPrologue != null) {
-                logger.info("Saved epilogue for appId: " + prologue.getApplicationId());
+                log.info("Saved epilogue for appId: " + prologue.getApplicationId());
                 prologueCache.updateCache(prologue.getApplicationId(), prologue);
             }
         }
@@ -238,7 +235,7 @@ public class ApplicationService {
 
             savedEpilogue = epilogueRepository.save(epilogue);
             if (savedEpilogue != null) {
-                logger.info("Saved epilogue for appId: " + epilogue.getApplicationId());
+                log.info("Saved epilogue for appId: " + epilogue.getApplicationId());
                 epilogueCache.updateCache(epilogue.getApplicationId(), epilogue);
             }
         }

@@ -1,7 +1,14 @@
 package io.github.shamrice.discapp.web.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class MaintenanceLocaleViewModel {
 
     private long applicationId;
@@ -17,51 +24,4 @@ public class MaintenanceLocaleViewModel {
         return this.selectedTimezone.equalsIgnoreCase(timezone);
     }
 
-    public long getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(long applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public String getInfoMessage() {
-        return infoMessage;
-    }
-
-    public void setInfoMessage(String infoMessage) {
-        this.infoMessage = infoMessage;
-    }
-
-    public List<String> getTimezones() {
-        return timezones;
-    }
-
-    public void setTimezones(List<String> timezones) {
-        this.timezones = timezones;
-    }
-
-    public String getSelectedTimezone() {
-        return selectedTimezone;
-    }
-
-    public void setSelectedTimezone(String selectedTimezone) {
-        this.selectedTimezone = selectedTimezone;
-    }
-
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
-    public String getRedirect() {
-        return redirect;
-    }
-
-    public void setRedirect(String redirect) {
-        this.redirect = redirect;
-    }
 }

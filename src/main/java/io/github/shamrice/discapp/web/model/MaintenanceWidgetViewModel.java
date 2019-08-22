@@ -1,5 +1,12 @@
 package io.github.shamrice.discapp.web.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@Getter
+@Setter
 public class MaintenanceWidgetViewModel {
 
     private long applicationId;
@@ -26,93 +33,5 @@ public class MaintenanceWidgetViewModel {
             return false;
         }
         return unit.equalsIgnoreCase(this.widgetWidthUnit);
-    }
-
-    public long getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(long applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public String getInfoMessage() {
-        return infoMessage;
-    }
-
-    public void setInfoMessage(String infoMessage) {
-        this.infoMessage = infoMessage;
-    }
-
-    public String getWidgetWidthUnit() {
-        return widgetWidthUnit;
-    }
-
-    public void setWidgetWidthUnit(String widgetWidthUnit) {
-        this.widgetWidthUnit = widgetWidthUnit;
-    }
-
-    public String getWidgetHeightUnit() {
-        return widgetHeightUnit;
-    }
-
-    public void setWidgetHeightUnit(String widgetHeightUnit) {
-        this.widgetHeightUnit = widgetHeightUnit;
-    }
-
-    public String getWidgetWidth() {
-        return widgetWidth;
-    }
-
-    public void setWidgetWidth(String widgetWidth) {
-        this.widgetWidth = widgetWidth;
-    }
-
-    public String getWidgetHeight() {
-        return widgetHeight;
-    }
-
-    public void setWidgetHeight(String widgetHeight) {
-        this.widgetHeight = widgetHeight;
-    }
-
-    public boolean isShowAuthor() {
-        return showAuthor;
-    }
-
-    public void setShowAuthor(boolean showAuthor) {
-        this.showAuthor = showAuthor;
-    }
-
-    public boolean isShowDate() {
-        return showDate;
-    }
-
-    public void setShowDate(boolean showDate) {
-        this.showDate = showDate;
-    }
-
-    public boolean isShowStyleSheet() {
-        return showStyleSheet;
-    }
-
-    public void setShowStyleSheet(boolean showStyleSheet) {
-        this.showStyleSheet = showStyleSheet;
-    }
-
-    public String getSubmitChanges() {
-        return submitChanges;
-    }
-
-    public void setSubmitChanges(String submitChanges) {
-        this.submitChanges = submitChanges;
-    }
-
-    public String getCodeHtml() {
-        return codeHtml;
-    }
-
-    public void setCodeHtml(String codeHtml) {
-        this.codeHtml = codeHtml;
     }
 }

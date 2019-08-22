@@ -1,15 +1,16 @@
 package io.github.shamrice.discapp.service.application.cache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
+@Slf4j
 public class ApplicationCache<T> {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationCache.class);
 
     private Map<Long, T> cacheMap = new ConcurrentHashMap<>();
     private Map<Long, Date> refreshDateList = new ConcurrentHashMap<>();
@@ -22,7 +23,7 @@ public class ApplicationCache<T> {
 
     public T getFromCache(Long applicationId) {
 
-        logger.info("Attempting to retrieve from cache. appId: " + applicationId);
+        log.debug("Attempting to retrieve from application cache. appId: " + applicationId);
 
         T cachedPrologue = cacheMap.get(applicationId);
         if (cachedPrologue != null) {
@@ -30,29 +31,30 @@ public class ApplicationCache<T> {
             //make sure value in config cache isn't stale.
             Date lastRefresh = refreshDateList.get(applicationId);
             if (lastRefresh != null) {
-                logger.info("newDate.getTime():       " + new Date().getTime());
-                logger.info("lastRefresh.getTime():   " + lastRefresh.getTime());
-                logger.info("maxCacheAgeMilliseconds: " + maxCacheAgeMilliseconds);
+                log.debug("newDate.getTime():       " + new Date().getTime());
+                log.debug("lastRefresh.getTime():   " + lastRefresh.getTime());
+                log.debug("maxCacheAgeMilliseconds: " + maxCacheAgeMilliseconds);
             }
             if (lastRefresh != null && (new Date().getTime() - lastRefresh.getTime() > maxCacheAgeMilliseconds)) {
 
-                logger.info("cache entry for appId: " + applicationId
+                log.info("application cache entry for appId: " + applicationId
                         + " is stale in cache and needs to be refreshed. Returning null.");
                 return null;
             }
 
-            logger.info("Found cached value for appId: " + applicationId);
+            log.debug("Found application cached value for appId: " + applicationId);
             return cachedPrologue;
         }
 
-        logger.info("Entry does not currently exist in the cache. appId: " + applicationId);
+        log.debug("Entry does not currently exist in the application cache. appId: " + applicationId);
         return null;
     }
 
+    @Synchronized
     public void updateCache(Long applicationId, T entry) {
 
         if (applicationId != null && applicationId > 0 && entry != null) {
-            logger.info("Updating cache with updated value for appId: " + applicationId);
+            log.info("Updating application cache with updated value for appId: " + applicationId);
 
             cacheMap.put(applicationId, entry);
             refreshDateList.put(applicationId, new Date());

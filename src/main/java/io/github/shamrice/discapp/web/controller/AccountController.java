@@ -10,8 +10,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,9 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
+@Slf4j
 public class AccountController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
@@ -61,7 +59,7 @@ public class AccountController {
     public ModelAndView postCreateAccount(@ModelAttribute AccountViewModel accountViewModel, ModelMap modelMap) {
 
         if (accountViewModel != null) {
-            logger.info("Attempting to create new account with username: " + accountViewModel.getUsername());
+            log.info("Attempting to create new account with username: " + accountViewModel.getUsername());
 
 
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
@@ -82,7 +80,7 @@ public class AccountController {
             DiscAppUser newUser = new DiscAppUser();
             newUser.setUsername(username);
             newUser.setPassword(password);
-            newUser.setAdmin(accountViewModel.isAdmin());
+            newUser.setIsAdmin(accountViewModel.isAdmin());
             newUser.setEmail(accountViewModel.getEmail());
             newUser.setShowEmail(accountViewModel.isShowEmail());
             newUser.setEnabled(accountViewModel.isEnabled());
@@ -91,10 +89,10 @@ public class AccountController {
             newUser.setCreateDt(new Date());
 
             if (discAppUserDetailsService.saveDiscAppUser(newUser)) {
-                logger.info("Successfully created new user: " + newUser.getUsername() + " : email: " + newUser.getEmail());
+                log.info("Successfully created new user: " + newUser.getUsername() + " : email: " + newUser.getEmail());
                 return new ModelAndView("account/createAccountSuccess");
             } else {
-                logger.error("Failed to create new user: " + newUser.getUsername() + " : email: " + newUser.getEmail());
+                log.error("Failed to create new user: " + newUser.getUsername() + " : email: " + newUser.getEmail());
                 accountViewModel.setErrorMessage("Failed to create new account for user: " + accountViewModel.getEmail());
             }
         }
@@ -135,12 +133,11 @@ public class AccountController {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
 
             accountViewModel.setUsername(user.getUsername());
-            accountViewModel.setAdmin(user.getAdmin());
+            accountViewModel.setAdmin(user.getIsAdmin());
             accountViewModel.setCreateDt(user.getCreateDt());
             accountViewModel.setModDt(user.getModDt());
             accountViewModel.setEmail(user.getEmail());
             accountViewModel.setEnabled(user.getEnabled());
-            accountViewModel.setAdmin(user.getAdmin());
             accountViewModel.setShowEmail(user.getShowEmail());
 
             if (user.getOwnerId() != null && user.getOwnerId() > 0) {
@@ -199,16 +196,16 @@ public class AccountController {
                     user.setPassword(password);
 
                     if (!discAppUserDetailsService.saveDiscAppUser(user)) {
-                        logger.error("Failed to update user : " + email + ". Changes will not be saved.");
+                        log.error("Failed to update user : " + email + ". Changes will not be saved.");
                         accountViewModel.setErrorMessage("Failed to update user.");
                     } else {
                         accountViewModel.setErrorMessage("Successfully updated user information.");
-                        logger.info("User " + email + " account information was updated.");
+                        log.info("User " + email + " account information was updated.");
 
                     }
                 }
             } else {
-                logger.error("Passwords do not match. Cannot update account information.");
+                log.error("Passwords do not match. Cannot update account information.");
                 accountViewModel.setErrorMessage("Passwords don't match. Cannot update account information.");
             }
         }
@@ -246,10 +243,10 @@ public class AccountController {
                                 app.setModDt(new Date());
 
                                 if (applicationService.save(app) != null) {
-                                    logger.info("Application id: " + app.getId() + " has been updated.");
+                                    log.info("Application id: " + app.getId() + " has been updated.");
                                     accountViewModel.setErrorMessage("Application name has been updated.");
                                 } else {
-                                    logger.error("Unable to save application changes for appId:" + app.getId());
+                                    log.error("Unable to save application changes for appId:" + app.getId());
                                     accountViewModel.setErrorMessage("Failed to update application name.");
                                 }
                             }
@@ -257,11 +254,11 @@ public class AccountController {
                     }
                 }
             } else {
-                logger.error("Application name entered to be changed is either null or empty");
+                log.error("Application name entered to be changed is either null or empty");
                 accountViewModel.setErrorMessage("Cannot update application name. Name cannot be null or empty.");
             }
         } else {
-            logger.error("Account view model is null. Nothing to update.");
+            log.error("Account view model is null. Nothing to update.");
         }
 
 
@@ -299,14 +296,14 @@ public class AccountController {
                         owner.setModDt(new Date());
 
                         if (accountService.saveOwner(owner) != null) {
-                            logger.info("Owner id " + owner.getId() + " has been updated.");
+                            log.info("Owner id " + owner.getId() + " has been updated.");
                             accountViewModel.setErrorMessage("Owner information has been updated.");
                         } else {
-                            logger.error("Error saving owner information for ownerId: " + owner.getId());
+                            log.error("Error saving owner information for ownerId: " + owner.getId());
                             accountViewModel.setErrorMessage("Unable to save updated owner information.");
                         }
                     } else {
-                        logger.error("Unable to find owner for id: " + accountViewModel.getOwnerId() + " to update.");
+                        log.error("Unable to find owner for id: " + accountViewModel.getOwnerId() + " to update.");
                         accountViewModel.setErrorMessage("Unable to find owner to update.");
                     }
                 }
@@ -369,28 +366,28 @@ public class AccountController {
                             if (savedApp != null) {
                                 user.setOwnerId(newOwner.getId());
                                 user.setPassword(password);
-                                user.setAdmin(true);
+                                user.setIsAdmin(true);
                                 discAppUserDetailsService.saveDiscAppUser(user);
 
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
                                 accountViewModel.setRedirect("/account/modify");
 
-                                logger.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
+                                log.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
                                 accountViewModel.setErrorMessage("Successfully created new owner and application for user.");
 
                             } else {
-                                logger.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + newOwner.getId());
+                                log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + newOwner.getId());
                                 accountViewModel.setErrorMessage("Failed to create new app.");
                             }
                         } else {
-                            logger.error("Failed to create new owner for email: " + newOwner.getEmail());
+                            log.error("Failed to create new owner for email: " + newOwner.getEmail());
                             accountViewModel.setErrorMessage("Failed to create new owner for new app.");
                         }
                     }
                 }
             } else {
-                logger.error("Cannot create a new account. passwords do not match");
+                log.error("Cannot create a new account. passwords do not match");
                 accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
             }
         }

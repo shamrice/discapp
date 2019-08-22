@@ -3,8 +3,7 @@ package io.github.shamrice.discapp.service.account;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,9 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class DiscAppUserDetailsService implements UserDetailsService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DiscAppUserDetailsService.class);
 
     @Autowired
     private DiscAppUserRepository discappUserRepository;
@@ -70,12 +68,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
-                    logger.info("Saved disc app user: " + createdUser.getEmail() + " : username: "
+                    log.info("Saved disc app user: " + createdUser.getEmail() + " : username: "
                             + createdUser.getUsername());
                     return true;
                 }
             } catch (Exception ex) {
-                logger.error("Failed to save disc app user: " + user.getEmail() + " :: " + ex.getMessage(), ex);
+                log.error("Failed to save disc app user: " + user.getEmail() + " :: " + ex.getMessage(), ex);
             }
         }
 

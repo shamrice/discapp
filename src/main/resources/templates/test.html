@@ -21,7 +21,13 @@
     <br />
     <br />
     <h2>Configurations</h2>
-    <p th:utext="${configs}"/>
+    <div th:each="config : ${configs}">
+        <p th:text="${config}"></p>
+        <br />
+        <hr>
+        <br />
+        <br/>
+    </div>
 
 </body>
 </html>

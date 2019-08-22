@@ -1,9 +1,16 @@
 package io.github.shamrice.discapp.data.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Stats {
 
     @Id
@@ -17,60 +24,4 @@ public class Stats {
     private Date createDt;
     private Date modDt;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(Long applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public String getStatDate() {
-        return statDate;
-    }
-
-    public void setStatDate(String statDate) {
-        this.statDate = statDate;
-    }
-
-    public Long getUniqueIps() {
-        return uniqueIps;
-    }
-
-    public void setUniqueIps(Long uniqueIps) {
-        this.uniqueIps = uniqueIps;
-    }
-
-    public Long getPageViews() {
-        return pageViews;
-    }
-
-    public void setPageViews(Long pageViews) {
-        this.pageViews = pageViews;
-    }
-
-    public Date getCreateDt() {
-        return createDt;
-    }
-
-    public void setCreateDt(Date createDt) {
-        this.createDt = createDt;
-    }
-
-    public Date getModDt() {
-        return modDt;
-    }
-
-    public void setModDt(Date modDt) {
-        this.modDt = modDt;
-    }
 }

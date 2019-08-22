@@ -3,17 +3,15 @@ package io.github.shamrice.discapp.service.configuration;
 import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@Slf4j
 public class ConfigurationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
 
     @Autowired
     private ConfigurationRepository configurationRepository;
@@ -26,7 +24,7 @@ public class ConfigurationService {
 
     public void setDefaultConfigurationValuesForApplication(Long applicationId) {
 
-        logger.info("Setting up default configuration values for appId: " + applicationId + " in database.");
+        log.info("Setting up default configuration values for appId: " + applicationId + " in database.");
 
         //todo: pull these default values from properties file
         Map<ConfigurationProperty, String> configsToSet = new HashMap<>();
@@ -71,7 +69,7 @@ public class ConfigurationService {
             newConfig.setModDt(new Date());
 
             configurationRepository.save(newConfig);
-            logger.info("Added new default configuration : " + newConfig.getName() + " = " + newConfig.getValue()
+            log.info("Added new default configuration : " + newConfig.getName() + " = " + newConfig.getValue()
                     + " for appId: " + applicationId);
         }
     }
@@ -91,14 +89,14 @@ public class ConfigurationService {
         );
 
         if (configuration != null) {
-            logger.info("Found configuration property: " + configurationProperty.getPropName()
+            log.info("Found configuration property: " + configurationProperty.getPropName()
                     + " for appid: " + applicationId + ". Returnning value of: " + configuration.getValue());
 
             configurationCache.updateCache(applicationId, configurationProperty, configuration);
             return configuration.getValue();
         }
 
-        logger.info("Unable to find configuration property: " + configurationProperty.getPropName()
+        log.info("Unable to find configuration property: " + configurationProperty.getPropName()
                 + " for appid: " + applicationId + ". Returning default value of: " + defaultValue);
         return defaultValue;
     }
@@ -110,12 +108,12 @@ public class ConfigurationService {
             try {
                 return Boolean.parseBoolean(foundStrVal);
             } catch (NumberFormatException ex) {
-                logger.error("Unable to parse found config value for " + configurationProperty.getPropName()
+                log.error("Unable to parse found config value for " + configurationProperty.getPropName()
                         + " : value: " + foundStrVal + " + for appId: " + applicationId, ex);
             }
         }
 
-        logger.info("Failed to find configuration value. Returning default value of: " + defaultValue
+        log.info("Failed to find configuration value. Returning default value of: " + defaultValue
                 + " : for appId: " + applicationId);
         return defaultValue;
     }
@@ -127,12 +125,12 @@ public class ConfigurationService {
             try {
                 return Integer.parseInt(foundStrVal);
             } catch (NumberFormatException ex) {
-                logger.error("Unable to parse found config value for " + configurationProperty.getPropName()
+                log.error("Unable to parse found config value for " + configurationProperty.getPropName()
                         + " : value: " + foundStrVal + " + for appId: " + applicationId, ex);
             }
         }
 
-        logger.info("Failed to find configuration value. Returning default value of: " + defaultValue
+        log.info("Failed to find configuration value. Returning default value of: " + defaultValue
                 + " : for appId: " + applicationId);
         return defaultValue;
     }
@@ -140,7 +138,7 @@ public class ConfigurationService {
     public boolean saveConfiguration(ConfigurationProperty configurationProperty, Configuration configuration) {
         if (configuration != null) {
             if (configuration.getName().equalsIgnoreCase(configurationProperty.getPropName())) {
-                logger.info("Saving valid configuration " + configurationProperty.getPropName() + " : "
+                log.info("Saving valid configuration " + configurationProperty.getPropName() + " : "
                         + configuration.getValue() + " for appId: " + configuration.getApplicationId());
                 //always update mod date
                 configuration.setModDt(new Date());
@@ -154,18 +152,18 @@ public class ConfigurationService {
                     configurationCache.updateCache(savedConfig.getApplicationId(), configurationProperty, savedConfig);
                     return true;
                 } else {
-                    logger.error("Failed to save configuration. Value returned was null from save.");
+                    log.error("Failed to save configuration. Value returned was null from save.");
                     return false;
                 }
 
             } else {
-                logger.error("Configuration property: " + configurationProperty.getPropName()
+                log.error("Configuration property: " + configurationProperty.getPropName()
                         + " does not match property name set in configuration to save: " + configuration.getName()
                         + " for appId: " + configuration.getApplicationId());
                 return false;
             }
         }
-        logger.error("Cannot save null configuration value.");
+        log.error("Cannot save null configuration value.");
         return false;
     }
 

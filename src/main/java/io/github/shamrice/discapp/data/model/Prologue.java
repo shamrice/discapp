@@ -1,11 +1,16 @@
 package io.github.shamrice.discapp.data.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
+@Getter @Setter @NoArgsConstructor
 public class Prologue {
 
     @Id
@@ -16,48 +21,4 @@ public class Prologue {
     private String text;
     private Date createDt;
     private Date modDt;
-
-    public Prologue() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(Long applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Date getCreateDt() {
-        return createDt;
-    }
-
-    public void setCreateDt(Date createDt) {
-        this.createDt = createDt;
-    }
-
-    public Date getModDt() {
-        return modDt;
-    }
-
-    public void setModDt(Date modDt) {
-        this.modDt = modDt;
-    }
 }

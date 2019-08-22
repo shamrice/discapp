@@ -5,8 +5,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.WidgetViewModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +21,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 @Controller
+@Slf4j
 public class WidgetController {
-
-    private static final Logger logger = LoggerFactory.getLogger(WidgetController.class);
 
     @Autowired
     private ConfigurationService configurationService;

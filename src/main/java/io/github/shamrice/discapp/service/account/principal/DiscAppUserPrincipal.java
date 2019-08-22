@@ -22,7 +22,7 @@ public class DiscAppUserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
-        if (user.getAdmin()) {
+        if (user.getIsAdmin()) {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + "ADMIN"));
         }
 
@@ -64,7 +64,7 @@ public class DiscAppUserPrincipal implements UserDetails {
     }
 
     public Boolean isAdmin() {
-        return user.getAdmin();
+        return user.getIsAdmin();
     }
 
     public String getEmail() {

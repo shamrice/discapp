@@ -14,8 +14,7 @@ import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,13 +27,10 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
+@Slf4j
 public class DiscAppController {
-
-    private static final Logger logger = LoggerFactory.getLogger(DiscAppController.class);
 
     @Autowired
     private ApplicationService applicationService;
@@ -119,11 +115,11 @@ public class DiscAppController {
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");
-                logger.info("Disc app with application id of " + appId + " does not exist. Returning null.");
+                log.info("Disc app with application id of " + appId + " does not exist. Returning null.");
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
-            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
+            log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
         return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
@@ -131,7 +127,7 @@ public class DiscAppController {
 
     @GetMapping("/createThread")
     public ModelAndView getCreateNewThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
-        logger.debug("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
+        log.debug("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
@@ -152,7 +148,7 @@ public class DiscAppController {
                 model.addAttribute("parentThreadSubject", threadViewModel.getSubject());
                 model.addAttribute("parentThreadBody", threadViewModel.getBody());
             } catch (NumberFormatException ex) {
-                logger.error("Unable to parse parent id from view thread model. appId: " + appId
+                log.error("Unable to parse parent id from view thread model. appId: " + appId
                         + " : attempted parentId: " + threadViewModel.getId());
             }
         }
@@ -173,7 +169,7 @@ public class DiscAppController {
                     parentId = Long.parseLong(newThreadViewModel.getParentId());
                 } catch (NumberFormatException ex) {
                     parentId = 0L;
-                    logger.error("Unable to parse parent id from returned new thread model from preview page. appId: " + appId
+                    log.error("Unable to parse parent id from returned new thread model from preview page. appId: " + appId
                             + " : attempted parentId: " + newThreadViewModel.getParentId());
                 }
             }
@@ -247,7 +243,7 @@ public class DiscAppController {
         if (newThreadViewModel != null) {
 
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
-                logger.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
+                log.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
 
                 return new ModelAndView("redirect:/indices/" + appId);
 
@@ -259,7 +255,7 @@ public class DiscAppController {
                     && newThreadViewModel.getSubmitter() != null && !newThreadViewModel.getSubmitter().isEmpty()
                     && newThreadViewModel.getSubject() != null && !newThreadViewModel.getSubject().isEmpty()) {
 
-                logger.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
+                log.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
                         + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
 
                 String subject = inputHelper.sanitizeInput(newThreadViewModel.getSubject());
@@ -313,7 +309,7 @@ public class DiscAppController {
                 threadService.saveThread(newThread, body);
             }
         }
-        logger.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
+        log.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
@@ -323,11 +319,11 @@ public class DiscAppController {
                                 Model model) {
 
         if (threadId == null || threadId < 1) {
-            logger.error("Null or invalid article id passed to view thread. Returning to app view for appId: " + appId);
+            log.error("Null or invalid article id passed to view thread. Returning to app view for appId: " + appId);
             return "redirect:/indices/" + appId;
         }
 
-        logger.info("Getting thread id " + threadId + " for app id: " + appId);
+        log.info("Getting thread id " + threadId + " for app id: " + appId);
 
         Thread currentThread = threadService.getThread(threadId);
         if (currentThread != null) {
@@ -346,7 +342,7 @@ public class DiscAppController {
             threadViewModel.setSubmitter(currentThread.getSubmitter());
             if (currentThread.getEmail() != null && !currentThread.getEmail().isEmpty()) {
                 threadViewModel.setEmail(currentThread.getEmail());
-                threadViewModel.setShowEmail(currentThread.getShowEmail());
+                threadViewModel.setShowEmail(currentThread.isShowEmail());
             } else {
                 //don't attempt to show a null or empty email regardless what was selected.
                 threadViewModel.setShowEmail(false);
@@ -379,12 +375,12 @@ public class DiscAppController {
         if (threadViewModel != null) {
             if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
 
-                logger.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
+                log.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
                 return new ModelAndView("redirect:/indices/" + appId + "#" + threadViewModel.getId());
 
             } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
 
-                logger.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
+                log.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
                         + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
@@ -393,7 +389,7 @@ public class DiscAppController {
             }
         }
 
-        logger.info("Fallback return to thread view.");
+        log.info("Fallback return to thread view.");
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
@@ -404,7 +400,7 @@ public class DiscAppController {
                                       Model model) {
 
         if (searchTerm == null || searchTerm.isEmpty() || returnToApp != null) {
-            logger.info("Empty search term entered for appId: " + appId + " : returning to app view page.");
+            log.info("Empty search term entered for appId: " + appId + " : returning to app view page.");
             return new ModelAndView("redirect:/indices/" + appId);
         }
 
@@ -432,11 +428,11 @@ public class DiscAppController {
 
             } else {
                 model.addAttribute("error", "Disc app with id " + appId + " returned null.");
-                logger.info("Disc app with application id of " + appId + " does not exist. Returning null.");
+                log.info("Disc app with application id of " + appId + " does not exist. Returning null.");
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
-            logger.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
+            log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
         return new ModelAndView("redirect:/indices/" + appId);
@@ -687,7 +683,7 @@ public class DiscAppController {
             return highlightNewMessages && currentNodeInstant.isAfter(now.minus(24, ChronoUnit.HOURS));
         }
 
-        logger.warn("Null thread node or create date sent to be checked if highlight functionality should be applied.");
+        log.warn("Null thread node or create date sent to be checked if highlight functionality should be applied.");
         return false;
     }
 }

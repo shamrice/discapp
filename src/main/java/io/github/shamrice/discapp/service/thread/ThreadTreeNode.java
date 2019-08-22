@@ -14,11 +14,9 @@ public class ThreadTreeNode {
         this.current = current;
     }
 
-
     public Thread getCurrent() {
         return current;
     }
-
 
     public List<ThreadTreeNode> getSubThreads() {
         return subThreads;

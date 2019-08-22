@@ -12,8 +12,7 @@ import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,14 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 @Controller
+@Slf4j
 public class DiscAppMaintenanceController {
-
-    private static final Logger logger = LoggerFactory.getLogger(DiscAppMaintenanceController.class);
 
     private static final String THREAD_TAB = "threads";
     private static final String DATE_TAB = "date";
@@ -100,7 +97,7 @@ public class DiscAppMaintenanceController {
                 try {
                     width = Integer.parseInt(maintenanceWidgetViewModel.getWidgetWidth());
                 } catch (NumberFormatException widthEx) {
-                    logger.warn("Invalid widget width for appId: " + appId
+                    log.warn("Invalid widget width for appId: " + appId
                             + " : value: " + maintenanceWidgetViewModel.getWidgetWidth() + " :: using default: "
                             + width + " :: " + widthEx.getMessage());
                 }
@@ -110,18 +107,18 @@ public class DiscAppMaintenanceController {
                 try {
                     height = Integer.parseInt(maintenanceWidgetViewModel.getWidgetHeight());
                 } catch (NumberFormatException heightEx) {
-                    logger.warn("Invalid widget height for appId: " + appId
+                    log.warn("Invalid widget height for appId: " + appId
                             + " : value: " + maintenanceWidgetViewModel.getWidgetHeight() + " :: using default: "
                             + height + " :: " + heightEx.getMessage());
                 }
                 maintenanceWidgetViewModel.setWidgetHeight(String.valueOf(height));
 
             } else {
-                logger.warn("User " + username + " attempted to modify appid: " + appId + " widgets but is not the owner.");
+                log.warn("User " + username + " attempted to modify appid: " + appId + " widgets but is not the owner.");
                 maintenanceWidgetViewModel.setInfoMessage("You do not have permission to edit this disc app.");
             }
         } catch (Exception ex) {
-            logger.error("Error saving widget settings for appId: " + appId + " :: " + ex.getMessage(), ex);
+            log.error("Error saving widget settings for appId: " + appId + " :: " + ex.getMessage(), ex);
             maintenanceWidgetViewModel.setInfoMessage("Unable to save widget settings. Please try again.");
         }
 
@@ -197,11 +194,11 @@ public class DiscAppMaintenanceController {
                 );
 
             } else {
-                logger.warn("User: " + username + " attempted to access widget admin of : " + appId + " which they do not own.");
+                log.warn("User: " + username + " attempted to access widget admin of : " + appId + " which they do not own.");
                 maintenanceWidgetViewModel.setInfoMessage("You do not have permission to access this page.");
             }
         } catch (Exception ex) {
-            logger.error("Error getting widget maintenance page for : " + appId + " :: " + ex.getMessage(), ex);
+            log.error("Error getting widget maintenance page for : " + appId + " :: " + ex.getMessage(), ex);
             maintenanceWidgetViewModel.setInfoMessage("An unexpected error has occurred. Please try again.");
         }
 
@@ -241,10 +238,10 @@ public class DiscAppMaintenanceController {
 
             } else {
                 maintenanceLocaleViewModel.setInfoMessage("You do not have permission to edit this disc app.");
-                logger.warn("User: " + username + " attempted to edit appId: " + appId + " even though they are not the owner.");
+                log.warn("User: " + username + " attempted to edit appId: " + appId + " even though they are not the owner.");
             }
         } catch (Exception ex) {
-            logger.error("Error getting locale admin view: " + ex.getMessage(), ex);
+            log.error("Error getting locale admin view: " + ex.getMessage(), ex);
             maintenanceLocaleViewModel.setInfoMessage("An error has occurred. Please try again.");
         }
 
@@ -316,11 +313,11 @@ public class DiscAppMaintenanceController {
                 }
 
             } else {
-                logger.error("user: " + username + " attempted to view stats of a disc app they don't own. AppId: " + appId);
+                log.error("user: " + username + " attempted to view stats of a disc app they don't own. AppId: " + appId);
                 maintenanceStatsViewModel.setInfoMessage("You do not have permission to view these stats.");
             }
         } catch (Exception ex) {
-            logger.error("Error getting stats for appId: " + appId + " :: " + ex.getMessage(), ex);
+            log.error("Error getting stats for appId: " + appId + " :: " + ex.getMessage(), ex);
             maintenanceStatsViewModel.setInfoMessage("Error retrieving statistics.");
         }
 
@@ -343,7 +340,7 @@ public class DiscAppMaintenanceController {
                 model.addAttribute("isAdmin", "true");
             }
         } catch (Exception ex) {
-            logger.error("Failed to display landing page for maintenance for appid: " + appId + " :: " + ex.getMessage(), ex);
+            log.error("Failed to display landing page for maintenance for appid: " + appId + " :: " + ex.getMessage(), ex);
         }
 
         return new ModelAndView("admin/disc-info");
@@ -370,7 +367,7 @@ public class DiscAppMaintenanceController {
                     //delete from edit message screen
                     if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
                         if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), false)) {
-                            logger.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
+                            log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
                             deleteThreadsSuccess = false;
                         }
                     } else {
@@ -379,7 +376,7 @@ public class DiscAppMaintenanceController {
                             for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
                                 long threadId = Long.parseLong(threadIdStr);
                                 if (!threadService.deleteThread(app.getId(), threadId, false)) {
-                                    logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
+                                    log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
                                     deleteThreadsSuccess = false;
                                 }
                             }
@@ -401,7 +398,7 @@ public class DiscAppMaintenanceController {
                     //delete from edit message screen
                     if (maintenanceThreadViewModel.isOnEditMessage() &&  maintenanceThreadViewModel.getEditArticleId() != null) {
                         if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), true)) {
-                            logger.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId() + " and replies.");
+                            log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId() + " and replies.");
                             deleteThreadsAndRepliesSuccess = false;
                         }
                     } else {
@@ -409,7 +406,7 @@ public class DiscAppMaintenanceController {
                             for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
                                 long threadId = Long.parseLong(threadIdStr);
                                 if (!threadService.deleteThread(app.getId(), threadId, true)) {
-                                    logger.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
+                                    log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
                                     deleteThreadsAndRepliesSuccess = false;
                                 }
                             }
@@ -432,7 +429,7 @@ public class DiscAppMaintenanceController {
                     //report abuse from edit message screen
                     if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
                         if (!threadService.reportThreadForAbuse(app.getId(), maintenanceThreadViewModel.getEditArticleId(), user.getId())) {
-                            logger.error("Failed to report thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
+                            log.error("Failed to report thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
                             threadsReportedSuccess = false;
                         }
                     } else {
@@ -441,7 +438,7 @@ public class DiscAppMaintenanceController {
                             for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
                                 long threadId = Long.parseLong(threadIdStr);
                                 if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
-                                    logger.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
+                                    log.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
                                     threadsReportedSuccess = false;
                                 }
                             }
@@ -552,7 +549,7 @@ public class DiscAppMaintenanceController {
                         maintenanceThreadViewModel.setOnEditModifyMessage(true);
 
                     } else {
-                        logger.warn("Failed to find thread to edit: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                        log.warn("Failed to find thread to edit: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
                         maintenanceThreadViewModel.setOnEditModifyMessage(false);
                         maintenanceThreadViewModel.setOnEditMessage(false);
                         maintenanceThreadViewModel.setInfoMessage("An error occurred loading message to edit. Please try again.");
@@ -579,7 +576,7 @@ public class DiscAppMaintenanceController {
                         if (threadService.saveThread(editThread, body)) {
                             maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
                         } else {
-                            logger.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                            log.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
                             maintenanceThreadViewModel.setInfoMessage("Failed to update thread.");
                         }
 
@@ -598,7 +595,7 @@ public class DiscAppMaintenanceController {
 
             }
         } catch (Exception ex) {
-            logger.error("Thread administration action failed: " + ex.getMessage(), ex);
+            log.error("Thread administration action failed: " + ex.getMessage(), ex);
             maintenanceThreadViewModel.setInfoMessage("Error has occurred. Please try again.");
         }
 
@@ -675,10 +672,10 @@ public class DiscAppMaintenanceController {
             } else {
                 //TODO : redirect users who don't have permission to view page to a permission denied page or something.
                 maintenanceThreadViewModel.setInfoMessage("You do not have permission to edit this disc app.");
-                logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
+                log.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
             }
         } catch (Exception ex) {
-            logger.error("Error: " + ex.getMessage(), ex);
+            log.error("Error: " + ex.getMessage(), ex);
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
         }
 
@@ -716,7 +713,7 @@ public class DiscAppMaintenanceController {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Error getting edit thread view: " + ex.getMessage(), ex);
+            log.error("Error getting edit thread view: " + ex.getMessage(), ex);
         }
 
 
@@ -850,7 +847,7 @@ public class DiscAppMaintenanceController {
 
             } else {
                 maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
-                logger.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
+                log.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
@@ -922,7 +919,7 @@ public class DiscAppMaintenanceController {
                                               Model model) {
 
         if (maintenanceViewModel.getApplicationName() == null || maintenanceViewModel.getApplicationName().isEmpty()) {
-            logger.warn("Cannot update application name to an empty string");
+            log.warn("Cannot update application name to an empty string");
             maintenanceViewModel.setInfoMessage("Cannot update disc app name to an empty value.");
             return getAppearanceView(appId, redirect, maintenanceViewModel, model);
         }
@@ -935,7 +932,7 @@ public class DiscAppMaintenanceController {
                 Application app = applicationService.get(appId);
                 if (app != null && app.getOwnerId().equals(user.getOwnerId())) {
 
-                    logger.info("Updating application name of id: " + app.getId() + " from: "
+                    log.info("Updating application name of id: " + app.getId() + " from: "
                             + maintenanceViewModel.getApplicationName() + " to: " + app.getName());
 
                     String updatedAppName = inputHelper.sanitizeInput(maintenanceViewModel.getApplicationName());
@@ -1016,7 +1013,7 @@ public class DiscAppMaintenanceController {
                     }
 
                     if (!maintenanceViewModel.getPrologueText().equals(prologue.getText())) {
-                        logger.info("Updating prologue text of id: " + app.getId());
+                        log.info("Updating prologue text of id: " + app.getId());
                         prologue.setModDt(new Date());
                         prologue.setText(maintenanceViewModel.getPrologueText());
 
@@ -1038,7 +1035,7 @@ public class DiscAppMaintenanceController {
                     }
 
                     if (!maintenanceViewModel.getEpilogueText().equals(epilogue.getText())) {
-                        logger.info("Updating epilogue text of id: " + app.getId());
+                        log.info("Updating epilogue text of id: " + app.getId());
                         epilogue.setModDt(new Date());
                         epilogue.setText(maintenanceViewModel.getEpilogueText());
 
@@ -1271,7 +1268,7 @@ public class DiscAppMaintenanceController {
             boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, dateFormat);
 
             if (timezoneSaved && dateFormatSaved) {
-                logger.info("Saved date and time settings for appId: " + appId);
+                log.info("Saved date and time settings for appId: " + appId);
                 maintenanceLocaleViewModel.setInfoMessage("Successfully saved changes to Date and Time.");
             } else {
                 maintenanceLocaleViewModel.setInfoMessage("Failed to save changes to Date and Time.");
@@ -1297,7 +1294,7 @@ public class DiscAppMaintenanceController {
         Configuration configToUpdate = configurationService.getConfiguration(appId, property.getPropName());
 
         if (configToUpdate == null) {
-            logger.info("Creating new configuration prop: " + property.getPropName() + " for appId: " + appId);
+            log.info("Creating new configuration prop: " + property.getPropName() + " for appId: " + appId);
             configToUpdate = new Configuration();
             configToUpdate.setName(property.getPropName());
             configToUpdate.setApplicationId(appId);
@@ -1306,10 +1303,10 @@ public class DiscAppMaintenanceController {
         configToUpdate.setValue(value);
 
         if (!configurationService.saveConfiguration(property, configToUpdate)) {
-            logger.warn("Failed to update configuration " + property.getPropName() + " of appId: " + appId);
+            log.warn("Failed to update configuration " + property.getPropName() + " of appId: " + appId);
             return false;
         } else {
-            logger.info("Updated " + property.getPropName() + " for appId: " + appId + " to " + value);
+            log.info("Updated " + property.getPropName() + " for appId: " + appId + " to " + value);
         }
 
         return true;

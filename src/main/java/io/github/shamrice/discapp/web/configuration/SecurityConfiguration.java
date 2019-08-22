@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
 
@@ -54,17 +53,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessHandler(logoutSuccessHandler())
                     .permitAll();
-
-
-
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
         auth.userDetailsService(discAppUserDetailsService)
                 .passwordEncoder(new BCryptPasswordEncoder(15));
-
     }
 
     @Bean
