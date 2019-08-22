@@ -14,13 +14,24 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ConfigurationCache {
 
+    private static ConfigurationCache instance = null;
+
     private Map<Long, Map<ConfigurationProperty, Configuration>> configurationCacheMap = new ConcurrentHashMap<>();
     private Map<Long, Date> configIdLastRefreshDateList = new ConcurrentHashMap<>();
 
     private long maxCacheAgeMilliseconds = 900000L; //default 15 min
 
+    private ConfigurationCache() {}
+
+    public static ConfigurationCache getInstance() {
+        if (instance == null) {
+            instance = new ConfigurationCache();
+        }
+        return instance;
+    }
+
     public void setMaxCacheAgeMilliseconds(long milliseconds) {
-        this.maxCacheAgeMilliseconds = milliseconds;
+        maxCacheAgeMilliseconds = milliseconds;
     }
 
     public Configuration getFromCache(Long applicationId, ConfigurationProperty configurationProperty) {

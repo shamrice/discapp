@@ -16,8 +16,6 @@ public class ConfigurationService {
     @Autowired
     private ConfigurationRepository configurationRepository;
 
-    private ConfigurationCache configurationCache = new ConfigurationCache();
-
     public List<Configuration> list() {
         return configurationRepository.findAll();
     }
@@ -77,7 +75,7 @@ public class ConfigurationService {
     public String getStringValue(Long applicationId, ConfigurationProperty configurationProperty, String defaultValue) {
 
         //try to get from cache first:
-        Configuration configFromCache = configurationCache.getFromCache(applicationId, configurationProperty);
+        Configuration configFromCache = ConfigurationCache.getInstance().getFromCache(applicationId, configurationProperty);
         if (configFromCache != null) {
             return configFromCache.getValue();
         }
@@ -92,7 +90,7 @@ public class ConfigurationService {
             log.info("Found configuration property: " + configurationProperty.getPropName()
                     + " for appid: " + applicationId + ". Returnning value of: " + configuration.getValue());
 
-            configurationCache.updateCache(applicationId, configurationProperty, configuration);
+            ConfigurationCache.getInstance().updateCache(applicationId, configurationProperty, configuration);
             return configuration.getValue();
         }
 
@@ -149,7 +147,7 @@ public class ConfigurationService {
 
                 Configuration savedConfig = configurationRepository.save(configuration);
                 if (savedConfig != null) {
-                    configurationCache.updateCache(savedConfig.getApplicationId(), configurationProperty, savedConfig);
+                    ConfigurationCache.getInstance().updateCache(savedConfig.getApplicationId(), configurationProperty, savedConfig);
                     return true;
                 } else {
                     log.error("Failed to save configuration. Value returned was null from save.");
