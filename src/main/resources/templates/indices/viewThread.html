@@ -33,13 +33,33 @@
             <div class="headers">
 
                 <div th:if="${threadViewModel.isShowEmail()}" class="header">
-                    <span class="author_header">
-                        <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
-                    </span>
+                    <div th:if="${threadViewModel.getCurrentUsername()}">
+                        <span class="tooltip author_header">
+                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
+                            <span class="tooltiptext" th:utext="@{|Current username:<br />${threadViewModel.getCurrentUsername()}|}"></span>
+                        </span>
+
+                    </div>
+
+                    <div th:unless="${threadViewModel.getCurrentUsername()}">
+                        <span class="author_header">
+                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
+                        </span>
+                    </div>
                 </div>
                 <div th:unless="${threadViewModel.isShowEmail()}" class="header">
-                    <span class="author_header" th:text="${threadViewModel.getSubmitter()}">
-                    </span>
+                    <div th:if="${threadViewModel.getCurrentUsername()}" class="tooltip">
+                        <span class="tooltip author_header">
+                            [[${threadViewModel.getSubmitter()}]]
+                            <span class="tooltiptext" th:utext="@{|Current username:<br />${threadViewModel.getCurrentUsername()}|}"></span>
+                        </span>
+
+                    </div>
+
+                    <div th:unless="${threadViewModel.getCurrentUsername()}">
+                        <span class="author_header" th:text="${threadViewModel.getSubmitter()}">
+                        </span>
+                    </div>
                 </div>
                 <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
                 <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}"></span></div>

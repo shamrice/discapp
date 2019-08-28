@@ -35,6 +35,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return new DiscAppUserPrincipal(user);
     }
 
+    public DiscAppUser getByDiscAppUserId(long userId) {
+        return discappUserRepository.getOne(userId);
+    }
+
     public DiscAppUser getByEmail(String email) {
         if (email != null && !email.trim().isEmpty()) {
             return discappUserRepository.findByEmail(email);

@@ -489,7 +489,8 @@ public class DiscAppMaintenanceController {
 
                         Thread newThread = new Thread();
                         newThread.setSubmitter(user.getUsername());
-                        newThread.setDiscappUserId(user.getId());
+                        //newThread.setDiscappUserId(user.getId());
+                        newThread.setDiscAppUser(user);
                         newThread.setParentId(0L);
                         newThread.setShowEmail(user.getShowEmail());
                         newThread.setEmail(user.getEmail());
@@ -708,6 +709,12 @@ public class DiscAppMaintenanceController {
                     maintenanceThreadViewModel.setEditArticleIpAddress(editingThread.getIpAddress());
                     maintenanceThreadViewModel.setEditArticleMessage(editingThread.getBody());
                     //todo add user agent.
+
+                    if (editingThread.getDiscAppUser() != null) {
+                        maintenanceThreadViewModel.setEditArticleUserEmail(editingThread.getDiscAppUser().getEmail());
+                        maintenanceThreadViewModel.setEditArticleCurrentUsername(editingThread.getDiscAppUser().getUsername());
+                        maintenanceThreadViewModel.setEditArticleUserId(editingThread.getDiscAppUser().getId());
+                    }
 
 
                 }

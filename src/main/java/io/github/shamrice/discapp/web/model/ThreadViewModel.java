@@ -12,6 +12,7 @@ public class ThreadViewModel {
     private String id;
     private String appId;
     private String submitter;
+    private String currentUsername;
     private String email;
     private String ipAddress;
     private String subject;

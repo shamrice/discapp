@@ -23,6 +23,25 @@
 
 
         <table style="margin:1em; border-spacing:3px;">
+            <tr th:if="${maintenanceThreadViewModel.getEditArticleCurrentUsername()}">
+                <th>Account Username: </th>
+                <td th:text="@{|${maintenanceThreadViewModel.getEditArticleCurrentUsername()} (UserId: ${maintenanceThreadViewModel.getEditArticleUserId()})|}">
+                    <!-- TODO : add this for threads from accounts! span style="background-color:#8ff; padding:4px; margin-left:1em; font-size:smaller; ">Account ID:29139  <select
+                        name="new_perm" class="button" style="border:1px solid black;">
+<option value="r">Read</option>
+<option value="rf">Reply</option>
+<option selected="selected" value="rfp">Post</option>
+<option value="rfph">Hold</option>
+</select> <input type="submit" name="ChangePerm" value="Change Perm" class="button"/></span-->
+                </td>
+            </tr>
+            <tr th:if="${maintenanceThreadViewModel.getEditArticleUserEmail()}">
+                <th>Account Email</th>
+                <td>
+                    <a th:href="@{|mailto:${maintenanceThreadViewModel.getEditArticleUserEmail()}|}"
+                       th:text="${maintenanceThreadViewModel.getEditArticleUserEmail()}"></a>
+                </td>
+            </tr>
             <tr>
                 <th>Author</th>
                 <td th:text="${maintenanceThreadViewModel.getEditArticleSubmitter()}">

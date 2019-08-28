@@ -276,7 +276,8 @@ public class DiscAppController {
 
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(userEmail);
                 if (discAppUser != null) {
-                    newThread.setDiscappUserId(discAppUser.getId());
+                    //newThread.setDiscappUserId(discAppUser.getId());
+                    newThread.setDiscAppUser(discAppUser);
                     newThread.setSubmitter(discAppUser.getUsername());
                     newThread.setEmail(discAppUser.getEmail());
                     newThread.setShowEmail(discAppUser.getShowEmail());
@@ -331,7 +332,15 @@ public class DiscAppController {
             String threadBody = threadService.getThreadBodyText(threadId);
             String subThreadsHtml = getThreadViewThreadHtml(currentThread);
 
+            DiscAppUser sourceUser = currentThread.getDiscAppUser();
+
             ThreadViewModel threadViewModel = new ThreadViewModel();
+
+            //set current username if exists and different than in thread table.
+            if (sourceUser != null && !currentThread.getSubmitter().equals(sourceUser.getUsername())) {
+                threadViewModel.setCurrentUsername(sourceUser.getUsername());
+            }
+
             threadViewModel.setBody(threadBody);
             threadViewModel.setModDt(currentThread.getModDt().toString());
             threadViewModel.setAppId(appId.toString());
@@ -340,13 +349,19 @@ public class DiscAppController {
             threadViewModel.setParentId(currentThread.getParentId().toString());
             threadViewModel.setSubject(currentThread.getSubject());
             threadViewModel.setSubmitter(currentThread.getSubmitter());
-            if (currentThread.getEmail() != null && !currentThread.getEmail().isEmpty()) {
+
+            //use source user info if exists first.
+            if (sourceUser != null && sourceUser.getEmail() != null) {
+                threadViewModel.setEmail(sourceUser.getEmail());
+                threadViewModel.setShowEmail(sourceUser.getShowEmail());
+            } else if (currentThread.getEmail() != null && !currentThread.getEmail().isEmpty()) {
                 threadViewModel.setEmail(currentThread.getEmail());
                 threadViewModel.setShowEmail(currentThread.isShowEmail());
             } else {
                 //don't attempt to show a null or empty email regardless what was selected.
                 threadViewModel.setShowEmail(false);
             }
+
             //adjust date in view to current timezone and proper formatting
             threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, currentThread.getCreateDt(), true));
 

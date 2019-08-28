@@ -59,5 +59,8 @@ public class MaintenanceThreadViewModel {
     private String editArticleUserAgent;
     private String editArticleMessage;
     private String editArticleReplyThreadsHtml;
+    private String editArticleCurrentUsername;
+    private String editArticleUserEmail;
+    private Long editArticleUserId;
 
 }
