@@ -529,7 +529,7 @@ public class DiscAppMaintenanceController {
                 //selected to modify a single message
                 if (maintenanceThreadViewModel.getEditArticle() != null && !maintenanceThreadViewModel.getEditArticle().isEmpty() && maintenanceThreadViewModel.isOnEditMessage()) {
 
-                    Thread threadToEdit = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+                    Thread threadToEdit = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
 
                     if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
                         maintenanceThreadViewModel.setEditArticleSubmitter(threadToEdit.getSubmitter());
@@ -561,7 +561,7 @@ public class DiscAppMaintenanceController {
                 if (maintenanceThreadViewModel.getEditArticleChangeMessage() != null && !maintenanceThreadViewModel.getEditArticleChangeMessage().isEmpty()
                         && maintenanceThreadViewModel.isOnEditModifyMessage()) {
 
-                    Thread editThread = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+                    Thread editThread = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
                     if (editThread != null && editThread.getApplicationId().equals(app.getId())) {
                         String submitter = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubmitter());
                         String email = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleEmail());
@@ -654,7 +654,7 @@ public class DiscAppMaintenanceController {
                     //todo : something wonky going on here. this is set here but the others are set in the above method..?
                     //todo: setting above does not work.
                     if (maintenanceThreadViewModel.isOnEditMessage()) {
-                        Thread threadToEdit = threadService.getThread(maintenanceThreadViewModel.getEditArticleId());
+                        Thread threadToEdit = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
 
                         if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
                             ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
@@ -698,7 +698,7 @@ public class DiscAppMaintenanceController {
 
                 maintenanceThreadViewModel.setOnEditMessage(true);
 
-                Thread editingThread = threadService.getThread(threadId);
+                Thread editingThread = threadService.getThread(app.getId(), threadId);
                 if (editingThread != null) {
                     maintenanceThreadViewModel.setEditArticleId(editingThread.getId());
                     maintenanceThreadViewModel.setEditArticleSubmitter(editingThread.getSubmitter());

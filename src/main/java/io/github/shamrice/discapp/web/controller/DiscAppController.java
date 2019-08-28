@@ -331,16 +331,15 @@ public class DiscAppController {
         }
 
         log.info("Getting thread id " + threadId + " for app id: " + appId);
+        ThreadViewModel threadViewModel = new ThreadViewModel();
 
-        Thread currentThread = threadService.getThread(threadId);
+        Thread currentThread = threadService.getThread(appId, threadId);
         if (currentThread != null) {
 
             String threadBody = threadService.getThreadBodyText(threadId);
             String subThreadsHtml = getThreadViewThreadHtml(currentThread);
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
-
-            ThreadViewModel threadViewModel = new ThreadViewModel();
 
             //set current username if exists and different than in thread table.
             if (sourceUser != null && !currentThread.getSubmitter().equals(sourceUser.getUsername())) {
@@ -384,6 +383,9 @@ public class DiscAppController {
 
             model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
             model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+        } else {
+            log.warn("Attempted to view thread: " + threadId + " on appId: " + appId + " but does not belong to app. Redirecting to appView.");
+            return "redirect:/indices/" + appId;
         }
 
         return "indices/viewThread";
@@ -629,7 +631,7 @@ public class DiscAppController {
         //if not top level thread:
         if (currentThread.getParentId() != null && currentThread.getParentId() != 0L) {
 
-            Thread parentThread = threadService.getThread(currentThread.getParentId());
+            Thread parentThread = threadService.getThread(currentThread.getApplicationId(), currentThread.getParentId());
             if (parentThread != null) {
 
                 //if grandparent is not top level thread.

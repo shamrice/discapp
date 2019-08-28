@@ -26,6 +26,8 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
     List<Thread> findByApplicationIdAndDeletedAndIpAddressContainingIgnoreCase(Long applicationId, Boolean deleted, String ipAddress);
     List<Thread> findByApplicationIdAndDeletedAndEmailContainingIgnoreCase(Long applicationId, Boolean deleted, String email);
 
+    Thread getOneByApplicationIdAndId(Long applicationId, Long id);
+
     //todo add approved
 
     long countByApplicationIdAndDeleted(Long applicationId, Boolean deleted);

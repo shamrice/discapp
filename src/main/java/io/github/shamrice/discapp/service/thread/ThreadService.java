@@ -302,9 +302,9 @@ public class ThreadService {
         );
     }
 
-    public Thread getThread(Long threadId) {
-        Thread foundThread = threadRepository.getOne(threadId);
-        return foundThread.getDeleted() ? null : foundThread;
+    public Thread getThread(long applicationId, long threadId) {
+        Thread foundThread = threadRepository.getOneByApplicationIdAndId(applicationId, threadId);
+        return foundThread != null && foundThread.getDeleted() ? null : foundThread;
     }
 
     public ThreadBody getThreadBody(Long threadId) {
