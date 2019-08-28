@@ -16,6 +16,7 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -298,6 +299,11 @@ public class DiscAppController {
                         ipAddress = request.getRemoteAddr();
                     }
                     newThread.setIpAddress(ipAddress);
+
+                    String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                    if (userAgent != null && !userAgent.isEmpty()) {
+                        newThread.setUserAgent(userAgent);
+                    }
                 }
 
                 String body = newThreadViewModel.getBody();

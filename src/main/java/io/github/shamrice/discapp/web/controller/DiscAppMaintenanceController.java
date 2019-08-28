@@ -708,7 +708,7 @@ public class DiscAppMaintenanceController {
                     maintenanceThreadViewModel.setEditArticleModDt(editingThread.getModDt().toString());
                     maintenanceThreadViewModel.setEditArticleIpAddress(editingThread.getIpAddress());
                     maintenanceThreadViewModel.setEditArticleMessage(editingThread.getBody());
-                    //todo add user agent.
+                    maintenanceThreadViewModel.setEditArticleUserAgent(editingThread.getUserAgent());
 
                     if (editingThread.getDiscAppUser() != null) {
                         maintenanceThreadViewModel.setEditArticleUserEmail(editingThread.getDiscAppUser().getEmail());

@@ -27,6 +27,7 @@ public class Thread {
     private String submitter;
     private String email;
     private String ipAddress;
+    private String userAgent;
     private String subject;
 
     @Column(table = "thread", name = "show_email")

@@ -72,6 +72,7 @@ CREATE TABLE thread (
     submitter varchar(50) NOT NULL,
     email varchar(60),
     ip_address varchar(64),
+    user_agent varchar(150),
     subject varchar(65) NOT NULL,
     deleted bool NOT NULL default false,
     show_email bool NOT NULL default false,
