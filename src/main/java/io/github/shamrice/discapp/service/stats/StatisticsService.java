@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -91,7 +92,9 @@ public class StatisticsService {
     }
 
     public Stats getStats(long statsId) {
-        return statsRepository.getOne(statsId);
+        Optional<Stats> stats = statsRepository.findById(statsId);
+        return stats.orElse(null);
+
     }
 
     public List<StatsUniqueIps> getUniqueIpsForStatsId(long statsId) {

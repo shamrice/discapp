@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -128,7 +129,8 @@ public class ApplicationService {
     }
 
     public Application get(Long id) {
-        return applicationRepository.getOne(id);
+        Optional<Application> app = applicationRepository.findById(id);
+        return app.orElse(null);
     }
 
     public boolean isOwnerOfApp(long appId, String email) {

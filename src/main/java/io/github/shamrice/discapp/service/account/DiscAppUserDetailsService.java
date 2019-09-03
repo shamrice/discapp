@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class DiscAppUserDetailsService implements UserDetailsService {
@@ -36,7 +38,8 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     }
 
     public DiscAppUser getByDiscAppUserId(long userId) {
-        return discappUserRepository.getOne(userId);
+        Optional<DiscAppUser> discAppUser = discappUserRepository.findById(userId);
+        return discAppUser.orElse(null);
     }
 
     public DiscAppUser getByEmail(String email) {

@@ -31,17 +31,22 @@ public class ThreadService {
     private ReportedAbuseRepository reportedAbuseRepository;
 
     public boolean reportThreadForAbuse(long applicationId, long threadId, long reporterDiscAppUserId) {
-        Thread abuseThread = threadRepository.getOne(threadId);
+        Optional<Thread> abuseThread = threadRepository.findById(threadId);
 
-        if (!abuseThread.getApplicationId().equals(applicationId)) {
+        if (!abuseThread.isPresent()) {
+            log.error("Unable to find threadId: " + threadId + " to report.");
+            return false;
+        }
+
+        if (!abuseThread.get().getApplicationId().equals(applicationId)) {
             log.warn("Attempted to report thread id: " + threadId + " for abuse when application id is not from " + applicationId);
             return false;
         }
 
         ReportedAbuse newAbuseReport = new ReportedAbuse();
         newAbuseReport.setApplicationId(applicationId);
-        newAbuseReport.setIpAddress(abuseThread.getIpAddress());
-        newAbuseReport.setThreadId(abuseThread.getId());
+        newAbuseReport.setIpAddress(abuseThread.get().getIpAddress());
+        newAbuseReport.setThreadId(abuseThread.get().getId());
         newAbuseReport.setReportedBy(reporterDiscAppUserId);
         newAbuseReport.setModDt(new Date());
         newAbuseReport.setCreateDt(new Date());
@@ -51,7 +56,7 @@ public class ThreadService {
             log.info("Saved new abuse report for application_id: " + applicationId
                     + " : thread_id: " + threadId + " :: Marking thread for deletion.");
 
-            return deleteThread(applicationId, abuseThread.getId(), false);
+            return deleteThread(applicationId, abuseThread.get().getId(), false);
 
         } else {
             log.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
@@ -66,7 +71,14 @@ public class ThreadService {
 
     public boolean deleteThread(long applicationId, long threadId, boolean deleteSubThreads) {
 
-        Thread threadToDelete = threadRepository.getOne(threadId);
+        Optional<Thread> optionalThreadToDelete = threadRepository.findById(threadId);
+
+        if (!optionalThreadToDelete.isPresent()) {
+            log.error("Unable to find threadId: " + threadId + " to delete.");
+            return false;
+        }
+
+        Thread threadToDelete = optionalThreadToDelete.get();
 
         if (!threadToDelete.getApplicationId().equals(applicationId)) {
             log.warn("Attempted to delete thread id: " + threadId + " which belongs to a different application id than " + applicationId);
