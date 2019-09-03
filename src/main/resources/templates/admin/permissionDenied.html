@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Permission Denied</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+<div class="grey_box" style="width:32em">
+    <form method="post" action="/login" enctype="multipart/form-data">
+        <p>You are currently logged in as [[${username}]], but this DiscussionApp is
+            registered to a different account. You may switch to a different account or
+            enter this DiscApp's password in the next box.</p>
+        <table>
+            <tr>
+                <th>Email</th>
+                <td>
+                    <input type="text" name="username" class="button" />
+                </td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>
+                    <input type="password" name="password" class="button" />
+                </td>
+            </tr>
+        </table>
+        <input type="submit" name="Login" value="Login" class="button" />
+
+        <div style="margin-top:1ex;display:none;">
+            <label>
+                <input type="checkbox" name="expires" value="+14d" id="expires" />
+            </label>
+            <label for="expires">Stay logged in</label>
+        </div>
+
+        <!--input type="hidden" name="redirectUrl" th:value="@{|/admin/disc-maint.cgi?id=${appId}|}" /-->
+    </form>
+</div>
+<div class="grey_box" style="width:32em;display:none;">
+    <form method="post" th:action="@{|/disc-maint.cgi?id=${appId}|}" enctype="multipart/form-data">
+        <p style="text-align:center;">Or enter the admin password for this DiscussionApp-</p>
+        <div>
+            <input type="password" name="password" size="20" maxlength="20" />
+            <input type="submit" name="submit_password" value="Enter Password" class="button" />
+            <input type="hidden" name="id" th:value="${appId}" />
+        </div>
+    </form>
+</div>
+
+</body>
+
+</html>

@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.List;
 
@@ -59,6 +61,23 @@ public class DiscAppMaintenanceController {
     @Autowired
     private DiscAppController discAppController;
 
+    @GetMapping("/admin/permission-denied")
+    public ModelAndView getPermissionDeniedView(@RequestParam(name = "id") long appId,
+                                                HttpServletResponse response,
+                                                Model model) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        String username = accountHelper.getLoggedInEmail();
+        model.addAttribute("username", username);
+
+        Cookie newRedirectCookie = new Cookie("redirect_url", "/admin/disc-maint.cgi?id=" + appId);
+        newRedirectCookie.setPath("/");
+        response.addCookie(newRedirectCookie);
+
+        return new ModelAndView("admin/permissionDenied");
+    }
+
     @GetMapping("/admin/disc-maint.cgi")
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model) {
@@ -80,7 +99,8 @@ public class DiscAppMaintenanceController {
                                                @RequestParam(name = "redirect", required = false) String redirect,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
-                                               HttpServletRequest request) {
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -115,14 +135,14 @@ public class DiscAppMaintenanceController {
 
             } else {
                 log.warn("User " + username + " attempted to modify appid: " + appId + " widgets but is not the owner.");
-                maintenanceWidgetViewModel.setInfoMessage("You do not have permission to edit this disc app.");
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Error saving widget settings for appId: " + appId + " :: " + ex.getMessage(), ex);
             maintenanceWidgetViewModel.setInfoMessage("Unable to save widget settings. Please try again.");
         }
 
-        return getDiscMaintWidgetView(appId, redirect, maintenanceWidgetViewModel, model, request);
+        return getDiscMaintWidgetView(appId, redirect, maintenanceWidgetViewModel, model, request, response);
     }
 
     @GetMapping("/admin/disc-widget-maint.cgi")
@@ -130,7 +150,8 @@ public class DiscAppMaintenanceController {
                                                @RequestParam(name = "redirect", required =  false) String redirect,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
-                                               HttpServletRequest request) {
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
         model.addAttribute("redirect", redirect);
@@ -195,7 +216,7 @@ public class DiscAppMaintenanceController {
 
             } else {
                 log.warn("User: " + username + " attempted to access widget admin of : " + appId + " which they do not own.");
-                maintenanceWidgetViewModel.setInfoMessage("You do not have permission to access this page.");
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Error getting widget maintenance page for : " + appId + " :: " + ex.getMessage(), ex);
@@ -209,7 +230,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscLocaleView(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
                                           MaintenanceLocaleViewModel maintenanceLocaleViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
 
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
@@ -237,8 +259,8 @@ public class DiscAppMaintenanceController {
                 maintenanceLocaleViewModel.setTimezones(timezones);
 
             } else {
-                maintenanceLocaleViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 log.warn("User: " + username + " attempted to edit appId: " + appId + " even though they are not the owner.");
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Error getting locale admin view: " + ex.getMessage(), ex);
@@ -252,7 +274,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "selectedStatsId", required = false) Long statsId,
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
-                                         Model model) {
+                                         Model model,
+                                         HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
 
@@ -314,7 +337,8 @@ public class DiscAppMaintenanceController {
 
             } else {
                 log.error("user: " + username + " attempted to view stats of a disc app they don't own. AppId: " + appId);
-                maintenanceStatsViewModel.setInfoMessage("You do not have permission to view these stats.");
+                return getPermissionDeniedView(appId, response, model);
+
             }
         } catch (Exception ex) {
             log.error("Error getting stats for appId: " + appId + " :: " + ex.getMessage(), ex);
@@ -326,7 +350,8 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-info.cgi")
     public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
-                                        Model model) {
+                                        Model model,
+                                        HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
 
@@ -338,6 +363,8 @@ public class DiscAppMaintenanceController {
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
                 model.addAttribute("isAdmin", "true");
+            } else {
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Failed to display landing page for maintenance for appid: " + appId + " :: " + ex.getMessage(), ex);
@@ -352,7 +379,8 @@ public class DiscAppMaintenanceController {
                                          @RequestParam(name = "tab", required = false) String currentTab,
                                          @RequestParam(name = "pagemark", required = false) Long pageMark,
                                          @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
-                                         Model model) {
+                                         Model model,
+                                         HttpServletResponse response) {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -594,6 +622,8 @@ public class DiscAppMaintenanceController {
                 }
 
 
+            } else {
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Thread administration action failed: " + ex.getMessage(), ex);
@@ -604,14 +634,15 @@ public class DiscAppMaintenanceController {
             maintenanceThreadViewModel.setOnEditMessage(false);
         }
 
-        return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model);
+        return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model, response);
     }
 
     @GetMapping("/admin/disc-edit.cgi")
     public ModelAndView getDiscEditView(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "tab", required = false) String currentTab,
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
-                                        Model model) {
+                                        Model model,
+                                        HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
 
@@ -671,9 +702,8 @@ public class DiscAppMaintenanceController {
                 }
 
             } else {
-                //TODO : redirect users who don't have permission to view page to a permission denied page or something.
-                maintenanceThreadViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 log.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Error: " + ex.getMessage(), ex);
@@ -688,7 +718,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView getEditThreadView(@RequestParam(name = "disc") long appId,
                                           @RequestParam(name = "article") long threadId,
                                           @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -718,29 +749,30 @@ public class DiscAppMaintenanceController {
 
 
                 }
+            } else {
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             log.error("Error getting edit thread view: " + ex.getMessage(), ex);
         }
 
 
-        return getDiscEditView(appId, THREAD_TAB, maintenanceThreadViewModel, model);
+        return getDiscEditView(appId, THREAD_TAB, maintenanceThreadViewModel, model, response);
     }
 
     @GetMapping("/admin/appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model,
                                                  HttpServletRequest request) {
-        //TODO : change this?
         return discAppController.getAppView(appId, model, request);
     }
 
-    //@GetMapping("/admin/appearance-forms.cgi")
     @GetMapping("/admin/appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
 
         maintenanceViewModel.setRedirect(redirect);
         model.addAttribute("appId", appId);
@@ -853,8 +885,8 @@ public class DiscAppMaintenanceController {
                 maintenanceViewModel.setFavicon(favicon);
 
             } else {
-                maintenanceViewModel.setInfoMessage("You do not have permission to edit this disc app.");
                 log.warn("User: " + username + " has attempted to edit disc app id " + appId + ".");
+                return getPermissionDeniedView(appId, response, model);
             }
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
@@ -923,12 +955,13 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyApplication(@RequestParam(name = "id") long appId,
                                               @RequestParam(name = "redirect", required = false) String redirect,
                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                              Model model) {
+                                              Model model,
+                                              HttpServletResponse response) {
 
         if (maintenanceViewModel.getApplicationName() == null || maintenanceViewModel.getApplicationName().isEmpty()) {
             log.warn("Cannot update application name to an empty string");
             maintenanceViewModel.setInfoMessage("Cannot update disc app name to an empty value.");
-            return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+            return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -951,7 +984,7 @@ public class DiscAppMaintenanceController {
 
                     maintenanceViewModel.setInfoMessage("Successfully updated application name.");
                 } else {
-                    maintenanceViewModel.setInfoMessage("User is not the owner of this app. Cannot save changes.");
+                    return getPermissionDeniedView(appId, response, model);
                 }
             } else {
                 maintenanceViewModel.setInfoMessage("Logged in user does not exist");
@@ -960,7 +993,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
 
     }
 
@@ -968,11 +1001,12 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyStyleSheet(@RequestParam(name = "id") long appId,
                                              @RequestParam(name = "redirect", required = false) String redirect,
                                              @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                             Model model) {
+                                             Model model,
+                                             HttpServletResponse response) {
 
         if (maintenanceViewModel.getStyleSheetUrl() == null || maintenanceViewModel.getStyleSheetUrl().isEmpty()) {
             maintenanceViewModel.setInfoMessage("Style sheet URL cannot be empty. Settings not saved.");
-            return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+            return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -989,17 +1023,18 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/prologue-epilogue")
     public ModelAndView postModifyPrologueEplilogue(@RequestParam(name = "id") long appId,
                                                     @RequestParam(name = "redirect", required = false) String redirect,
                                                     @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                                    Model model) {
+                                                    Model model,
+                                                    HttpServletResponse response) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -1062,7 +1097,7 @@ public class DiscAppMaintenanceController {
                     }
 
                 } else {
-                    maintenanceViewModel.setInfoMessage("User is not the owner of this app. Cannot save changes.");
+                    return getPermissionDeniedView(appId, response, model);
                 }
             } else {
                 maintenanceViewModel.setInfoMessage("Logged in user does not exist");
@@ -1071,7 +1106,7 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
 
     }
 
@@ -1080,7 +1115,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyThreads(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -1106,17 +1142,18 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/header-footer")
     public ModelAndView postModifyHeaderFooter(@RequestParam(name = "id") long appId,
                                                @RequestParam(name = "redirect", required = false) String redirect,
                                                @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                               Model model) {
+                                               Model model,
+                                               HttpServletResponse response) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -1134,10 +1171,10 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
 
@@ -1145,7 +1182,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyLabels(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "redirect", required = false) String redirect,
                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                         Model model) {
+                                         Model model,
+                                         HttpServletResponse response) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -1166,10 +1204,10 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
 
@@ -1177,7 +1215,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyButtons(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -1201,10 +1240,10 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
 
@@ -1212,7 +1251,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView postModifyFavicon(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model) {
+                                          Model model,
+                                          HttpServletResponse response) {
 
         //default used if field is blank
         String favicon = "/favicon.ico";
@@ -1248,17 +1288,18 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model);
+        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/time")
     public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
                                        @RequestParam(name = "redirect", required = false) String redirect,
                                        @ModelAttribute MaintenanceLocaleViewModel maintenanceLocaleViewModel,
-                                       Model model) {
+                                       Model model,
+                                       HttpServletResponse response) {
 
         if (maintenanceLocaleViewModel.getDateFormat() == null || maintenanceLocaleViewModel.getDateFormat().trim().isEmpty()) {
             maintenanceLocaleViewModel.setDateFormat("EEE MMM dd, yyyy h:mma");
@@ -1282,10 +1323,10 @@ public class DiscAppMaintenanceController {
             }
 
         } else {
-            maintenanceLocaleViewModel.setInfoMessage("You do not have permissions to save these changes.");
+            return getPermissionDeniedView(appId, response, model);
         }
 
-        return getDiscLocaleView(appId, redirect, maintenanceLocaleViewModel, model);
+        return getDiscLocaleView(appId, redirect, maintenanceLocaleViewModel, model, response);
     }
 
 
