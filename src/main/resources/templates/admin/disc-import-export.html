@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+    div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+
+
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${maintenanceImportExportViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceImportExportViewModel.getInfoMessage()}">
+</div>
+
+<div class="grey_box" id="import_export_configuration" th:if="${maintenanceImportExportViewModel.getApplicationId()}"
+     style="width:36em;">
+
+    <div style="text-align:left;">
+        <label for="uploadSourceFile">Import Disc App</label>
+    </div>
+
+    <div style="padding:10px;">
+        <form name="f"
+              th:action="@{|/admin/data/import?id=${maintenanceImportExportViewModel.getApplicationId()}&redirect=${maintenanceImportExportViewModel.getRedirect()}|}"
+              method="post"
+              th:object="${maintenanceImportExportViewModel}"
+              enctype="multipart/form-data" >
+
+            <input type="file" class="button" id="uploadSourceFile" name="uploadSourceFile" />
+
+            <input type="submit" name="uploadImportFile" value="Upload Import File" class="button"/>
+        </form>
+    </div>
+
+    <div class="offset">
+        Here you can specify a previously exported Disc App data file to import into your
+        current Disc App. <b>Import files are subject to review before data is imported and
+        may take up to 14 business days before data is imported.</b>
+        <br/>
+        <br/>
+        <h4 class="alert-error">Warning: Re-importing existing data will cause duplicate threads.</h4>
+    </div>
+
+    <div style="text-align:left;padding:5px;">
+        <label for="exportData">Export Disc App</label>
+    </div>
+
+    <div style="padding:10px;">
+        <form name="f"
+              th:action="@{|/admin/data/export?id=${maintenanceImportExportViewModel.getApplicationId()}&redirect=${maintenanceImportExportViewModel.getRedirect()}|}"
+              method="post"
+              th:object="${maintenanceImportExportViewModel}">
+            <input class="button" type="submit" name="exportData" id="exportData"
+                   value="Click here to export your Disc App"/>
+        </form>
+    </div>
+
+    <div class="offset">
+        Clicking the above button will provide you with a data export of all the current threads
+        and replies in your Disc App. This can be used for archive / backup purposes and later used to
+        import the data to a new Disc App using the above import function in that Disc App's maintenance page.
+    </div>
+
+</div>
+
+</body>
+</html>

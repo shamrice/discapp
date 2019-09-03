@@ -3,10 +3,12 @@ package io.github.shamrice.discapp.web.controller;
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
+import io.github.shamrice.discapp.service.application.ApplicationExportService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
+import io.github.shamrice.discapp.service.storage.FileSystemStorageService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
@@ -15,13 +17,15 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import sun.rmi.rmic.Main;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +58,12 @@ public class DiscAppMaintenanceController {
     private StatisticsService statisticsService;
 
     @Autowired
+    private FileSystemStorageService fileSystemStorageService;
+
+    @Autowired
+    private ApplicationExportService applicationExportService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @Autowired
@@ -61,6 +71,118 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private DiscAppController discAppController;
+
+    @PostMapping("/admin/data/export")
+    @ResponseBody
+    public ResponseEntity<Resource> postExportFile(@RequestParam(name = "id") long appId,
+                                                   MaintenanceImportExportViewModel maintenanceImportExportViewModel,
+                                                   Model model,
+                                                   HttpServletResponse response) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceImportExportViewModel.setApplicationId(app.getId());
+
+                String filename = applicationExportService.generateExportForApplication(app.getId());
+                Resource file = fileSystemStorageService.loadAsResource(filename);
+                if (file != null) {
+                    log.info("Generated export file for appId: " + app.getId());
+                    return ResponseEntity.ok().header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + file.getFilename() + "\"")
+                            .body(file);
+                } else {
+                    log.warn("Failed to generate export file for appId: " + app.getId());
+                    return ResponseEntity.noContent().build();
+                }
+
+            } else {
+                log.warn("User: " + username + " attempted to export disc app they don't own :: appId: " + appId);
+            }
+        } catch (Exception ex) {
+            log.error("Error posting maintenance export for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/admin/data/import")
+    public ModelAndView postImportFile(@RequestParam(name = "id") long appId,
+                                       @RequestParam("uploadSourceFile") MultipartFile uploadSourceFile,
+                                       MaintenanceImportExportViewModel maintenanceImportExportViewModel,
+                                       Model model,
+                                       HttpServletResponse response) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceImportExportViewModel.setApplicationId(app.getId());
+                String newFilename = "disc_" + app.getId() + ".sql";
+
+                if (fileSystemStorageService.store(uploadSourceFile, newFilename)) {
+                    log.info("Uploaded disc app import file: " + uploadSourceFile.getOriginalFilename());
+                    maintenanceImportExportViewModel.setInfoMessage(
+                            "Disc App import file successfully uploaded. You will receive an email at your account email address " +
+                                    "when the import is completed.");
+                } else {
+                    maintenanceImportExportViewModel.setInfoMessage("Failed to upload Disc App import file. Please try again.");
+                }
+
+                return getImportExportView(app.getId(), maintenanceImportExportViewModel, model, response);
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error posting maintenance import for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
+
+    @GetMapping("/admin/disc-import-export.cgi")
+    public ModelAndView getImportExportView(@RequestParam(name = "id") long appId,
+                                           MaintenanceImportExportViewModel maintenanceImportExportViewModel,
+                                           Model model,
+                                           HttpServletResponse response) {
+        model.addAttribute("appName", "");
+        model.addAttribute("appId", appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceImportExportViewModel.setApplicationId(app.getId());
+
+                return new ModelAndView("admin/disc-import-export", "maintenanceImportExportViewModel", maintenanceImportExportViewModel);
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance import export page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
+
 
     @GetMapping("/admin/permission-denied")
     public ModelAndView getPermissionDeniedView(@RequestParam(name = "id") long appId,
