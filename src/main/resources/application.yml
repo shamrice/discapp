@@ -39,7 +39,7 @@ logging:
     io:
       github:
         shamrice:
-          discapp: ERROR
+          discapp: WARN
 
 server:
   port: 8081

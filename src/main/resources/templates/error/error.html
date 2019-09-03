@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Disc App - Error Page</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-An error occurred processing your request:
+<div class="grey_box">
 
-<h3 th:text="@{|Status Code: ${errorStatusCode}|}"></h3>
-<div th:text="${errorText}"></div>
-<br />
-<form>
-    <input type="button" value="Click here to return to previous page" onclick="history.back()">
-</form>
+    An error occurred processing your request:
+
+    <h3 th:text="@{|Status Code: ${errorStatusCode}|}"></h3>
+    <div th:text="${errorText}"></div>
+    <br/>
+
+    <form>
+        <input class="button" type="button" value="Click here to return to previous page" onclick="history.back()">
+    </form>
+
+</div>
+
 </body>
 </html>

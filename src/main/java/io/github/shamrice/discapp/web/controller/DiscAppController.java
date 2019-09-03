@@ -54,6 +54,9 @@ public class DiscAppController {
     @Autowired
     private InputHelper inputHelper;
 
+    @Autowired
+    private ErrorController errorController;
+
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId,
                                    Model model,
@@ -166,7 +169,8 @@ public class DiscAppController {
             log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
-        return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
+        return errorController.getNotFoundView("Disc App with ID of " + appId + " does not exist.", model);
+        //return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
     }
 
     @GetMapping("/createThread")

@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Disc App - Not Found</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-<div>
-    The disc app you requested does not exist. Please check the index number and try again.
-</div>
+<div class="grey_box">
 
-<div th:text="${errorText}"></div>
+    <div>
+        The disc app you requested does not exist. Please check the index number and try again.
+    </div>
 
-<div>
-    <br />
-    <form>
-        <input onclick="history.back()" type="button" value="Click here to return to previous page">
-    </form>
+    <div th:text="${errorText}"></div>
+
+    <div>
+        <br/>
+        <form>
+            <input class="button" onclick="history.back()" type="button" value="Click here to return to previous page">
+        </form>
+    </div>
+
 </div>
 
 </body>
