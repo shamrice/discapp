@@ -8,6 +8,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -704,7 +705,7 @@ public class DiscAppMaintenanceController {
                 if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                     //get edit threads html
                     List<String> threadTreeHtml = new ArrayList<>();
-                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50);
+                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50, ThreadSortOrder.CREATION);
 
                     if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
                         for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
@@ -849,7 +850,7 @@ public class DiscAppMaintenanceController {
                 maintenanceViewModel.setStyleSheetUrl(styleSheetUrl);
 
                 //threads config
-                String sortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, "creation");
+                String sortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
                 maintenanceViewModel.setThreadSortOrder(sortOrder);
 
                 boolean expandThreadsOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
@@ -1159,7 +1160,7 @@ public class DiscAppMaintenanceController {
             Application app = applicationService.get(appId);
 
             if (maintenanceViewModel.getThreadSortOrder() == null || maintenanceViewModel.getThreadSortOrder().isEmpty()) {
-                maintenanceViewModel.setThreadSortOrder("creation");
+                maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.CREATION.name());
             }
 
             boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());

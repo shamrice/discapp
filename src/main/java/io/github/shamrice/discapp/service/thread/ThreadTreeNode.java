@@ -1,32 +1,47 @@
 package io.github.shamrice.discapp.service.thread;
 
 import io.github.shamrice.discapp.data.model.Thread;
+import jdk.nashorn.internal.objects.annotations.Constructor;
+import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+@Getter
+@Setter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ThreadTreeNode {
 
+    @NonNull
     private Thread current;
+
     private List<ThreadTreeNode> subThreads = new ArrayList<>();
 
-    public ThreadTreeNode(Thread current) {
-        this.current = current;
-    }
-
-    public Thread getCurrent() {
-        return current;
-    }
-
-    public List<ThreadTreeNode> getSubThreads() {
-        return subThreads;
-    }
-
-    public void setSubThreads(List<ThreadTreeNode> subThreads) {
-        this.subThreads = subThreads;
-    }
-
-    public void addSubThread(ThreadTreeNode threadTreeNode) {
+    void addSubThread(ThreadTreeNode threadTreeNode) {
         this.subThreads.add(threadTreeNode);
+    }
+
+    Date getNewestCreateDateInNodes() {
+        Date newestDate = current.getCreateDt();
+
+        for (ThreadTreeNode currentNode : subThreads) {
+            newestDate = findNewestDateInSubThreads(currentNode, newestDate);
+        }
+
+        return newestDate;
+    }
+
+    private Date findNewestDateInSubThreads(ThreadTreeNode currentNode, Date currentMaxDate) {
+
+        if (currentNode.getCurrent().getCreateDt().after(currentMaxDate)) {
+            currentMaxDate = currentNode.getCurrent().getCreateDt();
+        }
+
+        for (ThreadTreeNode node : currentNode.subThreads) {
+            currentMaxDate = findNewestDateInSubThreads(node, currentMaxDate);
+        }
+
+        return currentMaxDate;
     }
 }

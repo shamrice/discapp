@@ -9,6 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
@@ -89,8 +90,10 @@ public class DiscAppController {
                 int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);
                 boolean showTopLevelPreview = configurationService.getBooleanValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, true);
                 boolean isExpandOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
+                String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
 
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads);
+
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()));
 
                 if (isExpandOnIndex) {
 

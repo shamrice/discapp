@@ -248,16 +248,16 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
-            <input type="hidden" name="id" value="46108"/>
+
             <table id="app_prefs" style="">
                 <tr>
                     <th>Sort threads in order of</th>
                     <td>
                         <label>
-                            <input type="radio" name="threadSortOrder" value="creation"
+                            <input type="radio" name="threadSortOrder" value="CREATION"
                                    th:checked="${maintenanceViewModel.isThreadSortOrderCreation()}"/>creation</label>
                         <label>
-                            <input type="radio" name="threadSortOrder" value="activity"
+                            <input type="radio" name="threadSortOrder" value="ACTIVITY"
                                    th:checked="${maintenanceViewModel.isThreadSortOrderActivity()}"/>activity</label>
                     </td>
                 </tr>
