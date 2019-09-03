@@ -80,18 +80,53 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-maint.cgi")
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
-                                               Model model) {
+                                               Model model,
+                                               HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
-        return new ModelAndView("admin/disc-maint");
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+                return new ModelAndView("admin/disc-maint");
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
     }
 
     @GetMapping("/admin/disc-toolbar.cgi")
     public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
-                                           Model model) {
+                                           Model model,
+                                           HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
-        return new ModelAndView("admin/disc-toolbar");
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute("username", username);
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+                return new ModelAndView("admin/disc-toolbar");
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance toolbar page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+
     }
 
     @PostMapping("/admin/disc-widget-maint.cgi")

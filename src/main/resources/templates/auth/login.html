@@ -23,32 +23,32 @@
 <div class="grey_box">
     <h1 id="banner">Login to Disc App Service</h1>
     <form name="f" th:action="@{/login}" method="post">
+
+        <div th:if="${param.error}" class="alert alert-error">
+            Invalid Username and Password
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            You have been logged out.
+        </div>
+
         <table>
-
-            <div th:if="${param.error}" class="alert alert-error">
-                Invalid Username and Password
-            </div>
-
-            <div th:if="${param.logout}" class="alert alert-success">
-                You have been logged out.
-            </div>
-
             <tr>
-                <td><label>Email:</label></td>
-                <td><input type="text" id="username" name="username"/></td>
+                <th><label>Email</label></th>
+                <td><input type="text" class="button" id="username" name="username"/></td>
             </tr>
             <tr>
-                <td><label>Password:</label></td>
-                <td><input type="password" id="password" name="password"></td>
-            </tr>
-            <tr>
-                <td colspan="2">&nbsp;</td>
+                <th><label>Password</label></th>
+                <td><input type="password" class="button" id="password" name="password"></td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
                     <input class="button" name="submit" type="submit" value="Login">&nbsp;
                     <input class="button" name="reset" type="reset">
                 </td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
