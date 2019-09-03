@@ -85,32 +85,75 @@ public class DiscAppController {
                 //get threads
                 int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);
                 boolean showTopLevelPreview = configurationService.getBooleanValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, true);
+                boolean isExpandOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
 
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads);
-                List<String> threadTreeHtml = new ArrayList<>();
-                String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
-                for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+                if (isExpandOnIndex) {
 
-                    String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview);
+                    List<String> threadTreeHtml = new ArrayList<>();
+                    String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
-                    //get replies if they exist and add on HTML.
-                    if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
-                        currentHtml += "<div class=\"responses\">";
-                        currentHtml += getAppViewThreadHtml(threadTreeNode, "", entryBreakString, true, -1, false);
-                        currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
-                        currentHtml += "</div>";
+                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+
+                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview);
+
+                        //get replies if they exist and add on HTML.
+                        if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
+                            currentHtml += "<div class=\"responses\">";
+                            currentHtml += getAppViewThreadHtml(threadTreeNode, "", entryBreakString, true, -1, false);
+                            currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
+                            currentHtml += "</div>";
+                        }
+
+                        threadTreeHtml.add(currentHtml);
                     }
 
-                    threadTreeHtml.add(currentHtml);
+                    model.addAttribute("threadNodeList", threadTreeHtml);
+                } else {
+                    model.addAttribute("dateLabel", configurationService.getStringValue(appId, ConfigurationProperty.DATE_LABEL_TEXT, "Date:"));
+                    model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
+                    model.addAttribute("subjectLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
+
+                    List<ThreadViewModel> threads = new ArrayList<>();
+                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+
+                        ThreadViewModel threadViewModel = new ThreadViewModel();
+
+                        threadViewModel.setSubmitter(threadTreeNode.getCurrent().getSubmitter());
+                        threadViewModel.setSubject(threadTreeNode.getCurrent().getSubject());
+                        threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, threadTreeNode.getCurrent().getCreateDt(), false));
+                        threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
+                        threadViewModel.setShowMoreOnPreviewText(false);
+
+                        String body = threadTreeNode.getCurrent().getBody();
+                        String previewText = null;
+                        if (body != null && !body.isEmpty()) {
+                            if (body.length() > 320) { //todo : system configuration for length.
+                                previewText = inputHelper.sanitizeInput(body.substring(0, 320));
+                                previewText += "...";
+                                threadViewModel.setShowMoreOnPreviewText(true);
+                            } else {
+                                previewText = inputHelper.sanitizeInput(body);
+                            }
+                        }
+                        threadViewModel.setPreviewText(previewText);
+
+                        threads.add(threadViewModel);
+
+                    }
+                    model.addAttribute("threads", threads);
+
                 }
 
-                model.addAttribute("threadNodeList", threadTreeHtml);
                 model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
                 model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
                 model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
                 model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
                 model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+                model.addAttribute("isExpandOnIndex", isExpandOnIndex);
+                model.addAttribute("isShowTopLevelPreview", showTopLevelPreview);
+
 
                 return new ModelAndView("indices/appView");
 

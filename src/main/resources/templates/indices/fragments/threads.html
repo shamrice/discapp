@@ -5,11 +5,54 @@
 <body>
 <div class="threads" th:fragment="threads">
 
-    <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
-        <div class="thread" th:utext="${threadHtml}"></div>
-        <div th:utext="${threadSeparator}"></div>
+    <div th:if="${isExpandOnIndex}">
+
+        <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
+            <div class="thread" th:utext="${threadHtml}"></div>
+            <div th:utext="${threadSeparator}"></div>
+        </div>
+
     </div>
 
+    <div th:unless="${isExpandOnIndex}">
+
+        <table id="entries_table" border="0">
+            <tr id="entries_headers">
+                <th class="entries_header" th:text="${subjectLabel}"></th>
+                <th class="entries_header" th:text="${submitterLabel}"></th>
+                <th class="entries_header" th:text="${dateLabel}"></th>
+            </tr>
+
+            <div th:if="${not #lists.isEmpty(threads)}" th:each="thread : ${threads}">
+
+                <tr class="entry_row">
+                    <td class="link_cell">
+                        <a class="article_link"
+                           th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}|}"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+                    </td>
+                    <td class="author_cell" th:text="${thread.getSubmitter()}"></td>
+                    <td class="date_cell" th:text="${thread.getCreateDt()}"></td>
+                </tr>
+
+                <tr th:if="${isShowTopLevelPreview && thread.getPreviewText() != null}">
+                    <td colspan="3">
+                        <div class="first_message">
+                            <span th:text="${thread.getPreviewText()}"></span>
+
+                            <span th:if="${thread.isShowMoreOnPreviewText()}">
+                            <a class="article_link"
+                               th:href="@{|/discussion.cgi?disc=${appId}&amp;amp&article=${thread.getId()}|}">more</a>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+
+            </div>
+
+        </table>
+
+    </div>
 </div>
 </body>
 </html>

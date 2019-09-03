@@ -1,8 +1,12 @@
 package io.github.shamrice.discapp.web.model;
 
+import io.github.shamrice.discapp.web.util.InputHelper;
+import jdk.nashorn.internal.runtime.logging.Logger;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @NoArgsConstructor
 @Getter
@@ -22,6 +26,8 @@ public class ThreadViewModel {
     private String modDt;
     private String returnToApp;
     private String postResponse;
+    private String previewText;
+    private boolean isShowMoreOnPreviewText;
     private boolean showEmail;
 
 }
