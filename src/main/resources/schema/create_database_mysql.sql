@@ -81,7 +81,7 @@ CREATE TABLE thread_body (
     id int(255) NOT NULL AUTO_INCREMENT,
     application_id int(20) NOT NULL,
     thread_id int(255) NOT NULL,
-    body varchar(16384) NOT NULL,
+    body varchar(32768) NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

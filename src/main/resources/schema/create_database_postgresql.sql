@@ -88,7 +88,7 @@ CREATE TABLE thread_body (
     id serial NOT NULL,
     application_id int NOT NULL,
     thread_id int NOT NULL,
-    body varchar(16384) NOT NULL,
+    body varchar(32768) NOT NULL,
     create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),
