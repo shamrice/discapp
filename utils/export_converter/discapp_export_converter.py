@@ -1,3 +1,4 @@
+#!/user/bin/python
 #
 # DiscApp Export Converter Script
 #
@@ -40,7 +41,7 @@ file_contents = file_contents.replace('date_entered datetime', 'date_entered TIM
 file_contents = file_contents.replace('threadactivity datetime', 'threadactivity TIMESTAMP')
 file_contents = file_contents.replace('KEY parent (parent),', '')
 file_contents = file_contents.replace('KEY grandparent (grandparent)', '')
-file_contents = file_contents.replace('PRIMARY KEY (id),', 'PRIMARY KEY (id)')
+file_contents = file_contents.replace('PRIMARY KEY (id),', 'is_imported bool DEFAULT false,\n  PRIMARY KEY (id)')
 file_contents = file_contents.replace('LOCK TABLES disc_46108 WRITE;', '')
 file_contents = file_contents.replace('UNLOCK TABLES;', '')
 

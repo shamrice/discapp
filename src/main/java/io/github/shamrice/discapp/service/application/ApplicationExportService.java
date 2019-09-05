@@ -69,6 +69,7 @@ public class ApplicationExportService {
                 "  create_dt TIMESTAMP NOT NULL DEFAULT NOW(), \n" +
                 "  mod_dt TIMESTAMP NOT NULL DEFAULT NOW(), \n" +
                 "  body varchar(16384), \n" +
+                "  is_imported bool DEFAULT false, \n" +
                 "  PRIMARY KEY (id) \n" +
                 ");\n\n");
 
