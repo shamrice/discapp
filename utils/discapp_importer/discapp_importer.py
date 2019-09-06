@@ -15,8 +15,7 @@
 
 
 from configparser import ConfigParser
-from discappimporters import ne_discapp_importer
-from discappimporters import webapp_discapp_importer
+from discappimporters import discapp_importer
 import psycopg2
 import argparse
 
@@ -55,16 +54,9 @@ def start_import(import_type, app_id):
         # close communication
         cur.close()
 
-        if import_type == 'ne':
-            print('Importing from staged NE source.')
-            importer = ne_discapp_importer.NeDiscAppImporter(conn, app_id)
-            importer.import_disc_app()
-        elif import_type == 'webapp':
-            print('Importing from staged webapp source.')
-            importer = webapp_discapp_importer.WebAppDiscAppImporter(conn, app_id)
-            importer.import_disc_app()
-        else:
-            print('Unknown import type: ' + import_type)
+        print('Importing from staged ' + import_type + ' source.')
+        importer = discapp_importer.DiscAppImporter(conn, app_id, import_type)
+        importer.import_disc_app()
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)

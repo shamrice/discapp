@@ -1,11 +1,62 @@
 import psycopg2
 
 
-class NeDiscAppImporter:
+class DiscAppImporter:
 
-    def __init__(self, conn, app_id):
+    def __init__(self, conn, app_id, import_type):
         self.conn = conn
         self.app_id = app_id
+        self.import_type = import_type
+
+        if import_type == 'webapp':
+            self.next_base_thread_search_sql = 'SELECT min(id) from disc_' + str(self.app_id) \
+                                                + ' WHERE parent = 0 AND is_imported = false'
+            self.next_base_thread_sql = 'SELECT id, author, email, ip, user_agent, subject, '\
+                                        + 'show_email, parent, personal_account, date_entered, threadactivity, ' \
+                                        + ' message FROM disc_'\
+                                        + str(self.app_id) + ' WHERE id = %s'
+            self.next_threads_sql = 'SELECT id, author, email, ip, user_agent, subject, '\
+                                    + 'show_email, parent, personal_account, date_entered, threadactivity, ' \
+                                    + 'message FROM disc_' + str(self.app_id) + ' WHERE parent = %s ' \
+                                    + 'AND is_imported = false ORDER by date_entered desc'
+            self.next_id_index = 0
+            self.source_id_index = 0
+            self.submitter_index = 1
+            self.email_index = 2
+            self.ip_address_index = 3
+            self.user_agent_index = 4
+            self.subject_index = 5
+            self.deleted_value = False
+            self.show_email_index = 6
+            self.disc_app_user_id_value = None
+            self.create_dt_index = 9
+            self.mod_dt_index = 10
+            self.body_index = 11
+
+        else:
+            self.next_base_thread_search_sql = 'SELECT min(thread_id) from disc_' + str(self.app_id) \
+                                               + ' WHERE parent_id = 0 AND is_imported = false'
+            self.next_base_thread_sql = 'SELECT id, thread_id, application_id, submitter, email, ip_address, ' \
+                                        + ' user_agent, subject, deleted, show_email, parent_id, ' \
+                                        + ' discapp_user_id, create_dt, mod_dt, body FROM disc_' + str(self.app_id) \
+                                        + ' WHERE thread_id = %s'
+            self.next_threads_sql = 'SELECT id, thread_id, application_id, submitter, email, ip_address, ' \
+                                    + ' user_agent, subject, deleted, show_email, parent_id, discapp_user_id, ' \
+                                    + ' create_dt, mod_dt, body FROM disc_' + str(self.app_id) \
+                                    + ' WHERE parent_id = %s AND is_imported = false ORDER by create_dt desc'
+            self.next_id_index = 1
+            self.source_id_index = 0
+            self.submitter_index = 3
+            self.email_index = 4
+            self.ip_address_index = 5
+            self.user_agent_index = 6
+            self.subject_index = 7
+            self.deleted_index = 8
+            self.show_email_index = 9
+            self.disc_app_user_id_index = 11
+            self.create_dt_index = 12
+            self.mod_dt_index = 13
+            self.body_index = 14
 
     def import_disc_app(self):
 
@@ -17,7 +68,7 @@ class NeDiscAppImporter:
             if next_root is not None:
                 print('NEXT ROOT LEVEL THREAD = ' + str(next_root))
 
-                original_parent_id = next_root[1]
+                original_parent_id = next_root[self.next_id_index]
 
                 self.__import_sub_thread(next_root, 0, original_parent_id)
 
@@ -29,10 +80,10 @@ class NeDiscAppImporter:
 
     def __get_next_base_thread(self):
 
-        print('getting next oldest thread with parent_id = 0')
+        print('getting next oldest thread with parent = 0')
 
         cur = self.conn.cursor()
-        sql = 'SELECT min(thread_id) from disc_' + str(self.app_id) + ' WHERE parent_id = 0 AND is_imported = false'
+        sql = self.next_base_thread_search_sql
         print('sql=' + sql)
         cur.execute(sql)
         row = cur.fetchone()
@@ -40,12 +91,10 @@ class NeDiscAppImporter:
 
         if row is not None:
             thread_id = row[0]
-            print('next original thread_id = ' + str(thread_id))
+            print('next original id = ' + str(thread_id))
             if thread_id is not None:
                 cur = self.conn.cursor()
-                cur.execute('SELECT id, thread_id, application_id, submitter, email, ip_address, user_agent, subject, '
-                            + 'deleted, show_email, parent_id, discapp_user_id, create_dt, mod_dt, body FROM disc_'
-                            + str(self.app_id) + ' WHERE thread_id = ' + str(thread_id))
+                cur.execute(self.next_base_thread_sql, [thread_id])
                 result = cur.fetchone()
                 cur.close()
 
@@ -62,9 +111,7 @@ class NeDiscAppImporter:
         if original_parent_id is not None:
 
             cur = self.conn.cursor()
-            sql = 'SELECT id, thread_id, application_id, submitter, email, ip_address, user_agent, subject, '\
-                  + 'deleted, show_email, parent_id, discapp_user_id, create_dt, mod_dt, body FROM disc_'\
-                + str(self.app_id) + ' WHERE parent_id = %s AND is_imported = false ORDER by create_dt desc'
+            sql = self.next_threads_sql
 
             print('sql=' + sql)
             original_parent_id = str(original_parent_id)
@@ -89,25 +136,30 @@ class NeDiscAppImporter:
             for next_row in next_rows:
 
                 print('Next rows are not None. Importing row...' + str(next_row))
-                original_parent_id = next_row[1]
+                original_parent_id = next_row[self.next_id_index]
                 print('..................going down.....................')
                 self.__import_sub_thread(next_row, new_parent, original_parent_id)
                 print('..................back up........................')
 
     def __insert_into_thread_table(self, row, new_parent_id):
 
-        source_id = row[0]
-        submitter = row[3]
-        email = row[4]
-        ip_address = row[5]
-        user_agent = row[6]
-        subject = row[7]
-        deleted = row[8]
-        show_email = row[9]
-        disc_app_user_id = row[11]
-        create_dt = row[12]
-        mod_dt = row[13]
-        body = row[14]
+        source_id = row[self.source_id_index]
+        submitter = row[self.submitter_index]
+        email = row[self.email_index]
+        ip_address = row[self.ip_address_index]
+        user_agent = row[self.user_agent_index]
+        subject = row[self.subject_index]
+        show_email = row[self.show_email_index]
+        create_dt = row[self.create_dt_index]
+        mod_dt = row[self.mod_dt_index]
+        body = row[self.body_index]
+
+        if self.import_type == 'webapp':
+            deleted = self.deleted_value
+            disc_app_user_id = self.disc_app_user_id_value
+        else:
+            deleted = row[self.deleted_index]
+            disc_app_user_id = row[self.disc_app_user_id_index]
 
         existing_record = self.__check_if_record_is_imported(submitter, subject, create_dt)
 
@@ -129,7 +181,7 @@ class NeDiscAppImporter:
             self.conn.commit()
             cur.close()
 
-            if body is not None:
+            if body is not None and body != '':
                 print('inserting body text=' + body)
                 sql = """INSERT INTO thread_body (application_id, thread_id, body, create_dt, mod_dt)
                         VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
