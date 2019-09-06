@@ -95,10 +95,6 @@ class NeDiscAppImporter:
                 print('..................back up........................')
 
     def __insert_into_thread_table(self, row, new_parent_id):
-        print('insert=' + str(row))
-        sql = """INSERT INTO thread (application_id, submitter, email, ip_address, user_agent, 
-                subject, deleted, show_email, parent_id, discapp_user_id, create_dt, mod_dt) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"""
 
         source_id = row[0]
         submitter = row[3]
@@ -113,24 +109,35 @@ class NeDiscAppImporter:
         mod_dt = row[13]
         body = row[14]
 
-        print('sql=' + sql)
-        cur = self.conn.cursor()
-        cur.execute(sql, (self.app_id, submitter, email, ip_address, user_agent, subject, deleted, show_email,
-                    new_parent_id, disc_app_user_id, create_dt, mod_dt))
+        existing_record = self.__check_if_record_is_imported(submitter, subject, create_dt)
 
-        inserted_row_id = cur.fetchone()[0]
-        self.conn.commit()
-        cur.close()
+        if existing_record is not None:
+            print('Record already imported. Skipping...')
+            inserted_row_id = existing_record[0]
+        else:
+            print('insert=' + str(row))
+            sql = """INSERT INTO thread (application_id, submitter, email, ip_address, user_agent,
+                    subject, deleted, show_email, parent_id, discapp_user_id, create_dt, mod_dt)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;"""
 
-        if body is not None:
-            print('inserting body text=' + body)
-            sql = """INSERT INTO thread_body (application_id, thread_id, body, create_dt, mod_dt) 
-                    VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
             print('sql=' + sql)
             cur = self.conn.cursor()
-            cur.execute(sql, (self.app_id, inserted_row_id, body, create_dt, mod_dt))
+            cur.execute(sql, (self.app_id, submitter, email, ip_address, user_agent, subject, deleted, show_email,
+                        new_parent_id, disc_app_user_id, create_dt, mod_dt))
+
+            inserted_row_id = cur.fetchone()[0]
             self.conn.commit()
             cur.close()
+
+            if body is not None:
+                print('inserting body text=' + body)
+                sql = """INSERT INTO thread_body (application_id, thread_id, body, create_dt, mod_dt)
+                        VALUES (%s, %s, %s, %s, %s) RETURNING id;"""
+                print('sql=' + sql)
+                cur = self.conn.cursor()
+                cur.execute(sql, (self.app_id, inserted_row_id, body, create_dt, mod_dt))
+                self.conn.commit()
+                cur.close()
 
         self.__update_staging_table_thread_as_imported(source_id)
 
@@ -146,3 +153,17 @@ class NeDiscAppImporter:
         cur.execute(sql, [thread_id])
         self.conn.commit()
         cur.close()
+
+    def __check_if_record_is_imported(self, submitter, subject, create_date):
+
+        print('Checking for existing record with submitter=' + submitter + ' subject='
+              + subject + ' create_date=' + str(create_date))
+
+        cur = self.conn.cursor()
+        sql = 'SELECT id FROM thread WHERE application_id = %s and submitter = %s and subject = %s and create_dt = %s'
+        cur.execute(sql, (self.app_id, submitter, subject, create_date))
+        existing_record = cur.fetchone()
+        cur.close()
+        print('Existing record = ' + str(existing_record))
+
+        return existing_record
