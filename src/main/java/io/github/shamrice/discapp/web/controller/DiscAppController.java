@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -57,6 +58,13 @@ public class DiscAppController {
 
     @Autowired
     private ErrorController errorController;
+
+    @GetMapping("/Indices/{applicationId}.html")
+    public ModelAndView getAppViewOriginalUrl(@PathVariable(name = "applicationId") Long appId,
+                                              Model model,
+                                              HttpServletRequest request) {
+        return getAppView(appId, model, request);
+    }
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId,

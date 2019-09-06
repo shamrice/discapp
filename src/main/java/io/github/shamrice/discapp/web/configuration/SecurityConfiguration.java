@@ -32,6 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .disable()
                 .authorizeRequests()
                     .antMatchers("/indices/**").permitAll()
+                    .antMatchers("/Indices/**").permitAll()
                     .antMatchers("/styles/**").permitAll()
                     .antMatchers("/images/**").permitAll()
                     .antMatchers("/*").permitAll()
