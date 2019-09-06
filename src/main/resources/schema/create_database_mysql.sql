@@ -33,7 +33,20 @@ CREATE TABLE owner (
 );
 
 
-commit;
+CREATE TABLE discapp_user (
+  id int(20) NOT NULL AUTO_INCREMENT,
+  username varchar(50) UNIQUE NOT NULL,
+  password varchar(255) NOT NULL,
+  email varchar(255) UNIQUE NOT NULL,
+  show_email bool NOT NULL DEFAULT FALSE,
+  owner_id int(20),
+  enabled bool NOT NULL DEFAULT TRUE,
+  is_admin bool NOT NULL DEFAULT FALSE,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (owner_id) REFERENCES owner(id)
+);
 
 
 CREATE TABLE application (
