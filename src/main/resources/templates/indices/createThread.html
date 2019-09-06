@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <div class="message_and_thread">
+        <div th:if="${parentThreadId != 0}" class="message_and_thread">
             <div class="headers">
                 <div th:text="${parentThreadSubmitter}"></div>
                 <div th:text="${parentThreadSubject}"></div>
