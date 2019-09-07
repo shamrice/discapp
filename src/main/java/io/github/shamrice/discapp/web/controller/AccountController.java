@@ -18,6 +18,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -152,14 +153,25 @@ public class AccountController {
                     accountViewModel.setOwnerEmail(owner.getEmail());
                     accountViewModel.setOwnerPhone(owner.getPhone());
 
-                    //TODO : modify account screen should be able to edit all apps owned by the user.
+                    //get list of applications for an account.
                     List<Application> apps = applicationService.getByOwnerId(owner.getId());
-                    if (apps != null && apps.size() > 0) {
-                        Application app = apps.get(0); //just get first one for now
-
-                        accountViewModel.setApplicationId(app.getId());
-                        accountViewModel.setApplicationName(app.getName());
+                    List<AccountViewModel.AccountApplication> accountApplications = new ArrayList<>();
+                    for (Application app : apps) {
+                        AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
+                                app.getName(), app.getId()
+                        );
+                        accountApplications.add(application);
                     }
+
+                    //sort them by app id.
+                    accountApplications.sort((a1, a2) -> {
+                        if (a1.getApplicationId().equals(a2.getApplicationId())) {
+                            return 0;
+                        }
+                        return a1.getApplicationId() > a2.getApplicationId() ? -1 : 1;
+                    });
+
+                    accountViewModel.setAccountApplications(accountApplications);
                 }
             }
         }

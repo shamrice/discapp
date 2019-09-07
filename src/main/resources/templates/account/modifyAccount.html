@@ -22,7 +22,8 @@
 
     <div class="grey_box">
         <h1 id="account_banner">Modify Account</h1>
-        <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}"
+              method="post" th:object="${accountViewModel}">
             <table>
 
                 <div th:if="${accountViewModel.getErrorMessage()}" class="alert alert-error"
@@ -75,16 +76,18 @@
         </form>
     </div>
 
-    <div class="grey_box" th:if="${accountViewModel.isOwner()}">
+    <div class="grey_box" th:if="${accountViewModel.isOwner()}"
+         th:each="accountApplication : ${accountViewModel.getAccountApplications()}">
 
         <h1 id="application_banner">Modify Application Information</h1>
-        <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}"
+              method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
                     <td>
                         <label>Application Index:</label>
                     </td>
-                    <td class="value-label" th:text="${accountViewModel.getApplicationId()}">
+                    <td class="value-label" th:text="${accountApplication.getApplicationId()}">
                     </td>
                 </tr>
                 <tr>
@@ -93,19 +96,19 @@
                     </td>
                     <td>
                         <input class="button" type="text" id="applicationName" name="applicationName"
-                               th:value="${accountViewModel.getApplicationName()}" maxlength="200"/>
+                               th:value="${accountApplication.getApplicationName()}" maxlength="200"/>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align:center;">
-                        <input type="hidden" name="applicationId" id="applicationId" th:value="${accountViewModel.getApplicationId()}" />
+                        <input type="hidden" name="applicationId" id="applicationId" th:value="${accountApplication.getApplicationId()}" />
                         <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
                         <input class="button" name="reset" type="reset">
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountViewModel.getApplicationId()}&redirect=${accountViewModel.getRedirect()}|}">
+                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}&amp;redirect=${accountViewModel.getRedirect()}|}">
                             Click Here To Modify Disc Application Settings</a>
                     </td>
                 </tr>
@@ -158,7 +161,8 @@
     <div class="grey_box" th:unless="${accountViewModel.isOwner()}">
 
         <h1 id="create_application_banner">Add Disc App To Account</h1>
-        <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}" method="post" th:object="${accountViewModel}">
+        <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}"
+              method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
                     <td>

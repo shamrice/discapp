@@ -1,15 +1,21 @@
 package io.github.shamrice.discapp.web.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
 public class AccountViewModel {
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class AccountApplication {
+        private @NonNull String applicationName;
+        private @NonNull Long applicationId;
+    }
 
     private String username;
     private String password;
@@ -30,6 +36,8 @@ public class AccountViewModel {
     private String ownerEmail;
     private Long applicationId;
     private String applicationName;
+
+    private List<AccountApplication> accountApplications;
 
     private String redirect;
 
