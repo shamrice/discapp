@@ -54,14 +54,14 @@
                         <input type="checkbox" name="showEmail" th:checked="${accountViewModel.isShowEmail()}"/>
                     </td>
                 </tr>
-                <tr>
+                <!--tr>
                     <td><label> Password: </label></td>
                     <td><input class="button" type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
                 </tr>
                 <tr>
                     <td><label> Confirm Password:</label></td>
                     <td><input class="button" type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
-                </tr>
+                </tr-->
                 <tr>
                     <td colspan="2">&nbsp;</td>
                 </tr>
@@ -162,7 +162,7 @@
             <table>
                 <tr>
                     <td>
-                        <label>Application Name:</label>
+                        <label>Application Name*:</label>
                     </td>
                     <td>
                         <input class="button" type="text" id="applicationName" name="applicationName"
@@ -171,7 +171,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <label>First Name:</label>
+                        <label>First Name*:</label>
                     </td>
                     <td>
                         <input class="button" type="text" id="ownerFirstName" name="ownerFirstName"
@@ -180,7 +180,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <label>Last Name:</label>
+                        <label>Last Name*:</label>
                     </td>
                     <td>
                         <input class="button" type="text" id="ownerLastName" name="ownerLastName"
@@ -197,11 +197,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label>Password:</label></td>
+                    <td><label>Password*:</label></td>
                     <td><input class="button" type="password" id="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
                 </tr>
                 <tr>
-                    <td><label>Confirm Password:</label></td>
+                    <td><label>Confirm Password*:</label></td>
                     <td><input class="button" type="password" id="confirmPassword" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
                 </tr>
                 <tr>
@@ -215,6 +215,11 @@
     </div>
 
     <table>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <a href="/logout">Log out</a>
+            </td>
+        </tr>
         <tr>
             <td colspan="2" style="text-align:center;">
                 <a th:href="${redirectUrl}" th:text="@{|Return to ${redirectUrl}|}"></a>

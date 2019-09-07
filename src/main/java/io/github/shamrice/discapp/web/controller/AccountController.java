@@ -12,6 +12,7 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -160,7 +161,6 @@ public class AccountController {
                         accountViewModel.setApplicationName(app.getName());
                     }
                 }
-
             }
         }
 
@@ -171,47 +171,33 @@ public class AccountController {
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                           @RequestParam(required = false) String redirect,
                                           ModelMap modelMap) {
-
         if (accountViewModel != null) {
 
             accountViewModel.setRedirect(redirect);
 
-            String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
+            String email = accountHelper.getLoggedInEmail();
 
-            if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
-                    && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
-                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()
-                    && password.equals(accountViewModel.getPassword())) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+            if (user != null) {
 
-                String email = accountHelper.getLoggedInEmail();
+                boolean showEmail = accountViewModel.isShowEmail();
 
-                DiscAppUser user = discAppUserDetailsService.getByEmail(email);
-                if (user != null) {
-                    if (username != null && !username.isEmpty()) {
-                        user.setUsername(username);
-                    }
-                    user.setShowEmail(accountViewModel.isShowEmail());
-                    user.setModDt(new Date());
-                    user.setPassword(password);
-
-                    if (!discAppUserDetailsService.saveDiscAppUser(user)) {
-                        log.error("Failed to update user : " + email + ". Changes will not be saved.");
-                        accountViewModel.setErrorMessage("Failed to update user.");
-                    } else {
-                        accountViewModel.setErrorMessage("Successfully updated user information.");
-                        log.info("User " + email + " account information was updated.");
-
-                    }
+                if (username == null || username.trim().isEmpty()) {
+                    username = user.getUsername();
                 }
-            } else {
-                log.error("Passwords do not match. Cannot update account information.");
-                accountViewModel.setErrorMessage("Passwords don't match. Cannot update account information.");
+
+                if (!discAppUserDetailsService.updateDiscAppUser(user.getId(), username, showEmail)) {
+                    log.error("Failed to update user : " + email + ". Changes will not be saved.");
+                    accountViewModel.setErrorMessage("Failed to update user.");
+                } else {
+                    accountViewModel.setErrorMessage("Successfully updated user information.");
+                    log.info("User " + email + " account information was updated.");
+                }
             }
         }
 
-        return getAccountModify(accountViewModel, redirect, modelMap);
-
+        return new ModelAndView("redirect:/account/modify");
     }
 
 
@@ -219,7 +205,6 @@ public class AccountController {
     public ModelAndView postApplicationModify(@ModelAttribute AccountViewModel accountViewModel,
                                               @RequestParam(required = false) String redirect,
                                               ModelMap modelMap) {
-
         if (accountViewModel != null) {
 
             accountViewModel.setRedirect(redirect);
@@ -329,7 +314,6 @@ public class AccountController {
                     && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()
                     && password.equals(accountViewModel.getPassword())) {
 
-
                 String email = accountHelper.getLoggedInEmail();
 
                 if (email != null && !email.trim().isEmpty()) {
@@ -337,23 +321,50 @@ public class AccountController {
                     DiscAppUser user = discAppUserDetailsService.getByEmail(email);
                     if (user != null) {
 
+                        //verify passwords entered are correct.
+                        if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
+                            log.error("Cannot add Disc App to account. Passwords do not match existing password for account.");
+                            accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
+                            return getAccountModify(accountViewModel, redirect, modelMap);
+                        }
+
                         String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
                         String ownerLastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
                         String ownerPhone = inputHelper.sanitizeInput(accountViewModel.getOwnerPhone());
+                        String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
-                        Owner newOwner = new Owner();
-                        newOwner.setFirstName(ownerFirstName);
-                        newOwner.setLastName(ownerLastName);
-                        newOwner.setEmail(user.getEmail()); //use same user email
-                        newOwner.setPhone(ownerPhone);
-                        newOwner.setEnabled(true);
-                        newOwner.setCreateDt(new Date());
-                        newOwner.setModDt(new Date());
 
-                        Owner savedOwner = accountService.saveOwner(newOwner);
+                        if ((ownerFirstName == null || ownerFirstName.trim().isEmpty())
+                                || (ownerLastName == null || ownerLastName.trim().isEmpty()) ) {
+                            log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
+                                    + " attempted to create a new owner without a first or last name.");
+                            accountViewModel.setErrorMessage("Owner first name and last name are required to create an application.");
+                            return getAccountModify(accountViewModel, redirect, modelMap);
+                        }
+
+                        if (appName == null || appName.trim().isEmpty()) {
+                            log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
+                                    + " attempted to create a new application without a name");
+                            accountViewModel.setErrorMessage("Application name is required to create an application.");
+                            return getAccountModify(accountViewModel, redirect, modelMap);
+                        }
+
+                        //check if owner already exists...
+                        Owner owner = accountService.getOwnerByEmail(user.getEmail());
+
+                        if (owner == null) {
+                            owner = new Owner();
+                            owner.setFirstName(ownerFirstName);
+                            owner.setLastName(ownerLastName);
+                            owner.setEmail(user.getEmail()); //use same user email
+                            owner.setPhone(ownerPhone);
+                            owner.setEnabled(true);
+                            owner.setCreateDt(new Date());
+                            owner.setModDt(new Date());
+                        }
+
+                        Owner savedOwner = accountService.saveOwner(owner);
                         if (savedOwner != null) {
-
-                            String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
                             Application newApp = new Application();
                             newApp.setName(appName);
@@ -364,35 +375,36 @@ public class AccountController {
                             Application savedApp = applicationService.save(newApp);
 
                             if (savedApp != null) {
-                                user.setOwnerId(newOwner.getId());
-                                user.setPassword(password);
-                                user.setIsAdmin(true);
-                                discAppUserDetailsService.saveDiscAppUser(user);
+
+                                if (!discAppUserDetailsService.updateOwnerInformation(user.getId(),
+                                        owner.getId(), true)) {
+                                    log.error("Failed to update disc app user id: " + user.getId()
+                                            + " with new ownerId: " + owner.getId());
+                                }
 
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
-                                accountViewModel.setRedirect("/account/modify");
-
                                 log.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
-                                accountViewModel.setErrorMessage("Successfully created new owner and application for user.");
 
                             } else {
-                                log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + newOwner.getId());
+                                log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + owner.getId());
                                 accountViewModel.setErrorMessage("Failed to create new app.");
+                                return getAccountModify(accountViewModel, redirect, modelMap);
                             }
                         } else {
-                            log.error("Failed to create new owner for email: " + newOwner.getEmail());
+                            log.error("Failed to create new owner for email: " + owner.getEmail());
                             accountViewModel.setErrorMessage("Failed to create new owner for new app.");
+                            return getAccountModify(accountViewModel, redirect, modelMap);
                         }
                     }
                 }
             } else {
-                log.error("Cannot create a new account. passwords do not match");
+                log.error("Cannot add Disc App to account. Passwords do not match");
                 accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
+                return getAccountModify(accountViewModel, redirect, modelMap);
             }
         }
 
-
-        return getAccountModify(accountViewModel, redirect, modelMap);
+        return new ModelAndView("redirect:/account/modify");
     }
 }

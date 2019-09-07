@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -59,7 +61,6 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     public boolean saveDiscAppUser(DiscAppUser user) {
 
-        //TODO : add logging
         if (user != null) {
 
             try {
@@ -85,5 +86,15 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         }
 
         return false;
+    }
+
+    public boolean updateDiscAppUser(long userId, String username, boolean isShowEmail) {
+        log.info("Updating user id: " + userId + " with username: " + username + " : showEmail: " + isShowEmail);
+        return discappUserRepository.updateDiscAppUser(userId, username, isShowEmail, new Date()) > 0;
+    }
+
+    public boolean updateOwnerInformation(long userId, long ownerId, boolean isAdmin) {
+        log.info("Updating user owner info: userId: " + userId + " : ownerId: " + ownerId + " : isAdmin: " + isAdmin);
+        return discappUserRepository.updateDiscAppUserOwnerInfo(userId, ownerId, isAdmin, new Date()) > 0;
     }
 }

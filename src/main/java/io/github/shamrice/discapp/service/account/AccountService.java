@@ -47,5 +47,9 @@ public class AccountService {
         return null;
     }
 
+    public Owner getOwnerByEmail(String email) {
+        return ownerRepository.findOneByEmail(email);
+    }
+
 
 }
