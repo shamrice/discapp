@@ -25,7 +25,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import sun.rmi.rmic.Main;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
