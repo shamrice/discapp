@@ -606,11 +606,19 @@ public class DiscAppController {
 
         if (!skipCurrentNode) {
 
-            currentHtml += "<li class=\"message_entry\">" +
-                    " <div class=\"response_headers\">";
+            //current entry gets different css and no inner div.
+            if (currentNode.getCurrent().getId().equals(currentlyViewedId)) {
+                currentHtml += "<li class=\"current_entry\">";
+            } else {
+                currentHtml += "<li class=\"message_entry\">" +
+                        " <div class=\"response_headers\">";
+            }
 
             if (isNewMessageHighlighted(currentNode)) {
                 currentHtml += "   <span class=\"response_headers new_message\">";
+            } else if (!isNewMessageHighlighted(currentNode) && currentNode.getCurrent().getId().equals(currentlyViewedId)) {
+                //if current thread, apply different css class to span
+                currentHtml += "   <span class=\"current_entry\">";
             } else {
                 currentHtml += "   <span class=\"response_headers\">";
             }
@@ -634,8 +642,11 @@ public class DiscAppController {
                             currentNode.getCurrent().getCreateDt(),
                             false) +
                     "       </span>" +
-                    "   </span>" +
-                    "</div>";
+                    "   </span>";
+            //close div tag on non-current entries.
+            if (!currentNode.getCurrent().getId().equals(currentlyViewedId)) {
+                currentHtml += "</div>";
+            }
 
             //only show preview if selected and not currently viewed thread
             if (showPreviewText && !currentNode.getCurrent().getId().equals(currentlyViewedId)) {
