@@ -13,6 +13,7 @@
 #
 
 import sys
+import re
 
 if len(sys.argv) != 2:
     print('Invalid number of arguments supplied. Please provide source SQL file.')
@@ -30,7 +31,7 @@ with open(sys.argv[1], 'r') as input_file:
 
 print('Replacing MySQL table creation script with Postgres.')
 file_contents = file_contents.replace('`', '')
-file_contents = file_contents.replace('ENGINE=MyISAM AUTO_INCREMENT=21020 DEFAULT CHARSET=latin1', '')
+file_contents = re.sub('ENGINE=MyISAM AUTO_INCREMENT=[0-9].*', ';', file_contents)
 file_contents = file_contents.replace('id mediumint(8) unsigned NOT NULL AUTO_INCREMENT', 'id serial NOT NULL')
 file_contents = file_contents.replace('mediumint(8) unsigned', 'int')
 file_contents = file_contents.replace('enum(\'0\',\'1\')', 'bool')
