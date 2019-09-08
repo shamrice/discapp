@@ -1,4 +1,3 @@
-#!/user/bin/python
 #
 # DiscApp Export Converter Script
 #
@@ -23,14 +22,11 @@ file_contents = 'set standard_conforming_strings = off;\n'
 
 with open(sys.argv[1], 'r') as input_file:
     print('\nOpened ' + sys.argv[1] + ' as input file.')
-    line = input_file.readline()
-    while line:
-        if not line.__contains__('/*!4'):
-            file_contents += line
-        line = input_file.readline()
+    file_contents += input_file.read()
 
 print('Replacing MySQL table creation script with Postgres.')
 file_contents = file_contents.replace('`', '')
+file_contents = re.sub('/\*!40[0-9].*[SET|ALTER].*\*/;', '', file_contents)
 file_contents = re.sub('ENGINE=MyISAM AUTO_INCREMENT=[0-9].*', ';', file_contents)
 file_contents = file_contents.replace('id mediumint(8) unsigned NOT NULL AUTO_INCREMENT', 'id serial NOT NULL')
 file_contents = file_contents.replace('mediumint(8) unsigned', 'int')
