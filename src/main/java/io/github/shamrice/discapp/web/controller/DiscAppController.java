@@ -309,32 +309,57 @@ public class DiscAppController {
 
                 return postPreviewThread(appId, newThreadViewModel, model);
 
-            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()
-                    && newThreadViewModel.getSubmitter() != null && !newThreadViewModel.getSubmitter().isEmpty()
-                    && newThreadViewModel.getSubject() != null && !newThreadViewModel.getSubject().isEmpty()) {
+            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()) {
 
-                log.info("new thread: " + newThreadViewModel.getAppId() + " : " + newThreadViewModel.getSubmitter() + " : "
-                        + newThreadViewModel.getSubject() + " : " + newThreadViewModel.getBody());
+                if ((newThreadViewModel.getSubject() == null || newThreadViewModel.getSubject().trim().isEmpty())
+                        && (newThreadViewModel.getBody() == null || newThreadViewModel.getBody().trim().isEmpty())) {
+                    log.warn("AppId: " + appId + " cannot create new thread with no subject and no body.");
+                    return new ModelAndView("redirect:/indices/" + appId);
+                }
 
-                String subject = inputHelper.sanitizeInput(newThreadViewModel.getSubject());
-                String submitter = inputHelper.sanitizeInput(newThreadViewModel.getSubmitter());
+                //set submitter to anon if not filled out
+                String submitter = "";
+                if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
+                    submitter = "Anonymous";
+                } else {
+                    submitter = newThreadViewModel.getSubmitter();
+                }
+
+                long parentId = Long.parseLong(newThreadViewModel.getParentId());
+
+                //set subject if blank depending if new thread or a reply and has message body.
+                String subject = "";
+                if ((newThreadViewModel.getSubject() == null || newThreadViewModel.getSubject().trim().isEmpty())) {
+                    if (parentId == 0L) {
+                        subject = "No Subject";
+                    } else {
+                        subject = "Re: " + newThreadViewModel.getParentThreadSubject();
+                    }
+                } else {
+                    subject = newThreadViewModel.getSubject();
+                }
+
+                //sanitize inputs.
+                subject = inputHelper.sanitizeInput(subject);
+                submitter = inputHelper.sanitizeInput(submitter);
                 String email = inputHelper.sanitizeInput(newThreadViewModel.getEmail());
+
+                log.info("new thread: " + newThreadViewModel.getAppId() + " : " + submitter + " : "
+                        + subject + " : " + newThreadViewModel.getBody());
 
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
-                newThread.setParentId(Long.parseLong(newThreadViewModel.getParentId()));
+                newThread.setParentId(parentId);
                 newThread.setDeleted(false);
                 newThread.setCreateDt(new Date());
                 newThread.setModDt(new Date());
                 newThread.setSubject(subject);
-
 
                 //set values for logged in user, if not logged in... use form data.
                 String userEmail = accountHelper.getLoggedInEmail();
 
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(userEmail);
                 if (discAppUser != null) {
-                    //newThread.setDiscappUserId(discAppUser.getId());
                     newThread.setDiscAppUser(discAppUser);
                     newThread.setSubmitter(discAppUser.getUsername());
                     newThread.setEmail(discAppUser.getEmail());
@@ -364,7 +389,7 @@ public class DiscAppController {
                 }
 
                 String body = newThreadViewModel.getBody();
-                if (body != null && !body.isEmpty()) {
+                if (body != null && !body.trim().isEmpty()) {
                     body = body.replaceAll("\r", "<br />");
 
                     body = inputHelper.addUrlHtmlLinksToString(body);
