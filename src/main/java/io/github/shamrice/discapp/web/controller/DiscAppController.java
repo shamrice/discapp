@@ -64,13 +64,15 @@ public class DiscAppController {
 
     @GetMapping("/Indices/{applicationId}.html")
     public ModelAndView getAppViewOriginalUrl(@PathVariable(name = "applicationId") Long appId,
+                                              @RequestParam(name = "page", required = false) Integer page,
                                               Model model,
                                               HttpServletRequest request) {
-        return getAppView(appId, model, request);
+        return getAppView(appId, page, model, request);
     }
 
     @GetMapping("/indices/{applicationId}")
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId,
+                                   @RequestParam(name = "page", required = false) Integer page,
                                    Model model,
                                    HttpServletRequest request) {
 
@@ -86,6 +88,14 @@ public class DiscAppController {
                 model.addAttribute("epilogueText", applicationService.getEpilogueText(app.getId()));
 
                 model.addAttribute("postMessageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+                model.addAttribute("nextPageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
+
+                if (page == null) {
+                    page = 0;
+                }
+                model.addAttribute("currentPage", page);
+                model.addAttribute("nextPage", page + 1);
+                model.addAttribute("hasNextPage", true); // default.
 
                 //get ip address
                 if (request != null) {
@@ -103,8 +113,12 @@ public class DiscAppController {
                 boolean isExpandOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
                 String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
 
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), page, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()));
 
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()));
+                //if there are less than max threads returned, we must be on the last page.
+                if (threadTreeNodeList.size() < maxThreads) {
+                    model.addAttribute("hasNextPage", false);
+                }
 
                 if (isExpandOnIndex) {
 
@@ -113,12 +127,14 @@ public class DiscAppController {
 
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
 
-                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview);
+                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview, page);
 
                         //get replies if they exist and add on HTML.
                         if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
                             currentHtml += "<div class=\"responses\">";
-                            currentHtml += getAppViewThreadHtml(threadTreeNode, "", entryBreakString, true, -1, false);
+                            currentHtml += getAppViewThreadHtml(threadTreeNode, "",
+                                    entryBreakString, true, -1,
+                                    false, page);
                             currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
                             currentHtml += "</div>";
                         }
@@ -171,7 +187,6 @@ public class DiscAppController {
                 model.addAttribute("isExpandOnIndex", isExpandOnIndex);
                 model.addAttribute("isShowTopLevelPreview", showTopLevelPreview);
 
-
                 return new ModelAndView("indices/appView");
 
             } else {
@@ -209,6 +224,7 @@ public class DiscAppController {
                 model.addAttribute("parentThreadSubmitter", threadViewModel.getSubmitter());
                 model.addAttribute("parentThreadSubject", threadViewModel.getSubject());
                 model.addAttribute("parentThreadBody", threadViewModel.getBody());
+                model.addAttribute("currentPage", threadViewModel.getCurrentPage());
             } catch (NumberFormatException ex) {
                 log.error("Unable to parse parent id from view thread model. appId: " + appId
                         + " : attempted parentId: " + threadViewModel.getId());
@@ -225,6 +241,7 @@ public class DiscAppController {
             model.addAttribute("parentThreadSubmitter", newThreadViewModel.getParentThreadSubmitter());
             model.addAttribute("parentThreadSubject", newThreadViewModel.getParentThreadSubject());
             model.addAttribute("parentThreadBody", newThreadViewModel.getParentThreadBody());
+            model.addAttribute("currentPage", newThreadViewModel.getCurrentPage());
 
             if (newThreadViewModel.getParentId() != null) {
                 try {
@@ -307,18 +324,26 @@ public class DiscAppController {
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
                 log.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
 
+                if (newThreadViewModel.getCurrentPage() != null && newThreadViewModel.getCurrentPage() > 0) {
+                    int page = newThreadViewModel.getCurrentPage();
+                    return new ModelAndView("redirect:/indices/" + appId + "?page=" + page);
+                }
                 return new ModelAndView("redirect:/indices/" + appId);
 
             } else if (newThreadViewModel.getPreviewArticle() != null && !newThreadViewModel.getPreviewArticle().isEmpty()) {
-
                 return postPreviewThread(appId, newThreadViewModel, model);
 
             } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()) {
 
+                int page = 0;
+                if (newThreadViewModel.getCurrentPage() != null && newThreadViewModel.getCurrentPage() > 0) {
+                    page = newThreadViewModel.getCurrentPage();
+                }
+
                 if ((newThreadViewModel.getSubject() == null || newThreadViewModel.getSubject().trim().isEmpty())
                         && (newThreadViewModel.getBody() == null || newThreadViewModel.getBody().trim().isEmpty())) {
                     log.warn("AppId: " + appId + " cannot create new thread with no subject and no body.");
-                    return new ModelAndView("redirect:/indices/" + appId);
+                    return new ModelAndView("redirect:/indices/" + appId + "?page=" + page);
                 }
 
                 //set submitter to anon if not filled out
@@ -400,6 +425,7 @@ public class DiscAppController {
                 }
 
                 threadService.saveThread(newThread, body);
+                return new ModelAndView("redirect:/indices/" + appId + "?page=" + page);
             }
         }
         log.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");
@@ -409,11 +435,16 @@ public class DiscAppController {
     @GetMapping("discussion.cgi")
     public String getViewThread(@RequestParam(name = "disc") Long appId,
                                 @RequestParam(name = "article", required = false) Long threadId,
+                                @RequestParam(name = "page", required = false) Integer currentPage,
                                 Model model) {
 
         if (threadId == null || threadId < 1) {
             log.error("Null or invalid article id passed to view thread. Returning to app view for appId: " + appId);
             return "redirect:/indices/" + appId;
+        }
+
+        if (currentPage == null || currentPage < 0) {
+            currentPage = 0;
         }
 
         log.info("Getting thread id " + threadId + " for app id: " + appId);
@@ -423,7 +454,7 @@ public class DiscAppController {
         if (currentThread != null) {
 
             String threadBody = threadService.getThreadBodyText(threadId);
-            String subThreadsHtml = getThreadViewThreadHtml(currentThread);
+            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage);
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
 
@@ -432,6 +463,7 @@ public class DiscAppController {
                 threadViewModel.setCurrentUsername(sourceUser.getUsername());
             }
 
+            threadViewModel.setCurrentPage(currentPage);
             threadViewModel.setBody(threadBody);
             threadViewModel.setModDt(currentThread.getModDt().toString());
             threadViewModel.setAppId(appId.toString());
@@ -483,9 +515,13 @@ public class DiscAppController {
                                            Model model) {
         if (threadViewModel != null) {
             if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
+                int currentPage = 0;
+                if (threadViewModel.getCurrentPage() != null && threadViewModel.getCurrentPage() > 0) {
+                    currentPage = threadViewModel.getCurrentPage();
+                }
 
                 log.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
-                return new ModelAndView("redirect:/indices/" + appId + "#" + threadViewModel.getId());
+                return new ModelAndView("redirect:/indices/" + appId + "?page=" + currentPage + "#" + threadViewModel.getId());
 
             } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
 
@@ -555,7 +591,7 @@ public class DiscAppController {
             currentHtml += " <li>"
                     + "        <a "
                     + " href=\"/discussion.cgi?disc=" + thread.getApplicationId()
-                    + "&article=" + thread.getId() + "\""
+                    + "&amp;article=" + thread.getId() + "\""
                     + " name=\"" + thread.getId() + "\">"
                     + thread.getSubject()
                     + "</a>  "
@@ -572,7 +608,8 @@ public class DiscAppController {
         return currentHtml;
     }
 
-    private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString, boolean showPreviewText) {
+    private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString,
+                                           boolean showPreviewText, int currentPage) {
 
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
@@ -587,7 +624,8 @@ public class DiscAppController {
                 "            <div class=\"" + messageHeaderText + "\">" +
                 "               <span class=\"" + messageSpanText + "\">" +
                 "                   <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                "&article=" + currentNode.getCurrent().getId() + "\"" +
+                "&amp;article=" + currentNode.getCurrent().getId() +
+                "&amp;page=" + currentPage + "\"" +
                 " name=\"" + currentNode.getCurrent().getId() + "\">" +
                 currentNode.getCurrent().getSubject() +
                 "                   </a> " + entryBreakString +
@@ -611,7 +649,8 @@ public class DiscAppController {
                 if (previewText.length() > 320) {
                     previewText = previewText.substring(0, 320); //todo configurable length
                     previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                            "&article=" + currentNode.getCurrent().getId() + "\"" +
+                            "&amp;article=" + currentNode.getCurrent().getId() +
+                            "&amp;page=" + currentPage + "\"" +
                             " name=\"" + currentNode.getCurrent().getId() + "\">" +
                             " more</a> ";
                 }
@@ -630,7 +669,7 @@ public class DiscAppController {
      */
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
                                         boolean skipCurrentNode, long currentlyViewedId,
-                                        boolean showPreviewText) {
+                                        boolean showPreviewText, int currentPage) {
 
         if (!skipCurrentNode) {
 
@@ -656,7 +695,8 @@ public class DiscAppController {
                 currentHtml += currentNode.getCurrent().getSubject();
             } else {
                 currentHtml += "      <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                        "&article=" + currentNode.getCurrent().getId() + "\"" +
+                        "&amp;article=" + currentNode.getCurrent().getId() +
+                        "&amp;page=" + currentPage + "\"" +
                         " name=\"" + currentNode.getCurrent().getId() + "\">" +
                         currentNode.getCurrent().getSubject() +
                         "</a> ";
@@ -686,7 +726,8 @@ public class DiscAppController {
                     if (previewText.length() > 200) {
                         previewText = previewText.substring(0, 200); //todo configurable length
                         previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                                "&article=" + currentNode.getCurrent().getId() + "\"" +
+                                "&amp;article=" + currentNode.getCurrent().getId() +
+                                "&amp;page=" + currentPage + "\"" +
                                 " name=\"" + currentNode.getCurrent().getId() + "\">" +
                                 " more</a> ";
                     }
@@ -701,7 +742,8 @@ public class DiscAppController {
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
 
             currentHtml += "<li class=\"nested_list\"><ul>";
-            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false, currentlyViewedId, showPreviewText);
+            currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false,
+                    currentlyViewedId, showPreviewText, currentPage);
             currentHtml += "</li>";
         }
 
@@ -717,7 +759,7 @@ public class DiscAppController {
      * @param currentThread Current thread being viewed on the view thread page.
      * @return Returns formatted HTML block for reply threads.
      */
-    private String getThreadViewThreadHtml(Thread currentThread) {
+    private String getThreadViewThreadHtml(Thread currentThread, int currentPage) {
 
         //default reply thread values
         boolean skipCurrent = true;
@@ -755,10 +797,11 @@ public class DiscAppController {
         ThreadTreeNode subThreadNode = threadService.getFullThreadTree(grandparentId);
 
         if (subThreadNode != null) {
-            String entryBreakString = configurationService.getStringValue(currentThread.getApplicationId(), ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+            String entryBreakString = configurationService.getStringValue(currentThread.getApplicationId(),
+                    ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
             currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                    skipCurrent, currentThread.getId(), true) ;
+                    skipCurrent, currentThread.getId(), true, currentPage) ;
 
             //first child thread needs additional html tags added
             if (isFirstChild) {

@@ -260,11 +260,10 @@ public class ThreadService {
         return uniqueThreadList;
     }
 
-    //TODO : accept page number.
-    public List<ThreadTreeNode> getLatestThreads(Long applicationId, int numThreads, ThreadSortOrder threadSortOrder) {
+    public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads, ThreadSortOrder threadSortOrder) {
 
         //query to get latest parent threads (parentId = 0L) for an application
-        Pageable limit = PageRequest.of(0, numThreads);
+        Pageable limit = PageRequest.of(page, numThreads);
         List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
                 applicationId,
                 TOP_LEVEL_THREAD_PARENT_ID,
@@ -297,9 +296,9 @@ public class ThreadService {
      * @param numThreads
      * @return
      */
-    public List<Thread> getLatestThreads(long applicationId, int numThreads) {
+    public List<Thread> getLatestThreads(long applicationId, int page, int numThreads) {
         //query to get latest parent threads (parentId = 0L) for an application
-        Pageable limit = PageRequest.of(0, numThreads);
+        Pageable limit = PageRequest.of(page, numThreads);
         return threadRepository.findByApplicationIdAndDeletedOrderByCreateDtDesc(
                 applicationId,
                 false,
@@ -313,9 +312,9 @@ public class ThreadService {
      * @param numThreads
      * @return
      */
-    public List<Thread> getLatestTopLevelThreads(long applicationId, int numThreads) {
+    public List<Thread> getLatestTopLevelThreads(long applicationId, int page, int numThreads) {
         //query to get latest parent threads (parentId = 0L) for an application
-        Pageable limit = PageRequest.of(0, numThreads);
+        Pageable limit = PageRequest.of(page, numThreads);
         return threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
                 applicationId,
                 TOP_LEVEL_THREAD_PARENT_ID,

@@ -826,7 +826,8 @@ public class DiscAppMaintenanceController {
                 if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                     //get edit threads html
                     List<String> threadTreeHtml = new ArrayList<>();
-                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 50, ThreadSortOrder.CREATION);
+                    //todo: page number.
+                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 0,50, ThreadSortOrder.CREATION);
 
                     if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
                         for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
@@ -921,7 +922,7 @@ public class DiscAppMaintenanceController {
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model,
                                                  HttpServletRequest request) {
-        return discAppController.getAppView(appId, model, request);
+        return discAppController.getAppView(appId, 0, model, request);
     }
 
     @GetMapping("/admin/appearance-frameset.cgi")

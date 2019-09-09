@@ -42,6 +42,16 @@
         static thread prototyping placeholder
     </div>
 
+    <div th:if="${hasNextPage}">
+        <form method="get" th:action="@{|/indices/${appId}|}"
+              enctype="multipart/form-data">
+            <input type="hidden" name="page" th:value="${nextPage}"/>
+            <div id="next_button" style="text-align:center; margin-top:1em;">
+                <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage" />
+            </div>
+        </form>
+    </div>
+
     <div th:replace="indices/fragments/epilogue :: epilogue">
         static prototyping placeholder
     </div>

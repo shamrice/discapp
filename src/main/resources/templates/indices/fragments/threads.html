@@ -28,7 +28,7 @@
                 <tr class="entry_row">
                     <td class="link_cell">
                         <a class="article_link"
-                           th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}|}"
+                           th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}&amp;page=${currentPage}|}"
                            th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
                     </td>
                     <td class="author_cell" th:text="${thread.getSubmitter()}"></td>
@@ -42,7 +42,7 @@
 
                             <span th:if="${thread.isShowMoreOnPreviewText()}">
                             <a class="article_link"
-                               th:href="@{|/discussion.cgi?disc=${appId}&amp;amp&article=${thread.getId()}|}">more</a>
+                               th:href="@{|/discussion.cgi?disc=${appId}&amp;amp&article=${thread.getId()}&amp;page=${currentPage}|}">more</a>
                             </span>
                         </div>
                     </td>

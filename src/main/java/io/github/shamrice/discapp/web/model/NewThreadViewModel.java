@@ -25,5 +25,6 @@ public class NewThreadViewModel {
     private String parentThreadSubmitter;
     private String parentThreadSubject;
     private String parentThreadBody;
+    private Integer currentPage;
 
 }

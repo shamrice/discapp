@@ -25,5 +25,6 @@ public class ThreadViewModel {
     private String previewText;
     private boolean isShowMoreOnPreviewText;
     private boolean showEmail;
+    private Integer currentPage;
 
 }

@@ -78,6 +78,7 @@
                     <input type="hidden" name="subject" th:value="${threadViewModel.getSubject()}"/>
                     <input type="hidden" name="submitter" th:value="${threadViewModel.getSubmitter()}"/>
                     <input type="hidden" name="body" th:value="${threadViewModel.getBody()}"/>
+                    <input type="hidden" name="currentPage" th:value="${threadViewModel.getCurrentPage()}"/>
 
                     <input type="submit" name="postResponse" th:value="${replyButtonText}" class="button" id="postResponse"
                            style="float:left;"/>
