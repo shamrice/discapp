@@ -34,6 +34,10 @@ import java.util.*;
 @Slf4j
 public class DiscAppController {
 
+    private static final String BLANK_SUBMITTER = "Anonymous";
+    private static final String BLANK_SUBJECT = "No Subject";
+    private static final String BLANK_REPLY_PREFIX = "Re: ";
+
     @Autowired
     private ApplicationService applicationService;
 
@@ -320,7 +324,7 @@ public class DiscAppController {
                 //set submitter to anon if not filled out
                 String submitter = "";
                 if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
-                    submitter = "Anonymous";
+                    submitter = BLANK_SUBMITTER;
                 } else {
                     submitter = newThreadViewModel.getSubmitter();
                 }
@@ -331,9 +335,9 @@ public class DiscAppController {
                 String subject = "";
                 if ((newThreadViewModel.getSubject() == null || newThreadViewModel.getSubject().trim().isEmpty())) {
                     if (parentId == 0L) {
-                        subject = "No Subject";
+                        subject = BLANK_SUBJECT;
                     } else {
-                        subject = "Re: " + newThreadViewModel.getParentThreadSubject();
+                        subject = BLANK_REPLY_PREFIX + newThreadViewModel.getParentThreadSubject();
                     }
                 } else {
                     subject = newThreadViewModel.getSubject();
