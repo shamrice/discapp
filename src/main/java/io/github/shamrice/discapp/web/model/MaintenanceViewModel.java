@@ -55,6 +55,7 @@ public class MaintenanceViewModel {
     private String returnButton;
     private String previewButton;
     private String postButton;
+    private String previousPageButton;
     private String nextPageButton;
     private String replyButton;
 

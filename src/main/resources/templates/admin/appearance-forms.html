@@ -570,6 +570,15 @@ parent.frames.preview.document.location.reload();
                 </tr>
                 <tr>
                     <th>
+                        <label for="previousButton">Previous Page</label>
+                    </th>
+                    <td>
+                        <input type="text" id="previousButton" name="previousPageButton"
+                               th:value="${maintenanceViewModel.getPreviousPageButton()}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
                         <label for="nextButton">Next Page</label>
                     </th>
                     <td>

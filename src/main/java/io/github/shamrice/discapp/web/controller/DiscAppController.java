@@ -89,10 +89,16 @@ public class DiscAppController {
 
                 model.addAttribute("postMessageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
                 model.addAttribute("nextPageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
+                model.addAttribute("previousPageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
 
                 if (page == null) {
                     page = 0;
                 }
+                if (page > 0) {
+                    model.addAttribute("hasPreviousPage", true);
+                    model.addAttribute("previousPage", page - 1);
+                }
+
                 model.addAttribute("currentPage", page);
                 model.addAttribute("nextPage", page + 1);
                 model.addAttribute("hasNextPage", true); // default.

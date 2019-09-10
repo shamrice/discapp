@@ -12,6 +12,7 @@ public enum ConfigurationProperty {
     POST_MESSAGE_BUTTON_TEXT ("button.post.message.text"),
     RETURN_TO_MESSAGES_BUTTON_TEXT ("button.return.to.messages.text"),
     NEXT_PAGE_BUTTON_TEXT ("button.page.next.text"),
+    PREVIOUS_PAGE_BUTTON_TEXT ("button.page.previous.text"),
     POST_REPLY_MESSAGE_BUTTON_TEXT ("button.reply.post.text"),
     SHARE_BUTTON_TEXT ("button.share.text"),
     STYLE_SHEET_URL ("stylesheet.url"),

@@ -36,6 +36,7 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message");
         configsToSet.put(ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Articles");
         configsToSet.put(ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page");
+        configsToSet.put(ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page");
         configsToSet.put(ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply");
         configsToSet.put(ConfigurationProperty.SHARE_BUTTON_TEXT, "Share");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_URL, "/styles/graph2.css");

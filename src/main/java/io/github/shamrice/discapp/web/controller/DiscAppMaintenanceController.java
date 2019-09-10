@@ -1032,6 +1032,9 @@ public class DiscAppMaintenanceController {
                 String postButton = configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message");
                 maintenanceViewModel.setPostButton(postButton);
 
+                String previousPageButton = configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page");
+                maintenanceViewModel.setPreviousPageButton(previousPageButton);
+
                 String nextPageButton = configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page");
                 maintenanceViewModel.setNextPageButton(nextPageButton);
 
@@ -1386,11 +1389,12 @@ public class DiscAppMaintenanceController {
             boolean returnButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
             boolean previewButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
             boolean postButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
+            boolean previousPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviousPageButton()));
             boolean nextPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
             boolean replyButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
 
             if (shareButtonSaved && editButtonSaved && returnButtonSaved && previewButtonSaved && postButtonSaved
-                    && nextPageButtonSaved && replyButtonSaved) {
+                    && previousPageButtonSaved && nextPageButtonSaved && replyButtonSaved) {
 
                 maintenanceViewModel.setInfoMessage("Successfully saved changes to buttons.");
             } else {

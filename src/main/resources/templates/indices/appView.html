@@ -15,7 +15,6 @@
         /* li { margin-top: 1ex } */
 
         div.message_preview { width:30em; }
-
     </style>
 </head>
 <body>
@@ -42,14 +41,21 @@
         static thread prototyping placeholder
     </div>
 
-    <div th:if="${hasNextPage}">
-        <form method="get" th:action="@{|/indices/${appId}|}"
-              enctype="multipart/form-data">
-            <input type="hidden" name="page" th:value="${nextPage}"/>
-            <div id="next_button" style="text-align:center; margin-top:1em;">
-                <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage" />
-            </div>
+    <div id="navigation_buttons" style="text-align:center; margin-top:1em;">
+
+        <form th:if="${hasPreviousPage}" method="get" th:action="@{|/indices/${appId}|}"
+              enctype="multipart/form-data" style="display:inline-block;">
+            <input type="hidden" name="page" th:value="${previousPage}"/>
+            <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
         </form>
+
+
+        <form th:if="${hasNextPage}" method="get" th:action="@{|/indices/${appId}|}"
+              enctype="multipart/form-data" style="display:inline-block;">
+            <input type="hidden" name="page" th:value="${nextPage}"/>
+            <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
+        </form>
+
     </div>
 
     <div th:replace="indices/fragments/epilogue :: epilogue">
@@ -57,7 +63,6 @@
     </div>
 
     <div th:if="${footerText}" th:utext="${footerText}"></div>
-
 </div>
 </body>
 </html>
