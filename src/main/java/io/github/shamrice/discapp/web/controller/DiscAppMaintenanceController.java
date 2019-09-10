@@ -195,6 +195,7 @@ public class DiscAppMaintenanceController {
 
         Cookie newRedirectCookie = new Cookie("redirect_url", "/admin/disc-maint.cgi?id=" + appId);
         newRedirectCookie.setPath("/");
+        newRedirectCookie.setMaxAge(-1);
         response.addCookie(newRedirectCookie);
 
         return new ModelAndView("admin/permissionDenied");

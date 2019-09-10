@@ -70,7 +70,9 @@ public class AuthenticationController {
             return logout(redirect, appName, request, response, modelMap);
         }
 
-        response.addCookie(new Cookie("redirect_url", redirect));
+        Cookie redirectCookie = new Cookie("redirect_urL", redirect);
+        redirectCookie.setMaxAge(-1); //only live as long as the browser stays on the window
+        response.addCookie(redirectCookie);
         modelMap.addAttribute("redirectUrl", redirect);
         modelMap.addAttribute("appName", appName);
 
@@ -94,7 +96,9 @@ public class AuthenticationController {
             appName = redirect;
         }
 
-        response.addCookie(new Cookie("redirect_url", redirect));
+        Cookie redirectCookie = new Cookie("redirect_urL", redirect);
+        redirectCookie.setMaxAge(-1); //only live as long as the browser stays on the window.
+        response.addCookie(redirectCookie);
         modelMap.addAttribute("redirectUrl", redirect);
         modelMap.addAttribute("appName", appName);
 
