@@ -48,3 +48,8 @@ logging:
 
 server:
   port: 8081
+  servlet:
+    session:
+      cookie:
+        max-age: 14d
+      timeout: 1d
