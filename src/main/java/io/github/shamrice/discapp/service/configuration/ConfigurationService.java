@@ -89,7 +89,7 @@ public class ConfigurationService {
 
         if (configuration != null) {
             log.info("Found configuration property: " + configurationProperty.getPropName()
-                    + " for appid: " + applicationId + ". Returnning value of: " + configuration.getValue());
+                    + " for appid: " + applicationId + ". Returning value of: " + configuration.getValue());
 
             ConfigurationCache.getInstance().updateCache(applicationId, configurationProperty, configuration);
             return configuration.getValue();

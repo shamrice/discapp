@@ -31,7 +31,9 @@ public enum ConfigurationProperty {
     DATE_FORMAT_PATTERN ("date.format.pattern"),
     WIDGET_SHOW_AUTHOR ("widget.show.author"),
     WIDGET_SHOW_DATE("widget.show.date"),
-    WIDGET_USE_STYLE_SHEET("widget.use.stylesheet");
+    WIDGET_USE_STYLE_SHEET("widget.use.stylesheet"),
+    EMAIL_PASSWORD_RESET_SUBJECT("email.passwordreset.subject"),
+    EMAIL_PASSWORD_RESET_MESSAGE("email.passwordreset.message");
 
     private final String propName;
 

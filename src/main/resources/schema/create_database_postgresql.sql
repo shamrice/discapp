@@ -152,6 +152,16 @@ CREATE TABLE stats_unique_ips (
   FOREIGN KEY (stats_id) REFERENCES stats(id)
 );
 
+CREATE TABLE password_reset (
+  id serial NOT NULL,
+  email varchar(255) UNIQUE NOT NULL,
+  key varchar(64) NOT NULL,
+  code INT NOT NULL,
+  is_redeemed boolean NOT NULL DEFAULT false,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  exp_dt TIMESTAMP NOT NULL,
+  PRIMARY KEY (id)
+);
 
 commit;
 

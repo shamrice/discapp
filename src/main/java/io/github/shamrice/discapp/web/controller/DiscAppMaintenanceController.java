@@ -15,6 +15,7 @@ import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -67,6 +68,9 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private InputHelper inputHelper;
+
+    @Autowired
+    private WebHelper webHelper;
 
     @Autowired
     private DiscAppController discAppController;
@@ -359,7 +363,7 @@ public class DiscAppMaintenanceController {
                     widthUnitForCode = "%";
                 }
 
-                String baseUrl = getBaseUrl(request);
+                String baseUrl = webHelper.getBaseUrl(request);
 
                 maintenanceWidgetViewModel.setCodeHtml(
                         getWidgetHtml(
@@ -1676,11 +1680,4 @@ public class DiscAppMaintenanceController {
                 "</div>\n";
     }
 
-    private String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme() + "://";
-        String serverName = request.getServerName();
-        String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
-        String contextPath = request.getContextPath();
-        return scheme + serverName + serverPort + contextPath;
-    }
 }

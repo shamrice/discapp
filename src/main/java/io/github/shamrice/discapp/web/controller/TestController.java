@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.util.InputHelper;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -34,8 +36,14 @@ public class TestController {
     @Autowired
     private InputHelper inputHelper;
 
+    @Autowired
+    private WebHelper webHelper;
+
     @GetMapping("/test/test")
-    public String test(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
+    public String test(
+            @RequestParam(name = "name", required = false, defaultValue = "World") String name,
+            Model model,
+            HttpServletRequest request) {
         model.addAttribute("name", name);
 
         String ownersStr = "";
@@ -53,6 +61,8 @@ public class TestController {
 
         List<Configuration> configurationList = configurationService.list();
         model.addAttribute("configs", configurationList);
+
+        accountService.createPasswordResetRequest("shamrice@gmail.com", webHelper.getBaseUrl(request) + "/password/reset");
 
         return "test";
     }

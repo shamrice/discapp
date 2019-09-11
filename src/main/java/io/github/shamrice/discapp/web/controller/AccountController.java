@@ -10,6 +10,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -18,6 +19,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +45,102 @@ public class AccountController {
 
     @Autowired
     private InputHelper inputHelper;
+
+    @Autowired
+    private WebHelper webHelper;
+
+    @PostMapping("/password/reset/{resetKey}")
+    public ModelAndView postPasswordResetForm(@PathVariable(name = "resetKey") String resetKey,
+                                              @RequestParam(name = "email") String email,
+                                              @RequestParam(name = "password") String newPassword,
+                                              @RequestParam(name = "confirmPassword") String confirmPassword,
+                                              @RequestParam(name = "resetCode") String resetCode,
+                                              ModelMap modelMap) {
+        log.debug("Password reset post: resetKey = " + resetKey + " email=" + email + " resetCode=" + resetCode);
+
+        modelMap.addAttribute("resetKey", resetKey);
+        modelMap.addAttribute("email", email);
+        modelMap.addAttribute("resetCode", resetCode);
+
+        if (email == null || email.trim().isEmpty()) {
+            modelMap.addAttribute("errorMessage", "Invalid email address.");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty() || newPassword.length() < 8) {
+            modelMap.addAttribute("errorMessage", "Password must be at least 8 characters");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            modelMap.addAttribute("errorMessage", "New password confirmation does not match.");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
+
+        if (resetCode == null || resetCode.trim().isEmpty()) {
+            modelMap.addAttribute("errorMessage", "Valid password reset code is required.");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
+
+        int resetCodeInt = 0;
+        try {
+            resetCodeInt = Integer.parseInt(resetCode.trim());
+        } catch (NumberFormatException numFormatEx) {
+            log.error("Failed to parse password reset code: " + resetCode + " for email: " + email + " :: "
+                    + numFormatEx.getMessage(), numFormatEx);
+            modelMap.addAttribute("errorMessage", "Valid password reset code is required.");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
+
+        if (accountService.performPasswordReset(resetKey, resetCodeInt, email, newPassword)) {
+            modelMap.addAttribute("status", "Password successfully reset.");
+            return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+        }
+
+        modelMap.addAttribute("status", "Password reset failed. Please resubmit request.");
+        return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+    }
+
+    @GetMapping("/password/reset/{resetKey}")
+    public ModelAndView getPasswordResetFormView(@PathVariable(name = "resetKey") String resetKey,
+                                             ModelMap modelMap) {
+        modelMap.addAttribute("resetKey", resetKey);
+        return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+    }
+
+    @GetMapping("/account/password")
+    public ModelAndView getAccountPasswordResetRequestView(@RequestParam(required = false) String redirect,
+                                                           ModelMap modelMap) {
+        if (redirect == null || redirect.isEmpty()) {
+            redirect = "/login";
+        }
+
+        modelMap.addAttribute("redirectUrl", redirect);
+        return new ModelAndView("account/password/resetPasswordRequest");
+    }
+
+    @PostMapping("/account/password")
+    public ModelAndView postAccountPasswordRequestView(@RequestParam(name = "email") String email,
+                                                       ModelMap modelMap,
+                                                       HttpServletRequest request) {
+
+        if (email != null && !email.trim().isEmpty()) {
+            log.info("Attempting to create new password reset request for email: " + email);
+
+            if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + "/password/reset")) {
+                log.warn("Failed to create password request for email: " + email);
+                modelMap.addAttribute("status", "Failed to create password reset request");
+                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+            } else {
+                modelMap.addAttribute("status", "Password request sent to email address: " + email);
+                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+            }
+        }
+
+        modelMap.addAttribute("Email address cannot be empty.");
+        return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+
+    }
 
     @GetMapping("/account/create")
     public ModelAndView getCreateAccount(@ModelAttribute AccountViewModel accountViewModel,
