@@ -19,6 +19,7 @@ public class AccountViewModel {
 
     private String username;
     private String password;
+    private String newPassword;
     private String confirmPassword;
     private boolean showEmail;
     private String email;

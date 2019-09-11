@@ -277,6 +277,64 @@ public class AccountController {
         return new ModelAndView("account/modifyAccount", "accountViewModel", accountViewModel);
     }
 
+    @PostMapping("/account/modify/password")
+    public ModelAndView postAccountModifyPassword(@ModelAttribute AccountViewModel accountViewModel,
+                                                  @RequestParam(required = false) String redirect,
+                                                  ModelMap modelMap) {
+        if (accountViewModel != null) {
+
+            accountViewModel.setRedirect(redirect);
+
+            String email = accountHelper.getLoggedInEmail();
+
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+            if (user != null) {
+
+                String currentPassword = accountViewModel.getPassword();
+                String newPassword = accountViewModel.getNewPassword();
+                String confirmNewPassword = accountViewModel.getConfirmPassword();
+
+                if ((currentPassword == null || currentPassword.trim().isEmpty())
+                        || (newPassword == null || newPassword.trim().isEmpty())
+                        || (confirmNewPassword == null || confirmNewPassword.isEmpty())) {
+
+                    accountViewModel.setErrorMessage("Password must be at least 8 characters.");
+                    return getAccountModify(accountViewModel, redirect, modelMap);
+                }
+
+                if (newPassword.length() < 8) { //todo : set length in some constant somewhere or config...
+                    accountViewModel.setErrorMessage("Password must be at least 8 characters.");
+                    return getAccountModify(accountViewModel, redirect, modelMap);
+                }
+
+                if (!newPassword.trim().equals(confirmNewPassword.trim())) {
+                    accountViewModel.setErrorMessage("Passwords do not match.");
+                    return getAccountModify(accountViewModel, redirect, modelMap);
+                } else {
+
+                    //verify passwords entered are correct.
+                    if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
+                        log.error("Cannot update account password. Original password does not match existing password for account.");
+                        accountViewModel.setErrorMessage("Failed to update password");
+                        return getAccountModify(accountViewModel, redirect, modelMap);
+                    }
+
+                    user.setPassword(newPassword.trim());
+                    if (discAppUserDetailsService.saveDiscAppUser(user)) {
+                        accountViewModel.setErrorMessage("Password successfully updated.");
+                        return getAccountModify(accountViewModel, redirect, modelMap);
+                    } else {
+                        log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
+                        accountViewModel.setErrorMessage("Failed to update password.");
+                        return getAccountModify(accountViewModel, redirect, modelMap);
+                    }
+                }
+            }
+        }
+
+        return new ModelAndView("redirect:/account/modify");
+    }
+
     @PostMapping("/account/modify/account")
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                           @RequestParam(required = false) String redirect,
