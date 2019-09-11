@@ -33,7 +33,10 @@ public enum ConfigurationProperty {
     WIDGET_SHOW_DATE("widget.show.date"),
     WIDGET_USE_STYLE_SHEET("widget.use.stylesheet"),
     EMAIL_PASSWORD_RESET_SUBJECT("email.passwordreset.subject"),
-    EMAIL_PASSWORD_RESET_MESSAGE("email.passwordreset.message");
+    EMAIL_PASSWORD_RESET_MESSAGE("email.passwordreset.message"),
+    EMAIL_NEW_ACCOUNT_CREATED_SUBJECT("email.newaccount.subject"),
+    EMAIL_NEW_ACCOUNT_CREATED_MESSAGE("email.newaccount.message"),
+    EMAIL_ADMIN_ADDRESS("email.admin.address");
 
     private final String propName;
 

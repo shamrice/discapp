@@ -2,7 +2,11 @@ package io.github.shamrice.discapp.service.account;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
+import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
+import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +27,14 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Autowired
     private DiscAppUserRepository discappUserRepository;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private EmailNotificationService emailNotificationService;
+
+    private final static String NEW_ACCOUNT_EMAIL = "NEW_ACCOUNT_EMAIL";
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -63,6 +77,11 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
         if (user != null) {
 
+            boolean isNewUser = false;
+            if (user.getId() == null || user.getId() <= 0) {
+                isNewUser = true;
+            }
+
             try {
                 if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                     String plainPassword = user.getPassword();
@@ -78,6 +97,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
                     log.info("Saved disc app user: " + createdUser.getEmail() + " : username: "
                             + createdUser.getUsername());
+
+                    //send email notification
+                    if (isNewUser) {
+                        sendNewUserEmailNotification(createdUser.getEmail());
+                    }
+
                     return true;
                 }
             } catch (Exception ex) {
@@ -96,5 +121,19 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     public boolean updateOwnerInformation(long userId, long ownerId, boolean isAdmin) {
         log.info("Updating user owner info: userId: " + userId + " : ownerId: " + ownerId + " : isAdmin: " + isAdmin);
         return discappUserRepository.updateDiscAppUserOwnerInfo(userId, ownerId, isAdmin, new Date()) > 0;
+    }
+
+    private void sendNewUserEmailNotification(String newUserEmail) {
+        Map<String, Object> templateParams = new HashMap<>();
+        templateParams.put(NEW_ACCOUNT_EMAIL, newUserEmail);
+
+        String adminEmail = configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
+        if (adminEmail == null) {
+            log.error("Could not find admin email address in configuration property: "
+                    + ConfigurationProperty.EMAIL_ADMIN_ADDRESS.getPropName() + " : new account email notification not sent.");
+            return;
+        }
+
+        emailNotificationService.send(adminEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams);
     }
 }

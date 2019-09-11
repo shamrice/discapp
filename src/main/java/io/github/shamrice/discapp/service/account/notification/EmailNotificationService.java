@@ -42,7 +42,7 @@ public class EmailNotificationService {
         message.setSubject(subject);
         message.setText(body);
         emailSender.send(message);
-        log.info("Sent password reset request to: " + to + " message: " + message.toString());
+        log.info("Sent " + notificationType.name() + " email to: " + to + " message: " + message.toString());
 
     }
 
@@ -50,6 +50,8 @@ public class EmailNotificationService {
         switch (notificationType) {
             case PASSWORD_RESET:
                 return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_PASSWORD_RESET_SUBJECT, null);
+            case NEW_ACCOUNT_CREATED:
+                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_SUBJECT, null);
         }
 
         return null;
@@ -59,7 +61,8 @@ public class EmailNotificationService {
         switch (notificationType) {
             case PASSWORD_RESET:
                 return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_PASSWORD_RESET_MESSAGE, null);
-
+            case NEW_ACCOUNT_CREATED:
+                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_MESSAGE, null);
         }
         return  null;
     }

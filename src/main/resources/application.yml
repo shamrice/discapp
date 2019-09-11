@@ -4,16 +4,14 @@ spring.mail.properties.mail.smtp.starttls.enable: true
 spring:
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: EMAIL_USERNAME
-    password: EMAIL_PASSWORD
+    host: ${EMAIL_SMTP_HOST}
+    port: ${EMAIL_SMTP_PORT}
+    username: ${NOTIFICATION_EMAIL_ADDRESS}
+    password: ${NOTIFICATION_PASSWORD}
     protocol: smtp
     tls: true
     properties.mail.smtp:
       auth: true
-#      starttls.enabled: true
-#      ssl.trust: smtp.gmail.com
 
   servlet:
     multipart:
@@ -59,7 +57,7 @@ logging:
     io:
       github:
         shamrice:
-          discapp: INFO
+          discapp: WARN
 
 server:
   port: 8081
