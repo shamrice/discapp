@@ -12,7 +12,7 @@ VALUES (0, 'email.passwordreset.subject', 'DiscApp: Reset Password Request');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.passwordreset.message',
-'Please user the following URL to reset the password for your account: PASSWORD_RESET_URL \r\n \r\n Your password reset code is: PASSWORD_RESET_CODE');
+'Please use the following URL to reset the password for your account: PASSWORD_RESET_URL \r\n \r\n Your password reset code is: PASSWORD_RESET_CODE');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.newaccount.subject', 'DiscApp: New Account Creation Request');
