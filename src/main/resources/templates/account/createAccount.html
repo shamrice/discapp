@@ -6,6 +6,25 @@
     <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <script type="text/javascript">
+      var onloadCallback = function() {
+        grecaptcha.render('html_element', {
+          'sitekey' : '6Lcy7LcUAAAAAEX5j1QoCUpgM3tViv6oHdUCBkTV'
+        });
+      };
+
+    function validateReCaptcha() {
+        var response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            alert('ReCaptcha is not valid.');
+            return false;
+        } else {
+            return true;
+        }
+    }
+    </script>
+
 </head>
 <body>
 
@@ -22,7 +41,7 @@
 
 <div class="grey_box" style="width:40em;">
     <h1 id="banner">Create Disc App Account</h1>
-    <form name="f" th:action="@{/account/create}" method="post" th:object="${accountViewModel}">
+    <form name="f" th:action="@{/account/create}" method="post" th:object="${accountViewModel}" onsubmit="return validateReCaptcha();">
         <table>
 
             <div th:if="${accountViewModel.getErrorMessage()}" class="alert alert-error" th:text="${accountViewModel.getErrorMessage()}">
@@ -54,6 +73,11 @@
                 </td>
             </tr>
             <tr>
+                <td colspan="2">
+                    <div id="html_element" style="display:inline-block;"></div>
+                </td>
+            </tr>
+            <tr>
                 <td colspan="2">&nbsp;</td>
             </tr>
             <tr>
@@ -74,6 +98,11 @@
             </tr>
         </table>
     </form>
+
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+            async defer>
+    </script>
+
 
 </div>
 
