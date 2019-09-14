@@ -25,4 +25,11 @@ INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.admin.address', 'ADMIN_EMAIL@EXAMPLE.COM');
 
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'recaptcha.secret', 'RE_CAPTCHA_SECRET');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'recaptcha.verify.url', 'https://www.google.com/recaptcha/api/siteverify');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'recaptcha.verify.enabled', 'true');

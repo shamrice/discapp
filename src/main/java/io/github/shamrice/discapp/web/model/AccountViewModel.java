@@ -31,6 +31,8 @@ public class AccountViewModel {
     private String errorMessage;
     private String infoMessage;
 
+    private String reCaptchaResponse;
+
     private String ownerFirstName;
     private String ownerLastName;
     private String ownerPhone;

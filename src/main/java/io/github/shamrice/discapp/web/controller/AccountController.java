@@ -12,17 +12,22 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.json.JSONParser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @Slf4j
@@ -55,12 +60,20 @@ public class AccountController {
                                               @RequestParam(name = "password") String newPassword,
                                               @RequestParam(name = "confirmPassword") String confirmPassword,
                                               @RequestParam(name = "resetCode") String resetCode,
+                                              @RequestParam(name = "reCaptchaResponse") String reCaptchaResponse,
                                               ModelMap modelMap) {
         log.debug("Password reset post: resetKey = " + resetKey + " email=" + email + " resetCode=" + resetCode);
 
         modelMap.addAttribute("resetKey", resetKey);
         modelMap.addAttribute("email", email);
         modelMap.addAttribute("resetCode", resetCode);
+
+        if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
+            log.warn("Failed to create password reset request for " + email
+                    + " due to ReCaptcha verification failure.");
+            modelMap.addAttribute("errorMessage", "Password reset failed. Please resubmit request.");
+            return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
+        }
 
         if (email == null || email.trim().isEmpty()) {
             modelMap.addAttribute("errorMessage", "Invalid email address.");
@@ -121,11 +134,19 @@ public class AccountController {
 
     @PostMapping("/account/password")
     public ModelAndView postAccountPasswordRequestView(@RequestParam(name = "email") String email,
+                                                       @RequestParam(name = "reCaptchaResponse") String reCaptchaResponse,
                                                        ModelMap modelMap,
                                                        HttpServletRequest request) {
 
         if (email != null && !email.trim().isEmpty()) {
             log.info("Attempting to create new password reset request for email: " + email);
+
+            if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
+                log.warn("Failed to create password reset request for " + email
+                        + " due to ReCaptcha verification failure.");
+                modelMap.addAttribute("status", "Failed to create password reset request");
+                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+            }
 
             if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + "/password/reset")) {
                 log.warn("Failed to create password request for email: " + email);
@@ -161,6 +182,12 @@ public class AccountController {
         if (accountViewModel != null) {
             log.info("Attempting to create new account with username: " + accountViewModel.getUsername());
 
+            if (!inputHelper.verifyReCaptchaResponse(accountViewModel.getReCaptchaResponse())) {
+                log.warn("Failed to create new account for " + accountViewModel.getUsername()
+                        + " due to ReCaptcha verification failure.");
+                accountViewModel.setErrorMessage("Failed to create account.");
+                return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
+            }
 
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
             String password = inputHelper.sanitizeInput(accountViewModel.getPassword());

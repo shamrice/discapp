@@ -36,7 +36,10 @@ public enum ConfigurationProperty {
     EMAIL_PASSWORD_RESET_MESSAGE("email.passwordreset.message"),
     EMAIL_NEW_ACCOUNT_CREATED_SUBJECT("email.newaccount.subject"),
     EMAIL_NEW_ACCOUNT_CREATED_MESSAGE("email.newaccount.message"),
-    EMAIL_ADMIN_ADDRESS("email.admin.address");
+    EMAIL_ADMIN_ADDRESS("email.admin.address"),
+    RE_CAPTCHA_VERIFY_URL("recaptcha.verify.url"),
+    RE_CAPTCHA_SECRET("recaptcha.secret"),
+    RE_CAPTCHA_VERIFY_ENABLED("recaptcha.verify.enabled");
 
     private final String propName;
 
