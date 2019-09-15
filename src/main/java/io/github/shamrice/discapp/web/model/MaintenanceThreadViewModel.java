@@ -23,8 +23,13 @@ public class MaintenanceThreadViewModel {
     private String deleteArticles;
     private String deleteArticlesAndReplies;
     private String reportAbuse;
-    private String nextPage;
-    private long nextPageStart;
+    private boolean hasNextPage;
+    private boolean hasPreviousPage;
+    private Integer nextPage;
+    private Integer previousPage;
+    private Integer currentPage;
+    private String nextPageSubmit;
+    private String previousPageSubmit;
 
     private String[] selectThreadCheckbox;
 
@@ -62,5 +67,13 @@ public class MaintenanceThreadViewModel {
     private String editArticleCurrentUsername;
     private String editArticleUserEmail;
     private Long editArticleUserId;
+
+    public Integer getNextPage() {
+        return currentPage == null ? 1 : currentPage + 1;
+    }
+
+    public Integer getPreviousPage() {
+        return currentPage == null ? 0 : currentPage - 1;
+    }
 
 }

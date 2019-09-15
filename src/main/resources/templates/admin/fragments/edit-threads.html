@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <style type="text/css">
+        label{font-weight:normal;}
+
+    </style>
 </head>
 <body>
 <div class="edit-threads" th:fragment="edit-threads">
@@ -14,9 +18,11 @@
     <div th:if="${maintenanceThreadViewModel.getTab().equals('search')}">
         <input type="hidden" name="authorSearch" th:value="${maintenanceThreadViewModel.getAuthorSearch()}" size="30"/>
         <input type="hidden" name="emailSearch" th:value="${maintenanceThreadViewModel.getEmailSearch()}" size="30"/>
-        <input type="hidden" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}" size="30"/>
+        <input type="hidden" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}"
+               size="30"/>
         <input type="hidden" name="ipSearch" th:value="${maintenanceThreadViewModel.getIpSearch()}" size="30"/>
-        <input type="hidden" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}" size="30"/>
+        <input type="hidden" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}"
+               size="30"/>
     </div>
 </div>
 </body>

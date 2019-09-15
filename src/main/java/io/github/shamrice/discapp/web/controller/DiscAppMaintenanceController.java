@@ -733,7 +733,8 @@ public class DiscAppMaintenanceController {
 
                         ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
                         if (subThreads != null) {
-                            String subThreadHtml = getEditThreadHtml(subThreads, "", true, false);
+                            String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
+                                    maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
                             maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
                         }
 
@@ -796,12 +797,13 @@ public class DiscAppMaintenanceController {
             maintenanceThreadViewModel.setOnEditMessage(false);
         }
 
-        return getDiscEditView(appId, currentTab, maintenanceThreadViewModel, model, response);
+        return getDiscEditView(appId, currentTab, maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel, model, response);
     }
 
     @GetMapping("/admin/disc-edit.cgi")
     public ModelAndView getDiscEditView(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "tab", required = false) String currentTab,
+                                        @RequestParam(name = "page", required = false) Integer page,
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                         Model model,
                                         HttpServletResponse response) {
@@ -813,6 +815,29 @@ public class DiscAppMaintenanceController {
         }
 
         maintenanceThreadViewModel.setTab(currentTab);
+
+        if (page != null && page >= 0) {
+            maintenanceThreadViewModel.setCurrentPage(page);
+        }
+
+        //set page to 0 if it's not already set
+        if (maintenanceThreadViewModel.getCurrentPage() == null || maintenanceThreadViewModel.getCurrentPage() < 0) {
+            maintenanceThreadViewModel.setCurrentPage(0);
+        }
+
+        //update page to next or previous if those buttons were selected.
+        if (maintenanceThreadViewModel.getNextPageSubmit() != null) {
+            maintenanceThreadViewModel.setCurrentPage(maintenanceThreadViewModel.getNextPage());
+        }
+        if (maintenanceThreadViewModel.getPreviousPageSubmit() != null) {
+            maintenanceThreadViewModel.setCurrentPage(maintenanceThreadViewModel.getPreviousPage());
+        }
+
+        //if current page isn't 0, there's a previous page.
+        if (maintenanceThreadViewModel.getCurrentPage() > 0) {
+            maintenanceThreadViewModel.setHasPreviousPage(true);
+        }
+
 
         try {
             Application app = applicationService.get(appId);
@@ -831,17 +856,26 @@ public class DiscAppMaintenanceController {
                 if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                     //get edit threads html
                     List<String> threadTreeHtml = new ArrayList<>();
-                    //todo: page number.
-                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 0,50, ThreadSortOrder.CREATION);
+
+                    List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(),20, ThreadSortOrder.CREATION);
+
+                    //if threads returned is less than asked for, there is no next page.
+                    if (threadTreeNodeList.size() < 20) {
+                        maintenanceThreadViewModel.setHasNextPage(false);
+                    } else {
+                        maintenanceThreadViewModel.setHasNextPage(true);
+                    }
 
                     if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
                         for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-                            String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>", false, true);
+                            String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>", false, true,
+                                    maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
                             currentHtml += "</ul>";
                             threadTreeHtml.add(currentHtml);
                         }
                     } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
-                        String currentHtml = getEditThreadListHtml(threadTreeNodeList);
+                        String currentHtml = getEditThreadListHtml(threadTreeNodeList, maintenanceThreadViewModel.getCurrentPage(),
+                                maintenanceThreadViewModel.getTab());
                         threadTreeHtml.add(currentHtml);
                     }
 
@@ -853,7 +887,8 @@ public class DiscAppMaintenanceController {
                         if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
                             ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
                             if (subThreads != null) {
-                                String subThreadHtml = getEditThreadHtml(subThreads, "", true, false);
+                                String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
+                                        maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
                                 maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
                             }
                         }
@@ -880,6 +915,8 @@ public class DiscAppMaintenanceController {
     @GetMapping("/admin/edit-thread.cgi")
     public ModelAndView getEditThreadView(@RequestParam(name = "disc") long appId,
                                           @RequestParam(name = "article") long threadId,
+                                          @RequestParam(name = "page", required = false) Integer page,
+                                          @RequestParam(name = "tab", required = false) String tab,
                                           @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                           Model model,
                                           HttpServletResponse response) {
@@ -887,6 +924,12 @@ public class DiscAppMaintenanceController {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
             model.addAttribute("username", username);
+
+            maintenanceThreadViewModel.setCurrentPage(page);
+
+            if (tab != null && !tab.isEmpty()) {
+                maintenanceThreadViewModel.setTab(tab);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -919,8 +962,7 @@ public class DiscAppMaintenanceController {
             log.error("Error getting edit thread view: " + ex.getMessage(), ex);
         }
 
-
-        return getDiscEditView(appId, THREAD_TAB, maintenanceThreadViewModel, model, response);
+        return getDiscEditView(appId, maintenanceThreadViewModel.getTab(), maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel, model, response);
     }
 
     @GetMapping("/admin/appearance-preview.cgi")
@@ -1533,13 +1575,15 @@ public class DiscAppMaintenanceController {
      * @param currentHtml Current html to be built upon
      * @return Returns generated HTML
      */
-    private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrent, boolean includeCheckBox) {
+    private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrent,
+                                     boolean includeCheckBox, int currentPage, String tab) {
 
         if (!skipCurrent) {
             currentHtml +=
                     "<li>" +
                             "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                            "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
+                            "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
+                            + "&amp;tab=" + tab +"\">" +
                             currentNode.getCurrent().getSubject() +
                             "</a> " +
 
@@ -1564,7 +1608,7 @@ public class DiscAppMaintenanceController {
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getEditThreadHtml(node, currentHtml, false, includeCheckBox);
+            currentHtml = getEditThreadHtml(node, currentHtml, false, includeCheckBox, currentPage, tab);
             currentHtml += "</ul>";
         }
 
@@ -1576,7 +1620,7 @@ public class DiscAppMaintenanceController {
      * @param threadTreeNodeList ThreadTreeNode list to use to populate HTML string
      * @return Generated HTML for node list
      */
-    private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList) {
+    private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList, int currentPage, String tab) {
 
         StringBuilder currentHtml = new StringBuilder("<ul>");
 
@@ -1598,7 +1642,8 @@ public class DiscAppMaintenanceController {
             currentHtml.append(
                     "<li>" +
                             "<a href=\"/admin/edit-thread.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
-                            "&amp;article=" + currentNode.getCurrent().getId() + "\">" +
+                            "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
+                            + "&amp;tab=" + tab + "\">" +
                             currentNode.getCurrent().getSubject() +
                             "</a> " +
 

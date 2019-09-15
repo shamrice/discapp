@@ -9,6 +9,10 @@
 
     <style type="text/css">
         label{font-weight:normal;}
+
+
+
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
@@ -31,11 +35,11 @@
           th:object="${maintenanceThreadViewModel}">
 
         <input type="hidden" name="id" th:value="${appId}"/>
+        <input type="hidden" name="currentPage" th:value="${maintenanceThreadViewModel.getCurrentPage()}"/>
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('threads')}">
-        <span class="tab" style="background-color:#fff; color:#00f;
-              border:3px solid blue; border-bottom-color:#fff;"
-        >View by Thread</span>
+            <span class="tab" style="background-color:#fff; color:#00f;
+              border:3px solid blue; border-bottom-color:#fff;">View by Thread</span>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
@@ -84,6 +88,14 @@
                     <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
                     <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+
+                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
+                           type="submit"
+                           name="previousPageSubmit" value="Previous Page" class="button"/>
+                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasNextPage()}"
+                           type="submit"
+                           name="nextPageSubmit" value="Next Page" class="button"/>
+
                     <input th:if="${maintenanceThreadViewModel.getTab().equals('search')}" type="submit"
                            name="searchAgain" value="Search Again" class="button"/>
                 </div>
@@ -97,12 +109,16 @@
                     <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
                     <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
-                    <input type="hidden" name="nextPageStart"
-                           th:value="${maintenanceThreadViewModel.getNextPageStart()}"/>
+
+                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
+                           type="submit"
+                           name="previousPageSubmit" value="Previous Page" class="button"/>
+                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasNextPage()}"
+                           type="submit"
+                           name="nextPageSubmit" value="Next Page" class="button"/>
+
                     <input th:if="${maintenanceThreadViewModel.getTab().equals('search')}" type="submit"
                            name="searchAgain" value="Search Again" class="button"/>
-                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search')}" type="submit"
-                           name="nextPage" value="Next Page" class="button"/>
                 </div>
                 <div>
                     <input type="hidden" name=".cgifields" value="selected"/>
