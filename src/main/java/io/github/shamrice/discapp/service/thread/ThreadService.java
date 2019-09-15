@@ -130,7 +130,7 @@ public class ThreadService {
 
     }
 
-    public boolean saveThread(Thread thread, String threadBodyText) {
+    public Long saveThread(Thread thread, String threadBodyText) {
 
         if (thread != null) {
 
@@ -163,14 +163,14 @@ public class ThreadService {
 
             if (createThread != null) {
                 log.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
-                return true;
+                return createThread.getId();
             }
 
         } else {
             log.error("Tried to create a null new thread.");
         }
 
-        return false;
+        return null;
     }
 
     public List<Thread> getThreads(Long applicationId) {

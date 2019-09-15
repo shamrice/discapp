@@ -59,13 +59,13 @@ public class ConfigurationCache {
                     return null;
                 }
 
-                log.info("Found cached configuration for appId: " + applicationId + " : prop: " + config.getName()
+                log.debug("Found cached configuration for appId: " + applicationId + " : prop: " + config.getName()
                         + " = " + config.getValue());
                 return config;
             }
         }
 
-        log.info("Configuration does not currently exist in the cache. appId: " + applicationId
+        log.debug("Configuration does not currently exist in the cache. appId: " + applicationId
                 + " : configProperty: " + configurationProperty.getPropName());
         return null;
     }
@@ -73,7 +73,7 @@ public class ConfigurationCache {
     @Synchronized
     public void updateCache(Long applicationId, ConfigurationProperty configurationProperty, Configuration configuration) {
         if (applicationId != null && applicationId > 0 && configuration != null) {
-            log.info("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
+            log.debug("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
                     + configuration.getName() + " = " + configuration.getValue());
 
             Map<ConfigurationProperty, Configuration> configs = configurationCacheMap.get(applicationId);

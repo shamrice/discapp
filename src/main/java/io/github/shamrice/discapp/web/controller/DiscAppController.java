@@ -210,7 +210,7 @@ public class DiscAppController {
 
     @GetMapping("/createThread")
     public ModelAndView getCreateNewThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
-        log.debug("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
+        log.warn("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
@@ -430,8 +430,10 @@ public class DiscAppController {
                     body = inputHelper.addUrlHtmlLinksToString(body);
                 }
 
-                threadService.saveThread(newThread, body);
-                return new ModelAndView("redirect:/indices/" + appId + "?page=" + page);
+                Long newThreadId = threadService.saveThread(newThread, body);
+                if (newThreadId != null) {
+                    return new ModelAndView("redirect:/discussion.cgi?disc=" + appId + "&article=" + newThreadId +"&page=" + page);
+                }
             }
         }
         log.info("Error posting thread or couldn't find redirect action for POST. Fallback return to thread view.");

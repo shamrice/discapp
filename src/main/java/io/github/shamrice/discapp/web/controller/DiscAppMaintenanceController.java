@@ -765,7 +765,7 @@ public class DiscAppMaintenanceController {
 
                         String body = maintenanceThreadViewModel.getEditArticleMessage();
 
-                        if (threadService.saveThread(editThread, body)) {
+                        if (threadService.saveThread(editThread, body) != null) {
                             maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
                         } else {
                             log.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
