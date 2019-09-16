@@ -33,3 +33,6 @@ VALUES (0, 'recaptcha.verify.url', 'https://www.google.com/recaptcha/api/sitever
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'recaptcha.verify.enabled', 'true');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'import.upload.location', 'imports');

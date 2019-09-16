@@ -41,7 +41,8 @@ public enum ConfigurationProperty {
     EMAIL_ADMIN_ADDRESS("email.admin.address"),
     RE_CAPTCHA_VERIFY_URL("recaptcha.verify.url"),
     RE_CAPTCHA_SECRET("recaptcha.secret"),
-    RE_CAPTCHA_VERIFY_ENABLED("recaptcha.verify.enabled");
+    RE_CAPTCHA_VERIFY_ENABLED("recaptcha.verify.enabled"),
+    IMPORT_UPLOAD_LOCATION("import.upload.location");
 
     private final String propName;
 

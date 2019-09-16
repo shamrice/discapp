@@ -1,8 +1,12 @@
 package io.github.shamrice.discapp.service.storage;
 
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,19 +23,14 @@ import java.nio.file.StandardCopyOption;
 @Slf4j
 public class FileSystemStorageService {
 
-    private final Path SAVE_LOCATION = Paths.get("imports");
+    @Autowired
+    private ConfigurationService configurationService;
 
-    public FileSystemStorageService() {
-        if (Files.notExists(SAVE_LOCATION)) {
-            try {
-                Files.createDirectory(SAVE_LOCATION);
-            } catch (IOException ex) {
-                log.error("Failed to create upload directory: " + SAVE_LOCATION + " :: " + ex.getMessage(), ex);
-            }
-        }
-    }
+    private Path saveLocation;
 
     public boolean store(MultipartFile file, String newFilename) throws Exception {
+
+        refreshLocationConfig();
 
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -50,9 +49,16 @@ public class FileSystemStorageService {
         }
 
         InputStream inputStream = file.getInputStream();
-        long bytesCopied = Files.copy(inputStream, this.SAVE_LOCATION.resolve(newFilename), StandardCopyOption.REPLACE_EXISTING);
+        Path saveLocationPath = saveLocation.resolve(newFilename);
+        long bytesCopied = Files.copy(inputStream, saveLocationPath, StandardCopyOption.REPLACE_EXISTING);
 
-        return bytesCopied > 0L;
+        if (bytesCopied > 0L) {
+            log.warn("Successfully stored uploaded file to " + saveLocationPath.toString());
+            return true;
+        } else {
+            log.error("Failed to upload file: " + saveLocationPath.toString());
+            return false;
+        }
     }
 
     public Resource loadAsResource(String filename) throws MalformedURLException, Exception {
@@ -66,6 +72,23 @@ public class FileSystemStorageService {
     }
 
     private Path load(String filename) {
-        return SAVE_LOCATION.resolve(filename);
+        refreshLocationConfig();
+        return saveLocation.resolve(filename);
     }
+
+    private void refreshLocationConfig() {
+        String saveLocationStr = configurationService.getStringValue(0L, ConfigurationProperty.IMPORT_UPLOAD_LOCATION, "imports");
+        log.info("Using configuration directory: " + saveLocationStr + " to save uploaded disc apps.");
+        saveLocation = Paths.get(saveLocationStr);
+
+        if (Files.notExists(saveLocation)) {
+            try {
+                Files.createDirectory(saveLocation);
+            } catch (IOException ex) {
+                log.error("Failed to create upload directory: " + saveLocation + " :: " + ex.getMessage(), ex);
+            }
+        }
+    }
+
+
 }
