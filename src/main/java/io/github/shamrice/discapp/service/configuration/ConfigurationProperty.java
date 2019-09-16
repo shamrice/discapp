@@ -19,6 +19,8 @@ public enum ConfigurationProperty {
     THREAD_SORT_ORDER ("thread.sort.order"),
     EXPAND_THREADS_ON_INDEX_PAGE ("page.index.expand.threads"),
     PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE ("page.index.preview.first"),
+    PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS ("page.index.preview.length"),
+    PREVIEW_REPLY_LENGTH_IN_NUM_CHARS ("thread.reply.preview.length"),
     HIGHLIGHT_NEW_MESSAGES ("thread.highlight.new"),
     THREAD_BREAK_TEXT ("thread.break.text"),
     ENTRY_BREAK_TEXT ("thread.entry.break.text"),

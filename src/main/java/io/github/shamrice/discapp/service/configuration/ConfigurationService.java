@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,6 +44,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, "activity");
         configsToSet.put(ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, "true");
+        configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, "320");
+        configsToSet.put(ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, "200");
         configsToSet.put(ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, "true");
         configsToSet.put(ConfigurationProperty.THREAD_BREAK_TEXT, " <hr /> ");
         configsToSet.put(ConfigurationProperty.ENTRY_BREAK_TEXT, " - ");

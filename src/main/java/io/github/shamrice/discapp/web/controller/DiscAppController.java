@@ -130,17 +130,19 @@ public class DiscAppController {
 
                     List<String> threadTreeHtml = new ArrayList<>();
                     String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+                    int maxPreviewLengthTopLevelThread = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, 320);
+                    int maxPreviewLengthReplies = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
 
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
 
-                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview, page);
+                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview, page, maxPreviewLengthTopLevelThread);
 
                         //get replies if they exist and add on HTML.
                         if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
                             currentHtml += "<div class=\"responses\">";
                             currentHtml += getAppViewThreadHtml(threadTreeNode, "",
                                     entryBreakString, true, -1,
-                                    false, page);
+                                    false, page, maxPreviewLengthReplies);
                             currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
                             currentHtml += "</div>";
                         }
@@ -461,8 +463,10 @@ public class DiscAppController {
         Thread currentThread = threadService.getThread(appId, threadId);
         if (currentThread != null) {
 
+            int maxPreviewLength = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
+
             String threadBody = threadService.getThreadBodyText(threadId);
-            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage);
+            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage, maxPreviewLength);
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
 
@@ -617,7 +621,7 @@ public class DiscAppController {
     }
 
     private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString,
-                                           boolean showPreviewText, int currentPage) {
+                                           boolean showPreviewText, int currentPage, int maxPreviewLength) {
 
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
@@ -654,8 +658,8 @@ public class DiscAppController {
 
                 previewText = inputHelper.sanitizeInput(previewText); //remove html from thread preview
 
-                if (previewText.length() > 320) {
-                    previewText = previewText.substring(0, 320); //todo configurable length
+                if (previewText.length() > maxPreviewLength) {
+                    previewText = previewText.substring(0, maxPreviewLength);
                     previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
                             "&amp;article=" + currentNode.getCurrent().getId() +
                             "&amp;page=" + currentPage + "\"" +
@@ -677,7 +681,7 @@ public class DiscAppController {
      */
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
                                         boolean skipCurrentNode, long currentlyViewedId,
-                                        boolean showPreviewText, int currentPage) {
+                                        boolean showPreviewText, int currentPage, int maxPreviewLength) {
 
         if (!skipCurrentNode) {
 
@@ -731,8 +735,8 @@ public class DiscAppController {
 
                     previewText = inputHelper.sanitizeInput(previewText); //clear HTML from preview thread body
 
-                    if (previewText.length() > 200) {
-                        previewText = previewText.substring(0, 200); //todo configurable length
+                    if (previewText.length() > maxPreviewLength) {
+                        previewText = previewText.substring(0, maxPreviewLength);
                         previewText +=  "...<a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
                                 "&amp;article=" + currentNode.getCurrent().getId() +
                                 "&amp;page=" + currentPage + "\"" +
@@ -751,7 +755,7 @@ public class DiscAppController {
 
             currentHtml += "<li class=\"nested_list\"><ul>";
             currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false,
-                    currentlyViewedId, showPreviewText, currentPage);
+                    currentlyViewedId, showPreviewText, currentPage, maxPreviewLength);
             currentHtml += "</li>";
         }
 
@@ -767,7 +771,7 @@ public class DiscAppController {
      * @param currentThread Current thread being viewed on the view thread page.
      * @return Returns formatted HTML block for reply threads.
      */
-    private String getThreadViewThreadHtml(Thread currentThread, int currentPage) {
+    private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength) {
 
         //default reply thread values
         boolean skipCurrent = true;
@@ -809,7 +813,7 @@ public class DiscAppController {
                     ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
             currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                    skipCurrent, currentThread.getId(), true, currentPage) ;
+                    skipCurrent, currentThread.getId(), true, currentPage, maxPreviewLength);
 
             //first child thread needs additional html tags added
             if (isFirstChild) {

@@ -336,6 +336,23 @@ parent.frames.preview.document.location.reload();
                     <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(30)}" value="30">30</option>
                 </select>
             </p>
+
+            <p><b>Preview Length on Top Level Threads</b> (Number characters in first message preview before presenting a "more" link)
+                <select name="previewTopLevelLength" class="button" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(200)}" value="200">200 - Small</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(320)}" value="320">320 - Medium</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(500)}" value="500">500 - Large</option>
+                </select>
+            </p>
+
+            <p><b>Preview Length on Replies</b> (Number characters in reply previews before presenting a "more" link on view thread page)
+                <select name="previewReplyLength" class="button" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(100)}" value="100">100 - Small</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(200)}" value="200">200 - Medium</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(300)}" value="300">300 - Large</option>
+                </select>
+            </p>
+
             <input type="submit" name="ChangeThreads" value="Change Threads" class="button"/>
         </form>
     </div>

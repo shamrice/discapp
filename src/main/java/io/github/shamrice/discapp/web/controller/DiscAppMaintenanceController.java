@@ -1040,6 +1040,12 @@ public class DiscAppMaintenanceController {
                 int threadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 15);
                 maintenanceViewModel.setThreadDepth(threadDepth);
 
+                int previewLengthTopLevel = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, 320);
+                maintenanceViewModel.setPreviewTopLevelLength(previewLengthTopLevel);
+
+                int previewLengthReply = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
+                maintenanceViewModel.setPreviewReplyLength(previewLengthReply);
+
                 //header footer configs
                 String headerText = configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, "");
                 maintenanceViewModel.setHeader(headerText);
@@ -1342,8 +1348,11 @@ public class DiscAppMaintenanceController {
             boolean threadBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
             boolean entryBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
             boolean threadDepthSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
+            boolean previewTopLevelSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewTopLevelLength()));
+            boolean previewReplySaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewReplyLength()));
 
-            if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved && threadDepthSaved) {
+            if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved
+                    && threadDepthSaved && previewTopLevelSaved && previewReplySaved) {
                 maintenanceViewModel.setInfoMessage("Successfully saved changes to threads.");
             } else {
                 maintenanceViewModel.setInfoMessage("Failed to save changes to threads.");

@@ -37,6 +37,8 @@ public class MaintenanceViewModel {
     private String threadBreak;
     private String entryBreak;
     private int threadDepth;
+    private int previewTopLevelLength;
+    private int previewReplyLength;
 
     //header/footer config
     private String header;
@@ -64,6 +66,14 @@ public class MaintenanceViewModel {
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
         return threadDepth == dropDownValue;
+    }
+
+    public boolean isSelectedPreviewTopLevelLength(int dropDownValue) {
+        return previewTopLevelLength == dropDownValue;
+    }
+
+    public boolean isSelectedPreviewReplyLength(int dropDownValue) {
+        return previewReplyLength == dropDownValue;
     }
 
     public boolean isThreadSortOrderCreation() {
