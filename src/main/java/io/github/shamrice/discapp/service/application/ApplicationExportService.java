@@ -2,6 +2,8 @@ package io.github.shamrice.discapp.service.application;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +21,18 @@ import java.util.List;
 @Slf4j
 public class ApplicationExportService {
 
-    private static final String EXPORT_DIRECTORY = "exports";
-
     @Autowired
     private ThreadService threadService;
 
-    public ApplicationExportService() {
-        Path exportDir = Paths.get(EXPORT_DIRECTORY);
-        if (Files.notExists(exportDir)) {
-            try {
-                Files.createDirectory(exportDir);
-            } catch (IOException ex) {
-                log.error("Failed to create export directory: " + EXPORT_DIRECTORY + " :: " + ex.getMessage(), ex);
-            }
-        }
-    }
+    @Autowired
+    private ConfigurationService configurationService;
+
+    private Path exportDir;
 
     public String generateExportForApplication(long appId) throws IOException {
-        File testFile = new File(EXPORT_DIRECTORY + "/export_" + appId + ".sql");
+        refreshExportDirectoryConfig();
+
+        File testFile = new File(exportDir.toString() + "/export_" + appId + ".sql");
         if (testFile.createNewFile()) {
             log.info("Created export file: " + testFile.getAbsolutePath() + " : " + testFile.getName());
 
@@ -119,6 +115,19 @@ public class ApplicationExportService {
         fileDataSb.append("\n\n");
 
         return fileDataSb.toString();
+    }
 
+    private void refreshExportDirectoryConfig() {
+        String exportDirStr = configurationService.getStringValue(0L, ConfigurationProperty.EXPORT_DOWNLOAD_LOCATION, "exports");
+        exportDir = Paths.get(exportDirStr);
+        log.info("Refreshing export directory configuration :: Configured path: " + exportDirStr
+                + " :: Absolute path: " + exportDir.toAbsolutePath().toAbsolutePath());
+        if (Files.notExists(exportDir)) {
+            try {
+                Files.createDirectory(exportDir);
+            } catch (IOException ex) {
+                log.error("Failed to create export directory: " + exportDir.toAbsolutePath().toString() + " :: " + ex.getMessage(), ex);
+            }
+        }
     }
 }

@@ -53,10 +53,10 @@ public class FileSystemStorageService {
         long bytesCopied = Files.copy(inputStream, saveLocationPath, StandardCopyOption.REPLACE_EXISTING);
 
         if (bytesCopied > 0L) {
-            log.warn("Successfully stored uploaded file to " + saveLocationPath.toString());
+            log.warn("Successfully stored uploaded file to " + saveLocationPath.toAbsolutePath().toString());
             return true;
         } else {
-            log.error("Failed to upload file: " + saveLocationPath.toString());
+            log.error("Failed to upload file: " + saveLocationPath.toAbsolutePath().toString());
             return false;
         }
     }
@@ -78,14 +78,15 @@ public class FileSystemStorageService {
 
     private void refreshLocationConfig() {
         String saveLocationStr = configurationService.getStringValue(0L, ConfigurationProperty.IMPORT_UPLOAD_LOCATION, "imports");
-        log.info("Using configuration directory: " + saveLocationStr + " to save uploaded disc apps.");
         saveLocation = Paths.get(saveLocationStr);
+        log.info("Refreshing upload location config :: Using configuration directory: " + saveLocationStr
+                + " :: Absolute path: " + saveLocation.toAbsolutePath().toString());
 
         if (Files.notExists(saveLocation)) {
             try {
                 Files.createDirectory(saveLocation);
             } catch (IOException ex) {
-                log.error("Failed to create upload directory: " + saveLocation + " :: " + ex.getMessage(), ex);
+                log.error("Failed to create upload directory: " + saveLocation.toAbsolutePath().toString() + " :: " + ex.getMessage(), ex);
             }
         }
     }
