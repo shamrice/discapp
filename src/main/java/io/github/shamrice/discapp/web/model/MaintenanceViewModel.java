@@ -36,6 +36,7 @@ public class MaintenanceViewModel {
     private boolean highlightNewMessages;
     private String threadBreak;
     private String entryBreak;
+    private int maxThreadCountPerPage;
     private int threadDepth;
     private int previewTopLevelLength;
     private int previewReplyLength;
@@ -63,6 +64,10 @@ public class MaintenanceViewModel {
 
     //favicon config
     private String favicon;
+
+    public boolean isSelectedMaxThreadCountPerPage(int dropDownValue) {
+        return maxThreadCountPerPage == dropDownValue;
+    }
 
     public boolean isSelectedThreadDepth(int dropDownValue) {
         return threadDepth == dropDownValue;

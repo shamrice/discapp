@@ -304,6 +304,20 @@ parent.frames.preview.document.location.reload();
                 <input type="text" name="entryBreak" th:value="${maintenanceViewModel.getEntryBreak()}" size="35"
                        maxlength="128"/>
             </p>
+
+            <p><b>Threads Per Page</b> (Number of threads on each page)
+                <select name="maxThreadCountPerPage" class="button" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(5)}" value="5">5</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(10)}" value="10">10</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(15)}" value="15">15</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(20)}" value="20">20</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(25)}" value="25">25</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(30)}" value="30">30</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(40)}" value="40">40</option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(50)}" value="50">50</option>
+                </select>
+            </p>
+
             <p><b>Thread Depth</b> (Number of indented replies before presenting a "# more comments" link)
                 <select name="threadDepth" class="button" style="border:1px solid black;">
                     <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(3)}" value="3">3</option>
