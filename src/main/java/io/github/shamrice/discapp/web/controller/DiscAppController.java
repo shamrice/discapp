@@ -132,6 +132,7 @@ public class DiscAppController {
                     String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
                     int maxPreviewLengthTopLevelThread = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, 320);
                     int maxPreviewLengthReplies = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
+                    int maxThreadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 30);
 
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
 
@@ -142,7 +143,7 @@ public class DiscAppController {
                             currentHtml += "<div class=\"responses\">";
                             currentHtml += getAppViewThreadHtml(threadTreeNode, "",
                                     entryBreakString, true, -1,
-                                    false, page, maxPreviewLengthReplies);
+                                    false, page, maxPreviewLengthReplies, 0, maxThreadDepth);
                             currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
                             currentHtml += "</div>";
                         }
@@ -464,9 +465,10 @@ public class DiscAppController {
         if (currentThread != null) {
 
             int maxPreviewLength = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
+            int maxThreadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 30);
 
             String threadBody = threadService.getThreadBodyText(threadId);
-            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage, maxPreviewLength);
+            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage, maxPreviewLength, maxThreadDepth);
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
 
@@ -681,9 +683,21 @@ public class DiscAppController {
      */
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
                                         boolean skipCurrentNode, long currentlyViewedId,
-                                        boolean showPreviewText, int currentPage, int maxPreviewLength) {
+                                        boolean showPreviewText, int currentPage, int maxPreviewLength,
+                                        int currentThreadDepth, int maxThreadDepth) {
 
         if (!skipCurrentNode) {
+
+            //increment thread depth. if hit max, set html and return back.
+            currentThreadDepth++;
+            if (currentThreadDepth >= maxThreadDepth) {
+                int numOfReplies = getThreadCount(currentNode, 0);
+                return currentHtml + "<li class=\"\">" +
+                        "<a class=\"\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                        "&amp;article=" + currentNode.getCurrent().getId() +
+                        "&amp;page=" + currentPage + "\">" + numOfReplies + " more comments</a>" +
+                        "</ul>";
+            }
 
             //current entry gets different css and no inner div.
             if (currentNode.getCurrent().getId().equals(currentlyViewedId)) {
@@ -755,11 +769,12 @@ public class DiscAppController {
 
             currentHtml += "<li class=\"nested_list\"><ul>";
             currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false,
-                    currentlyViewedId, showPreviewText, currentPage, maxPreviewLength);
+                    currentlyViewedId, showPreviewText, currentPage, maxPreviewLength, currentThreadDepth, maxThreadDepth);
             currentHtml += "</li>";
         }
 
         currentHtml += "</ul>";
+
 
         return currentHtml;
     }
@@ -771,7 +786,7 @@ public class DiscAppController {
      * @param currentThread Current thread being viewed on the view thread page.
      * @return Returns formatted HTML block for reply threads.
      */
-    private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength) {
+    private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength, int maxThreadDepth) {
 
         //default reply thread values
         boolean skipCurrent = true;
@@ -788,11 +803,13 @@ public class DiscAppController {
                 //if grandparent is not top level thread.
                 if (parentThread.getParentId() != 0L) {
                     grandparentId = parentThread.getParentId();
+                    maxThreadDepth += 2; //starting back two levels, so add to depth allowance.
                 } else {
                     //if grandparent is top level thread... set to parent
                     grandparentId = parentThread.getId();
                     skipCurrent = false;
                     isFirstChild = true;
+                    maxThreadDepth += 1; //starting back one level so add to depth allowance.
 
                 }
             } else {
@@ -813,7 +830,7 @@ public class DiscAppController {
                     ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
             currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                    skipCurrent, currentThread.getId(), true, currentPage, maxPreviewLength);
+                    skipCurrent, currentThread.getId(), true, currentPage, maxPreviewLength, 0, maxThreadDepth);
 
             //first child thread needs additional html tags added
             if (isFirstChild) {
@@ -824,6 +841,14 @@ public class DiscAppController {
         }
 
         return currentHtml;
+    }
+
+    private int getThreadCount(ThreadTreeNode threadTreeNode, int currentCount) {
+        for (ThreadTreeNode subThread : threadTreeNode.getSubThreads()) {
+            currentCount = getThreadCount(subThread, currentCount);
+        }
+        currentCount++;
+        return currentCount;
     }
 
     private String getAdjustedDateStringForConfiguredTimeZone(long appId, Date date, boolean includeComma) {
