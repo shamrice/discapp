@@ -15,6 +15,12 @@ public class AccountViewModel {
     public static class AccountApplication {
         private @NonNull String applicationName;
         private @NonNull Long applicationId;
+        private @NonNull String applicationStatus;
+
+        public boolean isSelectedApplicationStatus(String dropDownValue) {
+            return applicationStatus.equalsIgnoreCase(dropDownValue);
+        }
+
     }
 
     private String username;
@@ -39,6 +45,7 @@ public class AccountViewModel {
     private String ownerEmail;
     private Long applicationId;
     private String applicationName;
+    private String applicationStatus;
 
     private List<AccountApplication> accountApplications;
 

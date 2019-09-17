@@ -24,6 +24,7 @@ public class Application {
 
     private String name;
     private Long ownerId;
+    private Boolean enabled;
     private Date createDt;
     private Date modDt;
 }

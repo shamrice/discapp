@@ -131,6 +131,12 @@ public class ApplicationService {
     public Application get(Long id) {
         Optional<Application> app = applicationRepository.findById(id);
         if (app.isPresent()) {
+            //check if app is enabled.
+            if (!app.get().getEnabled()) {
+                log.warn("AppId: " + id + " is not currently enabled. Returning null.");
+                return null;
+            }
+            //check if owner is enabled.
             Owner appOwner = accountService.getOwnerById(app.get().getOwnerId());
             if (appOwner != null && appOwner.getEnabled()) {
                 return app.get();

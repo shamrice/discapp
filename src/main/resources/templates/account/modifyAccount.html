@@ -91,8 +91,19 @@
                     <label>Application Name:</label>
                 </td>
                 <td>
-                    <input class="button" type="text" id="applicationName" name="applicationName"
-                           th:value="${accountApplication.getApplicationName()}" maxlength="200"/>
+                    <input class="button" type="text" id="modifyAccountApplicationName" name="applicationName"
+                           th:value="${accountApplication.getApplicationName()}" maxlength="200" style="width:100%;"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Status:</label>
+                </td>
+                <td>
+                    <select name="applicationStatus" class="button" style="border:1px solid black;width:100%;">
+                        <option th:selected="${accountApplication.isSelectedApplicationStatus('enabled')}" value="enabled">Enabled</option>
+                        <option th:selected="${accountApplication.isSelectedApplicationStatus('disabled')}" value="disabled">Disabled</option>
+                    </select>
                 </td>
             </tr>
             <tr>
@@ -106,10 +117,15 @@
                     <input class="button" name="reset" type="reset">
                 </td>
             </tr>
-            <tr>
+            <tr th:if="${accountApplication.getApplicationStatus().equals('enabled')}">
                 <td colspan="2" style="padding:5px;">
                     <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}&amp;redirect=${accountViewModel.getRedirect()}|}">
                         Click Here To Modify Disc Application Settings</a>
+                </td>
+            </tr>
+            <tr th:unless="${accountApplication.getApplicationStatus().equals('enabled')}">
+                <td colspan="2" style="padding:5px;">
+                    Disc App must be enabled to further modify application settings.
                 </td>
             </tr>
         </table>

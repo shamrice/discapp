@@ -1,6 +1,5 @@
 package io.github.shamrice.discapp.web.controller;
 
-import com.sun.tools.corba.se.idl.constExpr.GreaterEqual;
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
@@ -13,20 +12,11 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
-import org.apache.tomcat.util.json.JSONParser;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +26,9 @@ import java.util.*;
 @Controller
 @Slf4j
 public class AccountController {
+
+    private static final String ENABLED = "enabled";
+    private static final String DISABLED = "disabled";
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
@@ -343,8 +336,13 @@ public class AccountController {
                     List<Application> apps = applicationService.getByOwnerId(owner.getId());
                     List<AccountViewModel.AccountApplication> accountApplications = new ArrayList<>();
                     for (Application app : apps) {
+
+                        String appStatus = DISABLED;
+                        if (app.getEnabled())
+                            appStatus = ENABLED;
+
                         AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
-                                app.getName(), app.getId()
+                                app.getName(), app.getId(), appStatus
                         );
                         accountApplications.add(application);
                     }
@@ -483,12 +481,18 @@ public class AccountController {
                                 app.setName(appName);
                                 app.setModDt(new Date());
 
+                                if (accountViewModel.getApplicationStatus().equalsIgnoreCase(ENABLED)) {
+                                    app.setEnabled(true);
+                                } else {
+                                    app.setEnabled(false);
+                                }
+
                                 if (applicationService.save(app) != null) {
                                     log.info("Application id: " + app.getId() + " has been updated.");
-                                    accountViewModel.setErrorMessage("Application name has been updated.");
+                                    accountViewModel.setErrorMessage("Application has been updated.");
                                 } else {
                                     log.error("Unable to save application changes for appId:" + app.getId());
-                                    accountViewModel.setErrorMessage("Failed to update application name.");
+                                    accountViewModel.setErrorMessage("Failed to update application.");
                                 }
                             }
                         }

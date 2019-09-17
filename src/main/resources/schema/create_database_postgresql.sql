@@ -49,6 +49,7 @@ CREATE TABLE application (
     id serial NOT NULL,
     name varchar(255) NOT NULL,
     owner_id int NOT NULL,
+    enabled bool NOT NULL DEFAULT TRUE,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
