@@ -130,7 +130,16 @@ public class ApplicationService {
 
     public Application get(Long id) {
         Optional<Application> app = applicationRepository.findById(id);
-        return app.orElse(null);
+        if (app.isPresent()) {
+            Owner appOwner = accountService.getOwnerById(app.get().getOwnerId());
+            if (appOwner != null && appOwner.getEnabled()) {
+                return app.get();
+            } else {
+                log.warn("Owner of appId: " + id + " is either null or currently disabled. Returning null app.");
+            }
+        }
+        log.error("No application found with appId: " + id + ". Returning null.");
+        return null;
     }
 
     public boolean isOwnerOfApp(long appId, String email) {

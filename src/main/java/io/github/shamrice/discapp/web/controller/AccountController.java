@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.web.controller;
 
+import com.sun.tools.corba.se.idl.constExpr.GreaterEqual;
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
@@ -12,9 +13,11 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -27,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Controller
@@ -53,6 +57,63 @@ public class AccountController {
 
     @Autowired
     private WebHelper webHelper;
+
+    @GetMapping("/account/delete/status")
+    public ModelAndView getAccountDeleteStatus(ModelMap modelMap) {
+        return new ModelAndView("account/delete/deleteAccountStatus", modelMap);
+    }
+
+    @GetMapping("/account/delete")
+    public ModelAndView getAccountDelete(ModelMap modelMap) {
+        return new ModelAndView("account/delete/deleteAccount", modelMap);
+    }
+
+    @PostMapping("/account/delete")
+    public ModelAndView postAccountDelete(@RequestParam(name = "reCaptchaResponse") String reCaptchaResponse,
+                                          ModelMap modelMap, HttpSession session) {
+
+        if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
+            log.warn("Delete account reCaptcha verification failed.");
+            modelMap.addAttribute("status", "User deletion failed.");
+            return new ModelAndView("account/delete/deleteAccountStatus", "model", modelMap);
+        }
+
+        String username = accountHelper.getLoggedInEmail();
+        if (username != null) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+            if (user != null) {
+
+                //mark owner as disabled. (when owner is disabled, all associated apps will be as well)
+                if (user.getOwnerId() != null) {
+                    Owner appOwner = accountService.getOwnerById(user.getOwnerId());
+                    if (appOwner != null) {
+                        appOwner.setEnabled(false);
+                        log.info("Delete Account : Disabling account owner id: " + appOwner.toString());
+                        if (accountService.saveOwner(appOwner) != null) {
+                            log.info("Successfully marked owner " + appOwner.toString() + " as disabled.");
+                        } else {
+                            log.error("Failed to mark owner: " + appOwner.toString() + " as disabled.");
+                        }
+                    }
+                }
+
+                //mark disc app account as disabled
+                if (discAppUserDetailsService.updateDiscAppUserEnabled(user.getId(), false)) {
+                    log.info("Successfully disabled disc app user: " + user.toString());
+                    modelMap.addAttribute("status", "User successfully deleted.");
+
+                    //invalidate current session.
+                    session.invalidate();
+
+                    return new ModelAndView("account/delete/deleteAccountStatus", "model", modelMap);
+                } else {
+                    log.error("Failed to disable disc app user: " + user.toString());
+                }
+            }
+        }
+        modelMap.addAttribute("status", "User deletion failed.");
+        return new ModelAndView("account/delete/deleteAccountStatus", "model", modelMap);
+    }
 
     @PostMapping("/password/reset/{resetKey}")
     public ModelAndView postPasswordResetForm(@PathVariable(name = "resetKey") String resetKey,

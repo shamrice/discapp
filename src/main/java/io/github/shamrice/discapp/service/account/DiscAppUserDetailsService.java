@@ -123,6 +123,11 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return discappUserRepository.updateDiscAppUserOwnerInfo(userId, ownerId, isAdmin, new Date()) > 0;
     }
 
+    public boolean updateDiscAppUserEnabled(long userId, boolean isEnabled) {
+        log.info("Updating user enabled status: userId: " + userId + " : isEnabled: " + isEnabled);
+        return discappUserRepository.updateDiscAppUserEnabled(userId, isEnabled, new Date()) > 0;
+    }
+
     private void sendNewUserEmailNotification(String newUserEmail) {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put(NEW_ACCOUNT_EMAIL, newUserEmail);

@@ -18,6 +18,7 @@
         color: green;
     }
 
+
 </style>
 
 <div th:if="${accountViewModel.getErrorMessage()}"
@@ -71,7 +72,7 @@
 </div>
 
 
-<div class="grey_box"  style="width:40em;" th:if="${accountViewModel.isOwner()}"
+<div class="grey_box" style="width:40em;" th:if="${accountViewModel.isOwner()}"
      th:each="accountApplication : ${accountViewModel.getAccountApplications()}">
 
     <h1 id="application_banner">Modify Application Information</h1>
@@ -234,15 +235,18 @@
 
             <tr>
                 <td><label>Current Password: </label></td>
-                <td><input class="button" type="password" name="password" th:value="${accountViewModel.getPassword()}"/></td>
+                <td><input class="button" type="password" name="password" th:value="${accountViewModel.getPassword()}"/>
+                </td>
             </tr>
             <tr>
                 <td><label>New Password: </label></td>
-                <td><input class="button" type="password" name="newPassword" th:value="${accountViewModel.getNewPassword()}"/></td>
+                <td><input class="button" type="password" name="newPassword"
+                           th:value="${accountViewModel.getNewPassword()}"/></td>
             </tr>
             <tr>
                 <td><label>Confirm New Password:</label></td>
-                <td><input class="button" type="password" name="confirmPassword" th:value="${accountViewModel.getConfirmPassword()}"/></td>
+                <td><input class="button" type="password" name="confirmPassword"
+                           th:value="${accountViewModel.getConfirmPassword()}"/></td>
             </tr>
             <tr>
                 <td colspan="2" style="padding:5px;">&nbsp;</td>
@@ -251,6 +255,29 @@
                 <td colspan="2" style="text-align:center;">
                     <input class="button" name="submit" type="submit" value="Change Password">&nbsp;
                     <input class="button" name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div class="grey_box" style="width:40em;">
+    <h1 id="delete_account_banner">Delete Account</h1>
+    <form name="f" action="/account/delete" method="get">
+        <table>
+
+            <tr>
+                <td colspan="2" style="padding:5px;">
+                    <p>
+                        Click the button below to delete your Disc App account. Any Disc Apps associated with your
+                        account will also be deleted and no longer accessible. Please contact us before you delete
+                        your account if you would like to transfer ownership of your Disc App to another account.
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input class="button" name="submit" type="submit" value="Delete Account">&nbsp;
                 </td>
             </tr>
         </table>

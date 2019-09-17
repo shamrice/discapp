@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Disc App - Reset Password</title>
+    <title>Disc App - Delete Account</title>
     <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -41,31 +41,23 @@
 </style>
 
 <div class="grey_box" style="width:40em;">
-    <h1 id="banner">Request Password Reset</h1>
+    <h1 id="banner">Delete Account</h1>
     <div style="padding:10px;">
-        If you have forgotten your Disc App password, please enter your email address below. Once submitted, an
-        email will be sent to your account with the steps necessary to complete the password reset process.
-    </div>
-    <form name="f" th:action="@{/account/password}" method="post" onsubmit="return validateReCaptcha();">
+        To delete your Disc App account, please click the button below. <b>When your account is deleted, any
+        Disc Apps you have created will also be deleted and no longer accessible.</b>
+
+    <form name="f" th:action="@{/account/delete}" method="post" onsubmit="return validateReCaptcha();">
         <input type="hidden" id="reCaptchaResponse" name="reCaptchaResponse">
         <table>
-            <tr>
-                <td><label>Email:</label></td>
-                <td><input type="email" id="email" name="email" maxlength="250"></td>
-            </tr>
             <tr>
                 <td colspan="2">
                     <div id="html_element" style="display:inline-block;"></div>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="padding:5px;">
-                </td>
-            </tr>
-            <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input class="button" name="submit" type="submit" value="Request Password Reset">&nbsp;
-                    <input class="button" name="reset" type="reset">
+                    <input class="button" name="deleteAccount" type="submit" value="Delete Account">&nbsp;
+                    <input class="button" type="button" value="Cancel" onclick="history.back()">
                 </td>
             </tr>
             <tr>
@@ -75,11 +67,6 @@
             <tr>
                 <td colspan="2" style="text-align:center;">
                     <a th:href="@{|/login?redirect=${redirectUrl}|}">Return to Login Page</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <a th:href="${redirectUrl}" th:text="@{|Return to ${redirectUrl}|}"></a>
                 </td>
             </tr>
         </table>

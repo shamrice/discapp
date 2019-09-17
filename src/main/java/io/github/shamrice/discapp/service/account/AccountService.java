@@ -64,10 +64,6 @@ public class AccountService {
         return ownerRepository.findOneByEmail(email);
     }
 
-    public void emailTest() {
-        emailNotificationService.send("shamrice@gmail.com", NotificationType.PASSWORD_RESET, null);
-    }
-
     public boolean performPasswordReset(String resetKey, int resetCode, String email, String newPassword) {
         PasswordReset passwordReset = passwordResetRepository.findOneByEmailAndKey(email, resetKey);
         if (passwordReset == null || passwordReset.getIsRedeemed()) {

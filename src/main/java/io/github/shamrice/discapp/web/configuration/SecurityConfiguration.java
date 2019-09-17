@@ -41,6 +41,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/account/password").permitAll()
                     .antMatchers("/password/reset/*").permitAll()
                     .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+                    .antMatchers("/account/delete").authenticated()
+                    .antMatchers("/account/delete/status").permitAll()
                     .antMatchers("/account/modify").authenticated()
                     .antMatchers("/account/modify/**").authenticated()
                     .antMatchers("/account/add/**").authenticated()
