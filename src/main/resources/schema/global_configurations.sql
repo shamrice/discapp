@@ -39,3 +39,6 @@ VALUES (0, 'import.upload.location', 'imports');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'export.download.location', 'exports');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'thread.post.interval.minimum', '1');

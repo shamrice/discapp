@@ -43,7 +43,8 @@ public enum ConfigurationProperty {
     RE_CAPTCHA_SECRET("recaptcha.secret"),
     RE_CAPTCHA_VERIFY_ENABLED("recaptcha.verify.enabled"),
     IMPORT_UPLOAD_LOCATION("import.upload.location"),
-    EXPORT_DOWNLOAD_LOCATION("export.download.location");
+    EXPORT_DOWNLOAD_LOCATION("export.download.location"),
+    MIN_THREAD_POST_INTERVAL_IN_SECONDS("thread.post.interval.minimum");
 
     private final String propName;
 

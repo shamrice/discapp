@@ -175,3 +175,9 @@ table#widget_table td.date_cell { width:4em; }
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.message_error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}

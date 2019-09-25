@@ -6,6 +6,8 @@ import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.data.repository.ReportedAbuseRepository;
 import io.github.shamrice.discapp.data.repository.ThreadBodyRepository;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,25 @@ public class ThreadService {
 
     @Autowired
     private ReportedAbuseRepository reportedAbuseRepository;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    public boolean isNewThreadPostTooSoon(long applicationId, String ipAddress) {
+        if (ipAddress != null && !ipAddress.trim().isEmpty()) {
+            Thread lastThreadSubmittedByIp = threadRepository.findTopByApplicationIdAndIpAddressOrderByCreateDtDesc(applicationId, ipAddress);
+            if (lastThreadSubmittedByIp != null) {
+                int minPostInterval = configurationService.getIntegerValue(0L, ConfigurationProperty.MIN_THREAD_POST_INTERVAL_IN_SECONDS, 60);
+                long currentInterval = (new Date().getTime() - lastThreadSubmittedByIp.getCreateDt().getTime()) / 1000;
+                if (currentInterval < minPostInterval) {
+                    log.warn("Attempt to create thread too soon for IpAddress: " + ipAddress + " on appId: " + applicationId + " :: minInterval="
+                            + minPostInterval + " :: currentInterval: " + currentInterval);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public boolean reportThreadForAbuse(long applicationId, long threadId, long reporterDiscAppUserId) {
         Optional<Thread> abuseThread = threadRepository.findById(threadId);

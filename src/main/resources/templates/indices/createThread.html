@@ -27,6 +27,10 @@
 
     <div th:utext="${headerText}"></div>
 
+    <div th:if="${errorMessage}">
+        <span class="message_error" th:text="${errorMessage}"></span>
+    </div>
+
     <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"
           enctype="multipart/form-data" action="submit">
 

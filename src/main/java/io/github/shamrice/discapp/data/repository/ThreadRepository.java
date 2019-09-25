@@ -28,6 +28,8 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
 
     Thread getOneByApplicationIdAndId(Long applicationId, Long id);
 
+    Thread findTopByApplicationIdAndIpAddressOrderByCreateDtDesc(Long applicationId, String ipAddress);
+
     //todo add approved
 
     long countByApplicationIdAndDeleted(Long applicationId, Boolean deleted);

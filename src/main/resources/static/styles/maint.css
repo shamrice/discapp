@@ -145,3 +145,9 @@ a.tab:hover { background-color:#88f; color:#eee; }
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.message_error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}

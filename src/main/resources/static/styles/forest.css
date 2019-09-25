@@ -102,3 +102,9 @@ table#widget_table {margin:auto;}
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.message_error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}

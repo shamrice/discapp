@@ -252,6 +252,10 @@ public class DiscAppController {
             model.addAttribute("parentThreadBody", newThreadViewModel.getParentThreadBody());
             model.addAttribute("currentPage", newThreadViewModel.getCurrentPage());
 
+            if (newThreadViewModel.getErrorMessage() != null) {
+                model.addAttribute("errorMessage", newThreadViewModel.getErrorMessage());
+            }
+
             if (newThreadViewModel.getParentId() != null) {
                 try {
                     parentId = Long.parseLong(newThreadViewModel.getParentId());
@@ -355,6 +359,24 @@ public class DiscAppController {
                     return new ModelAndView("redirect:/indices/" + appId + "?page=" + page);
                 }
 
+                //set ip address and user agent
+                String ipAddress = null;
+                String userAgent = null;
+                if (request != null) {
+                    //check forwarded header for proxy users, if not found, use ip provided.
+                    ipAddress = request.getHeader("X-FORWARDED-FOR");
+                    if (ipAddress == null || ipAddress.isEmpty()) {
+                        ipAddress = request.getRemoteAddr();
+                    }
+                    userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                }
+
+                if (threadService.isNewThreadPostTooSoon(appId, ipAddress)) {
+                    log.error("Cannot create thread so soon after creating previous thread. Returning user to page with error.");
+                    newThreadViewModel.setErrorMessage("New message too soon after previous post. Please try again.");
+                    return createNewThread(appId, null, newThreadViewModel, model);
+                }
+
                 //set submitter to anon if not filled out
                 String submitter = "";
                 if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
@@ -392,6 +414,8 @@ public class DiscAppController {
                 newThread.setCreateDt(new Date());
                 newThread.setModDt(new Date());
                 newThread.setSubject(subject);
+                newThread.setIpAddress(ipAddress);
+                newThread.setUserAgent(userAgent);
 
                 //set values for logged in user, if not logged in... use form data.
                 String userEmail = accountHelper.getLoggedInEmail();
@@ -409,21 +433,6 @@ public class DiscAppController {
 
                     //only use input from checkbox if there's an email address entered
                     newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
-                }
-
-                //set ip address
-                if (request != null) {
-                    //check forwarded header for proxy users, if not found, use ip provided.
-                    String ipAddress = request.getHeader("X-FORWARDED-FOR");
-                    if (ipAddress == null || ipAddress.isEmpty()) {
-                        ipAddress = request.getRemoteAddr();
-                    }
-                    newThread.setIpAddress(ipAddress);
-
-                    String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-                    if (userAgent != null && !userAgent.isEmpty()) {
-                        newThread.setUserAgent(userAgent);
-                    }
                 }
 
                 String body = newThreadViewModel.getBody();
