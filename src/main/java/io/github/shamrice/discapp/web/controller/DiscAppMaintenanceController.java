@@ -513,9 +513,13 @@ public class DiscAppMaintenanceController {
     @GetMapping("/admin/disc-info.cgi")
     public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
                                         Model model,
-                                        HttpServletResponse response) {
+                                        HttpServletResponse response,
+                                        HttpServletRequest request) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
+
+        String baseUrl  = webHelper.getBaseUrl(request);
+        model.addAttribute("appUrl", baseUrl + "/indices/" + appId);
 
         try {
             Application app = applicationService.get(appId);
