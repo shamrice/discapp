@@ -520,6 +520,7 @@ public class DiscAppMaintenanceController {
 
         String baseUrl  = webHelper.getBaseUrl(request);
         model.addAttribute("appUrl", baseUrl + "/indices/" + appId);
+        //todo : indices string should be from static final property
 
         try {
             Application app = applicationService.get(appId);

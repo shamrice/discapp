@@ -17,8 +17,14 @@ public class ApplicationCache<T> {
 
     private long maxCacheAgeMilliseconds = 900000L; //default 15 min
 
+    private boolean maxCacheAgeSet = false;
+
     public void setMaxCacheAgeMilliseconds(long milliseconds) {
-        this.maxCacheAgeMilliseconds = milliseconds;
+        if (!maxCacheAgeSet) {
+            log.info("Setting max cache age for application cache to: " + milliseconds);
+            this.maxCacheAgeMilliseconds = milliseconds;
+            maxCacheAgeSet = true;
+        }
     }
 
     public T getFromCache(Long applicationId) {

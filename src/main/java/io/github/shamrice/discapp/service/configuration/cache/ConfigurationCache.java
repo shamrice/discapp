@@ -4,6 +4,7 @@ import io.github.shamrice.discapp.data.model.Configuration;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -21,6 +22,8 @@ public class ConfigurationCache {
 
     private long maxCacheAgeMilliseconds = 900000L; //default 15 min
 
+    private boolean cacheDurationSet = false;
+
     private ConfigurationCache() {}
 
     public static ConfigurationCache getInstance() {
@@ -31,7 +34,12 @@ public class ConfigurationCache {
     }
 
     public void setMaxCacheAgeMilliseconds(long milliseconds) {
-        maxCacheAgeMilliseconds = milliseconds;
+        log.debug("Calling max cache age in config cache: " + milliseconds);
+        if (!cacheDurationSet) {
+            log.info("Setting cache duration to: " + milliseconds);
+            maxCacheAgeMilliseconds = milliseconds;
+            cacheDurationSet = true;
+        }
     }
 
     public Configuration getFromCache(Long applicationId, ConfigurationProperty configurationProperty) {

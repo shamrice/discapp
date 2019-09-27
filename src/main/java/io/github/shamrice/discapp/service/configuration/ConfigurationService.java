@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,10 @@ public class ConfigurationService {
 
     @Autowired
     private ConfigurationRepository configurationRepository;
+
+    public ConfigurationService(@Value("${discapp.cache.duration}") Long cacheDuration) {
+        ConfigurationCache.getInstance().setMaxCacheAgeMilliseconds(cacheDuration);
+    }
 
     public List<Configuration> list() {
         return configurationRepository.findAll();

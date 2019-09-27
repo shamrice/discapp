@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -34,6 +35,12 @@ public class ApplicationService {
 
     private ApplicationCache<Prologue> prologueCache = new ApplicationCache<>();
     private ApplicationCache<Epilogue> epilogueCache = new ApplicationCache<>();
+
+    public ApplicationService(@Value("${discapp.cache.duration}") Long cacheDuration) {
+        prologueCache.setMaxCacheAgeMilliseconds(cacheDuration);
+        epilogueCache.setMaxCacheAgeMilliseconds(cacheDuration);
+    }
+
 
 
     public Application save(Application application) {

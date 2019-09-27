@@ -66,3 +66,7 @@ server:
       cookie:
         max-age: 14d
       timeout: 1d
+
+discapp:
+  cache:
+    duration: ${CACHE_DURATION}

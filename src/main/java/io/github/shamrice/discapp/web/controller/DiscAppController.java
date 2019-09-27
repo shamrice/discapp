@@ -34,6 +34,7 @@ import java.util.*;
 @Slf4j
 public class DiscAppController {
 
+    //todo: move to it's own shared properties class. (sort of also used in the thread service class... ish... )
     private static final String BLANK_SUBMITTER = "Anonymous";
     private static final String BLANK_SUBJECT = "No Subject";
     private static final String BLANK_REPLY_PREFIX = "Re: ";
