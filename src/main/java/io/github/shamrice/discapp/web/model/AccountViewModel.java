@@ -47,9 +47,23 @@ public class AccountViewModel {
     private String applicationName;
     private String applicationStatus;
 
+    private Integer maxDiscApps;
+
     private List<AccountApplication> accountApplications;
 
     private String redirect;
+
+    public boolean isBelowAppLimit() {
+        if (maxDiscApps == null) {
+            return true;
+        }
+
+        if (accountApplications == null) {
+            return true;
+        }
+
+        return accountApplications.size() < maxDiscApps;
+    }
 
     public boolean isOwner() {
         return this.ownerId != null;

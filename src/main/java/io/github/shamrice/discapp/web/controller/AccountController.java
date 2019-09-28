@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -313,6 +314,7 @@ public class AccountController {
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
 
+            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
             accountViewModel.setUsername(user.getUsername());
             accountViewModel.setAdmin(user.getIsAdmin());
             accountViewModel.setCreateDt(user.getCreateDt());
@@ -558,6 +560,55 @@ public class AccountController {
         return getAccountModify(accountViewModel, redirect, modelMap);
     }
 
+    @GetMapping("/account/add/application")
+    public ModelAndView getAddApplication(@ModelAttribute AccountViewModel accountViewModel,
+                                          @RequestParam(required = false) String redirect,
+                                          ModelMap modelMap) {
+        if (redirect != null) {
+            modelMap.addAttribute("redirectUrl", redirect);
+        }
+
+        String email = accountHelper.getLoggedInEmail();
+
+        if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+
+            if (user.getOwnerId() != null && user.getOwnerId() > 0) {
+                Owner owner = accountService.getOwnerById(user.getOwnerId());
+                if (owner != null) {
+                    accountViewModel.setOwnerId(owner.getId());
+                    accountViewModel.setOwnerFirstName(owner.getFirstName());
+                    accountViewModel.setOwnerLastName(owner.getLastName());
+                    accountViewModel.setOwnerEmail(owner.getEmail());
+                    accountViewModel.setOwnerPhone(owner.getPhone());
+
+                    List<Application> apps = applicationService.getByOwnerId(owner.getId());
+                    int appLimit = configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
+
+                    accountViewModel.setMaxDiscApps(appLimit);
+                    List<AccountViewModel.AccountApplication> accountApplications = new ArrayList<>();
+                    for (Application app : apps) {
+
+                        String appStatus = DISABLED;
+                        if (app.getEnabled())
+                            appStatus = ENABLED;
+
+                        AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
+                                app.getName(), app.getId(), appStatus
+                        );
+                        accountApplications.add(application);
+                    }
+                    accountViewModel.setAccountApplications(accountApplications);
+
+                    if (accountApplications.size() >= appLimit) {
+                        accountViewModel.setErrorMessage("Unable to add an additional application. You are already at your account limit.");
+                    }
+                }
+            }
+        }
+        return new ModelAndView("account/app/createApp", "accountViewModel", accountViewModel);
+    }
+
     @PostMapping("/account/add/application")
     public ModelAndView postAddApplication(@ModelAttribute AccountViewModel accountViewModel,
                                            @RequestParam(required = false) String redirect,
@@ -629,6 +680,7 @@ public class AccountController {
                             Application newApp = new Application();
                             newApp.setName(appName);
                             newApp.setOwnerId(savedOwner.getId());
+                            newApp.setEnabled(true);
                             newApp.setCreateDt(new Date());
                             newApp.setModDt(new Date());
 

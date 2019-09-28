@@ -19,6 +19,8 @@
     }
 
 
+
+
 </style>
 
 <div th:if="${accountViewModel.getErrorMessage()}"
@@ -28,7 +30,8 @@
 </div>
 
 <div class="grey_box" style="width:40em;">
-    <h1 id="account_banner">Modify Account</h1>
+    <h2 id="account_banner">Modify Account</h2>
+    <hr/>
     <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}"
           method="post" th:object="${accountViewModel}">
         <table>
@@ -72,69 +75,108 @@
 </div>
 
 
-<div class="grey_box" style="width:40em;" th:if="${accountViewModel.isOwner()}"
-     th:each="accountApplication : ${accountViewModel.getAccountApplications()}">
+<div class="grey_box" style="width:40em;" th:if="${accountViewModel.isOwner()}">
 
-    <h1 id="application_banner">Modify Application Information</h1>
-    <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}"
-          method="post" th:object="${accountViewModel}">
-        <table>
-            <tr>
-                <td>
-                    <label>Application Index:</label>
-                </td>
-                <td class="value-label" th:text="${accountApplication.getApplicationId()}">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>Application Name:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="modifyAccountApplicationName" name="applicationName"
-                           th:value="${accountApplication.getApplicationName()}" maxlength="200" style="width:100%;"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>Status:</label>
-                </td>
-                <td>
-                    <select name="applicationStatus" class="button" style="border:1px solid black;width:100%;">
-                        <option th:selected="${accountApplication.isSelectedApplicationStatus('enabled')}" value="enabled">Enabled</option>
-                        <option th:selected="${accountApplication.isSelectedApplicationStatus('disabled')}" value="disabled">Disabled</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="padding:5px;">&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <input type="hidden" name="applicationId" id="applicationId"
-                           th:value="${accountApplication.getApplicationId()}"/>
-                    <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input class="button" name="reset" type="reset">
-                </td>
-            </tr>
-            <tr th:if="${accountApplication.getApplicationStatus().equals('enabled')}">
-                <td colspan="2" style="padding:5px;">
-                    <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}&amp;redirect=${accountViewModel.getRedirect()}|}">
-                        Click Here To Modify Disc Application Settings</a>
-                </td>
-            </tr>
-            <tr th:unless="${accountApplication.getApplicationStatus().equals('enabled')}">
-                <td colspan="2" style="padding:5px;">
-                    Disc App must be enabled to further modify application settings.
-                </td>
-            </tr>
-        </table>
-    </form>
+    <h2 id="application_banner">Modify Application Information</h2>
+
+    <div th:each="accountApplication : ${accountViewModel.getAccountApplications()}">
+        <hr/>
+        <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}"
+              method="post" th:object="${accountViewModel}">
+            <table>
+                <tr>
+                    <td>
+                        <label>Application Index:</label>
+                    </td>
+                    <td class="value-label" th:text="${accountApplication.getApplicationId()}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Application Name:</label>
+                    </td>
+                    <td>
+                        <input class="button" type="text" id="modifyAccountApplicationName" name="applicationName"
+                               th:value="${accountApplication.getApplicationName()}" maxlength="200"
+                               style="width:100%;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Status:</label>
+                    </td>
+                    <td>
+                        <select name="applicationStatus" class="button" style="border:1px solid black;width:100%;">
+                            <option th:selected="${accountApplication.isSelectedApplicationStatus('enabled')}"
+                                    value="enabled">Enabled
+                            </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationStatus('disabled')}"
+                                    value="disabled">Disabled
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding:5px;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input type="hidden" name="applicationId" id="applicationId"
+                               th:value="${accountApplication.getApplicationId()}"/>
+                        <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                        <input class="button" name="reset" type="reset">
+                    </td>
+                </tr>
+                <tr th:if="${accountApplication.getApplicationStatus().equals('enabled')}">
+                    <td colspan="2" style="padding:5px;">
+                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}&amp;redirect=${accountViewModel.getRedirect()}|}">
+                            Click Here To Modify Disc Application Settings</a>
+                    </td>
+                </tr>
+                <tr th:unless="${accountApplication.getApplicationStatus().equals('enabled')}">
+                    <td colspan="2" style="padding:5px;">
+                        Disc App must be enabled to further modify application settings.
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+<div class="grey_box" style="width:40em;">
+    <h2 id="add_application_banner">Add Disc App to Account</h2>
+    <hr/>
+    <div th:if="${accountViewModel.isBelowAppLimit()}">
+        <form name="f" action="/account/add/application" method="get">
+            <table>
+                <tr>
+                    <td colspan="2" style="padding:5px;">
+                        <p th:text="@{|
+                        Click the button below to add a new Disc App to your account. Please be advised there is
+                        an account limit ${accountViewModel.getMaxDiscApps()} of Disc Apps per account. Once this
+                        limit is reached, you must delete a an existing App to add any more.
+                        |}">
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input class="button" name="submit" type="submit" value="Create New Disc App">&nbsp;
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div th:unless="${accountViewModel.isBelowAppLimit()}">
+        <p th:text="@{| Your account is currently at the max application limit of ${accountViewModel.getMaxDiscApps()}.
+                        Please delete an existing Disc App if you would like to create a new one.|}">
+        </p>
+    </div>
 </div>
 
 <div class="grey_box" style="width:40em;" th:if="${accountViewModel.isOwner()}">
-
-    <h1 id="owner_banner">Modify Application Owner Information</h1>
+    <h2 id="owner_banner">Modify Application Owner Information</h2>
+    <hr/>
     <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}"
           method="post" th:object="${accountViewModel}">
         <table>
@@ -178,73 +220,10 @@
     </form>
 </div>
 
-<div class="grey_box" style="width:40em;" th:unless="${accountViewModel.isOwner()}">
-
-    <h1 id="create_application_banner">Add Disc App To Account</h1>
-    <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}"
-          method="post" th:object="${accountViewModel}">
-        <table>
-            <tr>
-                <td>
-                    <label>Application Name*:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="applicationName" name="applicationName"
-                           th:value="${accountViewModel.getApplicationName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>First Name*:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="ownerFirstName" name="ownerFirstName"
-                           th:value="${accountViewModel.getOwnerFirstName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>Last Name*:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="ownerLastName" name="ownerLastName"
-                           th:value="${accountViewModel.getOwnerLastName()}"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>Phone Number:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="ownerPhone" name="ownerPhone"
-                           th:value="${accountViewModel.getOwnerPhone()}" maxlength="50"/>
-                </td>
-            </tr>
-            <tr>
-                <td><label>Password*:</label></td>
-                <td><input class="button" type="password" id="password" name="password"
-                           th:value="${accountViewModel.getPassword()}"/></td>
-            </tr>
-            <tr>
-                <td><label>Confirm Password*:</label></td>
-                <td><input class="button" type="password" id="confirmPassword" name="confirmPassword"
-                           th:value="${accountViewModel.getConfirmPassword()}"/></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="padding:5px;"></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
-                    <input class="button" name="reset" type="reset">
-                </td>
-            </tr>
-        </table>
-    </form>
-</div>
 
 <div class="grey_box" style="width:40em;">
-    <h1 id="password_change_banner">Change Account Password</h1>
+    <h2 id="password_change_banner">Change Account Password</h2>
+    <hr/>
     <form name="f" th:action="@{|/account/modify/password?redirect=${accountViewModel.getRedirect()}|}"
           method="post" th:object="${accountViewModel}">
         <table>
@@ -278,10 +257,10 @@
 </div>
 
 <div class="grey_box" style="width:40em;">
-    <h1 id="delete_account_banner">Delete Account</h1>
+    <h2 id="delete_account_banner">Delete Account</h2>
+    <hr/>
     <form name="f" action="/account/delete" method="get">
         <table>
-
             <tr>
                 <td colspan="2" style="padding:5px;">
                     <p>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Modify Account</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<style type="text/css">
+    .alert-error {
+        color: red;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+
+</style>
+
+<div th:if="${accountViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${accountViewModel.getErrorMessage()}">
+</div>
+
+<div class="grey_box" style="width:40em;" th:if="${accountViewModel.isBelowAppLimit()}">
+
+    <h2 id="create_application_banner">Add Disc App To Account</h2>
+    <hr />
+    <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}"
+          method="post" th:object="${accountViewModel}">
+
+        <span  th:if="${accountViewModel.isOwner()}">
+            <input type="hidden" id="existingOwnerFirstName" name="ownerFirstName"
+                   th:value="${accountViewModel.getOwnerFirstName()}"/>
+            <input type="hidden" id="existingOwnerLastName" name="ownerLastName"
+                   th:value="${accountViewModel.getOwnerLastName()}"/>
+            <input type="hidden" id="existingOwnerPhone" name="ownerPhone"
+                   th:value="${accountViewModel.getOwnerPhone()}"/>
+        </span>
+
+        <table>
+            <tr>
+                <td>
+                    <label>Application Name*:</label>
+                </td>
+                <td>
+                    <input class="button" type="text" id="applicationName" name="applicationName"
+                           th:value="${accountViewModel.getApplicationName()}"/>
+                </td>
+            </tr>
+            <tr th:unless="${accountViewModel.isOwner()}">
+                <td>
+                    <label>First Name*:</label>
+                </td>
+                <td>
+                    <input class="button" type="text" id="ownerFirstName" name="ownerFirstName"
+                           th:value="${accountViewModel.getOwnerFirstName()}"/>
+                </td>
+            </tr>
+            <tr th:unless="${accountViewModel.isOwner()}">
+                <td>
+                    <label>Last Name*:</label>
+                </td>
+                <td>
+                    <input class="button" type="text" id="ownerLastName" name="ownerLastName"
+                           th:value="${accountViewModel.getOwnerLastName()}"/>
+                </td>
+            </tr>
+            <tr th:unless="${accountViewModel.isOwner()}">
+                <td>
+                    <label>Phone Number:</label>
+                </td>
+                <td>
+                    <input class="button" type="text" id="ownerPhone" name="ownerPhone"
+                           th:value="${accountViewModel.getOwnerPhone()}" maxlength="50"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label>Current Password*:</label></td>
+                <td><input class="button" type="password" id="password" name="password"
+                           th:value="${accountViewModel.getPassword()}"/></td>
+            </tr>
+            <tr>
+                <td><label>Confirm Password*:</label></td>
+                <td><input class="button" type="password" id="confirmPassword" name="confirmPassword"
+                           th:value="${accountViewModel.getConfirmPassword()}"/></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding:5px;"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input class="button" name="submit" type="submit" value="Save Changes">&nbsp;
+                    <input class="button" name="reset" type="reset">
+                    <input class="button" type="button" value="Cancel" onclick="history.back()">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+</body>
