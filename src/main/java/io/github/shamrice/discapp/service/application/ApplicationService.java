@@ -52,6 +52,7 @@ public class ApplicationService {
         if (application != null) {
             if (application.getCreateDt() == null) {
                 application.setCreateDt(new Date());
+                application.setDeleted(false);
             }
             application.setModDt(new Date());
             savedApplication = applicationRepository.save(application);
@@ -137,8 +138,9 @@ public class ApplicationService {
         Optional<Application> app = applicationRepository.findById(id);
         if (app.isPresent()) {
             //check if app is enabled.
-            if (!app.get().getEnabled()) {
-                log.warn("AppId: " + id + " is not currently enabled. Returning null.");
+            if (!app.get().getEnabled() || app.get().getDeleted()) {
+                log.warn("AppId: " + id + " is either not enabled or is deleted. : Enabled="
+                        + app.get().getEnabled() + " : Deleted=" + app.get().getDeleted() + " :: Returning null.");
                 return null;
             }
             //check if owner is enabled.
@@ -159,7 +161,7 @@ public class ApplicationService {
         if (ownerIdForEmail != null && ownerIdForEmail > 0) {
             Owner owner = accountService.getOwnerById(ownerIdForEmail);
             if (owner != null) {
-                List<Application> ownedApps = applicationRepository.findByOwnerId(owner.getId());
+                List<Application> ownedApps = applicationRepository.findByOwnerIdAndDeleted(owner.getId(), false);
                 for (Application application : ownedApps) {
                     if (application.getId() != null && application.getId() == appId) {
                         log.info("User: " + email + " is owner of appId: " + appId + " :: returning true.");
@@ -177,7 +179,7 @@ public class ApplicationService {
     }
 
     public List<Application> getByOwnerId(long ownerId) {
-        return applicationRepository.findByOwnerId(ownerId);
+        return applicationRepository.findByOwnerIdAndDeleted(ownerId, false);
     }
 
     public Prologue getPrologue(long applicationId, boolean useCache) {

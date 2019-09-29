@@ -113,6 +113,9 @@
                             <option th:selected="${accountApplication.isSelectedApplicationStatus('disabled')}"
                                     value="disabled">Disabled
                             </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationStatus('delete')}"
+                                    value="delete" onclick="alert('Warning: Saving changes after selecting this option will permanently delete this Disc App as well as all associated threads. This action is not reversible!');">Delete
+                            </option>
                         </select>
                     </td>
                 </tr>

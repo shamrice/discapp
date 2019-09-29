@@ -50,6 +50,7 @@ CREATE TABLE application (
     name varchar(255) NOT NULL,
     owner_id int NOT NULL,
     enabled bool NOT NULL DEFAULT TRUE,
+    deleted bool NOT NULL DEFAULT FALSE,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

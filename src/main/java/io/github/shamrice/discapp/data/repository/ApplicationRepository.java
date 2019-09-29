@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-    List<Application> findByOwnerId(Long ownerId);
+    List<Application> findByOwnerIdAndDeleted(Long ownerId, Boolean deleted);
 
 }

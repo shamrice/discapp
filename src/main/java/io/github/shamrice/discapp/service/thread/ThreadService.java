@@ -90,6 +90,22 @@ public class ThreadService {
         return threadRepository.countByApplicationIdAndDeleted(applicationId, false);
     }
 
+    public void deleteAllThreadsInApplication(long applicationId) {
+        log.warn("Marking all threads for application Id: " + applicationId + " as deleted.");
+        List<Thread> threadsToMarkDeleted = threadRepository.findByApplicationIdAndDeleted(applicationId, false);
+        for (Thread thread : threadsToMarkDeleted) {
+            thread.setDeleted(true);
+            thread.setModDt(new Date());
+        }
+        List<Thread> markedThreads = threadRepository.saveAll(threadsToMarkDeleted);
+        if (markedThreads != null ) {
+            log.warn("Successfully marked " + markedThreads.size() + " threads as deleted for application id: " + applicationId);
+            return;
+        }
+
+        log.warn("No threads to mark as deleted for application id: " + applicationId);
+    }
+
     public boolean deleteThread(long applicationId, long threadId, boolean deleteSubThreads) {
 
         Optional<Thread> optionalThreadToDelete = threadRepository.findById(threadId);

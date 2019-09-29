@@ -8,6 +8,7 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -30,6 +31,7 @@ public class AccountController {
 
     private static final String ENABLED = "enabled";
     private static final String DISABLED = "disabled";
+    private static final String DELETE = "delete";
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
@@ -42,6 +44,9 @@ public class AccountController {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ThreadService threadService;
 
     @Autowired
     private AccountHelper accountHelper;
@@ -485,6 +490,11 @@ public class AccountController {
 
                                 if (accountViewModel.getApplicationStatus().equalsIgnoreCase(ENABLED)) {
                                     app.setEnabled(true);
+                                } else if (accountViewModel.getApplicationStatus().equalsIgnoreCase(DELETE)){
+                                    app.setEnabled(false);
+                                    app.setDeleted(true);
+                                    //mark all threads as deleted in DB.
+                                    threadService.deleteAllThreadsInApplication(app.getId());
                                 } else {
                                     app.setEnabled(false);
                                 }
@@ -681,6 +691,7 @@ public class AccountController {
                             newApp.setName(appName);
                             newApp.setOwnerId(savedOwner.getId());
                             newApp.setEnabled(true);
+                            newApp.setDeleted(false);
                             newApp.setCreateDt(new Date());
                             newApp.setModDt(new Date());
 
