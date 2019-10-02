@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -203,11 +202,6 @@ public class DiscAppMaintenanceController {
         String username = accountHelper.getLoggedInEmail();
         model.addAttribute("username", username);
 
-        Cookie newRedirectCookie = new Cookie("redirect_url", "/admin/disc-maint.cgi?id=" + appId);
-        newRedirectCookie.setPath("/");
-        newRedirectCookie.setMaxAge(-1);
-        response.addCookie(newRedirectCookie);
-
         return new ModelAndView("admin/permissionDenied");
     }
 
@@ -270,7 +264,6 @@ public class DiscAppMaintenanceController {
 
     @PostMapping("/admin/disc-widget-maint.cgi")
     public ModelAndView postDiscMainWidgetView(@RequestParam(name = "id") long appId,
-                                               @RequestParam(name = "redirect", required = false) String redirect,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
                                                HttpServletRequest request,
@@ -316,19 +309,17 @@ public class DiscAppMaintenanceController {
             maintenanceWidgetViewModel.setInfoMessage("Unable to save widget settings. Please try again.");
         }
 
-        return getDiscMaintWidgetView(appId, redirect, maintenanceWidgetViewModel, model, request, response);
+        return getDiscMaintWidgetView(appId, maintenanceWidgetViewModel, model, request, response);
     }
 
     @GetMapping("/admin/disc-widget-maint.cgi")
     public ModelAndView getDiscMaintWidgetView(@RequestParam(name = "id") long appId,
-                                               @RequestParam(name = "redirect", required =  false) String redirect,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
                                                HttpServletRequest request,
                                                HttpServletResponse response) {
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
-        model.addAttribute("redirect", redirect);
 
         try {
             Application app = applicationService.get(appId);
@@ -405,14 +396,12 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/disc-locale.cgi")
     public ModelAndView getDiscLocaleView(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
                                           MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                           Model model,
                                           HttpServletResponse response) {
 
         model.addAttribute("appName", "");
         model.addAttribute("appId", appId);
-        model.addAttribute("redirect", redirect);
 
         try {
             Application app = applicationService.get(appId);
@@ -1009,12 +998,10 @@ public class DiscAppMaintenanceController {
 
     @GetMapping("/admin/appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
 
-        maintenanceViewModel.setRedirect(redirect);
         model.addAttribute("appId", appId);
 
         try {
@@ -1150,64 +1137,54 @@ public class DiscAppMaintenanceController {
     }
 
     @GetMapping("/admin/modify/application")
-    public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId,
-                                             @RequestParam(name = "redirect", required = false) String redirect) {
+    public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/prologue-epilogue")
-    public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId,
-                                                  @RequestParam(name = "redirect", required = false) String redirect) {
+    public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/stylesheet")
-    public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId,
-                                            @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/threads")
-    public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/header-footer")
-    public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId,
-                                              @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/labels")
-    public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId,
-                                        @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/buttons")
-    public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/favicon")
-    public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @GetMapping("/admin/modify/time")
-    public ModelAndView getModifyTime(@RequestParam(name = "id") long appId,
-                                      @RequestParam(name = "redirect", required = false) String redirect) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId + "&redirect=" + redirect);
+    public ModelAndView getModifyTime(@RequestParam(name = "id") long appId) {
+        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
     @PostMapping("/admin/modify/application")
     public ModelAndView postModifyApplication(@RequestParam(name = "id") long appId,
-                                              @RequestParam(name = "redirect", required = false) String redirect,
                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                               Model model,
                                               HttpServletResponse response) {
@@ -1215,7 +1192,7 @@ public class DiscAppMaintenanceController {
         if (maintenanceViewModel.getApplicationName() == null || maintenanceViewModel.getApplicationName().isEmpty()) {
             log.warn("Cannot update application name to an empty string");
             maintenanceViewModel.setInfoMessage("Cannot update disc app name to an empty value.");
-            return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+            return getAppearanceView(appId, maintenanceViewModel, model, response);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -1247,20 +1224,19 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
 
     }
 
     @PostMapping("/admin/modify/stylesheet")
     public ModelAndView postModifyStyleSheet(@RequestParam(name = "id") long appId,
-                                             @RequestParam(name = "redirect", required = false) String redirect,
                                              @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                              Model model,
                                              HttpServletResponse response) {
 
         if (maintenanceViewModel.getStyleSheetUrl() == null || maintenanceViewModel.getStyleSheetUrl().isEmpty()) {
             maintenanceViewModel.setInfoMessage("Style sheet URL cannot be empty. Settings not saved.");
-            return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+            return getAppearanceView(appId, maintenanceViewModel, model, response);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -1280,12 +1256,11 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/prologue-epilogue")
     public ModelAndView postModifyPrologueEplilogue(@RequestParam(name = "id") long appId,
-                                                    @RequestParam(name = "redirect", required = false) String redirect,
                                                     @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                     Model model,
                                                     HttpServletResponse response) {
@@ -1360,14 +1335,13 @@ public class DiscAppMaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
 
     }
 
 
     @PostMapping("/admin/modify/threads")
     public ModelAndView postModifyThreads(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
@@ -1403,12 +1377,11 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/header-footer")
     public ModelAndView postModifyHeaderFooter(@RequestParam(name = "id") long appId,
-                                               @RequestParam(name = "redirect", required = false) String redirect,
                                                @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                Model model,
                                                HttpServletResponse response) {
@@ -1432,13 +1405,12 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
 
     @PostMapping("/admin/modify/labels")
     public ModelAndView postModifyLabels(@RequestParam(name = "id") long appId,
-                                         @RequestParam(name = "redirect", required = false) String redirect,
                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                          Model model,
                                          HttpServletResponse response) {
@@ -1465,13 +1437,12 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
 
     @PostMapping("/admin/modify/buttons")
     public ModelAndView postModifyButtons(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
@@ -1502,13 +1473,12 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
 
     @PostMapping("/admin/modify/favicon")
     public ModelAndView postModifyFavicon(@RequestParam(name = "id") long appId,
-                                          @RequestParam(name = "redirect", required = false) String redirect,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
@@ -1550,12 +1520,11 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getAppearanceView(appId, redirect, maintenanceViewModel, model, response);
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping("/admin/modify/time")
     public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
-                                       @RequestParam(name = "redirect", required = false) String redirect,
                                        @ModelAttribute MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                        Model model,
                                        HttpServletResponse response) {
@@ -1585,7 +1554,7 @@ public class DiscAppMaintenanceController {
             return getPermissionDeniedView(appId, response, model);
         }
 
-        return getDiscLocaleView(appId, redirect, maintenanceLocaleViewModel, model, response);
+        return getDiscLocaleView(appId, maintenanceLocaleViewModel, model, response);
     }
 
 

@@ -11,7 +11,6 @@ import java.util.Date;
 @Setter
 public class MaintenanceViewModel {
 
-    private String redirect;
     private String infoMessage;
 
     //application config

@@ -32,7 +32,7 @@
 <div class="grey_box" style="width:40em;">
     <h2 id="account_banner">Modify Account</h2>
     <hr/>
-    <form name="f" th:action="@{|/account/modify/account?redirect=${accountViewModel.getRedirect()}|}"
+    <form name="f" action="/account/modify/account"
           method="post" th:object="${accountViewModel}">
         <table>
             <tr>
@@ -81,7 +81,7 @@
 
     <div th:each="accountApplication : ${accountViewModel.getAccountApplications()}">
         <hr/>
-        <form name="app_form" th:action="@{|/account/modify/application?redirect=${accountViewModel.getRedirect()}|}"
+        <form name="app_form" action="/account/modify/application"
               method="post" th:object="${accountViewModel}">
             <table>
                 <tr>
@@ -132,7 +132,7 @@
                 </tr>
                 <tr th:if="${accountApplication.getApplicationStatus().equals('enabled')}">
                     <td colspan="2" style="padding:5px;">
-                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}&amp;redirect=${accountViewModel.getRedirect()}|}">
+                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}|}">
                             Click Here To Modify Disc Application Settings</a>
                     </td>
                 </tr>
@@ -180,7 +180,7 @@
 <div class="grey_box" style="width:40em;" th:if="${accountViewModel.isOwner()}">
     <h2 id="owner_banner">Modify Application Owner Information</h2>
     <hr/>
-    <form name="app_form" th:action="@{|/account/modify/owner?redirect=${accountViewModel.getRedirect()}|}"
+    <form name="app_form" action="/account/modify/owner"
           method="post" th:object="${accountViewModel}">
         <table>
             <tr>
@@ -227,7 +227,7 @@
 <div class="grey_box" style="width:40em;">
     <h2 id="password_change_banner">Change Account Password</h2>
     <hr/>
-    <form name="f" th:action="@{|/account/modify/password?redirect=${accountViewModel.getRedirect()}|}"
+    <form name="f" action="/account/modify/password"
           method="post" th:object="${accountViewModel}">
         <table>
 

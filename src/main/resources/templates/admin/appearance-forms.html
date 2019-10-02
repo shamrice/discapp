@@ -109,7 +109,7 @@ parent.frames.preview.document.location.reload();
         </div>
 
         <form name="f"
-              th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
             <table>
@@ -171,7 +171,7 @@ parent.frames.preview.document.location.reload();
         </script>
 
         <form name="f"
-              th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
             <table>
@@ -245,7 +245,7 @@ parent.frames.preview.document.location.reload();
         </div>
 
         <form name="f"
-              th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
 
@@ -383,7 +383,7 @@ parent.frames.preview.document.location.reload();
         <span class="toggle close" onclick="switchElements('headerbox_open', 'headerbox_closed');"
               title="Hide header controls">close</span>
         </div>
-        <form th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+        <form th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}" enctype="multipart/form-data">
 
@@ -416,7 +416,7 @@ parent.frames.preview.document.location.reload();
         </div>
 
         <form name="f"
-              th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
             <table>
@@ -484,7 +484,7 @@ parent.frames.preview.document.location.reload();
         </div>
 
         <form method="post"
-              th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
 
@@ -545,7 +545,7 @@ parent.frames.preview.document.location.reload();
         </div>
 
         <form method="post"
-              th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
 
@@ -633,7 +633,7 @@ parent.frames.preview.document.location.reload();
 
     <div class="grey_box" th:if="${maintenanceViewModel.getApplicationId()}">
         <form method="post"
-              th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}&redirect=${maintenanceViewModel.getRedirect()}|}"
+              th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
 

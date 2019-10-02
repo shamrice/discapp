@@ -31,7 +31,7 @@
 
     <h2 id="create_application_banner">Add Disc App To Account</h2>
     <hr />
-    <form name="app_form" th:action="@{|/account/add/application?redirect=${accountViewModel.getRedirect()}|}"
+    <form name="app_form" action="/account/add/application}"
           method="post" th:object="${accountViewModel}">
 
         <span  th:if="${accountViewModel.isOwner()}">

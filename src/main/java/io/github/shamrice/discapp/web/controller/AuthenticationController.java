@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 @Slf4j
@@ -23,12 +20,8 @@ public class AuthenticationController {
     private AccountHelper accountHelper;
 
     @GetMapping("/login")
-    public ModelAndView login(@RequestParam(required = false) String redirect,
-                              @RequestParam(required = false) String appName,
-                              @RequestParam(required = false) String relogin,
-                              @RequestParam(required = false) Long appId,
+    public ModelAndView login(@RequestParam(required = false) String relogin,
                               HttpServletRequest request,
-                              HttpServletResponse response,
                               ModelMap modelMap) {
 
         //show disc app admin login box if attempting to access maintenance page.
@@ -45,50 +38,16 @@ public class AuthenticationController {
             }
         }
 
-        //if name missing set to redirect url.
-        if (appName == null || appName.isEmpty()) {
-            appName = redirect;
-        }
-
         //if account is already logged in, bring them to the log out page
         if (accountHelper.isLoggedIn() && (relogin == null || relogin.isEmpty())) {
-            return logout(redirect, appName, request, response, modelMap);
+            return logout(modelMap);
         }
-
-        //todo : remove cookie stuff.
-        Cookie redirectCookie = new Cookie("redirect_url", redirect);
-        redirectCookie.setMaxAge(-1); //only live as long as the browser stays on the window
-        response.addCookie(redirectCookie);
-        modelMap.addAttribute("redirectUrl", redirect);
-        modelMap.addAttribute("appName", appName);
-
 
         return new ModelAndView("auth/login", modelMap);
     }
 
     @GetMapping("/logout")
-    public ModelAndView logout(@RequestParam(required = false) String redirect,
-                         @RequestParam(required = false) String appName,
-                         HttpServletRequest request,
-                         HttpServletResponse response,
-                         ModelMap modelMap) {
-
-        //get redirect from referer header if not in query param.
-        if (redirect == null || redirect.isEmpty()) {
-            redirect = request.getHeader("Referer");
-        }
-
-        //if name missing, set it to redirect url
-        if (appName == null || appName.isEmpty()) {
-            appName = redirect;
-        }
-
-        Cookie redirectCookie = new Cookie("redirect_url", redirect);
-        redirectCookie.setMaxAge(-1); //only live as long as the browser stays on the window.
-        response.addCookie(redirectCookie);
-        modelMap.addAttribute("redirectUrl", redirect);
-        modelMap.addAttribute("appName", appName);
-
+    public ModelAndView logout(ModelMap modelMap) {
         return new ModelAndView("auth/logout", modelMap);
     }
 

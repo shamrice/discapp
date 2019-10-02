@@ -54,8 +54,6 @@ public class AccountViewModel {
 
     private List<AccountApplication> accountApplications;
 
-    private String redirect;
-
     public boolean isBelowAppLimit() {
         if (maxDiscApps == null) {
             return true;

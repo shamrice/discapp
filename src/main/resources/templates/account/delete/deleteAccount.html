@@ -46,8 +46,7 @@
         To delete your Disc App account, please click the button below. <b>When your account is deleted, any
         Disc Apps you have created will also be deleted and no longer accessible.</b>
 
-    <form name="f" th:action="@{/account/delete}" method="post" onsubmit="return validateReCaptcha();">
-        <input type="hidden" id="reCaptchaResponse" name="reCaptchaResponse">
+
         <table>
             <tr>
                 <td colspan="2">
@@ -56,8 +55,14 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
+                    <form name="f" th:action="@{/account/delete}" method="post" onsubmit="return validateReCaptcha();">
+
+                    <input type="hidden" id="reCaptchaResponse" name="reCaptchaResponse">
                     <input class="button" name="deleteAccount" type="submit" value="Delete Account">&nbsp;
-                    <input class="button" type="button" value="Cancel" onclick="history.back()">
+                    </form>
+                    <a href="/account/modify">
+                        <button class="button">Cancel</button>
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -66,11 +71,11 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <a th:href="@{|/login|}">Return to Login Page</a>
+                    <a href="/login">Return to Login Page</a>
                 </td>
             </tr>
         </table>
-    </form>
+
     <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
             async defer>
     </script>

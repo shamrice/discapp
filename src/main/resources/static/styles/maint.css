@@ -46,6 +46,9 @@ legend { color:#000; }
 
 label{ font-weight:bold; text-align:right;}
 
+button { border:1px solid #000;  background-color:#fff; }
+button:hover { background-color:#ccf; }
+
 input.button { border:1px solid #000;  background-color:#fff; }
 input:hover { background-color:#ccf; }
 

@@ -34,7 +34,7 @@
      style="width:36em;">
 
     <form name="f"
-          th:action="@{|/admin/modify/time?id=${maintenanceLocaleViewModel.getApplicationId()}&redirect=${maintenanceLocaleViewModel.getRedirect()}|}"
+          th:action="@{|/admin/modify/time?id=${maintenanceLocaleViewModel.getApplicationId()}|}"
           method="post"
           th:object="${maintenanceLocaleViewModel}">
 

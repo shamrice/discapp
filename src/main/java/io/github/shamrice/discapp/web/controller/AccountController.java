@@ -182,13 +182,7 @@ public class AccountController {
     }
 
     @GetMapping("/account/password")
-    public ModelAndView getAccountPasswordResetRequestView(@RequestParam(required = false) String redirect,
-                                                           ModelMap modelMap) {
-        if (redirect == null || redirect.isEmpty()) {
-            redirect = "/login";
-        }
-
-        modelMap.addAttribute("redirectUrl", redirect);
+    public ModelAndView getAccountPasswordResetRequestView(ModelMap modelMap) {
         return new ModelAndView("account/password/resetPasswordRequest");
     }
 
@@ -233,14 +227,7 @@ public class AccountController {
 
     @GetMapping("/account/create")
     public ModelAndView getCreateAccount(@ModelAttribute AccountViewModel accountViewModel,
-                                         @RequestParam(required = false) String redirect,
                                          ModelMap modelMap) {
-
-        if (redirect == null || redirect.isEmpty()) {
-            redirect = "/login";
-        }
-
-        modelMap.addAttribute("redirectUrl", redirect);
         return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
     }
 
@@ -305,23 +292,7 @@ public class AccountController {
 
     @GetMapping("/account/modify")
     public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
-                                         @RequestParam(required = false) String redirect,
                                          ModelMap modelMap) {
-
-        //todo : not too happy with this flow for the redirect....
-        if (accountViewModel != null && accountViewModel.getRedirect() != null && !accountViewModel.getRedirect().isEmpty()) {
-            redirect = accountViewModel.getRedirect();
-        }
-
-        if (redirect == null || redirect.isEmpty()) {
-            redirect = "/logout";
-        }
-
-        if (accountViewModel != null && (accountViewModel.getRedirect() == null || accountViewModel.getRedirect().isEmpty())) {
-            accountViewModel.setRedirect(redirect);
-        }
-
-        modelMap.addAttribute("redirectUrl", redirect);
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -381,12 +352,8 @@ public class AccountController {
 
     @PostMapping("/account/modify/password")
     public ModelAndView postAccountModifyPassword(@ModelAttribute AccountViewModel accountViewModel,
-                                                  @RequestParam(required = false) String redirect,
                                                   ModelMap modelMap) {
         if (accountViewModel != null) {
-
-            accountViewModel.setRedirect(redirect);
-
             String email = accountHelper.getLoggedInEmail();
 
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
@@ -401,34 +368,34 @@ public class AccountController {
                         || (confirmNewPassword == null || confirmNewPassword.isEmpty())) {
 
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, redirect, modelMap);
+                    return getAccountModify(accountViewModel, modelMap);
                 }
 
                 if (newPassword.length() < 8) { //todo : set length in some constant somewhere or config...
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, redirect, modelMap);
+                    return getAccountModify(accountViewModel, modelMap);
                 }
 
                 if (!newPassword.trim().equals(confirmNewPassword.trim())) {
                     accountViewModel.setErrorMessage("Passwords do not match.");
-                    return getAccountModify(accountViewModel, redirect, modelMap);
+                    return getAccountModify(accountViewModel, modelMap);
                 } else {
 
                     //verify passwords entered are correct.
                     if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
                         log.error("Cannot update account password. Original password does not match existing password for account.");
                         accountViewModel.setErrorMessage("Failed to update password");
-                        return getAccountModify(accountViewModel, redirect, modelMap);
+                        return getAccountModify(accountViewModel, modelMap);
                     }
 
                     user.setPassword(newPassword.trim());
                     if (discAppUserDetailsService.saveDiscAppUser(user)) {
                         accountViewModel.setErrorMessage("Password successfully updated.");
-                        return getAccountModify(accountViewModel, redirect, modelMap);
+                        return getAccountModify(accountViewModel, modelMap);
                     } else {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
                         accountViewModel.setErrorMessage("Failed to update password.");
-                        return getAccountModify(accountViewModel, redirect, modelMap);
+                        return getAccountModify(accountViewModel, modelMap);
                     }
                 }
             }
@@ -439,11 +406,8 @@ public class AccountController {
 
     @PostMapping("/account/modify/account")
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
-                                          @RequestParam(required = false) String redirect,
                                           ModelMap modelMap) {
         if (accountViewModel != null) {
-
-            accountViewModel.setRedirect(redirect);
 
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
             String email = accountHelper.getLoggedInEmail();
@@ -473,11 +437,8 @@ public class AccountController {
 
     @PostMapping("/account/modify/application")
     public ModelAndView postApplicationModify(@ModelAttribute AccountViewModel accountViewModel,
-                                              @RequestParam(required = false) String redirect,
                                               ModelMap modelMap) {
         if (accountViewModel != null) {
-
-            accountViewModel.setRedirect(redirect);
 
             if (accountViewModel.getApplicationName() != null && !accountViewModel.getApplicationName().isEmpty()) {
 
@@ -528,18 +489,15 @@ public class AccountController {
         }
 
 
-        return getAccountModify(accountViewModel, redirect, modelMap);
+        return getAccountModify(accountViewModel, modelMap);
     }
 
 
     @PostMapping("/account/modify/owner")
     public ModelAndView postOwnerModify(@ModelAttribute AccountViewModel accountViewModel,
-                                        @RequestParam(required = false) String redirect,
                                         ModelMap modelMap) {
 
         if (accountViewModel != null) {
-
-            accountViewModel.setRedirect(redirect);
 
             String email = accountHelper.getLoggedInEmail();
 
@@ -576,16 +534,12 @@ public class AccountController {
             }
         }
 
-        return getAccountModify(accountViewModel, redirect, modelMap);
+        return getAccountModify(accountViewModel, modelMap);
     }
 
     @GetMapping("/account/add/application")
     public ModelAndView getAddApplication(@ModelAttribute AccountViewModel accountViewModel,
-                                          @RequestParam(required = false) String redirect,
                                           ModelMap modelMap) {
-        if (redirect != null) {
-            modelMap.addAttribute("redirectUrl", redirect);
-        }
 
         String email = accountHelper.getLoggedInEmail();
 
@@ -630,12 +584,9 @@ public class AccountController {
 
     @PostMapping("/account/add/application")
     public ModelAndView postAddApplication(@ModelAttribute AccountViewModel accountViewModel,
-                                           @RequestParam(required = false) String redirect,
                                            ModelMap modelMap) {
 
         if (accountViewModel != null) {
-
-            accountViewModel.setRedirect(redirect);
 
             String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
             String appAdminPassword = inputHelper.sanitizeInput(accountViewModel.getApplicationAdminPassword());
@@ -658,7 +609,7 @@ public class AccountController {
                         if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
                             log.error("Cannot add Disc App to account. Passwords do not match existing password for account.");
                             accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                            return getAccountModify(accountViewModel, redirect, modelMap);
+                            return getAccountModify(accountViewModel, modelMap);
                         }
 
                         String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
@@ -672,14 +623,14 @@ public class AccountController {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new owner without a first or last name.");
                             accountViewModel.setErrorMessage("Owner first name and last name are required to create an application.");
-                            return getAccountModify(accountViewModel, redirect, modelMap);
+                            return getAccountModify(accountViewModel, modelMap);
                         }
 
                         if (appName == null || appName.trim().isEmpty()) {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new application without a name");
                             accountViewModel.setErrorMessage("Application name is required to create an application.");
-                            return getAccountModify(accountViewModel, redirect, modelMap);
+                            return getAccountModify(accountViewModel, modelMap);
                         }
 
                         //check if owner already exists...
@@ -742,19 +693,19 @@ public class AccountController {
                             } else {
                                 log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + owner.getId());
                                 accountViewModel.setErrorMessage("Failed to create new app.");
-                                return getAccountModify(accountViewModel, redirect, modelMap);
+                                return getAccountModify(accountViewModel, modelMap);
                             }
                         } else {
                             log.error("Failed to create new owner for email: " + owner.getEmail());
                             accountViewModel.setErrorMessage("Failed to create new owner for new app.");
-                            return getAccountModify(accountViewModel, redirect, modelMap);
+                            return getAccountModify(accountViewModel, modelMap);
                         }
                     }
                 }
             } else {
                 log.error("Cannot add Disc App to account. Passwords do not match");
                 accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                return getAccountModify(accountViewModel, redirect, modelMap);
+                return getAccountModify(accountViewModel, modelMap);
             }
         }
 

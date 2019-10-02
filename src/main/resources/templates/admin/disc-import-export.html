@@ -41,7 +41,7 @@
 
     <div style="padding:10px;">
         <form name="f"
-              th:action="@{|/admin/data/import?id=${maintenanceImportExportViewModel.getApplicationId()}&redirect=${maintenanceImportExportViewModel.getRedirect()}|}"
+              th:action="@{|/admin/data/import?id=${maintenanceImportExportViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceImportExportViewModel}"
               enctype="multipart/form-data" >
@@ -67,7 +67,7 @@
 
     <div style="padding:10px;">
         <form name="f"
-              th:action="@{|/admin/data/export?id=${maintenanceImportExportViewModel.getApplicationId()}&redirect=${maintenanceImportExportViewModel.getRedirect()}|}"
+              th:action="@{|/admin/data/export?id=${maintenanceImportExportViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceImportExportViewModel}">
             <input class="button" type="submit" name="exportData" id="exportData"

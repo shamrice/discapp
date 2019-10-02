@@ -13,7 +13,6 @@ public class MaintenanceLocaleViewModel {
 
     private long applicationId;
     private String infoMessage;
-    private String redirect;
 
     //date and time config
     private List<String> timezones;
