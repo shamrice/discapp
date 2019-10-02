@@ -164,8 +164,15 @@ public class ApplicationService {
                 List<Application> ownedApps = applicationRepository.findByOwnerIdAndDeleted(owner.getId(), false);
                 for (Application application : ownedApps) {
                     if (application.getId() != null && application.getId() == appId) {
-                        log.info("User: " + email + " is owner of appId: " + appId + " :: returning true.");
-                        return true;
+
+                        DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+                        if (user != null && user.getIsUserAccount()) {
+                            log.info("User: " + email + " is owner of appId: " + appId + " :: and is regular user :: returning true.");
+                            return true;
+                        } else if (user != null && !user.getIsUserAccount() && user.getUsername().equals(String.valueOf(appId))) {
+                            log.info("User: " + email + " is owner of appId: " + appId + " :: and is matching system account to appId :: returning true.");
+                            return true;
+                        }
                     }
                 }
             }

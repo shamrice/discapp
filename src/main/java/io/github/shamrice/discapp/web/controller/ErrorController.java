@@ -52,6 +52,12 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         return new ModelAndView("error/notFound");
     }
 
+    @RequestMapping(value = "/error/permissionDenied")
+    public ModelAndView getPermissionDeniedView(String errorText, Model model) {
+        model.addAttribute("errorText", errorText);
+        return new ModelAndView("error/permissionDenied");
+    }
+
     public String getErrorPath() {
         return "/error";
     }

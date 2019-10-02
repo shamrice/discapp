@@ -89,6 +89,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -170,6 +173,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -217,6 +223,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
                 return new ModelAndView("admin/disc-maint");
@@ -242,6 +251,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
                 return new ModelAndView("admin/disc-toolbar");
@@ -323,6 +335,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -404,6 +419,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -446,6 +464,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -527,6 +548,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
                 model.addAttribute("isAdmin", "true");
@@ -848,6 +872,9 @@ public class DiscAppMaintenanceController {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -929,6 +956,9 @@ public class DiscAppMaintenanceController {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
             model.addAttribute("username", username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             maintenanceThreadViewModel.setCurrentPage(page);
 
@@ -993,7 +1023,9 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
 
             model.addAttribute("username", username);
-
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute("isUserAccount", true);
+            }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -1742,5 +1774,4 @@ public class DiscAppMaintenanceController {
                 "\n" +
                 "</div>\n";
     }
-
 }

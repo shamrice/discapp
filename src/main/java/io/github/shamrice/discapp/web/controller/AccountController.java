@@ -208,6 +208,14 @@ public class AccountController {
                 return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
             }
 
+            //don't allow password reset requests to be generated for system admin accounts.
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email.trim());
+            if (user != null && !user.getIsUserAccount()) {
+                log.warn("Failed to create password reset request for email: " + email + " :: user is system admin account.");
+                modelMap.addAttribute("status", "Failed to create password reset request");
+                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
+            }
+
             if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + "/password/reset")) {
                 log.warn("Failed to create password request for email: " + email);
                 modelMap.addAttribute("status", "Failed to create password reset request");
@@ -272,6 +280,7 @@ public class AccountController {
             newUser.setShowEmail(accountViewModel.isShowEmail());
             newUser.setEnabled(accountViewModel.isEnabled());
             newUser.setOwnerId(accountViewModel.getOwnerId());
+            newUser.setIsUserAccount(true);
             newUser.setModDt(new Date());
             newUser.setCreateDt(new Date());
 
@@ -629,11 +638,14 @@ public class AccountController {
             accountViewModel.setRedirect(redirect);
 
             String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
+            String appAdminPassword = inputHelper.sanitizeInput(accountViewModel.getApplicationAdminPassword());
 
-            if (accountViewModel.getPassword().equals(accountViewModel.getConfirmPassword())
+            if (accountViewModel.getApplicationAdminPassword().equals(accountViewModel.getConfirmApplicationAdminPassword())
                     && accountViewModel.getPassword() != null && !accountViewModel.getPassword().isEmpty()
-                    && accountViewModel.getConfirmPassword() != null && !accountViewModel.getConfirmPassword().isEmpty()
-                    && password.equals(accountViewModel.getPassword())) {
+                    && accountViewModel.getConfirmApplicationAdminPassword() != null && !accountViewModel.getConfirmApplicationAdminPassword().isEmpty()
+                    && accountViewModel.getApplicationAdminPassword() != null && !accountViewModel.getApplicationAdminPassword().isEmpty()
+                    && password.equals(accountViewModel.getPassword())
+                    && appAdminPassword.equals(accountViewModel.getApplicationAdminPassword())) {
 
                 String email = accountHelper.getLoggedInEmail();
 
@@ -700,9 +712,27 @@ public class AccountController {
                             if (savedApp != null) {
 
                                 if (!discAppUserDetailsService.updateOwnerInformation(user.getId(),
-                                        owner.getId(), true)) {
+                                        savedOwner.getId(), true)) {
                                     log.error("Failed to update disc app user id: " + user.getId()
-                                            + " with new ownerId: " + owner.getId());
+                                            + " with new ownerId: " + savedOwner.getId());
+                                }
+
+                                //create new disc app admin user.
+                                DiscAppUser newAdminAccount = new DiscAppUser();
+                                newAdminAccount.setEnabled(true);
+                                newAdminAccount.setIsAdmin(true);
+                                newAdminAccount.setOwnerId(savedOwner.getId());
+                                newAdminAccount.setShowEmail(false);
+                                newAdminAccount.setEmail(savedApp.getId().toString()); //email and username set to appId
+                                newAdminAccount.setUsername(savedApp.getId().toString());
+                                newAdminAccount.setCreateDt(new Date());
+                                newAdminAccount.setModDt(new Date());
+                                newAdminAccount.setPassword(accountViewModel.getApplicationAdminPassword());
+                                newAdminAccount.setIsUserAccount(false);
+
+                                //save new user and don't create email notification as account is active from the get go.
+                                if (!discAppUserDetailsService.saveDiscAppUser(newAdminAccount, false)) {
+                                    log.error("Failed to create new admin user for new disc app: " + savedApp.getId());
                                 }
 
                                 //save default configuration values for new app.

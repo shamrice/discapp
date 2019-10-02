@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@ToString
 public class DiscAppUserPrincipal implements UserDetails {
 
     private static final String ROLE_PREFIX = "ROLE_";
@@ -24,6 +26,12 @@ public class DiscAppUserPrincipal implements UserDetails {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         if (user.getIsAdmin()) {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + "ADMIN"));
+        }
+
+        if (user.getIsUserAccount()) {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + "USER"));
+        } else {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + "SYSTEM"));
         }
 
         return grantedAuthorityList;
@@ -65,6 +73,10 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     public Boolean isAdmin() {
         return user.getIsAdmin();
+    }
+
+    public Boolean isUserAccount() {
+        return user.getIsUserAccount();
     }
 
     public String getEmail() {

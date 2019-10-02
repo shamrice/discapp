@@ -276,6 +276,13 @@ public class DiscAppController {
             model.addAttribute("submitter", user.getUsername());
             model.addAttribute("email", user.getEmail());
             model.addAttribute("showEmail", user.getShowEmail());
+
+            if (!user.getIsUserAccount()) {
+                log.error("User is system admin account. Posting is not allowed. :: " + user.toString());
+                return errorController.getPermissionDeniedView("Disc App system Admin accounts cannot create "
+                        + " new posts. Please log out and either log in as a regular user account or remain logged out "
+                        + " when creating a new thread.", model);
+            }
         }
 
         model.addAttribute("appName", app.getName());

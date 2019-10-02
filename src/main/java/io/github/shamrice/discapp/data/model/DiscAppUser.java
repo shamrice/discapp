@@ -34,6 +34,8 @@ public class DiscAppUser {
 
     private Boolean isAdmin;
 
+    private Boolean isUserAccount;
+
     private Date createDt;
     private Date modDt;
 

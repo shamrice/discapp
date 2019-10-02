@@ -74,6 +74,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     }
 
     public boolean saveDiscAppUser(DiscAppUser user) {
+        return saveDiscAppUser(user, true);
+    }
+
+    public boolean saveDiscAppUser(DiscAppUser user, boolean sendNewUserEmailNotification) {
 
         if (user != null) {
 
@@ -99,7 +103,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                             + createdUser.getUsername());
 
                     //send email notification
-                    if (isNewUser) {
+                    if (isNewUser && sendNewUserEmailNotification) {
                         sendNewUserEmailNotification(createdUser.getEmail());
                     }
 

@@ -39,6 +39,7 @@ CREATE TABLE discapp_user (
     owner_id int,
     enabled bool NOT NULL DEFAULT TRUE,
     is_admin bool NOT NULL DEFAULT FALSE,
+    is_user_account NOT NULL DEFAULT TRUE,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

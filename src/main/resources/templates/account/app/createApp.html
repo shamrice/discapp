@@ -53,6 +53,25 @@
                            th:value="${accountViewModel.getApplicationName()}"/>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <label>Application Admin Password*:</label>
+                </td>
+                <td>
+                    <input class="button" type="password" id="applicationAdminPassword" name="applicationAdminPassword"
+                           th:value="${accountViewModel.getApplicationAdminPassword()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Confirm Application Admin Password*:</label>
+                </td>
+                <td>
+                    <input class="button" type="password" id="confirmApplicationAdminPassword" name="confirmApplicationAdminPassword"
+                           th:value="${accountViewModel.getConfirmApplicationAdminPassword()}"/>
+                </td>
+            </tr>
+
             <tr th:unless="${accountViewModel.isOwner()}">
                 <td>
                     <label>First Name*:</label>
@@ -81,14 +100,9 @@
                 </td>
             </tr>
             <tr>
-                <td><label>Current Password*:</label></td>
+                <td><label>Current Account Password*:</label></td>
                 <td><input class="button" type="password" id="password" name="password"
                            th:value="${accountViewModel.getPassword()}"/></td>
-            </tr>
-            <tr>
-                <td><label>Confirm Password*:</label></td>
-                <td><input class="button" type="password" id="confirmPassword" name="confirmPassword"
-                           th:value="${accountViewModel.getConfirmPassword()}"/></td>
             </tr>
             <tr>
                 <td colspan="2" style="padding:5px;"></td>

@@ -20,7 +20,7 @@
     }
 </style>
 
-<div class="grey_box">
+<div class="grey_box" style="width:32em;">
     <h1 id="banner">Login to Disc App Service</h1>
     <form name="f" th:action="@{/login}" method="post">
 
@@ -62,12 +62,23 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <a th:href="${redirectUrl}" th:text="@{|Return to ${appName}|}"></a>
+                    <a href="#" onclick="history.back()" type="text">Click Here to Return to Previous Page</a>
                 </td>
             </tr>
         </table>
     </form>
 
+</div>
+
+<div th:if="${appId}" class="grey_box" style="width:32em;">
+    <form method="post" action="/login" enctype="multipart/form-data">
+        <p style="text-align:center;">Or enter the admin password for this DiscussionApp-</p>
+        <div>
+            <input type="password" name="password" size="20" maxlength="20" />
+            <input type="submit" name="submit_password" value="Enter Password" class="button" />
+            <input type="hidden" name="username" th:value="${appId}" />
+        </div>
+    </form>
 </div>
 
 </body>

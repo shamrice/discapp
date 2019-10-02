@@ -49,6 +49,9 @@ public class AccountViewModel {
 
     private Integer maxDiscApps;
 
+    private String applicationAdminPassword;
+    private String confirmApplicationAdminPassword;
+
     private List<AccountApplication> accountApplications;
 
     private String redirect;

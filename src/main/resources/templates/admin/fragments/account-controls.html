@@ -5,7 +5,7 @@
 <body>
 <div id="account" th:fragment="account-controls">
     [[${username}]]
-    <a href="/account/modify" target="_parent">Control Center</a>
+    <a th:if="${isUserAccount}" href="/account/modify" target="_parent">Control Center</a>
     <a th:href="@{|/admin/disc-maint.cgi?id=${appId}|}" target="_parent">Settings</a>
     <a href="/logout" target="_parent">Logout</a>
 </div>
