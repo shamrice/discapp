@@ -172,6 +172,15 @@ CREATE TABLE password_reset (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE import_data (
+  id int(255) NOT NULL AUTO_INCREMENT,
+  application_id int UNIQUE NOT NULL,
+  import_name varchar(100) NOT NULL,
+  import_data bytea NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (application_id) REFERENCES application(id)
+);
 
 
 commit;

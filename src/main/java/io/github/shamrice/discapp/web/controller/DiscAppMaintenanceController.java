@@ -3,8 +3,9 @@ package io.github.shamrice.discapp.web.controller;
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
-import io.github.shamrice.discapp.service.application.ApplicationExportService;
+import io.github.shamrice.discapp.service.application.data.ApplicationExportService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.application.data.ApplicationImportService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
@@ -18,7 +19,9 @@ import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -63,6 +66,9 @@ public class DiscAppMaintenanceController {
     private ApplicationExportService applicationExportService;
 
     @Autowired
+    private ApplicationImportService applicationImportService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @Autowired
@@ -73,6 +79,37 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private DiscAppController discAppController;
+
+    @GetMapping("/admin/data/download")
+    @ResponseBody
+    public ResponseEntity<Resource> downloadImportFile(@RequestParam(name = "id") long appId) {
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            //todo : this should be moved to site admin section of site where "su" can download imports.
+            if (app != null && applicationService.isOwnerOfApp(app.getId(), username)) {
+
+                ImportData importData = applicationImportService.getImportData(app.getId());
+
+                if (importData != null) {
+                    Resource file = new ByteArrayResource(importData.getImportData());
+                    return ResponseEntity.ok().header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + importData.getImportName() + "\"")
+                            .body(file);
+                }
+
+            } else {
+                log.warn("User: " + username + " attempted to download import of disc app they don't own :: appId: " + appId);
+            }
+        } catch (Exception ex) {
+            log.error("Error downloading import for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.badRequest().build();
+    }
 
     @PostMapping("/admin/data/export")
     @ResponseBody
@@ -139,11 +176,12 @@ public class DiscAppMaintenanceController {
                 maintenanceImportExportViewModel.setApplicationId(app.getId());
                 String newFilename = "disc_" + app.getId() + ".sql";
 
-                if (fileSystemStorageService.store(uploadSourceFile, newFilename)) {
-                    log.info("Uploaded disc app import file: " + uploadSourceFile.getOriginalFilename());
+                if (applicationImportService.saveImportData(app.getId(), newFilename, uploadSourceFile.getBytes())) {
+                    log.info("Import for appId: " + app.getId() + " saved successfully to import table.");
                     maintenanceImportExportViewModel.setInfoMessage(
                             "Disc App import file successfully uploaded. You will receive an email at your account email address " +
                                     "when the import is completed.");
+
                 } else {
                     maintenanceImportExportViewModel.setInfoMessage("Failed to upload Disc App import file. Please try again.");
                 }

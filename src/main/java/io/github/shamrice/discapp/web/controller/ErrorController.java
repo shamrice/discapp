@@ -31,7 +31,7 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         }
 
 
-        if (statusCode.equals(HttpStatus.FORBIDDEN.value())) {
+        if (statusCode != null && statusCode.equals(HttpStatus.FORBIDDEN.value())) {
             log.info("Status code 403 " + errorText, exception);
             return new ModelAndView("redirect:/login?relogin=true&" + request.getQueryString());
         }

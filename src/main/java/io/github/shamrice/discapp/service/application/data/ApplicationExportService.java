@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.service.application;
+package io.github.shamrice.discapp.service.application.data;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
