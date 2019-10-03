@@ -290,8 +290,9 @@ public class AccountController {
         return "account/createAccountSuccess";
     }
 
-    @GetMapping("/account/modify")
-    public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
+
+    @GetMapping("/account/application")
+    public ModelAndView getAccountApplication(@ModelAttribute AccountViewModel accountViewModel,
                                          ModelMap modelMap) {
 
         String email = accountHelper.getLoggedInEmail();
@@ -343,6 +344,42 @@ public class AccountController {
                     });
 
                     accountViewModel.setAccountApplications(accountApplications);
+                }
+            }
+        }
+
+        return new ModelAndView("account/application/manageApplications", "accountViewModel", accountViewModel);
+    }
+
+
+    @GetMapping("/account/modify")
+    public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
+                                         ModelMap modelMap) {
+
+        String email = accountHelper.getLoggedInEmail();
+
+        if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
+            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+
+            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
+            accountViewModel.setUsername(user.getUsername());
+            accountViewModel.setAdmin(user.getIsAdmin());
+            accountViewModel.setCreateDt(user.getCreateDt());
+            accountViewModel.setModDt(user.getModDt());
+            accountViewModel.setEmail(user.getEmail());
+            accountViewModel.setEnabled(user.getEnabled());
+            accountViewModel.setShowEmail(user.getShowEmail());
+
+            if (user.getOwnerId() != null && user.getOwnerId() > 0) {
+                Owner owner = accountService.getOwnerById(user.getOwnerId());
+
+                if (owner != null) {
+
+                    accountViewModel.setOwnerId(owner.getId());
+                    accountViewModel.setOwnerFirstName(owner.getFirstName());
+                    accountViewModel.setOwnerLastName(owner.getLastName());
+                    accountViewModel.setOwnerEmail(owner.getEmail());
+                    accountViewModel.setOwnerPhone(owner.getPhone());
                 }
             }
         }
@@ -489,7 +526,7 @@ public class AccountController {
         }
 
 
-        return getAccountModify(accountViewModel, modelMap);
+        return getAccountApplication(accountViewModel, modelMap);
     }
 
 
@@ -579,7 +616,7 @@ public class AccountController {
                 }
             }
         }
-        return new ModelAndView("account/app/createApp", "accountViewModel", accountViewModel);
+        return new ModelAndView("account/application/createApplication", "accountViewModel", accountViewModel);
     }
 
     @PostMapping("/account/add/application")
@@ -689,26 +726,26 @@ public class AccountController {
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
                                 log.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
+                                accountViewModel.setInfoMessage("Successfully created new application.");
 
                             } else {
                                 log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + owner.getId());
                                 accountViewModel.setErrorMessage("Failed to create new app.");
-                                return getAccountModify(accountViewModel, modelMap);
+                                return getAccountApplication(accountViewModel, modelMap);
                             }
                         } else {
                             log.error("Failed to create new owner for email: " + owner.getEmail());
                             accountViewModel.setErrorMessage("Failed to create new owner for new app.");
-                            return getAccountModify(accountViewModel, modelMap);
+                            return getAccountApplication(accountViewModel, modelMap);
                         }
                     }
                 }
             } else {
                 log.error("Cannot add Disc App to account. Passwords do not match");
                 accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                return getAccountModify(accountViewModel, modelMap);
+                return getAccountApplication(accountViewModel, modelMap);
             }
         }
-
-        return new ModelAndView("redirect:/account/modify");
+        return getAccountApplication(accountViewModel, modelMap);
     }
 }

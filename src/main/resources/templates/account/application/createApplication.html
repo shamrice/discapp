@@ -17,8 +17,6 @@
     .alert-success {
         color: green;
     }
-
-
 </style>
 
 <div th:if="${accountViewModel.getErrorMessage()}"
@@ -31,7 +29,7 @@
 
     <h2 id="create_application_banner">Add Disc App To Account</h2>
     <hr />
-    <form name="app_form" action="/account/add/application}"
+    <form name="app_form" action="/account/add/application"
           method="post" th:object="${accountViewModel}">
 
         <span  th:if="${accountViewModel.isOwner()}">
