@@ -154,3 +154,11 @@ a.tab:hover { background-color:#88f; color:#eee; }
     font-weight: bold;
     text-align: center;
 }
+
+.alert-error {
+    color: red;
+}
+
+.alert-success {
+    color: green;
+}

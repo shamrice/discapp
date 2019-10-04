@@ -427,7 +427,7 @@ public class AccountController {
 
                     user.setPassword(newPassword.trim());
                     if (discAppUserDetailsService.saveDiscAppUser(user)) {
-                        accountViewModel.setErrorMessage("Password successfully updated.");
+                        accountViewModel.setInfoMessage("Password successfully updated.");
                         return getAccountModify(accountViewModel, modelMap);
                     } else {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
@@ -462,7 +462,7 @@ public class AccountController {
                     log.error("Failed to update user : " + email + ". Changes will not be saved.");
                     accountViewModel.setErrorMessage("Failed to update user.");
                 } else {
-                    accountViewModel.setErrorMessage("Successfully updated user information.");
+                    accountViewModel.setInfoMessage("Successfully updated user information.");
                     log.info("User " + email + " account information was updated.");
                 }
             }
@@ -508,7 +508,7 @@ public class AccountController {
 
                                 if (applicationService.save(app) != null) {
                                     log.info("Application id: " + app.getId() + " has been updated.");
-                                    accountViewModel.setErrorMessage("Application has been updated.");
+                                    accountViewModel.setInfoMessage("Application has been updated.");
                                 } else {
                                     log.error("Unable to save application changes for appId:" + app.getId());
                                     accountViewModel.setErrorMessage("Failed to update application.");
@@ -558,7 +558,7 @@ public class AccountController {
 
                         if (accountService.saveOwner(owner) != null) {
                             log.info("Owner id " + owner.getId() + " has been updated.");
-                            accountViewModel.setErrorMessage("Owner information has been updated.");
+                            accountViewModel.setInfoMessage("Owner information has been updated.");
                         } else {
                             log.error("Error saving owner information for ownerId: " + owner.getId());
                             accountViewModel.setErrorMessage("Unable to save updated owner information.");

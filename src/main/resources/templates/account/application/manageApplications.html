@@ -2,14 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Disc App - Modify Account</title>
+    <title>Disc App - Manage Applications</title>
     <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-<style type="text/css">
+<!--style type="text/css">
     .alert-error {
         color: red;
     }
@@ -17,9 +17,7 @@
     .alert-success {
         color: green;
     }
-
-
-</style>
+</style-->
 
 <div th:if="${accountViewModel.getInfoMessage()}"
      class="grey_box alert alert-success"
@@ -139,15 +137,14 @@
 <table>
     <tr>
         <td colspan="2" style="text-align:center;">
-            <a href="/logout">Log out</a>
+            <a href="/account/modify" type="text">Click Here to Return to Account Modify Page</a>
         </td>
     </tr>
     <tr>
         <td colspan="2" style="text-align:center;">
-            <a href="/account/modify" type="text">Click Here to Return to Account Modify Page</a>
+            <a href="/logout">Log out</a>
         </td>
     </tr>
 </table>
-
 
 </body>
