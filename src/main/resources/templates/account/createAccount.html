@@ -29,16 +29,6 @@
 </head>
 <body>
 
-<!--style type="text/css">
-    .alert-error {
-        color: red;
-    }
-
-    .alert-success {
-        color: green;
-    }
-</style-->
-
 <div class="grey_box" style="width:40em;">
     <h1 id="banner">Create Disc App Account</h1>
     <form name="f" th:action="@{/account/create}" method="post" th:object="${accountViewModel}" onsubmit="return validateReCaptcha();">
