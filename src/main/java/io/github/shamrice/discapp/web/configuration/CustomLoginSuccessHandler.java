@@ -23,7 +23,7 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         //for redirect on system admin accounts to their related disc maintenance page.
         DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)authentication.getPrincipal();
         if (userPrincipal != null) {
-            log.warn("Login by user: " + userPrincipal.toString());
+            log.debug("Login by user: " + userPrincipal.toString());
             if (!userPrincipal.isUserAccount()) {
                 log.info("Account: " + userPrincipal.toString() + " :: is System admin account. Redirecting to related admin page.");
                 //todo : probably should pull that string from somewhere instead of just hard coded...

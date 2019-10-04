@@ -195,10 +195,12 @@ public class AccountController {
         if (email != null && !email.trim().isEmpty()) {
             log.info("Attempting to create new password reset request for email: " + email);
 
+            //always tell client that password request was success to keep brute force email searching impossible.
+            modelMap.addAttribute("status", "Please check the email address you provided for the next steps in your password reset request.");
+
             if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
                 log.warn("Failed to create password reset request for " + email
                         + " due to ReCaptcha verification failure.");
-                modelMap.addAttribute("status", "Failed to create password reset request");
                 return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
             }
 
@@ -206,23 +208,16 @@ public class AccountController {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email.trim());
             if (user != null && !user.getIsUserAccount()) {
                 log.warn("Failed to create password reset request for email: " + email + " :: user is system admin account.");
-                modelMap.addAttribute("status", "Failed to create password reset request");
                 return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
             }
 
             if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + "/password/reset")) {
                 log.warn("Failed to create password request for email: " + email);
-                modelMap.addAttribute("status", "Failed to create password reset request");
-                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
-            } else {
-                modelMap.addAttribute("status", "Password request sent to email address: " + email);
-                return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
             }
+            return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
-
-        modelMap.addAttribute("Email address cannot be empty.");
+        modelMap.addAttribute("status", "An Email address is required to reset your password.");
         return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
-
     }
 
     @GetMapping("/account/create")
