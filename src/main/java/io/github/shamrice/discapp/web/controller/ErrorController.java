@@ -9,6 +9,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.ERROR_STATUS_CODE;
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.ERROR_TEXT;
+
 @Controller
 @Slf4j
 public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
@@ -39,8 +42,8 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         log.error("Error: status code: " + statusCode + " : " + errorText + " :: attempted uri: "
                 + attemptedUri, exception);
 
-        model.addAttribute("errorStatusCode", statusCode);
-        model.addAttribute("errorText", errorText);
+        model.addAttribute(ERROR_STATUS_CODE, statusCode);
+        model.addAttribute(ERROR_TEXT, errorText);
 
         return new ModelAndView("error/error", "model", model);
 
@@ -48,13 +51,13 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
     @RequestMapping(value = "/error/notfound")
     public ModelAndView getNotFoundView(String errorText, Model model) {
-        model.addAttribute("errorText", errorText);
+        model.addAttribute(ERROR_TEXT, errorText);
         return new ModelAndView("error/notFound");
     }
 
     @RequestMapping(value = "/error/permissionDenied")
     public ModelAndView getPermissionDeniedView(String errorText, Model model) {
-        model.addAttribute("errorText", errorText);
+        model.addAttribute(ERROR_TEXT, errorText);
         return new ModelAndView("error/permissionDenied");
     }
 

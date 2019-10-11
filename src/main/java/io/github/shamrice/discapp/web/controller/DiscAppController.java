@@ -30,6 +30,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+
 @Controller
 @Slf4j
 public class DiscAppController {
@@ -82,27 +84,27 @@ public class DiscAppController {
 
             if (app != null) {
 
-                model.addAttribute("appName", app.getName());
-                model.addAttribute("appId", app.getId());
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
 
-                model.addAttribute("prologueText", applicationService.getPrologueText(app.getId()));
-                model.addAttribute("epilogueText", applicationService.getEpilogueText(app.getId()));
+                model.addAttribute(PROLOGUE_TEXT, applicationService.getPrologueText(app.getId()));
+                model.addAttribute(EPILOGUE_TEXT, applicationService.getEpilogueText(app.getId()));
 
-                model.addAttribute("postMessageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-                model.addAttribute("nextPageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
-                model.addAttribute("previousPageButtonText", configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
+                model.addAttribute(POST_MESSAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+                model.addAttribute(NEXT_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
+                model.addAttribute(PREVIOUS_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
 
                 if (page == null) {
                     page = 0;
                 }
                 if (page > 0) {
-                    model.addAttribute("hasPreviousPage", true);
-                    model.addAttribute("previousPage", page - 1);
+                    model.addAttribute(HAS_PREVIOUS_PAGE, true);
+                    model.addAttribute(PREVIOUS_PAGE, page - 1);
                 }
 
-                model.addAttribute("currentPage", page);
-                model.addAttribute("nextPage", page + 1);
-                model.addAttribute("hasNextPage", true); // default.
+                model.addAttribute(CURRENT_PAGE, page);
+                model.addAttribute(NEXT_PAGE, page + 1);
+                model.addAttribute(HAS_NEXT_PAGE, true); // default.
 
                 //get ip address
                 if (request != null) {
@@ -124,7 +126,7 @@ public class DiscAppController {
 
                 //if there are less than max threads returned, we must be on the last page.
                 if (threadTreeNodeList.size() < maxThreads) {
-                    model.addAttribute("hasNextPage", false);
+                    model.addAttribute(HAS_NEXT_PAGE, false);
                 }
 
                 if (isExpandOnIndex) {
@@ -152,11 +154,11 @@ public class DiscAppController {
                         threadTreeHtml.add(currentHtml);
                     }
 
-                    model.addAttribute("threadNodeList", threadTreeHtml);
+                    model.addAttribute(THREAD_NODE_LIST, threadTreeHtml);
                 } else {
-                    model.addAttribute("dateLabel", configurationService.getStringValue(appId, ConfigurationProperty.DATE_LABEL_TEXT, "Date:"));
-                    model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
-                    model.addAttribute("subjectLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
+                    model.addAttribute(DATE_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.DATE_LABEL_TEXT, "Date:"));
+                    model.addAttribute(SUBMITTER_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
+                    model.addAttribute(SUBJECT_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
 
                     List<ThreadViewModel> threads = new ArrayList<>();
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
@@ -185,26 +187,26 @@ public class DiscAppController {
                         threads.add(threadViewModel);
 
                     }
-                    model.addAttribute("threads", threads);
+                    model.addAttribute(THREADS, threads);
 
                 }
 
-                model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
-                model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
-                model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
-                model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-                model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
-                model.addAttribute("isExpandOnIndex", isExpandOnIndex);
-                model.addAttribute("isShowTopLevelPreview", showTopLevelPreview);
+                model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute(THREAD_SEPARATOR, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
+                model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+                model.addAttribute(IS_EXPAND_ON_INDEX, isExpandOnIndex);
+                model.addAttribute(IS_SHOW_TOP_LEVEL_PREVIEW, showTopLevelPreview);
 
                 return new ModelAndView("indices/appView");
 
             } else {
-                model.addAttribute("error", "Disc app with id " + appId + " returned null.");
+                model.addAttribute(ERROR, "Disc app with id " + appId + " returned null.");
                 log.info("Disc app with application id of " + appId + " does not exist. Returning null.");
             }
         } catch (Exception ex) {
-            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+            model.addAttribute(ERROR, "No disc app with id " + appId + " found. " + ex.getMessage());
             log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 
@@ -231,10 +233,10 @@ public class DiscAppController {
         if (threadViewModel != null && threadViewModel.getId() != null) {
             try {
                 parentId = Long.parseLong(threadViewModel.getId());
-                model.addAttribute("parentThreadSubmitter", threadViewModel.getSubmitter());
-                model.addAttribute("parentThreadSubject", threadViewModel.getSubject());
-                model.addAttribute("parentThreadBody", threadViewModel.getBody());
-                model.addAttribute("currentPage", threadViewModel.getCurrentPage());
+                model.addAttribute(PARENT_THREAD_SUBMITTER, threadViewModel.getSubmitter());
+                model.addAttribute(PARENT_THREAD_SUBJECT, threadViewModel.getSubject());
+                model.addAttribute(PARENT_THREAD_BODY, threadViewModel.getBody());
+                model.addAttribute(CURRENT_PAGE, threadViewModel.getCurrentPage());
             } catch (NumberFormatException ex) {
                 log.error("Unable to parse parent id from view thread model. appId: " + appId
                         + " : attempted parentId: " + threadViewModel.getId());
@@ -243,18 +245,18 @@ public class DiscAppController {
 
         //if coming from preview page
         if (newThreadViewModel != null) {
-            model.addAttribute("submitter", newThreadViewModel.getSubmitter());
-            model.addAttribute("subject", newThreadViewModel.getSubject());
-            model.addAttribute("email", newThreadViewModel.getEmail());
-            model.addAttribute("body", newThreadViewModel.getBody());
-            model.addAttribute("showEmail", newThreadViewModel.isShowEmail());
-            model.addAttribute("parentThreadSubmitter", newThreadViewModel.getParentThreadSubmitter());
-            model.addAttribute("parentThreadSubject", newThreadViewModel.getParentThreadSubject());
-            model.addAttribute("parentThreadBody", newThreadViewModel.getParentThreadBody());
-            model.addAttribute("currentPage", newThreadViewModel.getCurrentPage());
+            model.addAttribute(SUBMITTER, newThreadViewModel.getSubmitter());
+            model.addAttribute(SUBJECT, newThreadViewModel.getSubject());
+            model.addAttribute(EMAIL, newThreadViewModel.getEmail());
+            model.addAttribute(BODY, newThreadViewModel.getBody());
+            model.addAttribute(SHOW_EMAIL, newThreadViewModel.isShowEmail());
+            model.addAttribute(PARENT_THREAD_SUBMITTER, newThreadViewModel.getParentThreadSubmitter());
+            model.addAttribute(PARENT_THREAD_SUBJECT, newThreadViewModel.getParentThreadSubject());
+            model.addAttribute(PARENT_THREAD_BODY, newThreadViewModel.getParentThreadBody());
+            model.addAttribute(CURRENT_PAGE, newThreadViewModel.getCurrentPage());
 
             if (newThreadViewModel.getErrorMessage() != null) {
-                model.addAttribute("errorMessage", newThreadViewModel.getErrorMessage());
+                model.addAttribute(ERROR_MESSAGE, newThreadViewModel.getErrorMessage());
             }
 
             if (newThreadViewModel.getParentId() != null) {
@@ -274,32 +276,32 @@ public class DiscAppController {
 
             //only set values if not a system account.
             if (user != null && user.getIsUserAccount()) {
-                model.addAttribute("isLoggedIn", true);
-                model.addAttribute("submitter", user.getUsername());
-                model.addAttribute("email", user.getEmail());
-                model.addAttribute("showEmail", user.getShowEmail());
+                model.addAttribute(IS_LOGGED_IN, true);
+                model.addAttribute(SUBMITTER, user.getUsername());
+                model.addAttribute(EMAIL, user.getEmail());
+                model.addAttribute(SHOW_EMAIL, user.getShowEmail());
             } else if (user != null && !user.getIsUserAccount()) {
-                model.addAttribute("isLoggedInSystemAccount", true);
+                model.addAttribute(IS_LOGGED_IN_SYSTEM_ACCOUNT, true);
                 log.info("User is system admin account. Posting will be treated as not logged in user.");
             }
         }
 
-        model.addAttribute("appName", app.getName());
-        model.addAttribute("appId", appId);
-        model.addAttribute("parentThreadId", parentId); //parentThreadId);
+        model.addAttribute(APP_NAME, app.getName());
+        model.addAttribute(APP_ID, appId);
+        model.addAttribute(PARENT_THREAD_ID, parentId); //parentThreadId);
 
-        model.addAttribute("submitterLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
-        model.addAttribute("emailLabel", configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
-        model.addAttribute("subjectLabel", configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
-        model.addAttribute("bodyLabel", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BODY_LABEL_TEXT, "Message Text:"));
-        model.addAttribute("previewButtonText", configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview"));
-        model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-        model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
-        model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-        model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
+        model.addAttribute(SUBMITTER_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
+        model.addAttribute(EMAIL_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
+        model.addAttribute(SUBJECT_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
+        model.addAttribute(BODY_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BODY_LABEL_TEXT, "Message Text:"));
+        model.addAttribute(PREVIEW_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview"));
+        model.addAttribute(POST_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+        model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+        model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
-        model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
-        model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+        model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+        model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
 
         return new ModelAndView("indices/createThread");
     }
@@ -310,8 +312,8 @@ public class DiscAppController {
                              Model model) {
 
         Application app = applicationService.get(appId);
-        model.addAttribute("appName", app.getName());
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, app.getName());
+        model.addAttribute(APP_ID, appId);
         model.addAttribute("newThreadViewModel", newThreadViewModel);
 
         String htmlBody = newThreadViewModel.getBody();
@@ -321,14 +323,14 @@ public class DiscAppController {
         newThreadViewModel.setHtmlBody(htmlBody);
 
 
-        model.addAttribute("editButtonText", configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message"));
-        model.addAttribute("postButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-        model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
-        model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-        model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
+        model.addAttribute(EDIT_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message"));
+        model.addAttribute(POST_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+        model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+        model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
-        model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
-        model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+        model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+        model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
 
         return new ModelAndView("indices/previewThread", "model", model);
     }
@@ -521,18 +523,18 @@ public class DiscAppController {
             threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, currentThread.getCreateDt(), true));
 
             Application app = applicationService.get(appId);
-            model.addAttribute("appName", app.getName());
+            model.addAttribute(APP_NAME, app.getName());
 
             model.addAttribute("threadViewModel", threadViewModel);
-            model.addAttribute("subThreadsHtml", subThreadsHtml);
+            model.addAttribute(SUB_THREADS_HTML, subThreadsHtml);
 
-            model.addAttribute("replyButtonText", configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply"));
-            model.addAttribute("returnButtonText", configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
-            model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-            model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
+            model.addAttribute(REPLY_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply"));
+            model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+            model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+            model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
-            model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
-            model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+            model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+            model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
         } else {
             log.warn("Attempted to view thread: " + threadId + " on appId: " + appId + " but does not belong to app. Redirecting to appView.");
             return "redirect:/indices/" + appId;
@@ -586,29 +588,29 @@ public class DiscAppController {
 
             if (app != null) {
 
-                model.addAttribute("appName", app.getName());
-                model.addAttribute("appId", app.getId());
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
 
                 //get search results
                 List<Thread> foundThreads = threadService.searchThreads(appId, searchTerm);
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
-                model.addAttribute("searchResults", getSearchThreadHtml(foundThreads, entryBreakString));
-                model.addAttribute("searchTerm", searchTerm);
+                model.addAttribute(SEARCH_RESULTS, getSearchThreadHtml(foundThreads, entryBreakString));
+                model.addAttribute(SEARCH_TERM, searchTerm);
 
-                model.addAttribute("headerText", configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
-                model.addAttribute("footerText", configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
-                model.addAttribute("threadSeparator", configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
-                model.addAttribute("faviconUrl", configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-                model.addAttribute("styleSheetUrl", configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
+                model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute(THREAD_SEPARATOR, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
+                model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
                 return new ModelAndView("indices/search", "model", model);
 
             } else {
-                model.addAttribute("error", "Disc app with id " + appId + " returned null.");
+                model.addAttribute(ERROR, "Disc app with id " + appId + " returned null.");
                 log.info("Disc app with application id of " + appId + " does not exist. Returning null.");
             }
         } catch (Exception ex) {
-            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+            model.addAttribute(ERROR, "No disc app with id " + appId + " found. " + ex.getMessage());
             log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
         }
 

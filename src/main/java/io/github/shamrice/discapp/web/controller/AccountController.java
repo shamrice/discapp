@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+
 @Controller
 @Slf4j
 public class AccountController {
@@ -124,34 +126,34 @@ public class AccountController {
                                               ModelMap modelMap) {
         log.debug("Password reset post: resetKey = " + resetKey + " email=" + email + " resetCode=" + resetCode);
 
-        modelMap.addAttribute("resetKey", resetKey);
-        modelMap.addAttribute("email", email);
-        modelMap.addAttribute("resetCode", resetCode);
+        modelMap.addAttribute(PASSWORD_RESET_KEY, resetKey);
+        modelMap.addAttribute(EMAIL, email);
+        modelMap.addAttribute(PASSWORD_RESET_CODE, resetCode);
 
         if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
             log.warn("Failed to create password reset request for " + email
                     + " due to ReCaptcha verification failure.");
-            modelMap.addAttribute("errorMessage", "Password reset failed. Please resubmit request.");
+            modelMap.addAttribute(ERROR_MESSAGE, "Password reset failed. Please resubmit request.");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
         if (email == null || email.trim().isEmpty()) {
-            modelMap.addAttribute("errorMessage", "Invalid email address.");
+            modelMap.addAttribute(ERROR_MESSAGE, "Invalid email address.");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
         if (newPassword == null || newPassword.trim().isEmpty() || newPassword.length() < 8) {
-            modelMap.addAttribute("errorMessage", "Password must be at least 8 characters");
+            modelMap.addAttribute(ERROR_MESSAGE, "Password must be at least 8 characters");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            modelMap.addAttribute("errorMessage", "New password confirmation does not match.");
+            modelMap.addAttribute(ERROR_MESSAGE, "New password confirmation does not match.");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
         if (resetCode == null || resetCode.trim().isEmpty()) {
-            modelMap.addAttribute("errorMessage", "Valid password reset code is required.");
+            modelMap.addAttribute(ERROR_MESSAGE, "Valid password reset code is required.");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
@@ -161,23 +163,23 @@ public class AccountController {
         } catch (NumberFormatException numFormatEx) {
             log.error("Failed to parse password reset code: " + resetCode + " for email: " + email + " :: "
                     + numFormatEx.getMessage(), numFormatEx);
-            modelMap.addAttribute("errorMessage", "Valid password reset code is required.");
+            modelMap.addAttribute(ERROR_MESSAGE, "Valid password reset code is required.");
             return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
         }
 
         if (accountService.performPasswordReset(resetKey, resetCodeInt, email, newPassword)) {
-            modelMap.addAttribute("status", "Password successfully reset.");
+            modelMap.addAttribute(STATUS, "Password successfully reset.");
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
 
-        modelMap.addAttribute("status", "Password reset failed. Please resubmit request.");
+        modelMap.addAttribute(STATUS, "Password reset failed. Please resubmit request.");
         return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
     }
 
     @GetMapping("/password/reset/{resetKey}")
     public ModelAndView getPasswordResetFormView(@PathVariable(name = "resetKey") String resetKey,
                                              ModelMap modelMap) {
-        modelMap.addAttribute("resetKey", resetKey);
+        modelMap.addAttribute(PASSWORD_RESET_KEY, resetKey);
         return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
     }
 
@@ -196,7 +198,7 @@ public class AccountController {
             log.info("Attempting to create new password reset request for email: " + email);
 
             //always tell client that password request was success to keep brute force email searching impossible.
-            modelMap.addAttribute("status", "Please check the email address you provided for the next steps in your password reset request.");
+            modelMap.addAttribute(STATUS, "Please check the email address you provided for the next steps in your password reset request.");
 
             if (!inputHelper.verifyReCaptchaResponse(reCaptchaResponse)) {
                 log.warn("Failed to create password reset request for " + email
@@ -216,7 +218,7 @@ public class AccountController {
             }
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
-        modelMap.addAttribute("status", "An Email address is required to reset your password.");
+        modelMap.addAttribute(STATUS, "An Email address is required to reset your password.");
         return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
     }
 

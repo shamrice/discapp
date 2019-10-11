@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.List;
+
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 
 @Controller
 @Slf4j
@@ -117,16 +118,16 @@ public class DiscAppMaintenanceController {
                                                    MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                                    Model model,
                                                    HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -162,14 +163,14 @@ public class DiscAppMaintenanceController {
                                        MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                        Model model,
                                        HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -202,16 +203,16 @@ public class DiscAppMaintenanceController {
                                            MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                            Model model,
                                            HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -234,11 +235,11 @@ public class DiscAppMaintenanceController {
     public ModelAndView getPermissionDeniedView(@RequestParam(name = "id") long appId,
                                                 HttpServletResponse response,
                                                 Model model) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         String username = accountHelper.getLoggedInEmail();
-        model.addAttribute("username", username);
+        model.addAttribute(USERNAME, username);
 
         return new ModelAndView("admin/permissionDenied");
     }
@@ -247,16 +248,16 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model,
                                                HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -275,16 +276,16 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
                                            Model model,
                                            HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -310,7 +311,7 @@ public class DiscAppMaintenanceController {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
@@ -356,16 +357,16 @@ public class DiscAppMaintenanceController {
                                                Model model,
                                                HttpServletRequest request,
                                                HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -438,16 +439,16 @@ public class DiscAppMaintenanceController {
                                           Model model,
                                           HttpServletResponse response) {
 
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -483,16 +484,16 @@ public class DiscAppMaintenanceController {
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
                                          Model model,
                                          HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
@@ -563,24 +564,24 @@ public class DiscAppMaintenanceController {
                                         Model model,
                                         HttpServletResponse response,
                                         HttpServletRequest request) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         String baseUrl  = webHelper.getBaseUrl(request);
-        model.addAttribute("appUrl", baseUrl + "/indices/" + appId);
+        model.addAttribute(APP_URL, baseUrl + "/indices/" + appId);
         //todo : indices string should be from static final property
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
-                model.addAttribute("isAdmin", "true");
+                model.addAttribute(IS_ADMIN, true);
             } else {
                 return getPermissionDeniedView(appId, response, model);
             }
@@ -863,8 +864,8 @@ public class DiscAppMaintenanceController {
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                         Model model,
                                         HttpServletResponse response) {
-        model.addAttribute("appName", "");
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
 
         if (currentTab == null || currentTab.isEmpty()) {
             currentTab = THREAD_TAB;
@@ -898,19 +899,19 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
-                model.addAttribute("appName", app.getName());
-                model.addAttribute("appId", app.getId());
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
                 maintenanceThreadViewModel.setApplicationId(app.getId());
 
                 DiscAppUser user = discAppUserDetailsService.getByEmail(username);
-                model.addAttribute("postingUsername", user.getUsername());
+                model.addAttribute(POSTING_USERNAME, user.getUsername());
 
                 if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                     //get edit threads html
@@ -982,9 +983,9 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             maintenanceThreadViewModel.setCurrentPage(page);
@@ -1040,22 +1041,22 @@ public class DiscAppMaintenanceController {
                                           Model model,
                                           HttpServletResponse response) {
 
-        model.addAttribute("appId", appId);
+        model.addAttribute(APP_ID, appId);
 
         try {
 
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute("username", username);
+            model.addAttribute(USERNAME, username);
             if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute("isUserAccount", true);
+                model.addAttribute(IS_USER_ACCOUNT, true);
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
 
-                model.addAttribute("appName", app.getName());
-                model.addAttribute("appId", app.getId());
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
 
                 //app config
                 maintenanceViewModel.setApplicationCreateDt(app.getCreateDt());
