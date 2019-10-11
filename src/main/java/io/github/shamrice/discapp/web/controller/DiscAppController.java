@@ -270,18 +270,17 @@ public class DiscAppController {
 
         //pre-fill form with user info if they are logged in
         if (accountHelper.isLoggedIn()) {
-            model.addAttribute("isLoggedIn", "true");
-
             DiscAppUser user = discAppUserDetailsService.getByEmail(accountHelper.getLoggedInEmail());
-            model.addAttribute("submitter", user.getUsername());
-            model.addAttribute("email", user.getEmail());
-            model.addAttribute("showEmail", user.getShowEmail());
 
-            if (!user.getIsUserAccount()) {
-                log.error("User is system admin account. Posting is not allowed. :: " + user.toString());
-                return errorController.getPermissionDeniedView("Disc App system Admin accounts cannot create "
-                        + " new posts. Please log out and either log in as a regular user account or remain logged out "
-                        + " when creating a new thread.", model);
+            //only set values if not a system account.
+            if (user != null && user.getIsUserAccount()) {
+                model.addAttribute("isLoggedIn", true);
+                model.addAttribute("submitter", user.getUsername());
+                model.addAttribute("email", user.getEmail());
+                model.addAttribute("showEmail", user.getShowEmail());
+            } else if (user != null && !user.getIsUserAccount()) {
+                model.addAttribute("isLoggedInSystemAccount", true);
+                log.info("User is system admin account. Posting will be treated as not logged in user.");
             }
         }
 
@@ -381,6 +380,7 @@ public class DiscAppController {
 
                 if (threadService.isNewThreadPostTooSoon(appId, ipAddress)) {
                     log.error("Cannot create thread so soon after creating previous thread. Returning user to page with error.");
+                    //TODO : centralise error messages.
                     newThreadViewModel.setErrorMessage("New message too soon after previous post. Please try again.");
                     return createNewThread(appId, null, newThreadViewModel, model);
                 }
@@ -429,7 +429,8 @@ public class DiscAppController {
                 String userEmail = accountHelper.getLoggedInEmail();
 
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(userEmail);
-                if (discAppUser != null) {
+                //only set values for logged in users who are not system accounts.
+                if (discAppUser != null && discAppUser.getIsUserAccount()) {
                     newThread.setDiscAppUser(discAppUser);
                     newThread.setSubmitter(discAppUser.getUsername());
                     newThread.setEmail(discAppUser.getEmail());

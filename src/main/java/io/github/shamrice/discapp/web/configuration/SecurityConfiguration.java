@@ -24,6 +24,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //TODO : _csrf token is not getting passed in the search function. One option is to include it, one to switch
         //TODO : search page to a GET mapping. Currently csrf is disabled and POST mappings are allowed
 
+        //TODO: url paths need to be located in centralized location.
         httpSecurity
                 .headers()
                     .frameOptions().disable()

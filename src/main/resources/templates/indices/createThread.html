@@ -58,8 +58,9 @@
                 <div th:unless="${isLoggedIn}">
                     <tr>
                         <td class="entries_header" th:utext="${submitterLabel}"></td>
-                        <td><input type="text" name="submitter" size="30" maxlength="50" th:value="${submitter}"/> <a
-                                th:href="@{|/auth/indices?id=${appId}|}">login</a>
+                        <td>
+                            <input type="text" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
+                            <a th:unless="${isLoggedInSystemAccount}" th:href="@{|/auth/indices?id=${appId}|}">login</a>
                         </td>
                     </tr>
 
