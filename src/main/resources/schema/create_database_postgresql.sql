@@ -176,6 +176,43 @@ CREATE TABLE import_data (
   FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
+CREATE TABLE application_permission (
+  id serial NOT NULL,
+  application_id int UNIQUE NOT NULL,
+  display_ip_address bool NOT NULL DEFAULT TRUE,
+  block_bad_words bool NOT NULL DEFAULT FALSE,
+  block_search_engines bool NOT NULL DEFAULT FALSE,
+  allow_html_permissions varchar(10) NOT NULL,
+  unregistered_user_permissions varchar(10) NOT NULL,
+  registered_user_permissions varchar(10) NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
+CREATE TABLE editor_permission (
+  id serial NOT NULL,
+  application_id int NOT NULL,
+  discapp_user_id int NOT NULL,
+  user_permissions varchar(10) NOT NULL,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  mod_dt TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (application_id) REFERENCES application(id),
+  FOREIGN KEY (discapp_user_id) REFERENCES discapp_user(id)
+);
+
+CREATE TABLE application_ip_block (
+    id serial NOT NULL,
+    application_id int NOT NULL,
+    ip_address_prefix varchar(64) NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
 commit;
 
 

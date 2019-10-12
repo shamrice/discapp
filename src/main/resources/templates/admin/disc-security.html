@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+    /* div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;} */
+    div.checkboxes{ text-align:left; width:22em; margin:auto; }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${maintenanceSecurityViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceSecurityViewModel.getInfoMessage()}">
+</div>
+
+<form method="post" th:action="@{|/admin/disc-security.cgi?id=${appId}|}" enctype="multipart/form-data" th:object="${maintenanceSecurityViewModel}">
+    <input type="hidden" name="id" th:value="${appId}" />
+    <div style="width:66em; margin:auto;">
+        <div style="width:35em; margin-right:1em; float:left;">
+            <div th:if="${maintenanceSecurityViewModel.getOwnerEmail()}" class="grey_box">
+                <div>
+                    <label for="email">Owner Email</label>
+                    <input type="text" name="ownerEmail" th:value="${maintenanceSecurityViewModel.getOwnerEmail()}" size="35" id="email" />
+                    <input type="submit" name="changeOwnerEmail" value="Change Owner Email" class="button" />
+                </div>
+            </div>
+            <div class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getPermissionMessage()}"></h3>
+                <table class="colored">
+                    <tr class="hidden_text">
+                        <th>&nbsp</th>
+                        <th><a href="#">None<p>Users with this privilege won't have any access to your DiscussionApp.</p></a></th>
+                        <th><a href="#">Read<p>Users can't post any messages.</p></a></th>
+                        <th><a href="#">Reply<p>Users can reply to messages, but can't create new threads.</p></a></th>
+                        <th><a href="#">Post<p>Users can create new threads as well as respond to messages.</p></a></th>
+                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a></th>
+                    </tr>
+                    <tr>
+                        <td>Unregistered users</td>
+                        <td>
+                            <label>
+                                <input type="radio" name="unregisteredPermissions" value="n" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="unregisteredPermissions" value="r" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="unregisteredPermissions" value="rf" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="unregisteredPermissions" value="rfp" checked="checked" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <!-- TODO: set checked -->
+                                <input type="radio" name="unregisteredPermissions" value="rfph" />
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Registered users</td>
+                        <td>
+                            <label>
+                                <input type="radio" name="registeredPermissions" value="n" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="registeredPermissions" value="r" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="registeredPermissions" value="rf" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="registeredPermissions" value="rfp" checked="checked" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="registeredPermissions" value="rfph" />
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" name="changeDefaultAccess" value="Change Default Access Permissions" class="button" />
+            </div>
+            <div class="grey_box">
+                <p style="font-size:smaller;">Editors can use the URL <a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank" th:text="${maintenanceSecurityViewModel.getEditUrl()}"></a> to edit articles.</p>
+                <table class="colored">
+                    <tr class="hidden_text">
+                        <th>&nbsp</th>
+                        <th><a href="#">None<p>Users with this privilege won't have any access to your DiscussionApp.</p></a></th>
+                        <th><a href="#">Read<p>Users can't post any messages.</p></a></th>
+                        <th><a href="#">Reply<p>Users can reply to messages, but can't create new threads.</p></a></th>
+                        <th><a href="#">Post<p>Users can create new threads as well as respond to messages.</p></a></th>
+                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a></th>
+                        <th><a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank">Edit<p>Users with Edit privileges are moderators who can edit <em>any</em> message.
+                            Be very selective about who you assign this privilege to.</p></a></th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td>Retna</td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="n" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="r" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="rf" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="rfp" checked="checked" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="rfph" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="rfpe" />
+                            </label>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="radio" name="perm_for_52833" value="delete" />
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" name="changeUserAccess" value="Change User Access Permissions" class="button" />
+                <input type="submit" name="deleteUsers" value="Delete Users" class="button" />
+                <input type="submit" name="searchUsersForm" value="Add Users" class="button" />
+            </div>
+        </div>
+        <div style="width:30em; float:left;">
+            <div class="grey_box">
+                <div class="checkboxes">
+                    <div>
+                        <label>
+                            <input type="checkbox" name="showIp" th:value="${maintenanceSecurityViewModel.isShowIp()}" th:checked="${maintenanceSecurityViewModel.isShowIp()}" />Publicly display IP addresses</label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" name="blockBadWords" th:value="${maintenanceSecurityViewModel.isBlockBadWords()}" th:checked="${maintenanceSecurityViewModel.isShowIp()}"/>Block bad words</label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" name="blockSearch" th:value="${maintenanceSecurityViewModel.isBlockSearch()}" th:checked="${maintenanceSecurityViewModel.isBlockSearch()}"/>Block search engines</label>
+                    </div>
+                </div>
+                <input type="submit" name="changeSecurity" value="Change Security Settings" class="button" style="margin-top:1em;" />
+            </div>
+            <div class="grey_box">
+                <div style="margin-bottom:1ex;">IP address prefixes to block</div>
+                <table>
+                    <tr>
+                        <td>
+                            <input type="text" name="blockIp1" size="20" maxlength="39" />
+                        </td>
+                        <td>
+                            <input type="text" name="blockIp2" size="20" maxlength="39" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="blockIp3" size="20" maxlength="39" />
+                        </td>
+                        <td>
+                            <input type="text" name="blockIp4" size="20" maxlength="39" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="blockIp5" size="20" maxlength="39" />
+                        </td>
+                        <td>
+                            <input type="text" name="blockIp6" size="20" maxlength="39" />
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" name="changeIPs" value="Update IP Settings" class="button" />
+            </div>
+            <div class="grey_box">
+                <div class="checkboxes">
+                    <label>
+                        <input type="radio" name="blockHtml" value="allow"
+                               th:checked="${maintenanceSecurityViewModel.isBlockHtml('allow')}"/>allow HTML everywhere</label>
+                    <br />
+                    <label>
+                        <input type="radio" name="blockHtml" value="subject" th:checked="${maintenanceSecurityViewModel.isBlockHtml('subject')}" />block HTML in subject and author fields</label>
+                    <br />
+                    <label>
+                        <input type="radio" name="blockHtml" value="forbid" th:checked="${maintenanceSecurityViewModel.isBlockHtml('forbid')}" />block HTML everywhere</label>
+                    <br />
+                    <div style="text-align:center; margin-top:1em;">
+                        <input type="submit" name="changeHTMLPerms" value="Change HTML Permissions" class="button" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TODO : div style="clear:left; padding:1em; text-align:center;"><a href="/abuse.cgi?discappid=46108">Abuse Database</a></div -->
+    <div>
+        <input type="hidden" name=".cgifields" value="block_search" />
+        <input type="hidden" name=".cgifields" value="block_html" />
+        <input type="hidden" name=".cgifields" value="block_bad_words" />
+        <input type="hidden" name=".cgifields" value="show_ip" />
+        <input type="hidden" name=".cgifields" value="perm_for_52833" />
+        <input type="hidden" name=".cgifields" value="accounts_can" />
+        <input type="hidden" name=".cgifields" value="world_can" />
+    </div>
+</form>
+
+</body>
+</html>

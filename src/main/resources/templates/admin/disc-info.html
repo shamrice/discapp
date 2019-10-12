@@ -51,7 +51,7 @@
     <div style="width:32em; margin:auto; text-align:center; margin-top:5%; font-weight:bold;">
         <!--h3 style="background-color:#fdd;">The DiscussionApp service will end on October 31, 2019.</h3>
         <h3><a href="/Dumps/disc_46108.sql">Click here to download your DiscApp</a></h3>
-        <h3><a href="?id=46108;dump=1">Click here to dump your DiscApp</a></h3-->
+        <h3><a href="?id=${appId};dump=1">Click here to dump your DiscApp</a></h3-->
         <div>Visitors can access your DiscussionApp with the URL </div>
         <div style="margin-top:1ex; margin-bottom:2em;"><a th:href="${appUrl}" target="_blank" th:text="${appUrl}"></a></div>
         <fieldset>
@@ -64,9 +64,9 @@
                     <td>
                         <a th:href="@{|/admin/disc-edit.cgi?id=${appId}|}"><img alt="Messages" src="/images/messages.png" /> Messages</a>
                     </td>
-                    <!--td>
-                        <a href="/admin/disc-security.cgi?id=46108"><img alt="Security" src="/images/lock.png" /> Security</a>
-                    </td-->
+                    <td>
+                        <a th:href="@{|/admin/disc-security.cgi?id=${appId}|}"><img alt="Security" src="/images/lock.png" /> Security</a>
+                    </td>
                 </tr>
                 <tr>
                     <!--td>

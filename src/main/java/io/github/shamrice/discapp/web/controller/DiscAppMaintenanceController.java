@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.data.ApplicationExportService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
@@ -70,6 +71,9 @@ public class DiscAppMaintenanceController {
     private ApplicationImportService applicationImportService;
 
     @Autowired
+    private AccountService accountService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @Autowired
@@ -80,6 +84,47 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private DiscAppController discAppController;
+
+    @GetMapping("/admin/disc-security.cgi")
+    public ModelAndView getDiscSecurityView(@RequestParam(name = "id") long appId,
+                                            MaintenanceSecurityViewModel maintenanceSecurityViewModel,
+                                            Model model,
+                                            HttpServletResponse response,
+                                            HttpServletRequest request) {
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute(USERNAME, username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute(IS_USER_ACCOUNT, true);
+            }
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                maintenanceSecurityViewModel.setApplicationId(app.getId());
+
+                Owner appOwner = accountService.getOwnerById(app.getOwnerId());
+                if (appOwner != null) {
+                    maintenanceSecurityViewModel.setOwnerEmail(appOwner.getEmail());
+                }
+
+                String baseUrl = webHelper.getBaseUrl(request);
+                maintenanceSecurityViewModel.setEditUrl(baseUrl + "/admin/disc-edit.cgi?id=" + appId);
+
+                return new ModelAndView("admin/disc-security", "maintenanceSecurityModel", maintenanceSecurityViewModel);
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance security page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
 
     @GetMapping("/admin/data/download")
     @ResponseBody
