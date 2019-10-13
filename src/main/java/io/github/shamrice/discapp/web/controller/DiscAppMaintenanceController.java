@@ -85,6 +85,107 @@ public class DiscAppMaintenanceController {
     @Autowired
     private DiscAppController discAppController;
 
+    @PostMapping("/admin/disc-security.cgi")
+    public ModelAndView postDiscSecurityView(@RequestParam(name = "id") long appId,
+                                             MaintenanceSecurityViewModel maintenanceSecurityViewModel,
+                                             Model model,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) {
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute(USERNAME, username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute(IS_USER_ACCOUNT, true);
+            }
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                //update owner email
+                if (maintenanceSecurityViewModel.getChangeOwnerEmail() != null) {
+                    Owner ownerToUpdate = accountService.getOwnerById(app.getOwnerId());
+                    String newEmail = inputHelper.sanitizeInput(maintenanceSecurityViewModel.getOwnerEmail());
+                    if (!newEmail.trim().isEmpty()) {
+                        ownerToUpdate.setEmail(newEmail);
+                        ownerToUpdate.setModDt(new Date());
+                        try {
+                            if (accountService.saveOwner(ownerToUpdate) != null) {
+                                log.info("Updated owner: " + ownerToUpdate.toString());
+                                maintenanceSecurityViewModel.setInfoMessage("Updated owner email.");
+                            } else {
+                                log.error("Failed to update owners email: " + ownerToUpdate.toString());
+                                maintenanceSecurityViewModel.setErrorMessage("Failed to update owner email.");
+                            }
+                        } catch (Exception ex) {
+                            log.error("Error updating owner email address: " + ex.getMessage(), ex);
+                            maintenanceSecurityViewModel.setErrorMessage("Owner email address already in use. Please specify a different email.");
+                        }
+                    } else {
+                        maintenanceSecurityViewModel.setErrorMessage("Owner email is either invalid or empty.");
+                    }
+                }
+
+                //get current permissions, or create new ones if they don't already exist.
+                ApplicationPermission appPermission = applicationService.getApplicationPermissions(app.getId());
+                if (appPermission == null) {
+                    appPermission = applicationService.getDefaultNewApplicationPermissions(app.getId());
+                }
+                appPermission.setModDt(new Date());
+
+                //set security permissions
+                if (maintenanceSecurityViewModel.getChangeSecurity() != null) {
+                    appPermission.setDisplayIpAddress(maintenanceSecurityViewModel.isShowIp());
+                    appPermission.setBlockBadWords(maintenanceSecurityViewModel.isBlockBadWords());
+                    appPermission.setBlockSearchEngines(maintenanceSecurityViewModel.isBlockSearch());
+                    if (applicationService.saveApplicationPermissions(appPermission)) {
+                        log.info("Saved updated app permissions: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setInfoMessage("Updated security settings");
+                    } else {
+                        log.error("Failed to update security settings: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setErrorMessage("Failed to update security settings.");
+                    }
+                }
+
+                //html blocking permissions
+                if (maintenanceSecurityViewModel.getChangeHTMLPerms() != null) {
+                    appPermission.setAllowHtmlPermissions(maintenanceSecurityViewModel.getBlockHtml());
+                    if (applicationService.saveApplicationPermissions(appPermission)) {
+                        log.info("Saved updated app HTML permissions: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setInfoMessage("Updated HTML permissions");
+                    } else {
+                        log.error("Failed to update HTML settings: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setErrorMessage("Failed to update HTML permissions.");
+                    }
+                }
+
+                //reg and unreg user posting permissions.
+                if (maintenanceSecurityViewModel.getChangeDefaultAccess() != null) {
+                    appPermission.setUnregisteredUserPermissions(maintenanceSecurityViewModel.getUnregisteredPermissions());
+                    appPermission.setRegisteredUserPermissions(maintenanceSecurityViewModel.getRegisteredPermissions());
+                    if (applicationService.saveApplicationPermissions(appPermission)) {
+                        log.info("Saved updated app user posting permissions: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setPermissionMessage("Permissions Updated");
+                    } else {
+                        log.error("Failed to update user posting permissions: " + appPermission.toString());
+                        maintenanceSecurityViewModel.setErrorMessage("Failed to update permissions.");
+                    }
+                }
+                return getDiscSecurityView(appId, maintenanceSecurityViewModel, model, response, request);
+
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance security page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
+
     @GetMapping("/admin/disc-security.cgi")
     public ModelAndView getDiscSecurityView(@RequestParam(name = "id") long appId,
                                             MaintenanceSecurityViewModel maintenanceSecurityViewModel,
@@ -114,6 +215,23 @@ public class DiscAppMaintenanceController {
 
                 String baseUrl = webHelper.getBaseUrl(request);
                 maintenanceSecurityViewModel.setEditUrl(baseUrl + "/admin/disc-edit.cgi?id=" + appId);
+
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+                if (applicationPermission != null) {
+                    maintenanceSecurityViewModel.setBlockBadWords(applicationPermission.getBlockBadWords());
+                    maintenanceSecurityViewModel.setBlockSearch(applicationPermission.getBlockSearchEngines());
+                    maintenanceSecurityViewModel.setShowIp(applicationPermission.getDisplayIpAddress());
+                    maintenanceSecurityViewModel.setRegisteredPermissions(applicationPermission.getRegisteredUserPermissions());
+                    maintenanceSecurityViewModel.setUnregisteredPermissions(applicationPermission.getUnregisteredUserPermissions());
+                    maintenanceSecurityViewModel.setBlockHtml(applicationPermission.getAllowHtmlPermissions());
+                } else {
+                    //if permissions are null. set default permission check boxes.
+                    //todo : these permission strings need to be stored somewhere
+                    maintenanceSecurityViewModel.setUnregisteredPermissions("rfp");
+                    maintenanceSecurityViewModel.setRegisteredPermissions("rfp");
+                    maintenanceSecurityViewModel.setBlockHtml("subject");
+                    maintenanceSecurityViewModel.setShowIp(true);
+                }
 
                 return new ModelAndView("admin/disc-security", "maintenanceSecurityModel", maintenanceSecurityViewModel);
             } else {

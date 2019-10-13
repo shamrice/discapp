@@ -49,4 +49,14 @@ public class MaintenanceSecurityViewModel {
         if (blockHtml == null || radioValue == null) return false;
         return blockHtml.equalsIgnoreCase(radioValue.toLowerCase());
     }
+
+    public boolean isUnregisteredUsersPermissionChecked(String permissionValue) {
+        if (unregisteredPermissions == null || permissionValue == null) return false;
+        return unregisteredPermissions.equalsIgnoreCase(permissionValue.toLowerCase());
+    }
+
+    public boolean isRegisteredUsersPermissionChecked(String permissionValue) {
+        if (registeredPermissions == null || permissionValue == null) return false;
+        return registeredPermissions.equalsIgnoreCase(permissionValue.toLowerCase());
+    }
 }

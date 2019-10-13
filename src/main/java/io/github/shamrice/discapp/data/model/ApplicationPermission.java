@@ -15,16 +15,19 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Application {
+public class ApplicationPermission {
 
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private Long ownerId;
-    private Boolean enabled;
-    private Boolean deleted;
+    private Long applicationId;
+    private Boolean displayIpAddress;
+    private Boolean blockBadWords;
+    private Boolean blockSearchEngines;
+    private String allowHtmlPermissions;
+    private String unregisteredUserPermissions;
+    private String registeredUserPermissions;
     private Date createDt;
     private Date modDt;
 }

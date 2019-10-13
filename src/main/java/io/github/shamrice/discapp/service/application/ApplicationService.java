@@ -22,6 +22,9 @@ public class ApplicationService {
     private ApplicationRepository applicationRepository;
 
     @Autowired
+    private ApplicationPermissionRepository applicationPermissionRepository;
+
+    @Autowired
     private PrologueRepository prologueRepository;
 
     @Autowired
@@ -271,6 +274,35 @@ public class ApplicationService {
             }
         }
         return savedEpilogue;
+    }
+
+    public ApplicationPermission getApplicationPermissions(long appId) {
+        return applicationPermissionRepository.findOneByApplicationId(appId).orElse(null);
+    }
+
+    public boolean saveApplicationPermissions(ApplicationPermission applicationPermission) {
+        if (applicationPermission == null) {
+            return false;
+        }
+
+        return applicationPermissionRepository.save(applicationPermission) != null;
+    }
+
+    public ApplicationPermission getDefaultNewApplicationPermissions(long appId) {
+        ApplicationPermission appPermission = new ApplicationPermission();
+        appPermission.setCreateDt(new Date());
+        appPermission.setModDt(new Date());
+        appPermission.setApplicationId(appId);
+        //set defaults
+        appPermission.setDisplayIpAddress(true);
+        appPermission.setBlockBadWords(false);
+        appPermission.setBlockSearchEngines(false);
+        //todo : these permission strings should live somewhere.
+        appPermission.setAllowHtmlPermissions("subject");
+        appPermission.setUnregisteredUserPermissions("rfp");
+        appPermission.setRegisteredUserPermissions("rfp");
+
+        return appPermission;
     }
 
 }
