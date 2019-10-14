@@ -38,14 +38,7 @@ public class MaintenanceSecurityViewModel {
     private String changeSecurity;
     private String securityMessage;
 
-    //todo : use a list or an array or something...
     private String[] blockIpList = new String[6];
-    private String blockIp1;
-    private String blockIp2;
-    private String blockIp3;
-    private String blockIp4;
-    private String blockIp5;
-    private String blockIp6;
     private String changeIPs;
     private String ipMessage;
 

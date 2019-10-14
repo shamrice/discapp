@@ -178,37 +178,13 @@ public class DiscAppMaintenanceController {
                 //block ip prefix settings
                 if (maintenanceSecurityViewModel.getChangeIPs() != null) {
 
-                    //todo : this is ugly...
                     List<ApplicationIpBlock> applicationIpBlocks = new ArrayList<>();
                     String ipPrefixRegex = "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.|)$";
-                    if (maintenanceSecurityViewModel.getBlockIp1() != null && !maintenanceSecurityViewModel.getBlockIp1().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp1().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp1()));
-                        }
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp2() != null && !maintenanceSecurityViewModel.getBlockIp2().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp2().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp2()));
-                        }
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp3() != null && !maintenanceSecurityViewModel.getBlockIp3().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp3().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp3()));
-                        }
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp4() != null && !maintenanceSecurityViewModel.getBlockIp4().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp4().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp4()));
-                        }
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp5() != null && !maintenanceSecurityViewModel.getBlockIp5().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp5().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp5()));
-                        }
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp6() != null && !maintenanceSecurityViewModel.getBlockIp6().trim().isEmpty()) {
-                        if (maintenanceSecurityViewModel.getBlockIp6().matches(ipPrefixRegex)) {
-                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp6()));
+
+                    for (int i = 0; i < maintenanceSecurityViewModel.getBlockIpList().length; i++) {
+                        String ipPrefix = maintenanceSecurityViewModel.getBlockIpList()[i];
+                        if (ipPrefix != null && !ipPrefix.trim().isEmpty() && ipPrefix.matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), ipPrefix));
                         }
                     }
 
@@ -220,7 +196,6 @@ public class DiscAppMaintenanceController {
                         log.error("Failed to save new ip block prefixes for appId: " + appId);
                         maintenanceSecurityViewModel.setErrorMessage("Failed to save IP block prefixes.");
                     }
-
                 }
 
                 //editor permissions setting
@@ -294,6 +269,8 @@ public class DiscAppMaintenanceController {
                     for (int i = 0; i < maintenanceSecurityViewModel.getBlockIpList().length; i++) {
                         if (i < applicationIpBlocks.size()) {
                             maintenanceSecurityViewModel.getBlockIpList()[i] = applicationIpBlocks.get(i).getIpAddressPrefix();
+                        } else {
+                            maintenanceSecurityViewModel.getBlockIpList()[i] = "";
                         }
                     }
                 }

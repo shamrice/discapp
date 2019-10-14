@@ -197,26 +197,26 @@
                 <table>
                     <tr>
                         <td>
-                            <input type="text" name="blockIp1" th:value="${maintenanceSecurityViewModel.getBlockIpList()[0]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[0]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[0]}" size="20" maxlength="39" />
                         </td>
                         <td>
-                            <input type="text" name="blockIp2" th:value="${maintenanceSecurityViewModel.getBlockIpList()[1]}" size="20" maxlength="39" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text" name="blockIp3" th:value="${maintenanceSecurityViewModel.getBlockIpList()[2]}" size="20" maxlength="39" />
-                        </td>
-                        <td>
-                            <input type="text" name="blockIp4" th:value="${maintenanceSecurityViewModel.getBlockIpList()[3]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[1]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[1]}" size="20" maxlength="39" />
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" name="blockIp5" th:value="${maintenanceSecurityViewModel.getBlockIpList()[4]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[2]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[2]}" size="20" maxlength="39" />
                         </td>
                         <td>
-                            <input type="text" name="blockIp6" th:value="${maintenanceSecurityViewModel.getBlockIpList()[5]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[3]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[3]}" size="20" maxlength="39" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" th:name="|blockIpList[4]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[4]}" size="20" maxlength="39" />
+                        </td>
+                        <td>
+                            <input type="text" th:name="|blockIpList[5]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[5]}" size="20" maxlength="39" />
                         </td>
                     </tr>
                 </table>
