@@ -1,0 +1,9 @@
+Sitemap: https://nediscapp.herokuapp.com/Sitemaps/forums.xml
+Sitemap: https://nediscapp.herokuapp.com/Sitemaps/articles.xml
+
+User-agent: *
+Disallow: /test
+Disallow: /error
+Disallow: /auth
+Disallow: /application
+

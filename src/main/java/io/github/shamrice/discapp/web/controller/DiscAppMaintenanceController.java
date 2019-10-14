@@ -115,7 +115,7 @@ public class DiscAppMaintenanceController {
                         try {
                             if (accountService.saveOwner(ownerToUpdate) != null) {
                                 log.info("Updated owner: " + ownerToUpdate.toString());
-                                maintenanceSecurityViewModel.setInfoMessage("Updated owner email.");
+                                maintenanceSecurityViewModel.setOwnerEmailMessage("Email address updated");
                             } else {
                                 log.error("Failed to update owners email: " + ownerToUpdate.toString());
                                 maintenanceSecurityViewModel.setErrorMessage("Failed to update owner email.");
@@ -143,7 +143,7 @@ public class DiscAppMaintenanceController {
                     appPermission.setBlockSearchEngines(maintenanceSecurityViewModel.isBlockSearch());
                     if (applicationService.saveApplicationPermissions(appPermission)) {
                         log.info("Saved updated app permissions: " + appPermission.toString());
-                        maintenanceSecurityViewModel.setInfoMessage("Updated security settings");
+                        maintenanceSecurityViewModel.setSecurityMessage("Settings updated");
                     } else {
                         log.error("Failed to update security settings: " + appPermission.toString());
                         maintenanceSecurityViewModel.setErrorMessage("Failed to update security settings.");
@@ -155,7 +155,7 @@ public class DiscAppMaintenanceController {
                     appPermission.setAllowHtmlPermissions(maintenanceSecurityViewModel.getBlockHtml());
                     if (applicationService.saveApplicationPermissions(appPermission)) {
                         log.info("Saved updated app HTML permissions: " + appPermission.toString());
-                        maintenanceSecurityViewModel.setInfoMessage("Updated HTML permissions");
+                        maintenanceSecurityViewModel.setHtmlMessage("HTML permissions updated.");
                     } else {
                         log.error("Failed to update HTML settings: " + appPermission.toString());
                         maintenanceSecurityViewModel.setErrorMessage("Failed to update HTML permissions.");
@@ -174,6 +174,47 @@ public class DiscAppMaintenanceController {
                         maintenanceSecurityViewModel.setErrorMessage("Failed to update permissions.");
                     }
                 }
+
+                //block ip prefix settings
+                if (maintenanceSecurityViewModel.getChangeIPs() != null) {
+
+                    //todo : this is ugly...
+                    List<ApplicationIpBlock> applicationIpBlocks = new ArrayList<>();
+                    if (maintenanceSecurityViewModel.getBlockIp1() != null && !maintenanceSecurityViewModel.getBlockIp1().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp1()));
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp2() != null && !maintenanceSecurityViewModel.getBlockIp2().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp2()));
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp3() != null && !maintenanceSecurityViewModel.getBlockIp3().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp3()));
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp4() != null && !maintenanceSecurityViewModel.getBlockIp4().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp4()));
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp5() != null && !maintenanceSecurityViewModel.getBlockIp5().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp5()));
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp6() != null && !maintenanceSecurityViewModel.getBlockIp6().trim().isEmpty()) {
+                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp6()));
+                    }
+                    if (applicationIpBlocks.size() > 0) {
+                        if (applicationService.saveApplicationBlockIps(app.getId(), applicationIpBlocks)) {
+                            log.info("Saved updated ip block prefixes for appId: " + appId);
+                            maintenanceSecurityViewModel.setIpMessage("IPs updated");
+                        } else {
+                            log.error("Failed to save new ip block prefixes for appId: " + appId);
+                            maintenanceSecurityViewModel.setErrorMessage("Failed to save IP block prefixes.");
+                        }
+                    }
+                }
+
+                //editor permissions setting
+                if (maintenanceSecurityViewModel.getChangeUserAccess() != null) {
+                    maintenanceSecurityViewModel.setEditorPermissionMessage("Permissions updated.");
+                    log.info("Updated editor permissions for appId: " + appId);
+                }
+
                 return getDiscSecurityView(appId, maintenanceSecurityViewModel, model, response, request);
 
             } else {
@@ -231,6 +272,16 @@ public class DiscAppMaintenanceController {
                     maintenanceSecurityViewModel.setRegisteredPermissions("rfp");
                     maintenanceSecurityViewModel.setBlockHtml("subject");
                     maintenanceSecurityViewModel.setShowIp(true);
+                }
+
+                //set values for blocked ips if exist.
+                List<ApplicationIpBlock> applicationIpBlocks = applicationService.getBlockedIpPrefixes(app.getId());
+                if (applicationIpBlocks != null && applicationIpBlocks.size() > 0) {
+                    for (int i = 0; i < maintenanceSecurityViewModel.getBlockIpList().length; i++) {
+                        if (i < applicationIpBlocks.size()) {
+                            maintenanceSecurityViewModel.getBlockIpList()[i] = applicationIpBlocks.get(i).getIpAddressPrefix();
+                        }
+                    }
                 }
 
                 return new ModelAndView("admin/disc-security", "maintenanceSecurityModel", maintenanceSecurityViewModel);
@@ -1944,5 +1995,14 @@ public class DiscAppMaintenanceController {
                 " Put your footer here.\n" +
                 "\n" +
                 "</div>\n";
+    }
+
+    private ApplicationIpBlock buildApplicationIpBlock(long appId, String ipPrefix) {
+        ApplicationIpBlock ipBlock = new ApplicationIpBlock();
+        ipBlock.setApplicationId(appId);
+        ipBlock.setCreateDt(new Date());
+        ipBlock.setModDt(new Date());
+        ipBlock.setIpAddressPrefix(ipPrefix);
+        return ipBlock;
     }
 }

@@ -25,6 +25,9 @@ public class ApplicationService {
     private ApplicationPermissionRepository applicationPermissionRepository;
 
     @Autowired
+    private ApplicationIpBlockRepository applicationIpBlockRepository;
+
+    @Autowired
     private PrologueRepository prologueRepository;
 
     @Autowired
@@ -303,6 +306,25 @@ public class ApplicationService {
         appPermission.setRegisteredUserPermissions("rfp");
 
         return appPermission;
+    }
+
+    public List<ApplicationIpBlock> getBlockedIpPrefixes(long appId) {
+        return applicationIpBlockRepository.findByApplicationId(appId);
+    }
+
+    public boolean saveApplicationBlockIps(long appId, List<ApplicationIpBlock> applicationIpBlocks) {
+        if (applicationIpBlocks == null) {
+            return false;
+        }
+
+        //clear any existing records out before saving new ones.
+        try {
+            applicationIpBlockRepository.deleteAll(getBlockedIpPrefixes(appId));
+        } catch (Exception ex) {
+            log.error("Error clearing ip blocks for appId: " + appId + " : " + ex.getMessage(), ex);
+        }
+
+        return applicationIpBlockRepository.saveAll(applicationIpBlocks) != null;
     }
 
 }

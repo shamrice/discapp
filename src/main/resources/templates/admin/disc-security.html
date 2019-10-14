@@ -36,6 +36,7 @@
     <div style="width:66em; margin:auto;">
         <div style="width:35em; margin-right:1em; float:left;">
             <div th:if="${maintenanceSecurityViewModel.getOwnerEmail()}" class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getOwnerEmailMessage()}" th:text="${maintenanceSecurityViewModel.getOwnerEmailMessage()}"></h3>
                 <div>
                     <label for="email">Owner Email</label>
                     <input type="text" name="ownerEmail" th:value="${maintenanceSecurityViewModel.getOwnerEmail()}" size="35" id="email" />
@@ -113,6 +114,7 @@
                 <input type="submit" name="changeDefaultAccess" value="Change Default Access Permissions" class="button" />
             </div>
             <div class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getEditorPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getEditorPermissionMessage()}"></h3>
                 <p style="font-size:smaller;">Editors can use the URL <a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank" th:text="${maintenanceSecurityViewModel.getEditUrl()}"></a> to edit articles.</p>
                 <table class="colored">
                     <tr class="hidden_text">
@@ -172,6 +174,7 @@
         </div>
         <div style="width:30em; float:left;">
             <div class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getSecurityMessage()}" th:text="${maintenanceSecurityViewModel.getSecurityMessage()}"></h3>
                 <div class="checkboxes">
                     <div>
                         <label>
@@ -189,36 +192,38 @@
                 <input type="submit" name="changeSecurity" value="Change Security Settings" class="button" style="margin-top:1em;" />
             </div>
             <div class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getIpMessage()}" th:text="${maintenanceSecurityViewModel.getIpMessage()}"></h3>
                 <div style="margin-bottom:1ex;">IP address prefixes to block</div>
                 <table>
                     <tr>
                         <td>
-                            <input type="text" name="blockIp1" size="20" maxlength="39" />
+                            <input type="text" name="blockIp1" th:value="${maintenanceSecurityViewModel.getBlockIpList()[0]}" size="20" maxlength="39" />
                         </td>
                         <td>
-                            <input type="text" name="blockIp2" size="20" maxlength="39" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text" name="blockIp3" size="20" maxlength="39" />
-                        </td>
-                        <td>
-                            <input type="text" name="blockIp4" size="20" maxlength="39" />
+                            <input type="text" name="blockIp2" th:value="${maintenanceSecurityViewModel.getBlockIpList()[1]}" size="20" maxlength="39" />
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" name="blockIp5" size="20" maxlength="39" />
+                            <input type="text" name="blockIp3" th:value="${maintenanceSecurityViewModel.getBlockIpList()[2]}" size="20" maxlength="39" />
                         </td>
                         <td>
-                            <input type="text" name="blockIp6" size="20" maxlength="39" />
+                            <input type="text" name="blockIp4" th:value="${maintenanceSecurityViewModel.getBlockIpList()[3]}" size="20" maxlength="39" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="blockIp5" th:value="${maintenanceSecurityViewModel.getBlockIpList()[4]}" size="20" maxlength="39" />
+                        </td>
+                        <td>
+                            <input type="text" name="blockIp6" th:value="${maintenanceSecurityViewModel.getBlockIpList()[5]}" size="20" maxlength="39" />
                         </td>
                     </tr>
                 </table>
                 <input type="submit" name="changeIPs" value="Update IP Settings" class="button" />
             </div>
             <div class="grey_box">
+                <h3 th:if="${maintenanceSecurityViewModel.getHtmlMessage()}" th:text="${maintenanceSecurityViewModel.getHtmlMessage()}"></h3>
                 <div class="checkboxes">
                     <label>
                         <input type="radio" name="blockHtml" value="allow"
