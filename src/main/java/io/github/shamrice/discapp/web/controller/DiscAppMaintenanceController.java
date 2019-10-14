@@ -200,8 +200,49 @@ public class DiscAppMaintenanceController {
 
                 //editor permissions setting
                 if (maintenanceSecurityViewModel.getChangeUserAccess() != null) {
-                    maintenanceSecurityViewModel.setEditorPermissionMessage("Permissions updated.");
-                    log.info("Updated editor permissions for appId: " + appId);
+
+                    List<EditorPermission> currentPermissions = applicationService.getEditorPermissions(app.getId());
+                    for (EditorPermission editorPermission : currentPermissions) {
+                        for (EditorPermission updatedPerms : maintenanceSecurityViewModel.getEditorPermissions()) {
+                            //only update matching records when not set to delete.
+                            if (!updatedPerms.getUserPermissions().equalsIgnoreCase("delete") && editorPermission.getId().equals(updatedPerms.getId())) {
+                                editorPermission.setUserPermissions(updatedPerms.getUserPermissions());
+                                editorPermission.setModDt(new Date());
+                                log.info("Updating editor permissions for id: " + editorPermission.getId() + " : for appid: "
+                                        + appId + " to: " + editorPermission.getUserPermissions());
+                                break;
+                            }
+                        }
+                    }
+
+                    if (applicationService.saveEditorPermissions(app.getId(), currentPermissions)) {
+                        maintenanceSecurityViewModel.setEditorPermissionMessage("Permissions updated.");
+                        log.info("Updated editor permissions for appId: " + appId);
+                    } else {
+                        log.error("Error saving updated editor permissions for appId: " + appId);
+                        maintenanceSecurityViewModel.setErrorMessage("Failed to save updated editor permissions.");
+                    }
+                }
+
+                //edit permissions delete
+                if (maintenanceSecurityViewModel.getDeleteUsers() != null) {
+
+                    List<EditorPermission> currentPermissions = applicationService.getEditorPermissions(app.getId());
+                    for (EditorPermission updatedPerms : maintenanceSecurityViewModel.getEditorPermissions()) {
+                        //if updated perms set to delete for the user...
+                        if (updatedPerms.getUserPermissions().equalsIgnoreCase("delete")) {
+                            //make sure user is in current application editor list before deleting.
+                            for (EditorPermission editorPermission : currentPermissions) {
+                                //find match and delete.
+                                if (editorPermission.getId().equals(updatedPerms.getId())) {
+                                    applicationService.deleteEditor(editorPermission.getId());
+                                    log.info("Deleted editor permissions for id: " + editorPermission.getId() + " : for appid: "
+                                            + appId + " to: " + editorPermission.getUserPermissions());
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 return getDiscSecurityView(appId, maintenanceSecurityViewModel, model, response, request);
@@ -274,6 +315,9 @@ public class DiscAppMaintenanceController {
                         }
                     }
                 }
+
+                //set editor permissions
+                maintenanceSecurityViewModel.setEditorPermissions(applicationService.getEditorPermissions(app.getId()));
 
                 return new ModelAndView("admin/disc-security", "maintenanceSecurityModel", maintenanceSecurityViewModel);
             } else {
@@ -453,7 +497,6 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model,
                                                HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
         model.addAttribute(APP_ID, appId);
 
         try {
@@ -466,6 +509,7 @@ public class DiscAppMaintenanceController {
             }
 
             if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+                model.addAttribute(APP_NAME, app.getName());
                 return new ModelAndView("admin/disc-maint");
             } else {
                 return getPermissionDeniedView(appId, response, model);

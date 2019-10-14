@@ -28,6 +28,9 @@ public class ApplicationService {
     private ApplicationIpBlockRepository applicationIpBlockRepository;
 
     @Autowired
+    private EditorPermissionRepository editorPermissionRepository;
+
+    @Autowired
     private PrologueRepository prologueRepository;
 
     @Autowired
@@ -325,6 +328,25 @@ public class ApplicationService {
         }
 
         return applicationIpBlockRepository.saveAll(applicationIpBlocks) != null;
+    }
+
+    public List<EditorPermission> getEditorPermissions(long appId) {
+        return editorPermissionRepository.findByApplicationId(appId);
+    }
+
+    public boolean saveEditorPermissions(long appId, List<EditorPermission> editorPermissions) {
+        if (editorPermissions == null) {
+            return false;
+        }
+        return editorPermissionRepository.saveAll(editorPermissions) != null;
+    }
+
+    public void deleteEditor(long editorId) {
+        try {
+            editorPermissionRepository.deleteById(editorId);
+        } catch (Exception ex) {
+            log.error("Error deleting editor id: " + editorId + " permissions: " + ex.getMessage(), ex);
+        }
     }
 
 }
