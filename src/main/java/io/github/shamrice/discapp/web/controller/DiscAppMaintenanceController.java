@@ -180,33 +180,47 @@ public class DiscAppMaintenanceController {
 
                     //todo : this is ugly...
                     List<ApplicationIpBlock> applicationIpBlocks = new ArrayList<>();
+                    String ipPrefixRegex = "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.|)$";
                     if (maintenanceSecurityViewModel.getBlockIp1() != null && !maintenanceSecurityViewModel.getBlockIp1().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp1()));
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp2() != null && !maintenanceSecurityViewModel.getBlockIp2().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp2()));
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp3() != null && !maintenanceSecurityViewModel.getBlockIp3().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp3()));
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp4() != null && !maintenanceSecurityViewModel.getBlockIp4().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp4()));
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp5() != null && !maintenanceSecurityViewModel.getBlockIp5().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp5()));
-                    }
-                    if (maintenanceSecurityViewModel.getBlockIp6() != null && !maintenanceSecurityViewModel.getBlockIp6().trim().isEmpty()) {
-                        applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp6()));
-                    }
-                    if (applicationIpBlocks.size() > 0) {
-                        if (applicationService.saveApplicationBlockIps(app.getId(), applicationIpBlocks)) {
-                            log.info("Saved updated ip block prefixes for appId: " + appId);
-                            maintenanceSecurityViewModel.setIpMessage("IPs updated");
-                        } else {
-                            log.error("Failed to save new ip block prefixes for appId: " + appId);
-                            maintenanceSecurityViewModel.setErrorMessage("Failed to save IP block prefixes.");
+                        if (maintenanceSecurityViewModel.getBlockIp1().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp1()));
                         }
                     }
+                    if (maintenanceSecurityViewModel.getBlockIp2() != null && !maintenanceSecurityViewModel.getBlockIp2().trim().isEmpty()) {
+                        if (maintenanceSecurityViewModel.getBlockIp2().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp2()));
+                        }
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp3() != null && !maintenanceSecurityViewModel.getBlockIp3().trim().isEmpty()) {
+                        if (maintenanceSecurityViewModel.getBlockIp3().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp3()));
+                        }
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp4() != null && !maintenanceSecurityViewModel.getBlockIp4().trim().isEmpty()) {
+                        if (maintenanceSecurityViewModel.getBlockIp4().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp4()));
+                        }
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp5() != null && !maintenanceSecurityViewModel.getBlockIp5().trim().isEmpty()) {
+                        if (maintenanceSecurityViewModel.getBlockIp5().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp5()));
+                        }
+                    }
+                    if (maintenanceSecurityViewModel.getBlockIp6() != null && !maintenanceSecurityViewModel.getBlockIp6().trim().isEmpty()) {
+                        if (maintenanceSecurityViewModel.getBlockIp6().matches(ipPrefixRegex)) {
+                            applicationIpBlocks.add(buildApplicationIpBlock(app.getId(), maintenanceSecurityViewModel.getBlockIp6()));
+                        }
+                    }
+
+                    //save
+                    if (applicationService.saveApplicationBlockIps(app.getId(), applicationIpBlocks)) {
+                        log.info("Saved updated ip block prefixes for appId: " + appId);
+                        maintenanceSecurityViewModel.setIpMessage("IPs updated");
+                    } else {
+                        log.error("Failed to save new ip block prefixes for appId: " + appId);
+                        maintenanceSecurityViewModel.setErrorMessage("Failed to save IP block prefixes.");
+                    }
+
                 }
 
                 //editor permissions setting
