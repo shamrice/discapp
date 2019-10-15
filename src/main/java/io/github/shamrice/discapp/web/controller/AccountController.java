@@ -669,7 +669,7 @@ public class AccountController {
                         }
 
                         //check if owner already exists...
-                        Owner owner = accountService.getOwnerByEmail(user.getEmail());
+                        Owner owner = accountService.getOwnerById(user.getOwnerId());
 
                         if (owner == null) {
                             owner = new Owner();
