@@ -181,14 +181,14 @@ public class ThreadService {
             if (applicationPermission != null && applicationPermission.getBlockBadWords()) {
                 List<String> badWordsList = configurationService.getStringListValue(0L, ConfigurationProperty.BAD_WORDS_LIST, new ArrayList<>());
                 for (String badWord : badWordsList) {
-                    thread.setSubject(thread.getSubject().replace(badWord, "..."));
-                    thread.setSubmitter(thread.getSubmitter().replace(badWord, "..."));
+                    thread.setSubject(thread.getSubject().replaceAll("(?i)" + badWord, " ... "));
+                    thread.setSubmitter(thread.getSubmitter().replaceAll("(?i)" + badWord, " ... "));
                     if (thread.getEmail().contains(badWord)) {
                         thread.setShowEmail(false);
-                        thread.setEmail(thread.getEmail().replace(badWord, "..."));
+                        thread.setEmail(thread.getEmail().replaceAll("(?i)" + badWord, " ... "));
                     }
                     if (threadBodyText != null && !threadBodyText.trim().isEmpty()) {
-                        threadBodyText = threadBodyText.replace(badWord, "...");
+                        threadBodyText = threadBodyText.replaceAll("(?i)" + badWord, " ... ");
                     }
                 }
             }
