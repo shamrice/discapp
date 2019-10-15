@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.model.ApplicationPermission;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.service.account.AccountService;
@@ -719,6 +720,10 @@ public class AccountController {
                                 if (!discAppUserDetailsService.saveDiscAppUser(newAdminAccount, false)) {
                                     log.error("Failed to create new admin user for new disc app: " + savedApp.getId());
                                 }
+
+                                //save default permission values for new app.
+                                ApplicationPermission newAppPermissions = applicationService.getDefaultNewApplicationPermissions(savedApp.getId());
+                                applicationService.saveApplicationPermissions(newAppPermissions);
 
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
