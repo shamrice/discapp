@@ -69,7 +69,7 @@ CREATE TABLE configuration (
     id int(20) NOT NULL AUTO_INCREMENT,
     application_id int(20) NOT NULL,
     name varchar(255) NOT NULL,
-    value varchar(255) NOT NULL,
+    value varchar NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

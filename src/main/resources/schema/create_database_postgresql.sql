@@ -62,7 +62,7 @@ CREATE TABLE configuration (
     id serial NOT NULL,
     application_id int NOT NULL,
     name varchar(255) NOT NULL,
-    value varchar(255) NOT NULL,
+    value varchar NOT NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
