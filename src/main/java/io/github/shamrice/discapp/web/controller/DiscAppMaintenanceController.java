@@ -85,6 +85,161 @@ public class DiscAppMaintenanceController {
     @Autowired
     private DiscAppController discAppController;
 
+    @PostMapping("/admin/disc-user-search.cgi")
+    public ModelAndView postUserSearchView(@RequestParam(name = "id") long appId,
+                                          MaintenanceUserSearchViewModel maintenanceUserSearchViewModel,
+                                          Model model,
+                                           HttpServletRequest request,
+                                          HttpServletResponse response) {
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute(USERNAME, username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute(IS_USER_ACCOUNT, true);
+            }
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                //if cancel, return back to security page.
+                if (maintenanceUserSearchViewModel.getCancel() != null) {
+                    return new ModelAndView("redirect:/admin/disc-security.cgi?id=" + appId);
+                }
+
+                //search users.
+                if (maintenanceUserSearchViewModel.getSearchUsers() != null) {
+                    String searchTerm = maintenanceUserSearchViewModel.getSearchTerm();
+
+                    //add result by email if email searched.
+                    if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                        if (searchTerm.contains("@")) {
+                            DiscAppUser result = discAppUserDetailsService.getByEmail(searchTerm);
+                            if (result != null) {
+                                if (app.getOwnerId().equals(result.getOwnerId())) {
+                                    log.info("Cannot add email : " + username + " to appid " + appId + " editors. Is already owner.");
+                                    maintenanceUserSearchViewModel.setErrorMessage(searchTerm
+                                            + " is the owner of this DiscussionApp and already has full administrative privileges.");
+                                } else {
+                                    maintenanceUserSearchViewModel.getSearchResults().add(result);
+                                }
+                            }
+                        } else {
+                            List<DiscAppUser> searchResults = discAppUserDetailsService.searchByUsername(searchTerm, true);
+
+                            //remove owners from results
+                            searchResults.removeAll(discAppUserDetailsService.getByOwnerId(app.getOwnerId()));
+
+                            //limit results to 10.
+                            if (searchResults.size() > 10) {
+                                searchResults = searchResults.subList(0, 9);
+                            }
+                            maintenanceUserSearchViewModel.setSearchResults(searchResults);
+                        }
+                    }
+                }
+
+                //add selected accounts
+                if (maintenanceUserSearchViewModel.getAddAccounts() != null) {
+
+                    List<EditorPermission> newEditors = new ArrayList<>();
+                    List<EditorPermission> currentEditors = applicationService.getEditorPermissions(app.getId());
+
+                    List<Long> currentEditorUserIds = new ArrayList<>();
+                    for (EditorPermission currentEditor : currentEditors) {
+                        currentEditorUserIds.add(currentEditor.getDiscAppUser().getId());
+                        log.warn("Found existing editor: " + currentEditor.toString());
+                    }
+
+                    for (long id : maintenanceUserSearchViewModel.getAddAccountId()) {
+                        log.warn("Adding editor id: " + id);
+                        //don't add editor if already exists.
+                        if (!currentEditorUserIds.contains(id)) {
+
+                            DiscAppUser user = discAppUserDetailsService.getByDiscAppUserId(id);
+                            if (user != null && user.getIsUserAccount() && !app.getOwnerId().equals(user.getOwnerId())) {
+                                EditorPermission newEditorPermission = new EditorPermission();
+                                newEditorPermission.setApplicationId(app.getId());
+                                newEditorPermission.setDiscAppUser(user);
+                                newEditorPermission.setUserPermissions("rfp");
+                                newEditorPermission.setIsActive(true);
+                                newEditorPermission.setCreateDt(new Date());
+                                newEditorPermission.setModDt(new Date());
+                                log.warn("Found new editor for this app: " + newEditorPermission.toString());
+                                newEditors.add(newEditorPermission);
+                            }
+
+                        } else {
+                            //update existing record to active if exists and is currently inactive.
+                            for (EditorPermission existing : currentEditors) {
+                                if (existing.getDiscAppUser().getId().equals(id) && !existing.getIsActive()) {
+                                    log.warn("Found existing editor for this app. " + existing.toString());
+                                    existing.setUserPermissions("rfp"); //todo : perm strings saved somewhere
+                                    existing.setIsActive(true);
+                                    existing.setModDt(new Date());
+
+                                    newEditors.add(existing);
+                                }
+                            }
+                        }
+                    }
+
+                    //save and add.
+                    if (applicationService.saveEditorPermissions(app.getId(), newEditors)) {
+                        log.info("Added " + newEditors.size() + " new editors to appId: " + appId);
+                        return new ModelAndView("redirect:/admin/disc-security.cgi?id=" + appId);
+                    } else {
+                        log.error("Failed to add new editors to appId: " + appId);
+                        maintenanceUserSearchViewModel.setErrorMessage("Failed to add new editors.");
+                    }
+                }
+
+                return new ModelAndView("admin/disc-user-search", "maintenanceUserSearchViewModel", maintenanceUserSearchViewModel);
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance security page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
+
+
+    @GetMapping("/admin/disc-user-search.cgi")
+    public ModelAndView getUserSearchView(@RequestParam(name = "id") long appId,
+                                          MaintenanceUserSearchViewModel maintenanceUserSearchViewModel,
+                                          Model model,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
+        model.addAttribute(APP_NAME, "");
+        model.addAttribute(APP_ID, appId);
+
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+
+            model.addAttribute(USERNAME, username);
+            if (!username.equals(String.valueOf(appId))) {
+                model.addAttribute(IS_USER_ACCOUNT, true);
+            }
+
+            if (app != null && applicationService.isOwnerOfApp(appId, username)) {
+
+                return new ModelAndView("admin/disc-user-search", "maintenanceUserSearchViewModel", maintenanceUserSearchViewModel);
+            } else {
+                return getPermissionDeniedView(appId, response, model);
+            }
+        } catch (Exception ex) {
+            log.error("Error getting maintenance security page for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+
+        return new ModelAndView("redirect:/error");
+    }
+
     @PostMapping("/admin/disc-security.cgi")
     public ModelAndView postDiscSecurityView(@RequestParam(name = "id") long appId,
                                              MaintenanceSecurityViewModel maintenanceSecurityViewModel,
@@ -233,10 +388,10 @@ public class DiscAppMaintenanceController {
                         if (updatedPerms.getUserPermissions().equalsIgnoreCase("delete")) {
                             //make sure user is in current application editor list before deleting.
                             for (EditorPermission editorPermission : currentPermissions) {
-                                //find match and delete.
+                                //find match and soft delete (deactivate).
                                 if (editorPermission.getId().equals(updatedPerms.getId())) {
-                                    applicationService.deleteEditor(editorPermission.getId());
-                                    log.info("Deleted editor permissions for id: " + editorPermission.getId() + " : for appid: "
+                                    applicationService.setEditorActivation(editorPermission.getId(), false);
+                                    log.info("Deactivated editor permissions for id: " + editorPermission.getId() + " : for appid: "
                                             + appId + " to: " + editorPermission.getUserPermissions());
                                     break;
                                 }
@@ -245,7 +400,12 @@ public class DiscAppMaintenanceController {
                     }
                 }
 
-                return getDiscSecurityView(appId, maintenanceSecurityViewModel, model, response, request);
+                //redirect to user search page.
+                if (maintenanceSecurityViewModel.getSearchUsersForm() != null) {
+                    return getUserSearchView(appId, new MaintenanceUserSearchViewModel(), model, request, response);
+                }
+
+                return getDiscSecurityView(appId, maintenanceSecurityViewModel, model, request, response);
 
             } else {
                 return getPermissionDeniedView(appId, response, model);
@@ -261,8 +421,8 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscSecurityView(@RequestParam(name = "id") long appId,
                                             MaintenanceSecurityViewModel maintenanceSecurityViewModel,
                                             Model model,
-                                            HttpServletResponse response,
-                                            HttpServletRequest request) {
+                                            HttpServletRequest request,
+                                            HttpServletResponse response) {
         model.addAttribute(APP_NAME, "");
         model.addAttribute(APP_ID, appId);
 
@@ -316,8 +476,14 @@ public class DiscAppMaintenanceController {
                     }
                 }
 
-                //set editor permissions
-                maintenanceSecurityViewModel.setEditorPermissions(applicationService.getEditorPermissions(app.getId()));
+                //add editor permissions for active editors.
+                maintenanceSecurityViewModel.setEditorPermissions(new ArrayList<>());
+                List<EditorPermission> editors = applicationService.getEditorPermissions(app.getId());
+                for (EditorPermission editor : editors) {
+                    if (editor.getIsActive()) {
+                        maintenanceSecurityViewModel.getEditorPermissions().add(editor);
+                    }
+                }
 
                 return new ModelAndView("admin/disc-security", "maintenanceSecurityModel", maintenanceSecurityViewModel);
             } else {

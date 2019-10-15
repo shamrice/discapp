@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository(value = "discapp_user")
 public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> {
@@ -34,4 +35,8 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
     @Transactional
     @Query(value = "UPDATE discapp_user SET enabled = :enabled, mod_dt = :modDt WHERE id = :id")
     int updateDiscAppUserEnabled(Long id, Boolean enabled, Date modDt);
+
+    List<DiscAppUser> findByUsernameContainingIgnoreCaseAndIsUserAccount(String username, boolean isUserAccount);
+
+    List<DiscAppUser> findByOwnerId(Long ownerId);
 }

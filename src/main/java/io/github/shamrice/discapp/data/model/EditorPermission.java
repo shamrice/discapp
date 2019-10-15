@@ -23,6 +23,7 @@ public class EditorPermission {
 
     private Long applicationId;
     private String userPermissions;
+    private Boolean isActive;
     private Date createDt;
     private Date modDt;
 

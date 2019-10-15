@@ -16,10 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -53,6 +50,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return new DiscAppUserPrincipal(user);
     }
 
+    public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {
+        return discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+    }
+
     public DiscAppUser getByDiscAppUserId(long userId) {
         Optional<DiscAppUser> discAppUser = discappUserRepository.findById(userId);
         return discAppUser.orElse(null);
@@ -63,6 +64,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             return discappUserRepository.findByEmail(email);
         }
         return null;
+    }
+
+    public List<DiscAppUser> getByOwnerId(long ownerId) {
+        return discappUserRepository.findByOwnerId(ownerId);
     }
 
     public Long getOwnerIdForEmail(String email) {

@@ -196,6 +196,7 @@ CREATE TABLE editor_permission (
   application_id int NOT NULL,
   discapp_user_id int NOT NULL,
   user_permissions varchar(10) NOT NULL,
+  is_active bool NOT NULL DEFAULT TRUE,
   create_dt TIMESTAMP DEFAULT NOW(),
   mod_dt TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY (id),

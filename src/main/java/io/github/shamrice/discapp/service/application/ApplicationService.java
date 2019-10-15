@@ -341,12 +341,15 @@ public class ApplicationService {
         return editorPermissionRepository.saveAll(editorPermissions) != null;
     }
 
-    public void deleteEditor(long editorId) {
-        try {
-            editorPermissionRepository.deleteById(editorId);
-        } catch (Exception ex) {
-            log.error("Error deleting editor id: " + editorId + " permissions: " + ex.getMessage(), ex);
+    public boolean setEditorActivation(long editorId, boolean isActive) {
+
+        EditorPermission editorToUpdate = editorPermissionRepository.findById(editorId).orElse(null);
+        if (editorToUpdate != null) {
+            editorToUpdate.setIsActive(isActive);
+            return editorPermissionRepository.save(editorToUpdate) != null;
         }
+        return false;
+
     }
 
 }

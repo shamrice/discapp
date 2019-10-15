@@ -6,8 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Repository(value = "editor_permission")
 public interface EditorPermissionRepository extends JpaRepository<EditorPermission, Long> {
 
     List<EditorPermission> findByApplicationId(Long applicationId);
+
 }
