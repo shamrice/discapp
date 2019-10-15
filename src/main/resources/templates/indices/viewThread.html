@@ -63,7 +63,9 @@
                 </div>
                 <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
                 <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}"></span></div>
-                <div class="header"><span class="ip_header" th:text="${threadViewModel.getIpAddress()}"></span></div>
+                <div  th:if="${threadViewModel.isShowIpAddress()}"  class="header">
+                    <span class="ip_header" th:text="${threadViewModel.getIpAddress()}"></span>
+                </div>
             </div>
             <br>
             <div class="message_text" th:utext="${threadViewModel.getBody()}"></div>

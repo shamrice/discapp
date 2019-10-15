@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.model.ApplicationPermission;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
@@ -521,6 +522,15 @@ public class DiscAppController {
 
             //adjust date in view to current timezone and proper formatting
             threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, currentThread.getCreateDt(), true));
+
+            //check app permissions if ip address should be shown:
+            ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+            if (applicationPermission != null) {
+                threadViewModel.setShowIpAddress(applicationPermission.getDisplayIpAddress());
+            } else {
+                //default to true
+                threadViewModel.setShowIpAddress(true);
+            }
 
             Application app = applicationService.get(appId);
             model.addAttribute(APP_NAME, app.getName());
