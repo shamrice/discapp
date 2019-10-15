@@ -45,7 +45,8 @@ public enum ConfigurationProperty {
     IMPORT_UPLOAD_LOCATION("import.upload.location"),
     EXPORT_DOWNLOAD_LOCATION("export.download.location"),
     MIN_THREAD_POST_INTERVAL_IN_SECONDS("thread.post.interval.minimum"),
-    MAX_APPS_PER_ACCOUNT("account.max.apps");
+    MAX_APPS_PER_ACCOUNT("account.max.apps"),
+    BAD_WORDS_LIST("filter.badwords.list");
 
     private final String propName;
 

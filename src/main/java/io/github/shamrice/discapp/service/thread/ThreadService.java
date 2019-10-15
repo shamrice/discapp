@@ -1,11 +1,13 @@
 package io.github.shamrice.discapp.service.thread;
 
+import io.github.shamrice.discapp.data.model.ApplicationPermission;
 import io.github.shamrice.discapp.data.model.ReportedAbuse;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.data.repository.ReportedAbuseRepository;
 import io.github.shamrice.discapp.data.repository.ThreadBodyRepository;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class ThreadService {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ApplicationService applicationService;
 
     public boolean isNewThreadPostTooSoon(long applicationId, String ipAddress) {
         if (ipAddress != null && !ipAddress.trim().isEmpty()) {
@@ -171,6 +176,23 @@ public class ThreadService {
 
         if (thread != null) {
 
+            //check bad words filter and act as needed.
+            ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(thread.getApplicationId());
+            if (applicationPermission != null && applicationPermission.getBlockBadWords()) {
+                List<String> badWordsList = configurationService.getStringListValue(0L, ConfigurationProperty.BAD_WORDS_LIST, new ArrayList<>());
+                for (String badWord : badWordsList) {
+                    thread.setSubject(thread.getSubject().replace(badWord, "..."));
+                    thread.setSubmitter(thread.getSubmitter().replace(badWord, "..."));
+                    if (thread.getEmail().contains(badWord)) {
+                        thread.setShowEmail(false);
+                        thread.setEmail(thread.getEmail().replace(badWord, "..."));
+                    }
+                    if (threadBodyText != null && !threadBodyText.trim().isEmpty()) {
+                        threadBodyText = threadBodyText.replace(badWord, "...");
+                    }
+                }
+            }
+
             //add (nm) to subjects with no body.
             if (!thread.getSubject().contains(NO_MESSAGE_SUBJECT_ANNOTATION) && (threadBodyText == null || threadBodyText.isEmpty())) {
                 String noBodySubject = thread.getSubject() + NO_MESSAGE_SUBJECT_ANNOTATION;
@@ -181,7 +203,7 @@ public class ThreadService {
             ThreadBody threadBody = threadBodyRepository.findByThreadId(createThread.getId());
 
             //new thread body that's not blank
-            if (threadBody == null && threadBodyText != null && !threadBodyText.isEmpty()) {
+            if (threadBody == null && threadBodyText != null && !threadBodyText.trim().isEmpty()) {
 
                 threadBody = new ThreadBody();
                 threadBody.setApplicationId(createThread.getApplicationId());

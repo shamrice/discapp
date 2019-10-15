@@ -46,4 +46,7 @@ VALUES (0, 'thread.post.interval.minimum', '1');
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'account.max.apps', '3');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'filter.badwords.list', '');
+
 

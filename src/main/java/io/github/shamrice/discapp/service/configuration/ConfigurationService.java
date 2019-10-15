@@ -142,6 +142,18 @@ public class ConfigurationService {
         return defaultValue;
     }
 
+    public List<String> getStringListValue(long applicationId, ConfigurationProperty configurationProperty, List<String> defaultValue) {
+        String foundStrVal = getStringValue(applicationId, configurationProperty, "");
+
+        if (foundStrVal != null && !foundStrVal.trim().isEmpty()) {
+            return Arrays.asList(foundStrVal.split(","));
+        }
+
+        log.info("Failed to find configuration value. Returning default value of: " + defaultValue
+                + " : for appId: " + applicationId);
+        return defaultValue;
+    }
+
     public boolean saveConfiguration(ConfigurationProperty configurationProperty, Configuration configuration) {
         if (configuration != null) {
             if (configuration.getName().equalsIgnoreCase(configurationProperty.getPropName())) {
