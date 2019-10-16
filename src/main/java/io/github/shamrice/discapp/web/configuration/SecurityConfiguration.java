@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.configuration;
 
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
+import io.github.shamrice.discapp.web.filter.DiscAppIpBlockFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +9,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -26,12 +29,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         //TODO: url paths need to be located in centralized location.
         httpSecurity
+                .addFilterAfter(new DiscAppIpBlockFilter(), FilterSecurityInterceptor.class)
                 .headers()
                     .frameOptions().disable()
                     .and()
                 .csrf()
                     .disable()
                 .authorizeRequests()
+                    .antMatchers("/error/permissionDenied").permitAll()
                     .antMatchers("/indices/**").permitAll()
                     .antMatchers("/Indices/**").permitAll()
                     .antMatchers("/styles/**").permitAll()
