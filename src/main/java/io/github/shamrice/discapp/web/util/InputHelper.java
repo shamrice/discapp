@@ -25,6 +25,10 @@ public class InputHelper {
     @Autowired
     private ConfigurationService configurationService;
 
+    public String convertHtmlToPlainText(String text) {
+        return text.replace("<", "&lt;").replace(">", "&gt;").trim();
+    }
+
     /**
      * Remove HTML via regex and trailing white spaces from text.
      * @param text Text to clean

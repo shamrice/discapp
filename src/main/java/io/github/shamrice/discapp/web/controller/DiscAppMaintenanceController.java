@@ -7,6 +7,8 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.data.ApplicationExportService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.application.data.ApplicationImportService;
+import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
+import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
@@ -164,7 +166,7 @@ public class DiscAppMaintenanceController {
                                 EditorPermission newEditorPermission = new EditorPermission();
                                 newEditorPermission.setApplicationId(app.getId());
                                 newEditorPermission.setDiscAppUser(user);
-                                newEditorPermission.setUserPermissions("rfp");
+                                newEditorPermission.setUserPermissions(UserPermission.POST);
                                 newEditorPermission.setIsActive(true);
                                 newEditorPermission.setCreateDt(new Date());
                                 newEditorPermission.setModDt(new Date());
@@ -177,7 +179,7 @@ public class DiscAppMaintenanceController {
                             for (EditorPermission existing : currentEditors) {
                                 if (existing.getDiscAppUser().getId().equals(id) && !existing.getIsActive()) {
                                     log.warn("Found existing editor for this app. " + existing.toString());
-                                    existing.setUserPermissions("rfp"); //todo : perm strings saved somewhere
+                                    existing.setUserPermissions(UserPermission.POST);
                                     existing.setIsActive(true);
                                     existing.setModDt(new Date());
 
@@ -458,9 +460,9 @@ public class DiscAppMaintenanceController {
                 } else {
                     //if permissions are null. set default permission check boxes.
                     //todo : these permission strings need to be stored somewhere
-                    maintenanceSecurityViewModel.setUnregisteredPermissions("rfp");
-                    maintenanceSecurityViewModel.setRegisteredPermissions("rfp");
-                    maintenanceSecurityViewModel.setBlockHtml("subject");
+                    maintenanceSecurityViewModel.setUnregisteredPermissions(UserPermission.POST);
+                    maintenanceSecurityViewModel.setRegisteredPermissions(UserPermission.POST);
+                    maintenanceSecurityViewModel.setBlockHtml(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
                     maintenanceSecurityViewModel.setShowIp(true);
                 }
 

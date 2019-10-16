@@ -5,6 +5,8 @@ import io.github.shamrice.discapp.data.repository.*;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
+import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
+import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.site.SiteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -314,10 +316,9 @@ public class ApplicationService {
         appPermission.setDisplayIpAddress(true);
         appPermission.setBlockBadWords(false);
         appPermission.setBlockSearchEngines(false);
-        //todo : these permission strings should live somewhere.
-        appPermission.setAllowHtmlPermissions("subject");
-        appPermission.setUnregisteredUserPermissions("rfp");
-        appPermission.setRegisteredUserPermissions("rfp");
+        appPermission.setAllowHtmlPermissions(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
+        appPermission.setUnregisteredUserPermissions(UserPermission.POST);
+        appPermission.setRegisteredUserPermissions(UserPermission.POST);
 
         return appPermission;
     }

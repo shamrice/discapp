@@ -35,7 +35,7 @@
                 <div th:if="${threadViewModel.isShowEmail()}" class="header">
                     <div th:if="${threadViewModel.getCurrentUsername()}">
                         <span class="tooltip author_header">
-                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
+                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:utext="${threadViewModel.getSubmitter()}"></a>
                             <span class="tooltiptext" th:utext="@{|Current username:<br />${threadViewModel.getCurrentUsername()}|}"></span>
                         </span>
 
@@ -43,7 +43,7 @@
 
                     <div th:unless="${threadViewModel.getCurrentUsername()}">
                         <span class="author_header">
-                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:text="${threadViewModel.getSubmitter()}"></a>
+                            <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:utext="${threadViewModel.getSubmitter()}"></a>
                         </span>
                     </div>
                 </div>
@@ -57,11 +57,11 @@
                     </div>
 
                     <div th:unless="${threadViewModel.getCurrentUsername()}">
-                        <span class="author_header" th:text="${threadViewModel.getSubmitter()}">
+                        <span class="author_header" th:utext="${threadViewModel.getSubmitter()}">
                         </span>
                     </div>
                 </div>
-                <div class="header"><span class="subject_header" th:text="${threadViewModel.getSubject()}"></span></div>
+                <div class="header"><span class="subject_header" th:utext="${threadViewModel.getSubject()}"></span></div>
                 <div class="header"><span class="date_header" th:text="${threadViewModel.getCreateDt()}"></span></div>
                 <div  th:if="${threadViewModel.isShowIpAddress()}"  class="header">
                     <span class="ip_header" th:text="${threadViewModel.getIpAddress()}"></span>

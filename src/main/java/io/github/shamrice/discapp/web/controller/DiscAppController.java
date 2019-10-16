@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
@@ -24,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -410,13 +412,34 @@ public class DiscAppController {
                     subject = newThreadViewModel.getSubject();
                 }
 
-                //sanitize inputs.
-                subject = inputHelper.sanitizeInput(subject);
-                submitter = inputHelper.sanitizeInput(submitter);
-                String email = inputHelper.sanitizeInput(newThreadViewModel.getEmail());
+                String email = newThreadViewModel.getEmail();
+                String body = newThreadViewModel.getBody();
+
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+
+                //sanitize inputs based on settings.
+                if (applicationPermission != null) {
+                    String htmlPermissions = applicationPermission.getAllowHtmlPermissions();
+
+                    if (HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS.equalsIgnoreCase(htmlPermissions) || HtmlPermission.FORBID.equalsIgnoreCase(htmlPermissions)) {
+                        submitter = inputHelper.convertHtmlToPlainText(submitter);
+                        email = inputHelper.convertHtmlToPlainText(email);
+                        subject = inputHelper.convertHtmlToPlainText(subject);
+                    }
+                    if (HtmlPermission.FORBID.equalsIgnoreCase(htmlPermissions)) {
+                        body = inputHelper.convertHtmlToPlainText(body);
+                    }
+                } else {
+                    //if no permissions exist (for some reason...) default to blocking in subject and submitter fields.
+                    log.warn("No application permissions exist for appId: " + appId
+                            + " defaulting to HTML permission: " + HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
+                    submitter = inputHelper.convertHtmlToPlainText(submitter);
+                    email = inputHelper.convertHtmlToPlainText(email);
+                    subject = inputHelper.convertHtmlToPlainText(subject);
+                }
 
                 log.info("new thread: " + newThreadViewModel.getAppId() + " : " + submitter + " : "
-                        + subject + " : " + newThreadViewModel.getBody());
+                        + subject + " : " + body);
 
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
@@ -447,10 +470,9 @@ public class DiscAppController {
                     newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
                 }
 
-                String body = newThreadViewModel.getBody();
+                //add links to urls and add new lines.
                 if (body != null && !body.trim().isEmpty()) {
                     body = body.replaceAll("\r", "<br />");
-
                     body = inputHelper.addUrlHtmlLinksToString(body);
                 }
 
@@ -493,9 +515,14 @@ public class DiscAppController {
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
 
-            //set current username if exists and different than in thread table.
-            if (sourceUser != null && !currentThread.getSubmitter().equals(sourceUser.getUsername())) {
-                threadViewModel.setCurrentUsername(sourceUser.getUsername());
+            try {
+                //set current username if exists and different than in thread table.
+                if (sourceUser != null && !currentThread.getSubmitter().equals(sourceUser.getUsername())) {
+                    threadViewModel.setCurrentUsername(sourceUser.getUsername());
+                }
+            } catch (EntityNotFoundException notFound) {
+                log.warn("DiscApp User Id not found for threadId " + currentThread.getId() + " :: " + notFound.getMessage(), notFound);
+                sourceUser = null;
             }
 
             threadViewModel.setCurrentPage(currentPage);
