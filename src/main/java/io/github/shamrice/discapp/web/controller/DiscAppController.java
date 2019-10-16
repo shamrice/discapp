@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
+import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
@@ -81,11 +82,22 @@ public class DiscAppController {
                                    @RequestParam(name = "page", required = false) Integer page,
                                    Model model,
                                    HttpServletRequest request) {
-
         try {
             Application app = applicationService.get(appId);
 
             if (app != null) {
+
+                //check if app has NONE user permission set for reg and unreg users.
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(app.getId());
+                if (applicationPermission != null) {
+                    boolean isLoggedIn = accountHelper.isLoggedIn();
+                    if (isLoggedIn && UserPermission.NONE.equalsIgnoreCase(applicationPermission.getRegisteredUserPermissions())) {
+                        return errorController.getPermissionDeniedView("", model);
+                    }
+                    if (!isLoggedIn && UserPermission.NONE.equalsIgnoreCase(applicationPermission.getUnregisteredUserPermissions())) {
+                        return errorController.getPermissionDeniedView("", model);
+                    }
+                }
 
                 model.addAttribute(APP_NAME, app.getName());
                 model.addAttribute(APP_ID, app.getId());
