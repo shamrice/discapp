@@ -15,6 +15,7 @@ import org.springframework.boot.context.annotation.Configurations;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,9 @@ public class ApplicationService {
 
     @Autowired
     private EpilogueRepository epilogueRepository;
+
+    @Autowired
+    private ReportedAbuseRepository reportedAbuseRepository;
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
@@ -360,7 +364,17 @@ public class ApplicationService {
             return editorPermissionRepository.save(editorToUpdate) != null;
         }
         return false;
+    }
 
+    public List<String> getReportedAbuseIpAddressesForApplication(long appId) {
+        List<String> reportedAbuseIps = new ArrayList<>();
+        List<ReportedAbuse> reportedAbuses = reportedAbuseRepository.findByApplicationId(appId);
+        if (reportedAbuses != null) {
+            for (ReportedAbuse reportedAbuse : reportedAbuses) {
+                reportedAbuseIps.add(reportedAbuse.getIpAddress());
+            }
+        }
+        return reportedAbuseIps;
     }
 
 }
