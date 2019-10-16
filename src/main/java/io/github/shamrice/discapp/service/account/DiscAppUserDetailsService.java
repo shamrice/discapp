@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -141,7 +140,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put(NEW_ACCOUNT_EMAIL, newUserEmail);
 
-        String adminEmail = configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
+        String adminEmail = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
         if (adminEmail == null) {
             log.error("Could not find admin email address in configuration property: "
                     + ConfigurationProperty.EMAIL_ADMIN_ADDRESS.getPropName() + " : new account email notification not sent.");

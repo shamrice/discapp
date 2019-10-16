@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.thymeleaf.spring5.util.SpringContentTypeUtils;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -66,13 +64,13 @@ public class InputHelper {
             return false;
         }
 
-        if (!configurationService.getBooleanValue(0L, ConfigurationProperty.RE_CAPTCHA_VERIFY_ENABLED, false)) {
+        if (!configurationService.getBooleanValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.RE_CAPTCHA_VERIFY_ENABLED, false)) {
             log.warn("Skipping ReCaptcha response verification. Configuration: "
                     + ConfigurationProperty.RE_CAPTCHA_VERIFY_ENABLED.getPropName() + " is not set to true.");
             return true;
         }
 
-        String secret = configurationService.getStringValue(0L, ConfigurationProperty.RE_CAPTCHA_SECRET, "");
+        String secret = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.RE_CAPTCHA_SECRET, "");
 
         if (secret.trim().isEmpty()) {
             log.warn("Skipping ReCaptcha response verification. ReCaptcha secret configuration value not set: "
@@ -82,7 +80,7 @@ public class InputHelper {
 
         log.info("Verifying ReCaptcha response: " + reCaptchaResponse);
 
-        String verifyBaseUrl = configurationService.getStringValue(0L, ConfigurationProperty.RE_CAPTCHA_VERIFY_URL, "https://www.google.com/recaptcha/api/siteverify");
+        String verifyBaseUrl = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.RE_CAPTCHA_VERIFY_URL, "https://www.google.com/recaptcha/api/siteverify");
         String url = verifyBaseUrl + "?secret=" + secret + "&response=" + reCaptchaResponse;
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();

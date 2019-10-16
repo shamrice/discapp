@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,7 +76,7 @@ public class FileSystemStorageService {
     }
 
     private void refreshLocationConfig() {
-        String saveLocationStr = configurationService.getStringValue(0L, ConfigurationProperty.IMPORT_UPLOAD_LOCATION, "imports");
+        String saveLocationStr = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.IMPORT_UPLOAD_LOCATION, "imports");
         saveLocation = Paths.get(saveLocationStr);
         log.info("Refreshing upload location config :: Using configuration directory: " + saveLocationStr
                 + " :: Absolute path: " + saveLocation.toAbsolutePath().toString());

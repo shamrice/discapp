@@ -298,7 +298,7 @@ public class AccountController {
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
 
-            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
+            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
             accountViewModel.setUsername(user.getUsername());
             accountViewModel.setAdmin(user.getIsAdmin());
             accountViewModel.setCreateDt(user.getCreateDt());
@@ -359,7 +359,7 @@ public class AccountController {
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
 
-            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
+            accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
             accountViewModel.setUsername(user.getUsername());
             accountViewModel.setAdmin(user.getIsAdmin());
             accountViewModel.setCreateDt(user.getCreateDt());
@@ -591,7 +591,7 @@ public class AccountController {
                     accountViewModel.setOwnerPhone(owner.getPhone());
 
                     List<Application> apps = applicationService.getByOwnerId(owner.getId());
-                    int appLimit = configurationService.getIntegerValue(0L, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
+                    int appLimit = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
 
                     accountViewModel.setMaxDiscApps(appLimit);
                     List<AccountViewModel.AccountApplication> accountApplications = new ArrayList<>();

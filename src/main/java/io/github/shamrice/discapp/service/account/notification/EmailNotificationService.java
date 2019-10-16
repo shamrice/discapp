@@ -8,7 +8,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import javax.mail.SendFailedException;
 import java.util.*;
 
 @Component
@@ -49,9 +48,9 @@ public class EmailNotificationService {
     private String getSubjectForType(NotificationType notificationType) {
         switch (notificationType) {
             case PASSWORD_RESET:
-                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_PASSWORD_RESET_SUBJECT, null);
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_PASSWORD_RESET_SUBJECT, null);
             case NEW_ACCOUNT_CREATED:
-                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_SUBJECT, null);
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_SUBJECT, null);
         }
 
         return null;
@@ -60,9 +59,9 @@ public class EmailNotificationService {
     private String getBodyForType(NotificationType notificationType) {
         switch (notificationType) {
             case PASSWORD_RESET:
-                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_PASSWORD_RESET_MESSAGE, null);
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_PASSWORD_RESET_MESSAGE, null);
             case NEW_ACCOUNT_CREATED:
-                return configurationService.getStringValue(0L, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_MESSAGE, null);
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_MESSAGE, null);
         }
         return  null;
     }

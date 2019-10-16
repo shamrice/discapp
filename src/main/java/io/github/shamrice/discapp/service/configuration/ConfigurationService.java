@@ -17,6 +17,8 @@ public class ConfigurationService {
     @Autowired
     private ConfigurationRepository configurationRepository;
 
+    public static final long SITE_WIDE_CONFIGURATION_APP_ID = 0L;
+
     public ConfigurationService(@Value("${discapp.cache.duration}") Long cacheDuration) {
         ConfigurationCache.getInstance().setMaxCacheAgeMilliseconds(cacheDuration);
     }

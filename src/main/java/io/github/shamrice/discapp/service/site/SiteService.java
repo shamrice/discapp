@@ -20,7 +20,7 @@ public class SiteService {
         String blockString = "Disallow: /Indices/" + appId + ".html\n"
                 + "Disallow: /indices/" + appId + "\n";
 
-        Configuration robotsConfig = configurationService.getConfiguration(0L, ConfigurationProperty.ROBOTS_TXT_CONTENTS.getPropName());
+        Configuration robotsConfig = configurationService.getConfiguration(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.ROBOTS_TXT_CONTENTS.getPropName());
 
         if (robotsConfig != null) {
             if (isBlocked) {

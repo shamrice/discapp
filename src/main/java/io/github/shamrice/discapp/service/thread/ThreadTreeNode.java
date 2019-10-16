@@ -1,7 +1,6 @@
 package io.github.shamrice.discapp.service.thread;
 
 import io.github.shamrice.discapp.data.model.Thread;
-import jdk.nashorn.internal.objects.annotations.Constructor;
 import lombok.*;
 
 import java.util.ArrayList;

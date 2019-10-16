@@ -23,7 +23,7 @@ public class SiteController {
 
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
-        String robotsTxtContents = configurationService.getStringValue(0L, ConfigurationProperty.ROBOTS_TXT_CONTENTS, "");
+        String robotsTxtContents = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.ROBOTS_TXT_CONTENTS, "");
         model.addAttribute("robotsTxtContents", robotsTxtContents);
         return "robots";
     }

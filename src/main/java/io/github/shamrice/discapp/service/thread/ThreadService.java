@@ -44,7 +44,7 @@ public class ThreadService {
         if (ipAddress != null && !ipAddress.trim().isEmpty()) {
             Thread lastThreadSubmittedByIp = threadRepository.findTopByApplicationIdAndIpAddressOrderByCreateDtDesc(applicationId, ipAddress);
             if (lastThreadSubmittedByIp != null) {
-                int minPostInterval = configurationService.getIntegerValue(0L, ConfigurationProperty.MIN_THREAD_POST_INTERVAL_IN_SECONDS, 60);
+                int minPostInterval = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MIN_THREAD_POST_INTERVAL_IN_SECONDS, 60);
                 long currentInterval = (new Date().getTime() - lastThreadSubmittedByIp.getCreateDt().getTime()) / 1000;
                 if (currentInterval < minPostInterval) {
                     log.warn("Attempt to create thread too soon for IpAddress: " + ipAddress + " on appId: " + applicationId + " :: minInterval="
@@ -169,7 +169,6 @@ public class ThreadService {
         }
 
         return false;
-
     }
 
     public Long saveThread(Thread thread, String threadBodyText) {
@@ -179,7 +178,7 @@ public class ThreadService {
             //check bad words filter and act as needed.
             ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(thread.getApplicationId());
             if (applicationPermission != null && applicationPermission.getBlockBadWords()) {
-                List<String> badWordsList = configurationService.getStringListValue(0L, ConfigurationProperty.BAD_WORDS_LIST, new ArrayList<>());
+                List<String> badWordsList = configurationService.getStringListValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.BAD_WORDS_LIST, new ArrayList<>());
                 for (String badWord : badWordsList) {
                     thread.setSubject(thread.getSubject().replaceAll("(?i)" + badWord, " ... "));
                     thread.setSubmitter(thread.getSubmitter().replaceAll("(?i)" + badWord, " ... "));

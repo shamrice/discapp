@@ -118,7 +118,7 @@ public class ApplicationExportService {
     }
 
     private void refreshExportDirectoryConfig() {
-        String exportDirStr = configurationService.getStringValue(0L, ConfigurationProperty.EXPORT_DOWNLOAD_LOCATION, "exports");
+        String exportDirStr = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EXPORT_DOWNLOAD_LOCATION, "exports");
         exportDir = Paths.get(exportDirStr);
         log.info("Refreshing export directory configuration :: Configured path: " + exportDirStr
                 + " :: Absolute path: " + exportDir.toAbsolutePath().toAbsolutePath());
