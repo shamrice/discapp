@@ -20,7 +20,6 @@ public class AccountViewModel {
         public boolean isSelectedApplicationStatus(String dropDownValue) {
             return applicationStatus.equalsIgnoreCase(dropDownValue);
         }
-
     }
 
     private String username;

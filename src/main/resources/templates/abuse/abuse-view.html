@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Abuse Database</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+    /* div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;} */
+    div.checkboxes{ text-align:left; width:22em; margin:auto; }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:if="${abuseViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${abuseViewModel.getInfoMessage()}">
+</div>
+
+<div th:if="${abuseViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${abuseViewModel.getErrorMessage()}">
+</div>
+
+<!-- TODO : this needs to be mapped! -->
+
+<form method="get" action="/abuse.cgi?discappid=64854;articleid=692869" enctype="multipart/form-data">
+    <table border="1">
+        <tr>
+            <td><b>DiscApp ID #</b></td>
+            <td>64854</td>
+        </tr>
+        <tr>
+            <td><b>Article ID #</b></td>
+            <td>692869</td>
+        </tr>
+        <tr>
+            <td><b>Author</b></td>
+            <td>conwayerik</td>
+        </tr>
+        <tr>
+            <td><b>Email</b></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>IP</b></td>
+            <td><a href="?whois=216.106.42.187" target="_blank">216.106.42.187</a></td>
+        </tr>
+        <tr>
+            <td><b>Date</b></td>
+            <td>Sat Jul 10, 2010 08:44:08</td>
+        </tr>
+        <tr>
+            <td><b>Subject</b></td>
+            <td>dirtbike forsale</td>
+        </tr>
+    </table>
+    <p>06,like new,no title.$350.oo 436-0311</p>
+</form>
+
+</body>
+</html>

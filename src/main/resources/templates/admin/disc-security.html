@@ -245,7 +245,9 @@
             </div>
         </div>
     </div>
-    <!-- TODO : div style="clear:left; padding:1em; text-align:center;"><a href="/abuse.cgi?discappid=46108">Abuse Database</a></div -->
+    <div style="clear:left; padding:1em; text-align:center;">
+        <a th:href="@{|/abuse/abuse.cgi?id=${appId}|}">Abuse Database</a>
+    </div>
     <div>
         <input type="hidden" name=".cgifields" value="block_search" />
         <input type="hidden" name=".cgifields" value="block_html" />
