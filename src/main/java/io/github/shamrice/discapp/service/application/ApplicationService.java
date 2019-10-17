@@ -317,8 +317,8 @@ public class ApplicationService {
         appPermission.setBlockBadWords(false);
         appPermission.setBlockSearchEngines(false);
         appPermission.setAllowHtmlPermissions(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
-        appPermission.setUnregisteredUserPermissions(UserPermission.POST);
-        appPermission.setRegisteredUserPermissions(UserPermission.POST);
+        appPermission.setUnregisteredUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
+        appPermission.setRegisteredUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
 
         return appPermission;
     }

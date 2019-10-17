@@ -4,9 +4,9 @@ public class UserPermission {
 
     public static final String NONE = "n";
     public static final String READ = "r";
-    public static final String REPLY = "rf";
-    public static final String POST = "rfp";
-    public static final String HOLD = "rfph";
-    public static final String EDIT = "rfpe";
+    public static final String REPLY = "f";
+    public static final String POST = "p";
+    public static final String HOLD = "h";
+    public static final String EDIT = "e";
 
 }

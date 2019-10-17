@@ -166,7 +166,7 @@ public class DiscAppMaintenanceController {
                                 EditorPermission newEditorPermission = new EditorPermission();
                                 newEditorPermission.setApplicationId(app.getId());
                                 newEditorPermission.setDiscAppUser(user);
-                                newEditorPermission.setUserPermissions(UserPermission.POST);
+                                newEditorPermission.setUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
                                 newEditorPermission.setIsActive(true);
                                 newEditorPermission.setCreateDt(new Date());
                                 newEditorPermission.setModDt(new Date());
@@ -179,7 +179,7 @@ public class DiscAppMaintenanceController {
                             for (EditorPermission existing : currentEditors) {
                                 if (existing.getDiscAppUser().getId().equals(id) && !existing.getIsActive()) {
                                     log.warn("Found existing editor for this app. " + existing.toString());
-                                    existing.setUserPermissions(UserPermission.POST);
+                                    existing.setUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
                                     existing.setIsActive(true);
                                     existing.setModDt(new Date());
 
@@ -459,9 +459,8 @@ public class DiscAppMaintenanceController {
                     maintenanceSecurityViewModel.setBlockHtml(applicationPermission.getAllowHtmlPermissions());
                 } else {
                     //if permissions are null. set default permission check boxes.
-                    //todo : these permission strings need to be stored somewhere
-                    maintenanceSecurityViewModel.setUnregisteredPermissions(UserPermission.POST);
-                    maintenanceSecurityViewModel.setRegisteredPermissions(UserPermission.POST);
+                    maintenanceSecurityViewModel.setUnregisteredPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
+                    maintenanceSecurityViewModel.setRegisteredPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
                     maintenanceSecurityViewModel.setBlockHtml(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
                     maintenanceSecurityViewModel.setShowIp(true);
                 }

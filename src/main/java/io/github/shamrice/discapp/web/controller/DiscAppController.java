@@ -87,16 +87,9 @@ public class DiscAppController {
 
             if (app != null) {
 
-                //check if app has NONE user permission set for reg and unreg users.
-                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(app.getId());
-                if (applicationPermission != null) {
-                    boolean isLoggedIn = accountHelper.isLoggedIn();
-                    if (isLoggedIn && UserPermission.NONE.equalsIgnoreCase(applicationPermission.getRegisteredUserPermissions())) {
-                        return errorController.getPermissionDeniedView("", model);
-                    }
-                    if (!isLoggedIn && UserPermission.NONE.equalsIgnoreCase(applicationPermission.getUnregisteredUserPermissions())) {
-                        return errorController.getPermissionDeniedView("", model);
-                    }
+                //if none permissions are set, redirect user to access denied.
+                if (checkUserHasPermission(app.getId(), UserPermission.NONE)) {
+                    return errorController.getPermissionDeniedView("", model);
                 }
 
                 model.addAttribute(APP_NAME, app.getName());
@@ -240,6 +233,11 @@ public class DiscAppController {
                                         @ModelAttribute ThreadViewModel threadViewModel,
                                         @ModelAttribute NewThreadViewModel newThreadViewModel,
                                         Model model) {
+
+        if (!checkUserHasPermission(appId, UserPermission.POST)) {
+            return errorController.getPermissionDeniedView("", model);
+        }
+
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
@@ -504,6 +502,10 @@ public class DiscAppController {
                                 @RequestParam(name = "page", required = false) Integer currentPage,
                                 Model model) {
 
+        if (!checkUserHasPermission(appId, UserPermission.READ)) {
+            return "/error/permissionDenied";
+        }
+
         if (threadId == null || threadId < 1) {
             log.error("Null or invalid article id passed to view thread. Returning to app view for appId: " + appId);
             return "redirect:/indices/" + appId;
@@ -607,6 +609,11 @@ public class DiscAppController {
                 return new ModelAndView("redirect:/indices/" + appId + "?page=" + currentPage + "#" + threadViewModel.getId());
 
             } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
+
+                //make sure user has reply permissions before allowing reply to be created.
+                if (!checkUserHasPermission(appId, UserPermission.REPLY)) {
+                    return errorController.getPermissionDeniedView("", model);
+                }
 
                 log.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
                         + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
@@ -954,5 +961,20 @@ public class DiscAppController {
 
         log.warn("Null thread node or create date sent to be checked if highlight functionality should be applied.");
         return false;
+    }
+
+    private boolean checkUserHasPermission(long appId, String permissionRequired) {
+
+        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+        if (applicationPermission != null) {
+            boolean isLoggedIn = accountHelper.isLoggedIn();
+            if (isLoggedIn) {
+                return applicationPermission.getRegisteredUserPermissions().contains(permissionRequired);
+            } else {
+                return applicationPermission.getUnregisteredUserPermissions().contains(permissionRequired);
+            }
+
+        }
+        return true; //default to true if app permissions aren't set
     }
 }
