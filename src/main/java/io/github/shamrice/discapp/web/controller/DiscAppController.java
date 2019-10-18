@@ -228,14 +228,25 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
+    @GetMapping("/postThread")
+    public ModelAndView getPostThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
+        log.warn("Attempted GET on post thread page. Redirecting to main view for appId: " + appId);
+        return new ModelAndView("redirect:/indices/" + appId);
+    }
+
     @PostMapping("/createThread")
     public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
                                         @ModelAttribute ThreadViewModel threadViewModel,
                                         @ModelAttribute NewThreadViewModel newThreadViewModel,
                                         Model model) {
 
-        if (!checkUserHasPermission(appId, UserPermission.POST)) {
-            return errorController.getPermissionDeniedView("", model);
+        //check if user has posting permissions when creating a new post.
+        if (newThreadViewModel != null) {
+            if (newThreadViewModel.getParentId() == null || newThreadViewModel.getParentId().equals("0")) {
+                if (!checkUserHasPermission(appId, UserPermission.POST)) {
+                    return errorController.getPermissionDeniedView("", model);
+                }
+            }
         }
 
         Application app = applicationService.get(appId);
@@ -973,8 +984,9 @@ public class DiscAppController {
             } else {
                 return applicationPermission.getUnregisteredUserPermissions().contains(permissionRequired);
             }
-
         }
-        return true; //default to true if app permissions aren't set
+        //return false that user has NONE permission if permissions are not set.
+        //default to true if app permissions aren't set for other permissions.
+        return !permissionRequired.equalsIgnoreCase(UserPermission.NONE);
     }
 }
