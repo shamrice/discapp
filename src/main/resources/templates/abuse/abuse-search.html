@@ -15,10 +15,6 @@
 </head>
 <body>
 
-<div th:replace="admin/fragments/account-controls :: account-controls">
-    static thread prototyping placeholder
-</div>
-
 <div th:if="${abuseViewModel.getInfoMessage()}"
      class="grey_box alert alert-success"
      style="width:40em;"
@@ -31,20 +27,18 @@
      th:text="${abuseViewModel.getErrorMessage()}">
 </div>
 
-<!-- TODO: this needs to be mapped! -->
-
-<form method="get" action="/abuse.cgi?SearchForm=Search" enctype="multipart/form-data">
+<form method="get" action="/abuse/abuse.cgi?SearchForm=Search" enctype="multipart/form-data">
     <table border="1">
         <tr>
             <td><b>DiscApp ID #</b></td>
             <td>
-                <input type="text" name="discappid" />
+                <input type="text" name="id" />
             </td>
         </tr>
         <tr>
             <td><b>Author</b></td>
             <td>
-                <input type="text" name="author" />
+                <input type="text" name="submitter" />
             </td>
         </tr>
         <tr>
@@ -68,11 +62,16 @@
         <tr>
             <td><b>Message</b></td>
             <td>
-                <input type="text" name="message" />
+                <input type="text" name="body" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <input class="button" type="submit" name="Search" value="Search" />
+                <input class="button" type="button" value="Cancel" onclick="history.back()">
             </td>
         </tr>
     </table>
-    <input type="submit" name="Search" value="Search" />
 </form>
 
 </body>

@@ -374,4 +374,8 @@ public class ApplicationService {
         return reportedAbuseIps;
     }
 
+    public List<ReportedAbuse> getReportedAbuseForApplication(long appId) {
+        return reportedAbuseRepository.findByApplicationId(appId);
+    }
+
 }

@@ -12,6 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@SecondaryTable(name = "thread")
 public class ReportedAbuse {
 
     @Id
@@ -22,9 +23,12 @@ public class ReportedAbuse {
     @Column(name = "application_id")
     private Long applicationId;
 
-    private Long threadId;
     private String ipAddress;
     private Long reportedBy;
     private Date createDt;
     private Date modDt;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "thread_id")
+    private Thread thread;
 }

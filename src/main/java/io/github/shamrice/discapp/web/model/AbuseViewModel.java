@@ -30,9 +30,11 @@ public class AbuseViewModel {
     private String errorMessage;
 
     private long discAppId;
+    private long threadId;
     private String submitter;
     private String email;
     private String ipAddress;
+    private Date createDt;
     private String subject;
     private String message;
     private List<ReportedThread> reportedThreads = new ArrayList<>();

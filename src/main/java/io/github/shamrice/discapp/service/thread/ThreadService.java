@@ -56,6 +56,40 @@ public class ThreadService {
         return false;
     }
 
+    public List<ReportedAbuse> searchForReportedAbuse(Long appId, String submitter, String email, String ipAddress, String subject, String body) {
+
+        boolean searchByAppId = appId != null;
+        boolean searchBySubmitter = submitter != null && !submitter.trim().isEmpty();
+        boolean searchByEmail = email != null && !email.trim().isEmpty();
+        boolean searchByIpAddress = ipAddress != null && !ipAddress.trim().isEmpty();
+        boolean searchBySubject = subject != null && !subject.trim().isEmpty();
+        boolean searchByBody = body != null && !body.trim().isEmpty();
+
+        List<ReportedAbuse> results = new ArrayList<>(reportedAbuseRepository.findAll());
+        List<ReportedAbuse> finalList = new ArrayList<>();
+        for (ReportedAbuse result : results) {
+            boolean validResult = true;
+            if (searchByAppId && !result.getApplicationId().equals(appId)) validResult = false;
+            if (searchByIpAddress && result.getIpAddress() != null && !result.getIpAddress().contains(ipAddress)) validResult = false;
+
+            if (result.getThread() != null) {
+                if (searchBySubmitter && !result.getThread().getSubmitter().toLowerCase().contains(submitter.toLowerCase())) validResult = false;
+                if (searchByEmail && !result.getThread().getEmail().toLowerCase().contains(email.toLowerCase())) validResult = false;
+                if (searchBySubject && !result.getThread().getSubject().toLowerCase().contains(subject.toLowerCase())) validResult = false;
+
+                if (result.getThread().getBody() != null) {
+                    if (searchByBody && !result.getThread().getBody().toLowerCase().contains(body.toLowerCase())) validResult = false;
+                }
+            }
+
+            if (validResult) {
+                finalList.add(result);
+            }
+        }
+
+        return finalList;
+    }
+
     public boolean reportThreadForAbuse(long applicationId, long threadId, long reporterDiscAppUserId) {
         Optional<Thread> abuseThread = threadRepository.findById(threadId);
 
@@ -69,23 +103,27 @@ public class ThreadService {
             return false;
         }
 
-        ReportedAbuse newAbuseReport = new ReportedAbuse();
-        newAbuseReport.setApplicationId(applicationId);
-        newAbuseReport.setIpAddress(abuseThread.get().getIpAddress());
-        newAbuseReport.setThreadId(abuseThread.get().getId());
-        newAbuseReport.setReportedBy(reporterDiscAppUserId);
-        newAbuseReport.setModDt(new Date());
-        newAbuseReport.setCreateDt(new Date());
+        Thread reportedThread = threadRepository.findById(threadId).orElse(null);
 
-        ReportedAbuse savedReport = reportedAbuseRepository.save(newAbuseReport);
-        if (savedReport != null) {
-            log.info("Saved new abuse report for application_id: " + applicationId
-                    + " : thread_id: " + threadId + " :: Marking thread for deletion.");
+        if (reportedThread != null) {
+            ReportedAbuse newAbuseReport = new ReportedAbuse();
+            newAbuseReport.setApplicationId(applicationId);
+            newAbuseReport.setIpAddress(abuseThread.get().getIpAddress());
+            newAbuseReport.setThread(reportedThread);
+            newAbuseReport.setReportedBy(reporterDiscAppUserId);
+            newAbuseReport.setModDt(new Date());
+            newAbuseReport.setCreateDt(new Date());
 
-            return deleteThread(applicationId, abuseThread.get().getId(), false);
+            ReportedAbuse savedReport = reportedAbuseRepository.save(newAbuseReport);
+            if (savedReport != null) {
+                log.info("Saved new abuse report for application_id: " + applicationId
+                        + " : thread_id: " + threadId + " :: Marking thread for deletion.");
 
-        } else {
-            log.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
+                return deleteThread(applicationId, abuseThread.get().getId(), false);
+
+            } else {
+                log.error("Failed to report abuse of thread_id: " + threadId + " for application_id: " + applicationId);
+            }
         }
 
         return false;
@@ -379,6 +417,11 @@ public class ThreadService {
                 false,
                 limit
         );
+    }
+
+    public Thread getThreadById(long threadId) {
+        //includes threads marked as deleted.
+        return threadRepository.findById(threadId).orElse(null);
     }
 
     public Thread getThread(long applicationId, long threadId) {

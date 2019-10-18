@@ -28,7 +28,11 @@
 </div>
 
 <form method="get" action="/abuse/abuse-search.cgi" enctype="multipart/form-data" th:object="${abuseViewModel}">
-    <input type="submit" name="searchForm" value="Search" />
+
+    <div style="text-align:center;height:25px;padding-bottom:20px;">
+        <input class="button" style="width:20%;height:100%;" type="submit" name="searchForm" value="Search" />
+    </div>
+
     <TABLE border="1">
         <tr>
             <th>DiscApp</th>
@@ -42,11 +46,11 @@
             th:each="reportedThread : ${abuseViewModel.getReportedThreads()}">
             <td th:text="${reportedThread.getApplicationId()}"></td>
             <td th:text="${reportedThread.getThreadCreateDt()}"></td>
-            <td><a th:href="@{|?whois=${reportedThread.getIpAddress()}|}" target="_blank" th:text="${reportedThread.getIpAddress()}"></a></td>
-            <td th:text="${reportedThread.getSubmitted()}"></td>
+            <td><a th:href="@{|https://www.whois.com/whois/${reportedThread.getIpAddress()}|}" target="_blank" th:text="${reportedThread.getIpAddress()}"></a></td>
+            <td th:text="${reportedThread.getSubmitter()}"></td>
             <td th:text="${reportedThread.getEmailAddress()}"></td>
             <td>
-                <a th:href="@{|abuse-view.cgi?id=${reportedThread.getApplicationId()}&amp;articleId=${reportedThread.getThreadId()}|}"
+                <a th:href="@{|abuse-view.cgi?articleId=${reportedThread.getThreadId()}|}"
                    th:text="${reportedThread.getSubject()}"></a>
             </td>
         </tr>

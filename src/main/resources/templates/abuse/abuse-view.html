@@ -27,40 +27,46 @@
      th:text="${abuseViewModel.getErrorMessage()}">
 </div>
 
-<!-- TODO : this needs to be mapped! -->
+<form method="get" action="/abuse/abuse-search.cgi" enctype="multipart/form-data" th:object="${abuseViewModel}">
 
-<form method="get" action="/abuse.cgi?discappid=64854;articleid=692869" enctype="multipart/form-data">
-    <table border="1">
+    <div style="height:25px;padding-bottom:20px;">
+        <input class="button" style="padding:5px;" type="submit" name="searchForm" value="Search Again" />
+        <input class="button" style="padding:5px;" type="button" value="Return to previous page" onclick="history.back()">
+    </div>
+
+    <table border="1" style="display:inline-block;">
         <tr>
             <td><b>DiscApp ID #</b></td>
-            <td>64854</td>
+            <td th:text="${abuseViewModel.getDiscAppId()}"></td>
         </tr>
         <tr>
             <td><b>Article ID #</b></td>
-            <td>692869</td>
+            <td th:text="${abuseViewModel.getThreadId()}"></td>
         </tr>
         <tr>
             <td><b>Author</b></td>
-            <td>conwayerik</td>
+            <td th:text="${abuseViewModel.getSubmitter()}"></td>
         </tr>
         <tr>
             <td><b>Email</b></td>
-            <td></td>
+            <td th:text="${abuseViewModel.getEmail()}"></td>
         </tr>
         <tr>
             <td><b>IP</b></td>
-            <td><a href="?whois=216.106.42.187" target="_blank">216.106.42.187</a></td>
+            <td>
+                <a th:href="@{|https://www.whois.com/whois/${abuseViewModel.getIpAddress()}|}" target="_blank" th:text="${abuseViewModel.getIpAddress()}"></a>
+            </td>
         </tr>
         <tr>
             <td><b>Date</b></td>
-            <td>Sat Jul 10, 2010 08:44:08</td>
+            <td th:text="${abuseViewModel.getCreateDt()}"></td>
         </tr>
         <tr>
             <td><b>Subject</b></td>
-            <td>dirtbike forsale</td>
+            <td th:text="${abuseViewModel.getSubject()}"></td>
         </tr>
     </table>
-    <p>06,like new,no title.$350.oo 436-0311</p>
+    <p th:text="${abuseViewModel.getMessage()}"></p>
 </form>
 
 </body>
