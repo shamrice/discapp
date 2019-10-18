@@ -46,7 +46,7 @@
             th:each="reportedThread : ${abuseViewModel.getReportedThreads()}">
             <td th:text="${reportedThread.getApplicationId()}"></td>
             <td th:text="${reportedThread.getThreadCreateDt()}"></td>
-            <td><a th:href="@{|https://www.whois.com/whois/${reportedThread.getIpAddress()}|}" target="_blank" th:text="${reportedThread.getIpAddress()}"></a></td>
+            <td><a th:href="@{|${abuseViewModel.getWhoIsUrl()}${reportedThread.getIpAddress()}|}" target="_blank" th:text="${reportedThread.getIpAddress()}"></a></td>
             <td th:text="${reportedThread.getSubmitter()}"></td>
             <td th:text="${reportedThread.getEmailAddress()}"></td>
             <td>

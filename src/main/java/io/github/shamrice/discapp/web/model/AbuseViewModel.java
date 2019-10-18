@@ -37,6 +37,7 @@ public class AbuseViewModel {
     private Date createDt;
     private String subject;
     private String message;
+    private String whoIsUrl;
     private List<ReportedThread> reportedThreads = new ArrayList<>();
 
     private String searchForm;

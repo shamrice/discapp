@@ -47,7 +47,8 @@ public enum ConfigurationProperty {
     MIN_THREAD_POST_INTERVAL_IN_SECONDS("thread.post.interval.minimum"),
     MAX_APPS_PER_ACCOUNT("account.max.apps"),
     BAD_WORDS_LIST("filter.badwords.list"),
-    ROBOTS_TXT_CONTENTS("robots.txt.contents");
+    ROBOTS_TXT_CONTENTS("robots.txt.contents"),
+    WHOIS_URL("whois.url");
 
     private final String propName;
 

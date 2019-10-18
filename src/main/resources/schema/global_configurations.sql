@@ -59,3 +59,6 @@ Disallow: /error
 Disallow: /auth
 Disallow: /application
 ');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'whois.url', 'https://www.whois.com/whois/');

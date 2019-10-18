@@ -2,6 +2,8 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.ReportedAbuse;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.AbuseViewModel;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,9 @@ public class AbuseController {
 
     @Autowired
     private ThreadService threadService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @GetMapping("/abuse/abuse.cgi")
     public ModelAndView getAbuseView(@RequestParam(name = "id", required = false) Long appId,
@@ -46,6 +51,9 @@ public class AbuseController {
                 abuseViewModel.getReportedThreads().add(reportedThread);
             }
         }
+        //set whois url based on site config
+        abuseViewModel.setWhoIsUrl(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.WHOIS_URL, "https://www.whois.com/whois/"));
+
         return new ModelAndView("abuse/abuse-results", "abuseViewModel", abuseViewModel);
     }
 
@@ -76,6 +84,9 @@ public class AbuseController {
              log.warn("No abuse thread found for thread Id: " + threadId);
              abuseViewModel.setErrorMessage("Failed to find reported thread with id: " + threadId);
          }
+
+        //set whois url based on site config
+        abuseViewModel.setWhoIsUrl(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.WHOIS_URL, "https://www.whois.com/whois/"));
 
         return new ModelAndView("abuse/abuse-view", "abuseViewModel", abuseViewModel);
     }

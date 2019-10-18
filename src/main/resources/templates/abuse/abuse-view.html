@@ -54,7 +54,7 @@
         <tr>
             <td><b>IP</b></td>
             <td>
-                <a th:href="@{|https://www.whois.com/whois/${abuseViewModel.getIpAddress()}|}" target="_blank" th:text="${abuseViewModel.getIpAddress()}"></a>
+                <a th:href="@{|${abuseViewModel.getWhoIsUrl()}${abuseViewModel.getIpAddress()}|}" target="_blank" th:text="${abuseViewModel.getIpAddress()}"></a>
             </td>
         </tr>
         <tr>
