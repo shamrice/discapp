@@ -69,6 +69,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
      * @throws IOException
      */
     private void handleAbuseIpBlockedForApp(ServletResponse servletResponse, long appId, String ipAddress) throws IOException {
+
         List<String> reportedAbuseIps = applicationService.getReportedAbuseIpAddressesForApplication(appId);
         if (reportedAbuseIps != null) {
             for (String abuseIp : reportedAbuseIps) {
@@ -78,7 +79,11 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                             + " : matching reported abuse ip: " + abuseIp
                             + " :: redirecting to permission denied page.");
                     HttpServletResponse response = (HttpServletResponse) servletResponse;
-                    response.sendRedirect("/error/permissionDenied");
+                    if (!response.isCommitted()) {
+                        response.sendRedirect("/error/permissionDenied");
+                    } else {
+                        log.info("Response already committed. Skipping IP block redirect to permission denied page.");
+                    }
                 }
             }
         }
@@ -93,6 +98,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
      * @param ipAddress source Ip address of request.
      */
     private void handleIpPrefixBlockedForApp(ServletResponse servletResponse, long appId, String ipAddress) throws IOException {
+
         List<ApplicationIpBlock> ipBlocks = applicationService.getBlockedIpPrefixes(appId);
         if (ipBlocks != null) {
             for (ApplicationIpBlock ipBlock : ipBlocks) {
@@ -102,10 +108,13 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                             + " : matching: " + ipBlock.getIpAddressPrefix()
                             + " :: redirecting to permission denied page.");
                     HttpServletResponse response = (HttpServletResponse) servletResponse;
-                    response.sendRedirect("/error/permissionDenied");
+                    if (!response.isCommitted()) {
+                        response.sendRedirect("/error/permissionDenied");
+                    } else {
+                        log.info("Response already committed. Skipping IP block redirect to permission denied page.");
+                    }
                 }
             }
         }
     }
-
 }
