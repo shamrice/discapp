@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.configuration;
 
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.filter.DiscAppIpBlockFilter;
+import io.github.shamrice.discapp.web.filter.MaintenancePermissionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

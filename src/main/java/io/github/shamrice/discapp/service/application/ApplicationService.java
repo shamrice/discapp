@@ -378,4 +378,8 @@ public class ApplicationService {
         return reportedAbuseRepository.findByApplicationId(appId);
     }
 
+    public List<EditorPermission> getEditorPermissionsForUser(long discAppUserId) {
+         return editorPermissionRepository.findByDiscAppUserId(discAppUserId);
+    }
+
 }

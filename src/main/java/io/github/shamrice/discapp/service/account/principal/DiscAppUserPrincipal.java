@@ -1,7 +1,9 @@
 package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

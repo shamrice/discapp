@@ -21,6 +21,9 @@ import java.util.List;
 @Slf4j
 public class DiscAppIpBlockFilter extends GenericFilterBean {
 
+    private static final String PERMISSION_DENIED_URL = "/error/permissionDenied";
+    private static final String APP_INDICES_URL = "indices";
+
     @Autowired
     private ApplicationService applicationService;
 
@@ -37,12 +40,13 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             String url = req.getRequestURL().toString();
 
-            String ipAddress = req.getHeader("X-FORWARDED-FOR");
-            if (ipAddress == null || ipAddress.isEmpty()) {
-                ipAddress = req.getRemoteAddr();
-            }
+            if (url.toLowerCase().contains(APP_INDICES_URL)) {
 
-            if (url.contains("indices") || url.contains("Indices")) {
+                String ipAddress = req.getHeader("X-FORWARDED-FOR");
+                if (ipAddress == null || ipAddress.isEmpty()) {
+                    ipAddress = req.getRemoteAddr();
+                }
+
                 try {
                     String appIdStr = url.substring(url.lastIndexOf("/") + 1).replace(".html", "");
 
@@ -80,7 +84,8 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                             + " :: redirecting to permission denied page.");
                     HttpServletResponse response = (HttpServletResponse) servletResponse;
                     if (!response.isCommitted()) {
-                        response.sendRedirect("/error/permissionDenied");
+                        response.sendRedirect(PERMISSION_DENIED_URL);
+                        return;
                     } else {
                         log.info("Response already committed. Skipping IP block redirect to permission denied page.");
                     }
@@ -109,7 +114,8 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                             + " :: redirecting to permission denied page.");
                     HttpServletResponse response = (HttpServletResponse) servletResponse;
                     if (!response.isCommitted()) {
-                        response.sendRedirect("/error/permissionDenied");
+                        response.sendRedirect(PERMISSION_DENIED_URL);
+                        return;
                     } else {
                         log.info("Response already committed. Skipping IP block redirect to permission denied page.");
                     }
