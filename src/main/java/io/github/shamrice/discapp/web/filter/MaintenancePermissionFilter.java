@@ -5,8 +5,10 @@ import io.github.shamrice.discapp.data.model.EditorPermission;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
+import io.github.shamrice.discapp.web.controller.DiscAppMaintenanceController;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.attoparser.discard.DiscardMarkupHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -25,10 +27,9 @@ import java.util.List;
 @Component
 public class MaintenancePermissionFilter extends GenericFilterBean {
 
-    private static final String URL_CHECK_DIRECTORY = "/admin/";
     private static final String THREAD_EDIT_PAGE = "disc-edit.cgi";
     private static final String APP_ID_QUERY_STRING_KEY = "?id=";
-    private static final String PERMISSION_DENIED_URL = "/admin/permission-denied";
+    private static final String PERMISSION_DENIED_URL = DiscAppMaintenanceController.CONTROLLER_URL_DIRECTORY + "permission-denied";
 
     @Autowired
     private ApplicationService applicationService;
@@ -54,7 +55,8 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
             String url = req.getRequestURL().toString();
 
-            if (url.contains(URL_CHECK_DIRECTORY) && !url.contains(PERMISSION_DENIED_URL)) {
+            if (url.contains(DiscAppMaintenanceController.CONTROLLER_URL_DIRECTORY)
+                    && !url.contains(PERMISSION_DENIED_URL)) {
 
                 String email = accountHelper.getLoggedInEmail();
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(email);

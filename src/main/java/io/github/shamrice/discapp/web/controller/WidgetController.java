@@ -24,13 +24,15 @@ import java.util.TimeZone;
 @Slf4j
 public class WidgetController {
 
+    public static final String CONTROLLER_URL_DIRECTORY = "/widget/";
+
     @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
     private ThreadService threadService;
 
-    @GetMapping("/widget/disc-widget.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-widget.cgi")
     public ModelAndView getWidgetView(@RequestParam(name = "disc") long appId,
                                       WidgetViewModel widgetViewModel,
                                       Model model) {

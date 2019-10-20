@@ -43,6 +43,8 @@ import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 @Slf4j
 public class DiscAppMaintenanceController {
 
+    public static final String CONTROLLER_URL_DIRECTORY = "/admin/";
+
     private static final String THREAD_TAB = "threads";
     private static final String DATE_TAB = "date";
     private static final String SEARCH_TAB = "search";
@@ -87,7 +89,7 @@ public class DiscAppMaintenanceController {
     @Autowired
     private DiscAppController discAppController;
 
-    @PostMapping("/admin/disc-user-search.cgi")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-user-search.cgi")
     public ModelAndView postUserSearchView(@RequestParam(name = "id") long appId,
                                           MaintenanceUserSearchViewModel maintenanceUserSearchViewModel,
                                           Model model,
@@ -209,7 +211,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @GetMapping("/admin/disc-user-search.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-user-search.cgi")
     public ModelAndView getUserSearchView(@RequestParam(name = "id") long appId,
                                           MaintenanceUserSearchViewModel maintenanceUserSearchViewModel,
                                           Model model,
@@ -236,7 +238,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @PostMapping("/admin/disc-security.cgi")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-security.cgi")
     public ModelAndView postDiscSecurityView(@RequestParam(name = "id") long appId,
                                              MaintenanceSecurityViewModel maintenanceSecurityViewModel,
                                              Model model,
@@ -408,7 +410,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @GetMapping("/admin/disc-security.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-security.cgi")
     public ModelAndView getDiscSecurityView(@RequestParam(name = "id") long appId,
                                             MaintenanceSecurityViewModel maintenanceSecurityViewModel,
                                             Model model,
@@ -482,7 +484,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @GetMapping("/admin/data/download")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "data/download")
     @ResponseBody
     public ResponseEntity<Resource> downloadImportFile(@RequestParam(name = "id") long appId) {
 
@@ -506,7 +508,7 @@ public class DiscAppMaintenanceController {
         return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/admin/data/export")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "data/export")
     @ResponseBody
     public ResponseEntity<Resource> postExportFile(@RequestParam(name = "id") long appId,
                                                    MaintenanceImportExportViewModel maintenanceImportExportViewModel,
@@ -546,7 +548,7 @@ public class DiscAppMaintenanceController {
         return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/admin/data/import")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "data/import")
     public ModelAndView postImportFile(@RequestParam(name = "id") long appId,
                                        @RequestParam("uploadSourceFile") MultipartFile uploadSourceFile,
                                        MaintenanceImportExportViewModel maintenanceImportExportViewModel,
@@ -583,7 +585,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @GetMapping("/admin/disc-import-export.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-import-export.cgi")
     public ModelAndView getImportExportView(@RequestParam(name = "id") long appId,
                                            MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                            Model model,
@@ -611,7 +613,7 @@ public class DiscAppMaintenanceController {
     }
 
 
-    @GetMapping("/admin/permission-denied")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "permission-denied")
     public ModelAndView getPermissionDeniedView(@RequestParam(name = "id") long appId,
                                                 HttpServletResponse response,
                                                 Model model) {
@@ -624,7 +626,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/permissionDenied");
     }
 
-    @GetMapping("/admin/disc-maint.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-maint.cgi")
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model,
                                                HttpServletResponse response) {
@@ -649,7 +651,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @GetMapping("/admin/disc-toolbar.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-toolbar.cgi")
     public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
                                            Model model,
                                            HttpServletResponse response) {
@@ -674,7 +676,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("redirect:/error");
     }
 
-    @PostMapping("/admin/disc-widget-maint.cgi")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-widget-maint.cgi")
     public ModelAndView postDiscMainWidgetView(@RequestParam(name = "id") long appId,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
@@ -718,7 +720,7 @@ public class DiscAppMaintenanceController {
         return getDiscMaintWidgetView(appId, maintenanceWidgetViewModel, model, request, response);
     }
 
-    @GetMapping("/admin/disc-widget-maint.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-widget-maint.cgi")
     public ModelAndView getDiscMaintWidgetView(@RequestParam(name = "id") long appId,
                                                MaintenanceWidgetViewModel maintenanceWidgetViewModel,
                                                Model model,
@@ -794,7 +796,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-widget-maint", "maintenanceWidgetViewModel", maintenanceWidgetViewModel);
     }
 
-    @GetMapping("/admin/disc-locale.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-locale.cgi")
     public ModelAndView getDiscLocaleView(@RequestParam(name = "id") long appId,
                                           MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                           Model model,
@@ -833,7 +835,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-locale", "maintenanceLocaleViewModel", maintenanceLocaleViewModel);
     }
 
-    @GetMapping("/admin/disc-stats.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-stats.cgi")
     public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "selectedStatsId", required = false) Long statsId,
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
@@ -906,7 +908,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-stats", "maintenanceStatsViewModel", maintenanceStatsViewModel);
     }
 
-    @GetMapping("/admin/disc-info.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-info.cgi")
     public ModelAndView getDiscInfoView(@RequestParam(name = "id") long appId,
                                         Model model,
                                         HttpServletResponse response,
@@ -936,7 +938,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-info");
     }
 
-    @PostMapping("/admin/disc-edit.cgi")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-edit.cgi")
     public ModelAndView postDiscEditView(HttpServletRequest request,
                                          @RequestParam(name = "id") long appId,
                                          @RequestParam(name = "tab", required = false) String currentTab,
@@ -1193,7 +1195,7 @@ public class DiscAppMaintenanceController {
         return getDiscEditView(appId, currentTab, maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel, model, response);
     }
 
-    @GetMapping("/admin/disc-edit.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-edit.cgi")
     public ModelAndView getDiscEditView(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "tab", required = false) String currentTab,
                                         @RequestParam(name = "page", required = false) Integer page,
@@ -1297,7 +1299,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-edit", "maintenanceThreadViewModel", maintenanceThreadViewModel);
     }
 
-    @GetMapping("/admin/edit-thread.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "edit-thread.cgi")
     public ModelAndView getEditThreadView(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "article") long threadId,
                                           @RequestParam(name = "page", required = false) Integer page,
@@ -1346,14 +1348,14 @@ public class DiscAppMaintenanceController {
         return getDiscEditView(appId, maintenanceThreadViewModel.getTab(), maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel, model, response);
     }
 
-    @GetMapping("/admin/appearance-preview.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model,
                                                  HttpServletRequest request) {
         return discAppController.getAppView(appId, 0, model, request);
     }
 
-    @GetMapping("/admin/appearance-frameset.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
@@ -1486,54 +1488,54 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/appearance-forms", "maintenanceViewModel", maintenanceViewModel);
     }
 
-    @GetMapping("/admin/modify/application")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
     public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId) {
 
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/prologue-epilogue")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
     public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId) {
 
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/stylesheet")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/threads")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/threads")
     public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/header-footer")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
     public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/labels")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/buttons")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/favicon")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/favicon")
     public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @GetMapping("/admin/modify/time")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
     }
 
-    @PostMapping("/admin/modify/application")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
     public ModelAndView postModifyApplication(@RequestParam(name = "id") long appId,
                                               @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                               Model model,
@@ -1574,7 +1576,7 @@ public class DiscAppMaintenanceController {
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
-    @PostMapping("/admin/modify/stylesheet")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
     public ModelAndView postModifyStyleSheet(@RequestParam(name = "id") long appId,
                                              @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                              Model model,
@@ -1598,8 +1600,8 @@ public class DiscAppMaintenanceController {
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
-    @PostMapping("/admin/modify/prologue-epilogue")
-    public ModelAndView postModifyPrologueEplilogue(@RequestParam(name = "id") long appId,
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
+    public ModelAndView postModifyPrologueEpilogue(@RequestParam(name = "id") long appId,
                                                     @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                     Model model,
                                                     HttpServletResponse response) {
@@ -1673,7 +1675,7 @@ public class DiscAppMaintenanceController {
     }
 
 
-    @PostMapping("/admin/modify/threads")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/threads")
     public ModelAndView postModifyThreads(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
@@ -1705,7 +1707,7 @@ public class DiscAppMaintenanceController {
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
-    @PostMapping("/admin/modify/header-footer")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
     public ModelAndView postModifyHeaderFooter(@RequestParam(name = "id") long appId,
                                                @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                                Model model,
@@ -1725,7 +1727,7 @@ public class DiscAppMaintenanceController {
     }
 
 
-    @PostMapping("/admin/modify/labels")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/labels")
     public ModelAndView postModifyLabels(@RequestParam(name = "id") long appId,
                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                          Model model,
@@ -1748,7 +1750,7 @@ public class DiscAppMaintenanceController {
     }
 
 
-    @PostMapping("/admin/modify/buttons")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/buttons")
     public ModelAndView postModifyButtons(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
@@ -1776,7 +1778,7 @@ public class DiscAppMaintenanceController {
     }
 
 
-    @PostMapping("/admin/modify/favicon")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/favicon")
     public ModelAndView postModifyFavicon(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
@@ -1814,7 +1816,7 @@ public class DiscAppMaintenanceController {
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
 
-    @PostMapping("/admin/modify/time")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/time")
     public ModelAndView postModifyTime(@RequestParam(name = "id") long appId,
                                        @ModelAttribute MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                        Model model,
@@ -1884,7 +1886,7 @@ public class DiscAppMaintenanceController {
         if (!skipCurrent) {
             currentHtml +=
                     "<li>" +
-                            "<a href=\"/admin/edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
+                            "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
                             "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
                             + "&amp;tab=" + tab +"\">" +
                             currentNode.getCurrent().getSubject() +
@@ -1944,7 +1946,7 @@ public class DiscAppMaintenanceController {
         for (ThreadTreeNode currentNode : allThreads) {
             currentHtml.append(
                     "<li>" +
-                            "<a href=\"/admin/edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
+                            "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
                             "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
                             + "&amp;tab=" + tab + "\">" +
                             currentNode.getCurrent().getSubject() +
@@ -1989,7 +1991,7 @@ public class DiscAppMaintenanceController {
         for (Thread thread : threads) {
 
             currentHtml += "<li>" +
-                    "<a href=\"/admin/edit-thread.cgi?id=" + thread.getApplicationId() +
+                    "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + thread.getApplicationId() +
                     "&amp;article=" + thread.getId() + "\">" +
                     thread.getSubject() +
                     "</a> " +
@@ -2018,7 +2020,7 @@ public class DiscAppMaintenanceController {
                 "\n" +
                 " Here's your widget! Put your header here.\n" +
                 "\n" +
-                "<iframe src=\"" + baseUrl + "/widget/disc-widget.cgi?disc=" + appId + "\" \n" +
+                "<iframe src=\"" + baseUrl + WidgetController.CONTROLLER_URL_DIRECTORY + "disc-widget.cgi?disc=" + appId + "\" \n" +
                 "        width=\"99%\" height=\"80%\" frameborder=\"no\" scrolling=\"no\">\n" +
                 "</iframe>\n" +
                 "\n" +
