@@ -88,7 +88,7 @@ public class DiscAppController {
             if (app != null) {
 
                 //if none permissions are set, redirect user to access denied.
-                if (checkUserHasPermission(app.getId(), UserPermission.NONE)) {
+                if (accountHelper.checkUserHasPermission(app.getId(), UserPermission.NONE)) {
                     return errorController.getPermissionDeniedView("", model);
                 }
 
@@ -243,7 +243,7 @@ public class DiscAppController {
         //check if user has posting permissions when creating a new post.
         if (newThreadViewModel != null) {
             if (newThreadViewModel.getParentId() == null || newThreadViewModel.getParentId().equals("0")) {
-                if (!checkUserHasPermission(appId, UserPermission.POST)) {
+                if (!accountHelper.checkUserHasPermission(appId, UserPermission.POST)) {
                     return errorController.getPermissionDeniedView("", model);
                 }
             }
@@ -513,7 +513,7 @@ public class DiscAppController {
                                 @RequestParam(name = "page", required = false) Integer currentPage,
                                 Model model) {
 
-        if (!checkUserHasPermission(appId, UserPermission.READ)) {
+        if (!accountHelper.checkUserHasPermission(appId, UserPermission.READ)) {
             return "/error/permissionDenied";
         }
 
@@ -622,7 +622,7 @@ public class DiscAppController {
             } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
 
                 //make sure user has reply permissions before allowing reply to be created.
-                if (!checkUserHasPermission(appId, UserPermission.REPLY)) {
+                if (!accountHelper.checkUserHasPermission(appId, UserPermission.REPLY)) {
                     return errorController.getPermissionDeniedView("", model);
                 }
 
@@ -974,27 +974,4 @@ public class DiscAppController {
         return false;
     }
 
-    private boolean checkUserHasPermission(long appId, String permissionRequired) {
-
-        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
-        if (applicationPermission != null) {
-            String loggedInEmail = accountHelper.getLoggedInEmail();
-            boolean isUserAccount = false;
-
-            if (loggedInEmail != null) {
-                DiscAppUser user = discAppUserDetailsService.getByEmail(loggedInEmail);
-                if (user != null) {
-                    isUserAccount = user.getIsUserAccount();
-                }
-            }
-            if (loggedInEmail != null && isUserAccount) {
-                return applicationPermission.getRegisteredUserPermissions().contains(permissionRequired);
-            } else {
-                return applicationPermission.getUnregisteredUserPermissions().contains(permissionRequired);
-            }
-        }
-        //return false that user has NONE permission if permissions are not set.
-        //default to true if app permissions aren't set for other permissions.
-        return !permissionRequired.equalsIgnoreCase(UserPermission.NONE);
-    }
 }
