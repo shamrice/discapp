@@ -978,8 +978,16 @@ public class DiscAppController {
 
         ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
         if (applicationPermission != null) {
-            boolean isLoggedIn = accountHelper.isLoggedIn();
-            if (isLoggedIn) {
+            String loggedInEmail = accountHelper.getLoggedInEmail();
+            boolean isUserAccount = false;
+
+            if (loggedInEmail != null) {
+                DiscAppUser user = discAppUserDetailsService.getByEmail(loggedInEmail);
+                if (user != null) {
+                    isUserAccount = user.getIsUserAccount();
+                }
+            }
+            if (loggedInEmail != null && isUserAccount) {
                 return applicationPermission.getRegisteredUserPermissions().contains(permissionRequired);
             } else {
                 return applicationPermission.getUnregisteredUserPermissions().contains(permissionRequired);
