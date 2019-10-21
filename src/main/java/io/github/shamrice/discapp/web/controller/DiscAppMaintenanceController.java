@@ -96,20 +96,12 @@ public class DiscAppMaintenanceController {
                                            HttpServletRequest request,
                                           HttpServletResponse response) {
 
-        //TODO : possible to move lines 99->109 into its own function? repeated EVERY SINGLE METHOD!
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
 
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
+        setCommonModelAttributes(model, app, username);
 
         try {
-            Application app = applicationService.get(appId);
-            String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
             //if cancel, return back to security page.
             if (maintenanceUserSearchViewModel.getCancel() != null) {
                 return new ModelAndView("redirect:/admin/disc-security.cgi?id=" + appId);
@@ -217,25 +209,13 @@ public class DiscAppMaintenanceController {
                                           Model model,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
 
-        try {
-            Application app = applicationService.get(appId);
-            String username = accountHelper.getLoggedInEmail();
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
+        setCommonModelAttributes(model, app, username);
 
-            return new ModelAndView("admin/disc-user-search", "maintenanceUserSearchViewModel", maintenanceUserSearchViewModel);
-
-        } catch (Exception ex) {
-            log.error("Error getting maintenance security page for appId: " + appId + " :: " + ex.getMessage(), ex);
-        }
-
-        return new ModelAndView("redirect:/error");
+        return new ModelAndView("admin/disc-user-search", "maintenanceUserSearchViewModel", maintenanceUserSearchViewModel);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-security.cgi")
@@ -244,18 +224,12 @@ public class DiscAppMaintenanceController {
                                              Model model,
                                              HttpServletRequest request,
                                              HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
 
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
+
+        setCommonModelAttributes(model, app, username);
         try {
-            Application app = applicationService.get(appId);
-            String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
             //update owner email
             if (maintenanceSecurityViewModel.getChangeOwnerEmail() != null) {
                 Owner ownerToUpdate = accountService.getOwnerById(app.getOwnerId());
@@ -416,18 +390,12 @@ public class DiscAppMaintenanceController {
                                             Model model,
                                             HttpServletRequest request,
                                             HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             maintenanceSecurityViewModel.setApplicationId(app.getId());
 
             Owner appOwner = accountService.getOwnerById(app.getOwnerId());
@@ -514,17 +482,12 @@ public class DiscAppMaintenanceController {
                                                    MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                                    Model model,
                                                    HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
 
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
 
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
+            setCommonModelAttributes(model, app, username);
 
             maintenanceImportExportViewModel.setApplicationId(app.getId());
 
@@ -554,14 +517,10 @@ public class DiscAppMaintenanceController {
                                        MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                        Model model,
                                        HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
+            setCommonModelAttributes(model, app, username);
 
             maintenanceImportExportViewModel.setApplicationId(app.getId());
             String newFilename = "disc_" + app.getId() + ".sql";
@@ -590,17 +549,10 @@ public class DiscAppMaintenanceController {
                                            MaintenanceImportExportViewModel maintenanceImportExportViewModel,
                                            Model model,
                                            HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
+            setCommonModelAttributes(model, app, username);
 
             maintenanceImportExportViewModel.setApplicationId(app.getId());
             return new ModelAndView("admin/disc-import-export", "maintenanceImportExportViewModel", maintenanceImportExportViewModel);
@@ -619,7 +571,6 @@ public class DiscAppMaintenanceController {
                                                 Model model) {
         model.addAttribute(APP_NAME, "");
         model.addAttribute(APP_ID, appId);
-
         String username = accountHelper.getLoggedInEmail();
         model.addAttribute(USERNAME, username);
 
@@ -630,18 +581,11 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model,
                                                HttpServletResponse response) {
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
+            setCommonModelAttributes(model, app, username);
 
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
-            model.addAttribute(APP_NAME, app.getName());
             return new ModelAndView("admin/disc-maint");
 
         } catch (Exception ex) {
@@ -655,18 +599,10 @@ public class DiscAppMaintenanceController {
     public ModelAndView getDiscToolbarView(@RequestParam(name = "id") long appId,
                                            Model model,
                                            HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             return new ModelAndView("admin/disc-toolbar");
 
         } catch (Exception ex) {
@@ -685,8 +621,7 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
+            setCommonModelAttributes(model, app, username);
 
             saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
             saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
@@ -726,18 +661,10 @@ public class DiscAppMaintenanceController {
                                                Model model,
                                                HttpServletRequest request,
                                                HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             maintenanceWidgetViewModel.setApplicationId(app.getId());
 
             boolean showAuthor = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, true);
@@ -801,19 +728,10 @@ public class DiscAppMaintenanceController {
                                           MaintenanceLocaleViewModel maintenanceLocaleViewModel,
                                           Model model,
                                           HttpServletResponse response) {
-
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             maintenanceLocaleViewModel.setApplicationId(app.getId());
 
             //time and date config
@@ -841,17 +759,10 @@ public class DiscAppMaintenanceController {
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
                                          Model model,
                                          HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
+            setCommonModelAttributes(model, app, username);
 
             long totalPageViews = 0L;
             long totalUniqueIps = 0L;
@@ -913,9 +824,6 @@ public class DiscAppMaintenanceController {
                                         Model model,
                                         HttpServletResponse response,
                                         HttpServletRequest request) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         String baseUrl = webHelper.getBaseUrl(request);
         model.addAttribute(APP_URL, baseUrl + "/indices/" + appId);
         //todo : indices string should be from static final property
@@ -923,12 +831,7 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             model.addAttribute(IS_ADMIN, true);
 
         } catch (Exception ex) {
@@ -949,6 +852,7 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
+            setCommonModelAttributes(model, app, username);
 
             //delete threads
             if (maintenanceThreadViewModel.getDeleteArticles() != null && !maintenanceThreadViewModel.getDeleteArticles().isEmpty()) {
@@ -1202,9 +1106,6 @@ public class DiscAppMaintenanceController {
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                         Model model,
                                         HttpServletResponse response) {
-        model.addAttribute(APP_NAME, "");
-        model.addAttribute(APP_ID, appId);
-
         if (currentTab == null || currentTab.isEmpty()) {
             currentTab = THREAD_TAB;
         }
@@ -1236,13 +1137,7 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
-            model.addAttribute(APP_NAME, app.getName());
-            model.addAttribute(APP_ID, app.getId());
+            setCommonModelAttributes(model, app, username);
             maintenanceThreadViewModel.setApplicationId(app.getId());
 
             DiscAppUser user = discAppUserDetailsService.getByEmail(username);
@@ -1310,11 +1205,7 @@ public class DiscAppMaintenanceController {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
+            setCommonModelAttributes(model, app, username);
             maintenanceThreadViewModel.setCurrentPage(page);
 
             if (tab != null && !tab.isEmpty()) {
@@ -1361,19 +1252,10 @@ public class DiscAppMaintenanceController {
                                           Model model,
                                           HttpServletResponse response) {
 
-        model.addAttribute(APP_ID, appId);
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
-
-            model.addAttribute(USERNAME, username);
-            if (!username.equals(String.valueOf(appId))) {
-                model.addAttribute(IS_USER_ACCOUNT, true);
-            }
-
-            model.addAttribute(APP_NAME, app.getName());
-            model.addAttribute(APP_ID, app.getId());
+            setCommonModelAttributes(model, app, username);
 
             //app config
             maintenanceViewModel.setApplicationCreateDt(app.getCreateDt());
@@ -2036,5 +1918,17 @@ public class DiscAppMaintenanceController {
         ipBlock.setModDt(new Date());
         ipBlock.setIpAddressPrefix(ipPrefix);
         return ipBlock;
+    }
+
+    private void setCommonModelAttributes(Model model, Application app, String username) {
+
+        model.addAttribute(APP_NAME, app.getName());
+        model.addAttribute(APP_ID, app.getId());
+        model.addAttribute(USERNAME, username);
+
+        if (!username.equals(String.valueOf(app.getId()))) {
+            model.addAttribute(IS_USER_ACCOUNT, true);
+        }
+
     }
 }
