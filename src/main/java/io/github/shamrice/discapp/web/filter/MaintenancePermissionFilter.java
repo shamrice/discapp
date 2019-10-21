@@ -8,7 +8,6 @@ import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.web.controller.DiscAppMaintenanceController;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.attoparser.discard.DiscardMarkupHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -27,7 +26,8 @@ import java.util.List;
 @Component
 public class MaintenancePermissionFilter extends GenericFilterBean {
 
-    private static final String THREAD_EDIT_PAGE = "disc-edit.cgi";
+    private static final String THREADS_EDIT_PAGE = "disc-edit.cgi";
+    private static final String THREAD_EDIT_PAGE = "edit-thread.cgi";
     private static final String APP_ID_QUERY_STRING_KEY = "?id=";
     private static final String PERMISSION_DENIED_URL = DiscAppMaintenanceController.CONTROLLER_URL_DIRECTORY + "permission-denied";
 
@@ -64,6 +64,7 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                 if (discAppUser != null ) {
 
                     try {
+                        //remove any extra query params except first id param
                         String queryString = req.getQueryString();
                         if (queryString.contains("&")) {
                             queryString = queryString.substring(0, queryString.indexOf("&"));
@@ -74,7 +75,7 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                         if (!applicationService.isOwnerOfApp(appId, email)) {
                             log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
 
-                            if (url.contains(THREAD_EDIT_PAGE)) {
+                            if (url.contains(THREAD_EDIT_PAGE) || url.contains(THREADS_EDIT_PAGE)) {
                                 boolean isEditorOfApp = false;
                                 List<EditorPermission> permissions = applicationService.getEditorPermissionsForUser(discAppUser.getId());
                                 for (EditorPermission editorPermission : permissions) {
