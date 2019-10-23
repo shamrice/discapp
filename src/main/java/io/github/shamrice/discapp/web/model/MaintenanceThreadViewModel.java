@@ -20,6 +20,7 @@ public class MaintenanceThreadViewModel {
     private boolean hasReadPermission;
 
     private boolean hasUnapprovedMessages;
+    private String approve;
 
     private String tab;
     private String infoMessage;

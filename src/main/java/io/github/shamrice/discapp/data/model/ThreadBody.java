@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.data.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Table(name = "thread_body")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class ThreadBody {
 

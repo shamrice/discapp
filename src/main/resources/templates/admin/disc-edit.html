@@ -78,8 +78,9 @@
 
                 <div class="buttons">
                     <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
-                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && !maintenanceThreadViewModel.getTab().equals('unapproved')}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                     <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
                     <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
@@ -99,8 +100,9 @@
 
                 <div class="buttons">
                     <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
-                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && !maintenanceThreadViewModel.getTab().equals('unapproved')}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                     <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
                     <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"

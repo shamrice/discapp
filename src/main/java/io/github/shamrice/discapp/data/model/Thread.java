@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.data.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
 @SecondaryTable(name = "discapp_user")//, pkJoinColumns = @PrimaryKeyJoinColumn(name = "discapp_user_id", referencedColumnName = "id"))
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Thread {
 

@@ -964,6 +964,59 @@ public class DiscAppMaintenanceController {
                 }
             }
 
+            //approve message
+            if (maintenanceThreadViewModel.getApprove() != null && !maintenanceThreadViewModel.getApprove().isEmpty()) {
+
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
+                } else {
+
+                    boolean threadApproved = true;
+
+                    //report abuse from edit message screen
+                    if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
+                        Thread thread = threadService.getThreadById(maintenanceThreadViewModel.getEditArticleId());
+                        if (thread != null && thread.getApplicationId().equals(app.getId())) {
+                            thread.setApproved(true);
+                            thread.setModDt(new Date());
+                            if (threadService.saveThread(thread, thread.getBody()) == null) {
+                                log.error("Failed to approve thread: " + thread.toString());
+                                threadApproved = false;
+                            } else {
+                                log.info("Thread marked as approved by user: " + username + " :: " + thread.toString());
+                            }
+                        }
+                    } else {
+
+                        if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                            for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                                long threadId = Long.parseLong(threadIdStr);
+                                Thread thread = threadService.getThreadById(threadId);
+                                if (thread != null && thread.getApplicationId().equals(app.getId())) {
+                                    thread.setApproved(true);
+                                    thread.setModDt(new Date());
+                                    if (threadService.saveThread(thread, thread.getBody()) == null) {
+                                        log.error("Failed to approve thread: " + thread.toString());
+                                        threadApproved = false;
+                                    } else {
+                                        log.info("Thread marked as approved by user: " + username + " :: " + thread.toString());
+                                    }
+                                } else {
+                                    log.warn("Thread id: " + threadIdStr + " for appId: " + app.getId()
+                                            + " Either does not exist or does not belong to thread. Cannot be approved.");
+                                }
+                            }
+                        }
+                    }
+
+                    if (threadApproved) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully approved messages.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to approve messages.");
+                    }
+                }
+            }
+
             //search messages
             if (maintenanceThreadViewModel.getFindMessages() != null && !maintenanceThreadViewModel.getFindMessages().isEmpty()) {
 

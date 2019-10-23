@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.data.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Stats {
 

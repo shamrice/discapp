@@ -17,6 +17,7 @@
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticles" value="Delete Message" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                 <input type="submit" name="editArticleCancelEdit" value="Return to Messages" class="button"/>
             </div>
         </div>
@@ -45,13 +46,6 @@
             <tr>
                 <th>Author</th>
                 <td th:text="${maintenanceThreadViewModel.getEditArticleSubmitter()}">
-                    <!-- TODO : add this for threads from accounts! span style="background-color:#8ff; padding:4px; margin-left:1em; font-size:smaller; ">Account ID:29139  <select
-                        name="new_perm" class="button" style="border:1px solid black;">
-<option value="r">Read</option>
-<option value="rf">Reply</option>
-<option selected="selected" value="rfp">Post</option>
-<option value="rfph">Hold</option>
-</select> <input type="submit" name="ChangePerm" value="Change Perm" class="button"/></span-->
                 </td>
             </tr>
             <tr>
@@ -87,15 +81,7 @@
              th:utext="${maintenanceThreadViewModel.getEditArticleMessage()}">
         </div>
         <div th:utext="${maintenanceThreadViewModel.getEditArticleReplyThreadsHtml()}"></div>
-        <!--ul>
-            <li><a href="disc-edit.cgi?id=46108;article=21048;pagemark=0;">Hm... Maybe that was the way it had to
-                work?</a>
-                <label for="checkbox_21048"><span style="font-size:smaller;"><span
-                        style="font-style:italic; margin-left:1ex; margin-right:1ex;">Puckdropper</span> Wed Aug 14 14:19</span>
-                </label>
-            </li>
-            <ul></ul>
-        </ul-->
+
     </div>
 
     <div th:if="${maintenanceThreadViewModel.isOnEditModifyMessage() && maintenanceThreadViewModel.isOnEditMessage()}">
