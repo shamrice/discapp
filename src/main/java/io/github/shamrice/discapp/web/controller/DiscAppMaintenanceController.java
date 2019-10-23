@@ -1023,6 +1023,8 @@ public class DiscAppMaintenanceController {
                 if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.READ)) {
                     maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
                 } else {
+                    //set off of unapproved so default is approved if user does not have permission to search unapproved threads
+                    boolean isApproved = !"unapproved".equalsIgnoreCase(maintenanceThreadViewModel.getApprovedSearch());
 
                     List<Thread> searchResults = threadService.searchThreadsByFields(
                             app.getId(),
@@ -1030,7 +1032,8 @@ public class DiscAppMaintenanceController {
                             maintenanceThreadViewModel.getEmailSearch(),
                             maintenanceThreadViewModel.getSubjectSearch(),
                             maintenanceThreadViewModel.getIpSearch(),
-                            maintenanceThreadViewModel.getMessageSearch()
+                            maintenanceThreadViewModel.getMessageSearch(),
+                            isApproved
                     );
 
                     String searchResultsHtml = getListThreadHtml(searchResults, SEARCH_TAB);

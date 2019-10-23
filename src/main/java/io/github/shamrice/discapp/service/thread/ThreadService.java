@@ -292,7 +292,7 @@ public class ThreadService {
         return foundThreads;
     }
 
-    public List<Thread> searchThreadsByFields(long applicationId, String submitter, String email, String subject, String ipAddress, String messageBody) {
+    public List<Thread> searchThreadsByFields(long applicationId, String submitter, String email, String subject, String ipAddress, String messageBody, boolean isApproved) {
 
         //todo : refactor this so the query is on an "and" instead of querying each and then trimming
 
@@ -300,7 +300,7 @@ public class ThreadService {
 
         //search
         if (subject != null && !subject.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, true, subject));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, isApproved, subject));
         }
 
         if (messageBody != null && !messageBody.trim().isEmpty()) {
@@ -309,7 +309,7 @@ public class ThreadService {
 
             for (ThreadBody threadBody : resultsInBody) {
                 Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-                if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false)) {
+                if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false) && (foundThread.get().isApproved() == isApproved)) {
                     foundThread.get().setBody(threadBody.getBody());
                     foundThread.ifPresent(foundThreads::add);
                 }
@@ -317,15 +317,15 @@ public class ThreadService {
         }
 
         if (submitter != null && !submitter.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubmitterContainingIgnoreCase(applicationId, false, true, submitter));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubmitterContainingIgnoreCase(applicationId, false, isApproved, submitter));
         }
 
         if (email != null && !email.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndEmailContainingIgnoreCase(applicationId, false, true, email));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndEmailContainingIgnoreCase(applicationId, false, isApproved, email));
         }
 
         if (ipAddress != null && !ipAddress.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndIpAddressContainingIgnoreCase(applicationId, false, true, ipAddress));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndIpAddressContainingIgnoreCase(applicationId, false, isApproved, ipAddress));
         }
 
         if (subject == null) subject = "";

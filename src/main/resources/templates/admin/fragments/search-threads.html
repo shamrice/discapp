@@ -37,7 +37,7 @@
                     <input type="text" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}" size="30"/>
                 </td>
             </tr>
-            <!-- TODO: ADD LATER tr>
+            <tr th:if="${maintenanceThreadViewModel.isHasEditPermission()}">
                 <th>Status</th>
                 <td>
                     <label>
@@ -45,7 +45,7 @@
                     <label>
                         <input type="radio" name="approvedSearch" value="unapproved"/>unapproved</label>
                 </td>
-            </tr -->
+            </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
                     <input type="submit" name="findMessages" value="Find Messages" class="button"/>
