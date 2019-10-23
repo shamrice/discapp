@@ -49,6 +49,7 @@ public class DiscAppMaintenanceController {
     private static final String DATE_TAB = "date";
     private static final String SEARCH_TAB = "search";
     private static final String POST_TAB = "post";
+    private static final String UNAPPROVED_TAB = "unapproved";
 
     @Autowired
     private ApplicationService applicationService;
@@ -979,7 +980,7 @@ public class DiscAppMaintenanceController {
                             maintenanceThreadViewModel.getMessageSearch()
                     );
 
-                    String searchResultsHtml = getSearchThreadHtml(searchResults);
+                    String searchResultsHtml = getListThreadHtml(searchResults, SEARCH_TAB);
                     List<String> threadHtml = new ArrayList<>();
                     threadHtml.add(searchResultsHtml);
                     maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
@@ -1218,12 +1219,17 @@ public class DiscAppMaintenanceController {
                 maintenanceThreadViewModel.setHasReadPermission(true);
             }
 
+            //enable the unapproved messages tab if they exist.
+            List<Thread> unapprovedThreads = threadService.getUnapprovedThreads(app.getId());
+            if (unapprovedThreads != null && unapprovedThreads.size() > 0) {
+                maintenanceThreadViewModel.setHasUnapprovedMessages(true);
+            }
 
-            if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
+            if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB) && !maintenanceThreadViewModel.getTab().equals(UNAPPROVED_TAB)) {
                 //get edit threads html
                 List<String> threadTreeHtml = new ArrayList<>();
 
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION);
+                List<ThreadTreeNode> threadTreeNodeList =  threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION);
 
                 //if threads returned is less than asked for, there is no next page.
                 if (threadTreeNodeList.size() < 20) {
@@ -1262,6 +1268,16 @@ public class DiscAppMaintenanceController {
 
                 maintenanceThreadViewModel.setEditThreadTreeHtml(threadTreeHtml);
                 maintenanceThreadViewModel.setNumberOfMessages(threadService.getTotalThreadCountForApplicationId(app.getId()));
+
+            } else if (maintenanceThreadViewModel.getTab().equalsIgnoreCase(UNAPPROVED_TAB)) {
+                //unapproved thread tab is selected.
+                if (unapprovedThreads != null) {
+                    String unapprovedThreadsResultHtml = getListThreadHtml(unapprovedThreads, UNAPPROVED_TAB);
+                    List<String> threadHtml = new ArrayList<>();
+                    threadHtml.add(unapprovedThreadsResultHtml);
+                    maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
+                    maintenanceThreadViewModel.setNumberOfMessages(unapprovedThreads.size());
+                }
             }
         } catch (Exception ex) {
             log.error("Error: " + ex.getMessage(), ex);
@@ -1299,10 +1315,17 @@ public class DiscAppMaintenanceController {
                     maintenanceThreadViewModel.setHasPostPermission(false);
                     maintenanceThreadViewModel.setHasReadPermission(false);
                 }
+            } else {
+                maintenanceThreadViewModel.setHasEditPermission(true);
+                maintenanceThreadViewModel.setHasPostPermission(true);
+                maintenanceThreadViewModel.setHasReadPermission(true);
             }
 
             if (tab != null && !tab.isEmpty()) {
                 if (tab.equals(POST_TAB) && !maintenanceThreadViewModel.isHasPostPermission()) {
+                    tab = THREAD_TAB;
+                }
+                if (tab.equalsIgnoreCase(UNAPPROVED_TAB) && !maintenanceThreadViewModel.isHasEditPermission()) {
                     tab = THREAD_TAB;
                 }
                 maintenanceThreadViewModel.setTab(tab);
@@ -1963,14 +1986,15 @@ public class DiscAppMaintenanceController {
     }
 
 
-    private String getSearchThreadHtml(List<Thread> threads) {
+    private String getListThreadHtml(List<Thread> threads, String tab) {
         String currentHtml = "<ul>";
 
         for (Thread thread : threads) {
 
             currentHtml += "<li>" +
                     "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + thread.getApplicationId() +
-                    "&amp;article=" + thread.getId() + "\">" +
+                    "&amp;article=" + thread.getId() +
+                    "&amp;tab=" + tab + "\">" +
                     thread.getSubject() +
                     "</a> " +
 

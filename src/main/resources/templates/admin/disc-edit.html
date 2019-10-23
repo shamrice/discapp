@@ -33,36 +33,33 @@
         <input type="hidden" name="id" th:value="${appId}"/>
         <input type="hidden" name="currentPage" th:value="${maintenanceThreadViewModel.getCurrentPage()}"/>
 
-        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('threads')}">
-            <span class="tab" style="background-color:#fff; color:#00f;
+        <div id="tabs">
+            <span th:if="${maintenanceThreadViewModel.getTab().equals('threads')}"  class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">View by Thread</span>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
-            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
-        </div>
+            <a th:unless="${maintenanceThreadViewModel.getTab().equals('threads')}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=threads|}">View by Thread</a>
 
-        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('date')}">
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=threads|}">View by Thread</a>
-            <span class="tab" style="background-color:#fff; color:#00f;
+            <span th:if="${maintenanceThreadViewModel.getTab().equals('date')}" class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">View by Date</span>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
-            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
-        </div>
+            <a th:unless="${maintenanceThreadViewModel.getTab().equals('date')}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
 
-        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('search')}">
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=threads|}">View by Thread</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
-            <span class="tab" style="background-color:#fff; color:#00f;
+            <span th:if="${maintenanceThreadViewModel.getTab().equals('search')}" class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">Search</span>
-            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
-        </div>
+            <a  th:unless="${maintenanceThreadViewModel.getTab().equals('search')}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
 
-        <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('post')}">
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=threads|}">View by Thread</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
-            <span class="tab" style="background-color:#fff; color:#00f;
+            <span th:if="${maintenanceThreadViewModel.getTab().equals('post') && maintenanceThreadViewModel.isHasPostPermission()}"  class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">Post</span>
+            <a th:if="${!maintenanceThreadViewModel.getTab().equals('post') && maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
+
+
+            <span th:if="${maintenanceThreadViewModel.getTab().equals('unapproved') && maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.isHasUnapprovedMessages()}"
+                  class="tab" style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">
+                Unapproved Messages
+            </span>
+            <a th:if="${!maintenanceThreadViewModel.getTab().equals('unapproved') && maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.isHasUnapprovedMessages()}"
+               class="tab"
+               th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=unapproved|}">
+                Unapproved Messages
+            </a>
         </div>
 
         <div th:if="${maintenanceThreadViewModel.isOnEditMessage() || maintenanceThreadViewModel.isOnEditModifyMessage()}">
@@ -73,7 +70,7 @@
 
         <div th:unless="${maintenanceThreadViewModel.isOnEditMessage()}">
 
-            <div th:if="${maintenanceThreadViewModel.getTab().equals('threads') || maintenanceThreadViewModel.getTab().equals('date') || (maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isSearchSubmitted())}"
+            <div th:if="${maintenanceThreadViewModel.getTab().equals('threads') || maintenanceThreadViewModel.getTab().equals('date') || (maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isSearchSubmitted()) || maintenanceThreadViewModel.getTab().equals('unapproved')}"
                  style="padding-left:1em;">
 
                 <p style="text-align:center;"

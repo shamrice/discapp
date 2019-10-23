@@ -19,6 +19,8 @@ public class MaintenanceThreadViewModel {
     private boolean hasPostPermission;
     private boolean hasReadPermission;
 
+    private boolean hasUnapprovedMessages;
+
     private String tab;
     private String infoMessage;
     private long numberOfMessages;
