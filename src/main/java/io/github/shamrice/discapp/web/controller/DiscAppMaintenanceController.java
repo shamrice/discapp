@@ -889,6 +889,9 @@ public class DiscAppMaintenanceController {
                     } else {
                         maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
                     }
+                    //return to thread list
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
                 }
             }
 
@@ -923,6 +926,9 @@ public class DiscAppMaintenanceController {
                     } else {
                         maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
                     }
+                    //return to thread list
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
                 }
             }
 
@@ -961,6 +967,9 @@ public class DiscAppMaintenanceController {
                     } else {
                         maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
                     }
+                    //set view back to thread list view
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
                 }
             }
 
@@ -1014,6 +1023,9 @@ public class DiscAppMaintenanceController {
                     } else {
                         maintenanceThreadViewModel.setInfoMessage("Failed to approve messages.");
                     }
+                    //set view back to thread list view
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
                 }
             }
 
