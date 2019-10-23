@@ -38,7 +38,7 @@
               border:3px solid blue; border-bottom-color:#fff;">View by Thread</span>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
+            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
         </div>
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('date')}">
@@ -46,7 +46,7 @@
             <span class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">View by Date</span>
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=search|}">Search</a>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
+            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
         </div>
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('search')}">
@@ -54,7 +54,7 @@
             <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=date|}">View by Date</a>
             <span class="tab" style="background-color:#fff; color:#00f;
               border:3px solid blue; border-bottom-color:#fff;">Search</span>
-            <a class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
+            <a th:if="${maintenanceThreadViewModel.isHasPostPermission()}" class="tab" th:href="@{|/admin/disc-edit.cgi?id=${appId}&tab=post|}">Post</a>
         </div>
 
         <div id="tabs" th:if="${maintenanceThreadViewModel.getTab().equals('post')}">
@@ -80,10 +80,10 @@
                    th:text="@{|There are ${maintenanceThreadViewModel.getNumberOfMessages()} messages.|}"></p>
 
                 <div class="buttons">
-                    <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
-                    <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
-                    <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
                     <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
                            type="submit"
@@ -101,10 +101,10 @@
                 </div>
 
                 <div class="buttons">
-                    <input type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
-                    <input type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticles" value="Delete Messages" class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="deleteArticlesAndReplies" value="Delete Messages and Replies"
                            class="button"/>
-                    <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                    <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}" type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
                     <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
                            type="submit"
@@ -130,7 +130,7 @@
             </div>
 
             <div th:if="${maintenanceThreadViewModel.getTab().equals('post')}">
-                <div th:replace="admin/fragments/post-thread :: post-thread">
+                <div th:if="${maintenanceThreadViewModel.isHasPostPermission()}" th:replace="admin/fragments/post-thread :: post-thread">
                     static thread prototyping placeholder
                 </div>
             </div>

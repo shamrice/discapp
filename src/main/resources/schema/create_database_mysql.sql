@@ -87,6 +87,7 @@ CREATE TABLE thread (
     show_email bool NOT NULL default false,
     deleted bool NOT NULL default false,
     parent_id int(255) NOT NULL DEFAULT 0,
+    is_approved bool NOT NULL default true,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

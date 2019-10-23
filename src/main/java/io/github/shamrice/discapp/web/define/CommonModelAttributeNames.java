@@ -8,6 +8,7 @@ public class CommonModelAttributeNames {
     public static final String EMAIL = "email";
     public static final String POSTING_USERNAME = "postingUsername";
     public static final String IS_USER_ACCOUNT = "isUserAccount";
+    public static final String IS_OWNER = "isOwnerAccount";
     public static final String IS_LOGGED_IN = "isLoggedIn";
     public static final String IS_LOGGED_IN_SYSTEM_ACCOUNT = "isLoggedInSystemAccount";
     public static final String IS_ADMIN = "isAdmin";

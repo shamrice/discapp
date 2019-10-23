@@ -36,6 +36,8 @@ public class Thread {
     private Boolean deleted;
     private Long parentId;
 
+    private boolean isApproved;
+
    // @Column(table = "thread", name = "disc_app_user_id", insertable = false, updatable = false)
    // private Long discappUserId;
 

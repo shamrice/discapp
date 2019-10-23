@@ -12,4 +12,5 @@ public interface EditorPermissionRepository extends JpaRepository<EditorPermissi
 
     List<EditorPermission> findByApplicationId(Long applicationId);
     List<EditorPermission> findByDiscAppUserId(Long discAppUserId);
+    EditorPermission findOneByApplicationIdAndDiscAppUserIdAndIsActive(Long applicationId, Long discAppUserId, Boolean isActive);
 }

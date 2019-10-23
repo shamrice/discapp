@@ -346,6 +346,10 @@ public class ApplicationService {
         return editorPermissionRepository.findByApplicationId(appId);
     }
 
+    public EditorPermission getEditorActivePermission(long appId, long discAppUserId) {
+        return editorPermissionRepository.findOneByApplicationIdAndDiscAppUserIdAndIsActive(appId, discAppUserId, true);
+    }
+
     public boolean saveEditorPermissions(long appId, List<EditorPermission> editorPermissions) {
         if (editorPermissions == null) {
             return false;

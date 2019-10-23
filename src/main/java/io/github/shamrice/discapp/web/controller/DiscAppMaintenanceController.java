@@ -849,6 +849,7 @@ public class DiscAppMaintenanceController {
                                          @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                          Model model,
                                          HttpServletResponse response) {
+
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -857,114 +858,134 @@ public class DiscAppMaintenanceController {
             //delete threads
             if (maintenanceThreadViewModel.getDeleteArticles() != null && !maintenanceThreadViewModel.getDeleteArticles().isEmpty()) {
 
-                boolean deleteThreadsSuccess = true;
-
-                //delete from edit message screen
-                if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
-                    if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), false)) {
-                        log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
-                        deleteThreadsSuccess = false;
-                    }
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
                 } else {
-                    //delete from thread view or search view with checkboxes.
-                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
-                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                            long threadId = Long.parseLong(threadIdStr);
-                            if (!threadService.deleteThread(app.getId(), threadId, false)) {
-                                log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
-                                deleteThreadsSuccess = false;
+
+                    boolean deleteThreadsSuccess = true;
+
+                    //delete from edit message screen
+                    if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
+                        if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), false)) {
+                            log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
+                            deleteThreadsSuccess = false;
+                        }
+                    } else {
+                        //delete from thread view or search view with checkboxes.
+                        if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                            for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                                long threadId = Long.parseLong(threadIdStr);
+                                if (!threadService.deleteThread(app.getId(), threadId, false)) {
+                                    log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId());
+                                    deleteThreadsSuccess = false;
+                                }
                             }
                         }
                     }
-                }
-                //set message for user
-                if (deleteThreadsSuccess) {
-                    maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages.");
-                } else {
-                    maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
+                    //set message for user
+                    if (deleteThreadsSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages.");
+                    }
                 }
             }
 
             //delete threads and replies
             if (maintenanceThreadViewModel.getDeleteArticlesAndReplies() != null && !maintenanceThreadViewModel.getDeleteArticlesAndReplies().isEmpty()) {
 
-                boolean deleteThreadsAndRepliesSuccess = true;
-
-                //delete from edit message screen
-                if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
-                    if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), true)) {
-                        log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId() + " and replies.");
-                        deleteThreadsAndRepliesSuccess = false;
-                    }
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
                 } else {
-                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
-                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                            long threadId = Long.parseLong(threadIdStr);
-                            if (!threadService.deleteThread(app.getId(), threadId, true)) {
-                                log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
-                                deleteThreadsAndRepliesSuccess = false;
+                    boolean deleteThreadsAndRepliesSuccess = true;
+
+                    //delete from edit message screen
+                    if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
+                        if (!threadService.deleteThread(app.getId(), maintenanceThreadViewModel.getEditArticleId(), true)) {
+                            log.error("Failed to delete thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId() + " and replies.");
+                            deleteThreadsAndRepliesSuccess = false;
+                        }
+                    } else {
+                        if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                            for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                                long threadId = Long.parseLong(threadIdStr);
+                                if (!threadService.deleteThread(app.getId(), threadId, true)) {
+                                    log.error("Failed to delete thread id: " + threadId + " for appId: " + app.getId() + " and replies.");
+                                    deleteThreadsAndRepliesSuccess = false;
+                                }
                             }
                         }
                     }
-                }
 
-                if (deleteThreadsAndRepliesSuccess) {
-                    maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages and replies.");
-                } else {
-                    maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
+                    if (deleteThreadsAndRepliesSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully deleted messages and replies.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to delete messages and replies.");
+                    }
                 }
             }
 
             //report abuse
             if (maintenanceThreadViewModel.getReportAbuse() != null && !maintenanceThreadViewModel.getReportAbuse().isEmpty()) {
-                DiscAppUser user = discAppUserDetailsService.getByEmail(username);
 
-                boolean threadsReportedSuccess = true;
-
-                //report abuse from edit message screen
-                if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
-                    if (!threadService.reportThreadForAbuse(app.getId(), maintenanceThreadViewModel.getEditArticleId(), user.getId())) {
-                        log.error("Failed to report thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
-                        threadsReportedSuccess = false;
-                    }
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
                 } else {
 
-                    if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
-                        for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
-                            long threadId = Long.parseLong(threadIdStr);
-                            if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
-                                log.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
-                                threadsReportedSuccess = false;
+                    DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+
+                    boolean threadsReportedSuccess = true;
+
+                    //report abuse from edit message screen
+                    if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
+                        if (!threadService.reportThreadForAbuse(app.getId(), maintenanceThreadViewModel.getEditArticleId(), user.getId())) {
+                            log.error("Failed to report thread id: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
+                            threadsReportedSuccess = false;
+                        }
+                    } else {
+
+                        if (maintenanceThreadViewModel.getSelectThreadCheckbox() != null) {
+                            for (String threadIdStr : maintenanceThreadViewModel.getSelectThreadCheckbox()) {
+                                long threadId = Long.parseLong(threadIdStr);
+                                if (!threadService.reportThreadForAbuse(app.getId(), threadId, user.getId())) {
+                                    log.error("Failed to report thread id: " + threadId + " for appId: " + app.getId());
+                                    threadsReportedSuccess = false;
+                                }
                             }
                         }
                     }
-                }
 
-                if (threadsReportedSuccess) {
-                    maintenanceThreadViewModel.setInfoMessage("Successfully reported and deleted messages.");
-                } else {
-                    maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
+                    if (threadsReportedSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully reported and deleted messages.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to report and delete messages.");
+                    }
                 }
             }
 
             //search messages
             if (maintenanceThreadViewModel.getFindMessages() != null && !maintenanceThreadViewModel.getFindMessages().isEmpty()) {
 
-                List<Thread> searchResults = threadService.searchThreadsByFields(
-                        app.getId(),
-                        maintenanceThreadViewModel.getAuthorSearch(),
-                        maintenanceThreadViewModel.getEmailSearch(),
-                        maintenanceThreadViewModel.getSubjectSearch(),
-                        maintenanceThreadViewModel.getIpSearch(),
-                        maintenanceThreadViewModel.getMessageSearch()
-                );
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.READ)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
+                } else {
 
-                String searchResultsHtml = getSearchThreadHtml(searchResults);
-                List<String> threadHtml = new ArrayList<>();
-                threadHtml.add(searchResultsHtml);
-                maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
-                maintenanceThreadViewModel.setNumberOfMessages(searchResults.size());
-                maintenanceThreadViewModel.setSearchSubmitted(true);
+                    List<Thread> searchResults = threadService.searchThreadsByFields(
+                            app.getId(),
+                            maintenanceThreadViewModel.getAuthorSearch(),
+                            maintenanceThreadViewModel.getEmailSearch(),
+                            maintenanceThreadViewModel.getSubjectSearch(),
+                            maintenanceThreadViewModel.getIpSearch(),
+                            maintenanceThreadViewModel.getMessageSearch()
+                    );
+
+                    String searchResultsHtml = getSearchThreadHtml(searchResults);
+                    List<String> threadHtml = new ArrayList<>();
+                    threadHtml.add(searchResultsHtml);
+                    maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
+                    maintenanceThreadViewModel.setNumberOfMessages(searchResults.size());
+                    maintenanceThreadViewModel.setSearchSubmitted(true);
+                }
             }
 
             //search again
@@ -976,43 +997,67 @@ public class DiscAppMaintenanceController {
             //post new message
             if (maintenanceThreadViewModel.getPostArticle() != null && !maintenanceThreadViewModel.getPostArticle().isEmpty()) {
 
-                DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.POST)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account currently does not have permission to post new messages.");
+                } else {
 
-                if (user != null && maintenanceThreadViewModel.getNewThreadSubject() != null && !maintenanceThreadViewModel.getNewThreadSubject().trim().isEmpty()) {
+                    DiscAppUser user = discAppUserDetailsService.getByEmail(username);
 
-                    String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getNewThreadSubject());
+                    if (user != null && user.getIsUserAccount()) {
 
-                    Thread newThread = new Thread();
-                    newThread.setSubmitter(user.getUsername());
-                    //newThread.setDiscappUserId(user.getId());
-                    newThread.setDiscAppUser(user);
-                    newThread.setParentId(0L);
-                    newThread.setShowEmail(user.getShowEmail());
-                    newThread.setEmail(user.getEmail());
-                    newThread.setDeleted(false);
-                    newThread.setApplicationId(app.getId());
-                    newThread.setSubject(subject);
-                    newThread.setModDt(new Date());
-                    newThread.setCreateDt(new Date());
+                        if (maintenanceThreadViewModel.getNewThreadSubject() != null
+                                && !maintenanceThreadViewModel.getNewThreadSubject().trim().isEmpty()) {
 
-                    //set ip address
-                    if (request != null) {
-                        //check forwarded header for proxy users, if not found, use ip provided.
-                        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-                        if (ipAddress == null || ipAddress.isEmpty()) {
-                            ipAddress = request.getRemoteAddr();
+                            String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getNewThreadSubject());
+
+                            boolean isApproved = true;
+                            if (accountHelper.checkUserHasEditorPermission(app.getId(), UserPermission.HOLD)) {
+                                isApproved = false;
+                            }
+
+                            //set ip address and user agent
+                            String ipAddress = null;
+                            String userAgent = null;
+                            if (request != null) {
+                                //check forwarded header for proxy users, if not found, use ip provided.
+                                ipAddress = request.getHeader("X-FORWARDED-FOR");
+                                if (ipAddress == null || ipAddress.isEmpty()) {
+                                    ipAddress = request.getRemoteAddr();
+                                }
+                                userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                            }
+
+                            Thread newThread = new Thread();
+                            newThread.setSubmitter(user.getUsername());
+                            newThread.setDiscAppUser(user);
+                            newThread.setParentId(0L);
+                            newThread.setShowEmail(user.getShowEmail());
+                            newThread.setEmail(user.getEmail());
+                            newThread.setDeleted(false);
+                            newThread.setApplicationId(app.getId());
+                            newThread.setSubject(subject);
+                            newThread.setModDt(new Date());
+                            newThread.setCreateDt(new Date());
+                            newThread.setApproved(isApproved);
+                            newThread.setIpAddress(ipAddress);
+                            newThread.setUserAgent(userAgent);
+
+                            String body = maintenanceThreadViewModel.getNewThreadMessage();
+                            if (body != null && !body.isEmpty()) {
+                                body = body.replaceAll("\r", "<br />");
+
+                                body = inputHelper.addUrlHtmlLinksToString(body);
+                            }
+
+                            threadService.saveThread(newThread, body);
+                        } else {
+                            maintenanceThreadViewModel.setInfoMessage("A subject is required to post a new message.");
                         }
-                        newThread.setIpAddress(ipAddress);
+                    } else {
+                        //TODO : maintenance accounts should post as logged out users. Page should ask for name/email
+                        //TODO : etc just like regular disc app does.
+                        maintenanceThreadViewModel.setInfoMessage("Maintenance system accounts cannot post new messages here. Please log in with a registered user account.");
                     }
-
-                    String body = maintenanceThreadViewModel.getNewThreadMessage();
-                    if (body != null && !body.isEmpty()) {
-                        body = body.replaceAll("\r", "<br />");
-
-                        body = inputHelper.addUrlHtmlLinksToString(body);
-                    }
-
-                    threadService.saveThread(newThread, body);
                 }
 
                 //return to thread tab.
@@ -1023,32 +1068,37 @@ public class DiscAppMaintenanceController {
             //selected to modify a single message
             if (maintenanceThreadViewModel.getEditArticle() != null && !maintenanceThreadViewModel.getEditArticle().isEmpty() && maintenanceThreadViewModel.isOnEditMessage()) {
 
-                Thread threadToEdit = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
-
-                if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
-                    maintenanceThreadViewModel.setEditArticleSubmitter(threadToEdit.getSubmitter());
-                    maintenanceThreadViewModel.setEditArticleEmail(threadToEdit.getEmail());
-                    maintenanceThreadViewModel.setEditArticleSubject(threadToEdit.getSubject());
-                    maintenanceThreadViewModel.setEditArticleMessage(threadToEdit.getBody());
-                    maintenanceThreadViewModel.setApplicationId(app.getId());
-
-                    String threadBody = threadService.getThreadBodyText(threadToEdit.getId());
-                    maintenanceThreadViewModel.setEditArticleMessage(threadBody);
-
-                    ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
-                    if (subThreads != null) {
-                        String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
-                                maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
-                        maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
-                    }
-
-                    maintenanceThreadViewModel.setOnEditModifyMessage(true);
-
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
                 } else {
-                    log.warn("Failed to find thread to edit: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
-                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
-                    maintenanceThreadViewModel.setOnEditMessage(false);
-                    maintenanceThreadViewModel.setInfoMessage("An error occurred loading message to edit. Please try again.");
+
+                    Thread threadToEdit = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
+
+                    if (threadToEdit != null && threadToEdit.getApplicationId().equals(app.getId())) {
+                        maintenanceThreadViewModel.setEditArticleSubmitter(threadToEdit.getSubmitter());
+                        maintenanceThreadViewModel.setEditArticleEmail(threadToEdit.getEmail());
+                        maintenanceThreadViewModel.setEditArticleSubject(threadToEdit.getSubject());
+                        maintenanceThreadViewModel.setEditArticleMessage(threadToEdit.getBody());
+                        maintenanceThreadViewModel.setApplicationId(app.getId());
+
+                        String threadBody = threadService.getThreadBodyText(threadToEdit.getId());
+                        maintenanceThreadViewModel.setEditArticleMessage(threadBody);
+
+                        ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
+                        if (subThreads != null) {
+                            String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
+                                    maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
+                            maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
+                        }
+
+                        maintenanceThreadViewModel.setOnEditModifyMessage(true);
+
+                    } else {
+                        log.warn("Failed to find thread to edit: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                        maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                        maintenanceThreadViewModel.setOnEditMessage(false);
+                        maintenanceThreadViewModel.setInfoMessage("An error occurred loading message to edit. Please try again.");
+                    }
                 }
             }
 
@@ -1056,28 +1106,33 @@ public class DiscAppMaintenanceController {
             if (maintenanceThreadViewModel.getEditArticleChangeMessage() != null && !maintenanceThreadViewModel.getEditArticleChangeMessage().isEmpty()
                     && maintenanceThreadViewModel.isOnEditModifyMessage()) {
 
-                Thread editThread = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
-                if (editThread != null && editThread.getApplicationId().equals(app.getId())) {
-                    String submitter = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubmitter());
-                    String email = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleEmail());
-                    String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubject());
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
+                } else {
 
-                    editThread.setSubmitter(submitter);
-                    editThread.setEmail(email);
-                    editThread.setSubject(subject);
-                    editThread.setModDt(new Date());
+                    Thread editThread = threadService.getThread(app.getId(), maintenanceThreadViewModel.getEditArticleId());
+                    if (editThread != null && editThread.getApplicationId().equals(app.getId())) {
+                        String submitter = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubmitter());
+                        String email = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleEmail());
+                        String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubject());
 
-                    String body = maintenanceThreadViewModel.getEditArticleMessage();
+                        editThread.setSubmitter(submitter);
+                        editThread.setEmail(email);
+                        editThread.setSubject(subject);
+                        editThread.setModDt(new Date());
 
-                    if (threadService.saveThread(editThread, body) != null) {
-                        maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
-                    } else {
-                        log.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
-                        maintenanceThreadViewModel.setInfoMessage("Failed to update thread.");
+                        String body = maintenanceThreadViewModel.getEditArticleMessage();
+
+                        if (threadService.saveThread(editThread, body) != null) {
+                            maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
+                        } else {
+                            log.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());
+                            maintenanceThreadViewModel.setInfoMessage("Failed to update thread.");
+                        }
+
+                        maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                        maintenanceThreadViewModel.setOnEditMessage(false);
                     }
-
-                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
-                    maintenanceThreadViewModel.setOnEditMessage(false);
                 }
             }
 
@@ -1106,6 +1161,7 @@ public class DiscAppMaintenanceController {
                                         @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                         Model model,
                                         HttpServletResponse response) {
+
         if (currentTab == null || currentTab.isEmpty()) {
             currentTab = THREAD_TAB;
         }
@@ -1142,6 +1198,26 @@ public class DiscAppMaintenanceController {
 
             DiscAppUser user = discAppUserDetailsService.getByEmail(username);
             model.addAttribute(POSTING_USERNAME, user.getUsername());
+
+            //set permissions in view model
+            if (!applicationService.isOwnerOfApp(app.getId(), username)) {
+                EditorPermission editorPermission = applicationService.getEditorActivePermission(app.getId(), user.getId());
+                if (editorPermission != null) {
+                    String permissions = editorPermission.getUserPermissions();
+                    maintenanceThreadViewModel.setHasEditPermission(permissions.contains(UserPermission.EDIT));
+                    maintenanceThreadViewModel.setHasPostPermission(permissions.contains(UserPermission.POST));
+                    maintenanceThreadViewModel.setHasReadPermission(permissions.contains(UserPermission.READ));
+                } else {
+                    maintenanceThreadViewModel.setHasEditPermission(false);
+                    maintenanceThreadViewModel.setHasPostPermission(false);
+                    maintenanceThreadViewModel.setHasReadPermission(false);
+                }
+            } else {
+                maintenanceThreadViewModel.setHasEditPermission(true);
+                maintenanceThreadViewModel.setHasPostPermission(true);
+                maintenanceThreadViewModel.setHasReadPermission(true);
+            }
+
 
             if (!maintenanceThreadViewModel.getTab().equals(SEARCH_TAB)) {
                 //get edit threads html
@@ -1202,13 +1278,33 @@ public class DiscAppMaintenanceController {
                                           @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                           Model model,
                                           HttpServletResponse response) {
+
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
             setCommonModelAttributes(model, app, username);
             maintenanceThreadViewModel.setCurrentPage(page);
 
+            //set permissions in view model
+            if (!applicationService.isOwnerOfApp(app.getId(), username)) {
+                DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+                EditorPermission editorPermission = applicationService.getEditorActivePermission(app.getId(), user.getId());
+                if (editorPermission != null) {
+                    String permissions = editorPermission.getUserPermissions();
+                    maintenanceThreadViewModel.setHasEditPermission(permissions.contains(UserPermission.EDIT));
+                    maintenanceThreadViewModel.setHasPostPermission(permissions.contains(UserPermission.POST));
+                    maintenanceThreadViewModel.setHasReadPermission(permissions.contains(UserPermission.READ));
+                } else {
+                    maintenanceThreadViewModel.setHasEditPermission(false);
+                    maintenanceThreadViewModel.setHasPostPermission(false);
+                    maintenanceThreadViewModel.setHasReadPermission(false);
+                }
+            }
+
             if (tab != null && !tab.isEmpty()) {
+                if (tab.equals(POST_TAB) && !maintenanceThreadViewModel.isHasPostPermission()) {
+                    tab = THREAD_TAB;
+                }
                 maintenanceThreadViewModel.setTab(tab);
             }
 
@@ -1928,6 +2024,10 @@ public class DiscAppMaintenanceController {
 
         if (!username.equals(String.valueOf(app.getId()))) {
             model.addAttribute(IS_USER_ACCOUNT, true);
+        }
+
+        if (applicationService.isOwnerOfApp(app.getId(), username)) {
+            model.addAttribute(IS_OWNER, true);
         }
 
     }

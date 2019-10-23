@@ -84,4 +84,8 @@ public class DiscAppUserPrincipal implements UserDetails {
     public String getEmail() {
         return user.getEmail();
     }
+
+    public long getId() {
+        return user.getId();
+    }
 }

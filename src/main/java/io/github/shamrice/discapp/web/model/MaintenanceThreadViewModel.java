@@ -15,6 +15,10 @@ public class MaintenanceThreadViewModel {
 
     private long applicationId;
 
+    private boolean hasEditPermission;
+    private boolean hasPostPermission;
+    private boolean hasReadPermission;
+
     private String tab;
     private String infoMessage;
     private long numberOfMessages;

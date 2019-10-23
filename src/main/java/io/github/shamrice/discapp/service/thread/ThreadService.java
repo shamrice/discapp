@@ -40,6 +40,10 @@ public class ThreadService {
     @Autowired
     private ApplicationService applicationService;
 
+    public List<Thread> getUnapprovedThreads(long appId) {
+        return threadRepository.findByApplicationIdAndDeletedAndIsApprovedOrderByCreateDtDesc(appId, false, false);
+    }
+
     public boolean isNewThreadPostTooSoon(long applicationId, String ipAddress) {
         if (ipAddress != null && !ipAddress.trim().isEmpty()) {
             Thread lastThreadSubmittedByIp = threadRepository.findTopByApplicationIdAndIpAddressOrderByCreateDtDesc(applicationId, ipAddress);
@@ -130,6 +134,7 @@ public class ThreadService {
     }
 
     public long getTotalThreadCountForApplicationId(long applicationId) {
+        //total count includes non-approved threads.
         return threadRepository.countByApplicationIdAndDeleted(applicationId, false);
     }
 
@@ -270,16 +275,16 @@ public class ThreadService {
     }
 
     public List<Thread> getThreads(Long applicationId) {
-        return threadRepository.findByApplicationIdAndDeleted(applicationId, false);
+        return threadRepository.findByApplicationIdAndDeletedAndIsApproved(applicationId, false, true);
     }
 
     public List<Thread> searchThreads(Long applicationId, String searchText) {
-        List<Thread> foundThreads = threadRepository.findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, searchText);
+        List<Thread> foundThreads = threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, true, searchText);
         List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
 
         for (ThreadBody threadBody : resultsInBody) {
             Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-            if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false)) {
+            if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false) && foundThread.get().isApproved()) {
                 foundThread.ifPresent(foundThreads::add);
             }
         }
@@ -295,7 +300,7 @@ public class ThreadService {
 
         //search
         if (subject != null && !subject.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, subject));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, true, subject));
         }
 
         if (messageBody != null && !messageBody.trim().isEmpty()) {
@@ -312,15 +317,15 @@ public class ThreadService {
         }
 
         if (submitter != null && !submitter.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndSubmitterContainingIgnoreCase(applicationId, false, submitter));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubmitterContainingIgnoreCase(applicationId, false, true, submitter));
         }
 
         if (email != null && !email.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndEmailContainingIgnoreCase(applicationId, false, email));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndEmailContainingIgnoreCase(applicationId, false, true, email));
         }
 
         if (ipAddress != null && !ipAddress.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIpAddressContainingIgnoreCase(applicationId, false, ipAddress));
+            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndIpAddressContainingIgnoreCase(applicationId, false, true, ipAddress));
         }
 
         if (subject == null) subject = "";
@@ -360,10 +365,11 @@ public class ThreadService {
 
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(page, numThreads);
-        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
+        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
                 applicationId,
                 TOP_LEVEL_THREAD_PARENT_ID,
                 false,
+                true,
                 limit
         );
 
@@ -395,9 +401,10 @@ public class ThreadService {
     public List<Thread> getLatestThreads(long applicationId, int page, int numThreads) {
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(page, numThreads);
-        return threadRepository.findByApplicationIdAndDeletedOrderByCreateDtDesc(
+        return threadRepository.findByApplicationIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
                 applicationId,
                 false,
+                true,
                 limit
         );
     }
@@ -411,10 +418,11 @@ public class ThreadService {
     public List<Thread> getLatestTopLevelThreads(long applicationId, int page, int numThreads) {
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(page, numThreads);
-        return threadRepository.findByApplicationIdAndParentIdAndDeletedOrderByCreateDtDesc(
+        return threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
                 applicationId,
                 TOP_LEVEL_THREAD_PARENT_ID,
                 false,
+                true,
                 limit
         );
     }
@@ -426,7 +434,7 @@ public class ThreadService {
 
     public Thread getThread(long applicationId, long threadId) {
         Thread foundThread = threadRepository.getOneByApplicationIdAndId(applicationId, threadId);
-        return foundThread != null && foundThread.getDeleted() ? null : foundThread;
+        return foundThread != null && foundThread.getDeleted() && foundThread.isApproved() ? null : foundThread;
     }
 
     public ThreadBody getThreadBody(Long threadId) {
@@ -453,10 +461,11 @@ public class ThreadService {
         if (topLevelThread.isPresent() && topLevelThread.get().getDeleted().equals(false)) {
             topThreadNode = new ThreadTreeNode(topLevelThread.get());
 
-            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(
+            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApproved(
                     topLevelThread.get().getApplicationId(),
                     topLevelThread.get().getId(),
-                    false
+                    false,
+                    true
             );
 
             buildThreadTree(topThreadNode, nextThreads);
@@ -478,10 +487,11 @@ public class ThreadService {
         }
 
         for (ThreadTreeNode subThread : currentNode.getSubThreads()) {
-            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeleted(
+            List<Thread> nextThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApproved(
                     subThread.getCurrent().getApplicationId(),
                     subThread.getCurrent().getId(),
-                    false
+                    false,
+                    true
             );
 
             buildThreadTree(subThread, nextThreads);

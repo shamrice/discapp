@@ -20,6 +20,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -77,16 +78,17 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
 
                             if (url.contains(THREAD_EDIT_PAGE) || url.contains(THREADS_EDIT_PAGE)) {
                                 boolean isEditorOfApp = false;
-                                List<EditorPermission> permissions = applicationService.getEditorPermissionsForUser(discAppUser.getId());
-                                for (EditorPermission editorPermission : permissions) {
-                                    if (editorPermission.getApplicationId().equals(appId) && !editorPermission.getUserPermissions().contains(UserPermission.NONE)) {
-                                        log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + editorPermission.getUserPermissions());
-                                        isEditorOfApp = true;
-                                        break;
-                                    }
+                                EditorPermission editorPermission = applicationService.getEditorActivePermission(appId, discAppUser.getId());
+
+                                if (editorPermission != null) {
+                                    log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + editorPermission.getUserPermissions());
+                                    //set editor permissions if permissions are not set to none.
+                                    isEditorOfApp = !editorPermission.getUserPermissions().contains(UserPermission.NONE);
                                 }
+
                                 if (!isEditorOfApp) {
-                                    log.info("User: " + email + " is not an editor of appId: " + appId
+                                    log.info("User: " + email + " is not an editor or has " + UserPermission.NONE
+                                            + "permission set for appId: " + appId
                                             + " :: redirecting to permission denied");
                                     resp.sendRedirect(PERMISSION_DENIED_URL + APP_ID_QUERY_STRING_KEY + appId);
                                     return;

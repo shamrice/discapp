@@ -40,7 +40,8 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             String url = req.getRequestURL().toString();
 
-            if (url.toLowerCase().contains(APP_INDICES_URL)) {
+            //todo : fix so filter works correctly on /indices/search?disc=appid urls.
+            if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains("search")) {
 
                 String ipAddress = req.getHeader("X-FORWARDED-FOR");
                 if (ipAddress == null || ipAddress.isEmpty()) {

@@ -462,6 +462,11 @@ public class DiscAppController {
                 log.info("new thread: " + newThreadViewModel.getAppId() + " : " + submitter + " : "
                         + subject + " : " + body);
 
+                boolean isApproved = true;
+                if (accountHelper.checkUserHasPermission(appId, UserPermission.HOLD)) {
+                    isApproved = false;
+                }
+
                 Thread newThread = new Thread();
                 newThread.setApplicationId(appId);
                 newThread.setParentId(parentId);
@@ -471,6 +476,7 @@ public class DiscAppController {
                 newThread.setSubject(subject);
                 newThread.setIpAddress(ipAddress);
                 newThread.setUserAgent(userAgent);
+                newThread.setApproved(isApproved);
 
                 //set values for logged in user, if not logged in... use form data.
                 String userEmail = accountHelper.getLoggedInEmail();
@@ -530,7 +536,7 @@ public class DiscAppController {
         ThreadViewModel threadViewModel = new ThreadViewModel();
 
         Thread currentThread = threadService.getThread(appId, threadId);
-        if (currentThread != null) {
+        if (currentThread != null && currentThread.isApproved()) {
 
             int maxPreviewLength = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
             int maxThreadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 30);
@@ -598,7 +604,7 @@ public class DiscAppController {
             model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
             model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
         } else {
-            log.warn("Attempted to view thread: " + threadId + " on appId: " + appId + " but does not belong to app. Redirecting to appView.");
+            log.warn("Attempted to view thread: " + threadId + " on appId: " + appId + " but does not belong to app or is not approved. Redirecting to appView.");
             return "redirect:/indices/" + appId;
         }
 

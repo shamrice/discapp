@@ -81,6 +81,7 @@ CREATE TABLE thread (
     show_email bool NOT NULL default false,
     parent_id int NOT NULL DEFAULT 0,
     discapp_user_id int DEFAULT NULL,
+    is_approved bool NOT NULL default true,
     create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),
