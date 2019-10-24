@@ -645,6 +645,14 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
+    @GetMapping("/indices/search")
+    public ModelAndView getSearchDiscApp(@RequestParam(name = "disc") Long appId,
+                                         Model model) {
+        log.debug("Attempted GET on search. Only POST is allowed. AppId: " + appId);
+        return new ModelAndView("redirect:/indices/" + appId);
+    }
+
+
     @PostMapping("/indices/search")
     public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
                                       @RequestParam(name = "searchTerm", required = false) String searchTerm,

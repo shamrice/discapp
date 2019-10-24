@@ -10,8 +10,10 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,7 +31,7 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
 
     private static final String THREADS_EDIT_PAGE = "disc-edit.cgi";
     private static final String THREAD_EDIT_PAGE = "edit-thread.cgi";
-    private static final String APP_ID_QUERY_STRING_KEY = "?id=";
+    private static final String APP_ID_QUERY_STRING_KEY = "id";
     private static final String PERMISSION_DENIED_URL = DiscAppMaintenanceController.CONTROLLER_URL_DIRECTORY + "permission-denied";
 
     @Autowired
@@ -65,42 +67,43 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                 if (discAppUser != null ) {
 
                     try {
-                        //remove any extra query params except first id param
-                        String queryString = req.getQueryString();
-                        if (queryString.contains("&")) {
-                            queryString = queryString.substring(0, queryString.indexOf("&"));
-                        }
-                        String appIdStr = queryString.substring(queryString.lastIndexOf(APP_ID_QUERY_STRING_KEY) + APP_ID_QUERY_STRING_KEY.length());
-                        long appId = Long.parseLong(appIdStr);
+                        MultiValueMap<String, String> params = UriComponentsBuilder
+                                .fromUriString(req.getRequestURL().toString() + "?" + req.getQueryString())
+                                .build()
+                                .getQueryParams();
+                        String appIdStr = params.getFirst(APP_ID_QUERY_STRING_KEY);
 
-                        if (!applicationService.isOwnerOfApp(appId, email)) {
-                            log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
+                        if (appIdStr != null) {
+                            long appId = Long.parseLong(appIdStr);
 
-                            if (url.contains(THREAD_EDIT_PAGE) || url.contains(THREADS_EDIT_PAGE)) {
-                                boolean isEditorOfApp = false;
-                                EditorPermission editorPermission = applicationService.getEditorActivePermission(appId, discAppUser.getId());
+                            if (!applicationService.isOwnerOfApp(appId, email)) {
+                                log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
 
-                                if (editorPermission != null) {
-                                    log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + editorPermission.getUserPermissions());
-                                    //set editor permissions if permissions are not set to none.
-                                    isEditorOfApp = !editorPermission.getUserPermissions().contains(UserPermission.NONE);
-                                }
+                                if (url.contains(THREAD_EDIT_PAGE) || url.contains(THREADS_EDIT_PAGE)) {
+                                    boolean isEditorOfApp = false;
+                                    EditorPermission editorPermission = applicationService.getEditorActivePermission(appId, discAppUser.getId());
 
-                                if (!isEditorOfApp) {
-                                    log.info("User: " + email + " is not an editor or has " + UserPermission.NONE
-                                            + "permission set for appId: " + appId
+                                    if (editorPermission != null) {
+                                        log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + editorPermission.getUserPermissions());
+                                        //set editor permissions if permissions are not set to none.
+                                        isEditorOfApp = !editorPermission.getUserPermissions().contains(UserPermission.NONE);
+                                    }
+
+                                    if (!isEditorOfApp) {
+                                        log.info("User: " + email + " is not an editor or has " + UserPermission.NONE
+                                                + "permission set for appId: " + appId
+                                                + " :: redirecting to permission denied");
+                                        resp.sendRedirect(PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
+                                        return;
+                                    }
+                                } else {
+                                    log.info("User: " + email + " is not the owner of appId: " + appId
                                             + " :: redirecting to permission denied");
-                                    resp.sendRedirect(PERMISSION_DENIED_URL + APP_ID_QUERY_STRING_KEY + appId);
+                                    resp.sendRedirect(PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
                                     return;
                                 }
-                            } else {
-                                log.info("User: " + email + " is not the owner of appId: " + appId
-                                        + " :: redirecting to permission denied");
-                                resp.sendRedirect(PERMISSION_DENIED_URL + APP_ID_QUERY_STRING_KEY + appId);
-                                return;
                             }
                         }
-
                     } catch (Exception ex) {
                         log.error("Error checking for url: " + url + " queryString= " + req.getQueryString()
                                 + " :: error: " + ex.getMessage(), ex);
@@ -113,6 +116,5 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
-
 
 }

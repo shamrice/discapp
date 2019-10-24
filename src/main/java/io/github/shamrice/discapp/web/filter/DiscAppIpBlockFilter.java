@@ -5,8 +5,10 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,6 +25,8 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
 
     private static final String PERMISSION_DENIED_URL = "/error/permissionDenied";
     private static final String APP_INDICES_URL = "indices";
+    private static final String SEARCH_URL = "search";
+    private static final String SEARCH_APP_ID_QUERY_PARAM = "disc";
 
     @Autowired
     private ApplicationService applicationService;
@@ -41,7 +45,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             String url = req.getRequestURL().toString();
 
             //todo : fix so filter works correctly on /indices/search?disc=appid urls.
-            if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains("search")) {
+            if (url.toLowerCase().contains(APP_INDICES_URL)) {
 
                 String ipAddress = req.getHeader("X-FORWARDED-FOR");
                 if (ipAddress == null || ipAddress.isEmpty()) {
@@ -49,12 +53,24 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                 }
 
                 try {
-                    String appIdStr = url.substring(url.lastIndexOf("/") + 1).replace(".html", "");
+                    String appIdStr;
+                    if (url.toLowerCase().contains(SEARCH_URL)) {
+                        MultiValueMap<String, String> params = UriComponentsBuilder
+                                .fromUriString(req.getRequestURL().toString() + "?" + req.getQueryString())
+                                .build()
+                                .getQueryParams();
 
-                    long appId = Long.parseLong(appIdStr);
+                        appIdStr = params.getFirst(SEARCH_APP_ID_QUERY_PARAM);
+                    } else {
+                        appIdStr = url.substring(url.lastIndexOf("/") + 1).replace(".html", "");
+                    }
 
-                    handleIpPrefixBlockedForApp(servletResponse, appId, ipAddress);
-                    handleAbuseIpBlockedForApp(servletResponse, appId, ipAddress);
+                    if (appIdStr != null) {
+                        long appId = Long.parseLong(appIdStr);
+
+                        handleIpPrefixBlockedForApp(servletResponse, appId, ipAddress);
+                        handleAbuseIpBlockedForApp(servletResponse, appId, ipAddress);
+                    }
 
                 } catch (Exception ex) {
                     log.error("Error checking disc app ip block for ip address: " + ipAddress + " for url: " + url
