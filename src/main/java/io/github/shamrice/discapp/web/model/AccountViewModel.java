@@ -51,7 +51,10 @@ public class AccountViewModel {
     private String applicationAdminPassword;
     private String confirmApplicationAdminPassword;
 
+    private String baseEditorUrl;
+
     private List<AccountApplication> accountApplications;
+    private List<AccountApplication> moderatingApplications;
 
     public boolean isBelowAppLimit() {
         if (maxDiscApps == null) {

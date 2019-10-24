@@ -75,7 +75,7 @@
                 <tr>
                     <td colspan="2" style="padding:5px;">
                         <p>
-                        Click the button below to create a new Disc App or manage existing Disc Apps associated
+                            Click the button below to create a new Disc App or manage existing Disc Apps associated
                             with your account.
 
                         </p>
@@ -88,6 +88,36 @@
                 </tr>
             </table>
         </form>
+    </div>
+</div>
+
+<div th:if="${not #lists.isEmpty(accountViewModel.getModeratingApplications())}" class="grey_box" style="width:40em;">
+    <h2 id="moderate_application_banner">Applications You Moderate</h2>
+    <hr/>
+    <!-- todo : move inline style tags to css -->
+    <div>
+        <table style="border:1px solid black;border-collapse:collapse;">
+            <tr style="color:white;background:#99e;">
+                <th style="text-align:center;padding:10px;border:1px solid black;">
+                    Application Name
+                </th>
+                <th style="text-align:center;padding:10px;border:1px solid black;">
+                    Editor URL
+                </th>
+            </tr>
+            <tr th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}"
+                style="text-align:left;">
+                <td th:text="${moderatingApplication.getApplicationName()}"
+                    style="border:1px solid black;padding:10px;">
+                </td>
+                <td style="border:1px solid black;padding:10px;">
+                    <a th:href="${accountViewModel.getBaseEditorUrl() + moderatingApplication.getApplicationId()}"
+                       th:text="${accountViewModel.getBaseEditorUrl() + moderatingApplication.getApplicationId()}"
+                       target="_blank">
+                    </a>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 

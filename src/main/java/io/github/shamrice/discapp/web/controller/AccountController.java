@@ -1,12 +1,10 @@
 package io.github.shamrice.discapp.web.controller;
 
-import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.ApplicationPermission;
-import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.Owner;
+import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
@@ -352,6 +350,7 @@ public class AccountController {
 
     @GetMapping("/account/modify")
     public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
+                                         HttpServletRequest request,
                                          ModelMap modelMap) {
 
         String email = accountHelper.getLoggedInEmail();
@@ -380,6 +379,31 @@ public class AccountController {
                     accountViewModel.setOwnerPhone(owner.getPhone());
                 }
             }
+
+            List<EditorPermission> editorPermissions = applicationService.getEditorPermissionsForUser(user.getId());
+            if (editorPermissions != null) {
+                List<AccountViewModel.AccountApplication> moderatingApplications = new ArrayList<>();
+
+                for (EditorPermission editorPermission : editorPermissions) {
+
+                    if (editorPermission.getUserPermissions().contains(UserPermission.EDIT)) {
+
+                        Application application = applicationService.get(editorPermission.getApplicationId());
+                        if (application != null) {
+                            AccountViewModel.AccountApplication accountApplication = new AccountViewModel.AccountApplication(
+                                    application.getName(),
+                                    application.getId(),
+                                    ENABLED
+                            );
+                            moderatingApplications.add(accountApplication);
+                        }
+                    }
+                }
+                String baseUrl = webHelper.getBaseUrl(request);
+                accountViewModel.setBaseEditorUrl(baseUrl + "/admin/disc-edit.cgi?id=");
+
+                accountViewModel.setModeratingApplications(moderatingApplications);
+            }
         }
 
         return new ModelAndView("account/modifyAccount", "accountViewModel", accountViewModel);
@@ -387,6 +411,7 @@ public class AccountController {
 
     @PostMapping("/account/modify/password")
     public ModelAndView postAccountModifyPassword(@ModelAttribute AccountViewModel accountViewModel,
+                                                  HttpServletRequest request,
                                                   ModelMap modelMap) {
         if (accountViewModel != null) {
             String email = accountHelper.getLoggedInEmail();
@@ -403,34 +428,34 @@ public class AccountController {
                         || (confirmNewPassword == null || confirmNewPassword.isEmpty())) {
 
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, modelMap);
+                    return getAccountModify(accountViewModel, request, modelMap);
                 }
 
                 if (newPassword.length() < 8) { //todo : set length in some constant somewhere or config...
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, modelMap);
+                    return getAccountModify(accountViewModel, request, modelMap);
                 }
 
                 if (!newPassword.trim().equals(confirmNewPassword.trim())) {
                     accountViewModel.setErrorMessage("Passwords do not match.");
-                    return getAccountModify(accountViewModel, modelMap);
+                    return getAccountModify(accountViewModel, request, modelMap);
                 } else {
 
                     //verify passwords entered are correct.
                     if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
                         log.error("Cannot update account password. Original password does not match existing password for account.");
                         accountViewModel.setErrorMessage("Failed to update password");
-                        return getAccountModify(accountViewModel, modelMap);
+                        return getAccountModify(accountViewModel, request, modelMap);
                     }
 
                     user.setPassword(newPassword.trim());
                     if (discAppUserDetailsService.saveDiscAppUser(user)) {
                         accountViewModel.setInfoMessage("Password successfully updated.");
-                        return getAccountModify(accountViewModel, modelMap);
+                        return getAccountModify(accountViewModel, request, modelMap);
                     } else {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
                         accountViewModel.setErrorMessage("Failed to update password.");
-                        return getAccountModify(accountViewModel, modelMap);
+                        return getAccountModify(accountViewModel, request, modelMap);
                     }
                 }
             }
@@ -530,6 +555,7 @@ public class AccountController {
 
     @PostMapping("/account/modify/owner")
     public ModelAndView postOwnerModify(@ModelAttribute AccountViewModel accountViewModel,
+                                        HttpServletRequest request,
                                         ModelMap modelMap) {
 
         if (accountViewModel != null) {
@@ -569,7 +595,7 @@ public class AccountController {
             }
         }
 
-        return getAccountModify(accountViewModel, modelMap);
+        return getAccountModify(accountViewModel, request, modelMap);
     }
 
     @GetMapping("/account/add/application")
@@ -619,6 +645,7 @@ public class AccountController {
 
     @PostMapping("/account/add/application")
     public ModelAndView postAddApplication(@ModelAttribute AccountViewModel accountViewModel,
+                                           HttpServletRequest request,
                                            ModelMap modelMap) {
 
         if (accountViewModel != null) {
@@ -644,7 +671,7 @@ public class AccountController {
                         if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
                             log.error("Cannot add Disc App to account. Passwords do not match existing password for account.");
                             accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                            return getAccountModify(accountViewModel, modelMap);
+                            return getAccountModify(accountViewModel, request, modelMap);
                         }
 
                         String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
@@ -658,14 +685,14 @@ public class AccountController {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new owner without a first or last name.");
                             accountViewModel.setErrorMessage("Owner first name and last name are required to create an application.");
-                            return getAccountModify(accountViewModel, modelMap);
+                            return getAccountModify(accountViewModel, request, modelMap);
                         }
 
                         if (appName == null || appName.trim().isEmpty()) {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new application without a name");
                             accountViewModel.setErrorMessage("Application name is required to create an application.");
-                            return getAccountModify(accountViewModel, modelMap);
+                            return getAccountModify(accountViewModel, request, modelMap);
                         }
 
                         //check if owner already exists...
