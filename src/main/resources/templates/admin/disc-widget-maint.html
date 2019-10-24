@@ -7,33 +7,6 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    <!--style type="text/css">
-        fieldset {
-            background-color: #fff;
-        }
-
-        fieldset a,
-        fieldset span {
-            text-decoration: none;
-            padding: 3px;
-            float: left;
-            font-weight: normal;
-        }
-
-        fieldset a:hover {
-            background-color: #ccf;
-        }
-
-        fieldset img {
-            height: 32px;
-            width: 32px;
-            vertical-align: middle;
-        }
-
-        p {
-            margin-bottom: 3ex;
-        }
-    </style-->
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
 <body>
@@ -111,15 +84,17 @@
                     (select style sheet on
                     <a th:href="@{|/admin/appearance-frameset.cgi?id=${maintenanceWidgetViewModel.getApplicationId()}|}">appearance tab</a>
 
-                    <!--TODO : documentation links -->
+                    <!--TODO : documentation links >
                     <a href="/Documentation/HTML/discussionapps_widgets.html" target="_blank">
                         see documentation)
-                    </a>
+                    </a>-->
+                    )
                 </span>
             </p>
 
             <div class="pad">
                 <input type="submit" name="submitChanges" value="Submit Changes" class="button" />
+                <input type="submit" name="resetToDefault" value="Reset To Default Values" class="button" />
             </div>
         </div>
         <div>
@@ -143,7 +118,6 @@
 
         <pre class="code" th:text="${maintenanceWidgetViewModel.getCodeHtml()}">
         </pre>
-
     </div>
 
 </div>

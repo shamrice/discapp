@@ -19,6 +19,7 @@ public class MaintenanceWidgetViewModel {
     private boolean showDate;
     private boolean showStyleSheet;
     private String submitChanges;
+    private String resetToDefault;
     private String codeHtml;
 
     public boolean isHeightUnit(String unit) {

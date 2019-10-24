@@ -65,6 +65,10 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.WIDGET_SHOW_AUTHOR, "true");
         configsToSet.put(ConfigurationProperty.WIDGET_SHOW_DATE, "false");
         configsToSet.put(ConfigurationProperty.WIDGET_USE_STYLE_SHEET, "true");
+        configsToSet.put(ConfigurationProperty.WIDGET_WIDTH, "20");
+        configsToSet.put(ConfigurationProperty.WIDGET_WIDTH_UNIT, "em");
+        configsToSet.put(ConfigurationProperty.WIDGET_HEIGHT, "18");
+        configsToSet.put(ConfigurationProperty.WIDGET_HEIGHT_UNIT, "em");
 
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");

@@ -624,29 +624,62 @@ public class DiscAppMaintenanceController {
             String username = accountHelper.getLoggedInEmail();
             setCommonModelAttributes(model, app, username);
 
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, String.valueOf(maintenanceWidgetViewModel.isShowStyleSheet()).toLowerCase());
+            //submit changes.
+            if (maintenanceWidgetViewModel.getSubmitChanges() != null && !maintenanceWidgetViewModel.getSubmitChanges().isEmpty()) {
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, String.valueOf(maintenanceWidgetViewModel.isShowStyleSheet()).toLowerCase());
 
-            int width = 20;
-            try {
-                width = Integer.parseInt(maintenanceWidgetViewModel.getWidgetWidth());
-            } catch (NumberFormatException widthEx) {
-                log.warn("Invalid widget width for appId: " + appId
-                        + " : value: " + maintenanceWidgetViewModel.getWidgetWidth() + " :: using default: "
-                        + width + " :: " + widthEx.getMessage());
-            }
-            maintenanceWidgetViewModel.setWidgetWidth(String.valueOf(width));
+                int width = 20;
+                try {
+                    width = Integer.parseInt(maintenanceWidgetViewModel.getWidgetWidth());
+                } catch (NumberFormatException widthEx) {
+                    log.warn("Invalid widget width for appId: " + appId
+                            + " : value: " + maintenanceWidgetViewModel.getWidgetWidth() + " :: using default: "
+                            + width + " :: " + widthEx.getMessage());
+                }
+                maintenanceWidgetViewModel.setWidgetWidth(String.valueOf(width));
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, String.valueOf(width));
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, maintenanceWidgetViewModel.getWidgetWidthUnit());
 
-            int height = 18;
-            try {
-                height = Integer.parseInt(maintenanceWidgetViewModel.getWidgetHeight());
-            } catch (NumberFormatException heightEx) {
-                log.warn("Invalid widget height for appId: " + appId
-                        + " : value: " + maintenanceWidgetViewModel.getWidgetHeight() + " :: using default: "
-                        + height + " :: " + heightEx.getMessage());
+                int height = 18;
+                try {
+                    height = Integer.parseInt(maintenanceWidgetViewModel.getWidgetHeight());
+                } catch (NumberFormatException heightEx) {
+                    log.warn("Invalid widget height for appId: " + appId
+                            + " : value: " + maintenanceWidgetViewModel.getWidgetHeight() + " :: using default: "
+                            + height + " :: " + heightEx.getMessage());
+                }
+                maintenanceWidgetViewModel.setWidgetHeight(String.valueOf(height));
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, String.valueOf(height));
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, maintenanceWidgetViewModel.getWidgetHeightUnit());
+            } else {
+                //reset to default values.
+                //todo : probably should get these values from somewhere in the config service or something...
+                String width = "20";
+                String widthUnit = "em";
+                String height = "18";
+                String heightUnit = "em";
+                String showAuthor = "true";
+                String showDate = "false";
+                String useStyleSheet = "true";
+
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, showAuthor);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, showDate);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, useStyleSheet);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, width);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, widthUnit);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, height);
+                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, heightUnit);
+
+                maintenanceWidgetViewModel.setWidgetWidth(width);
+                maintenanceWidgetViewModel.setWidgetWidthUnit(widthUnit);
+                maintenanceWidgetViewModel.setWidgetHeight(height);
+                maintenanceWidgetViewModel.setWidgetHeightUnit(heightUnit);
+                maintenanceWidgetViewModel.setShowAuthor(Boolean.parseBoolean(showAuthor));
+                maintenanceWidgetViewModel.setShowDate(Boolean.parseBoolean(showDate));
+                maintenanceWidgetViewModel.setShowStyleSheet(Boolean.parseBoolean(useStyleSheet));
             }
-            maintenanceWidgetViewModel.setWidgetHeight(String.valueOf(height));
 
         } catch (Exception ex) {
             log.error("Error saving widget settings for appId: " + appId + " :: " + ex.getMessage(), ex);
@@ -671,26 +704,18 @@ public class DiscAppMaintenanceController {
             boolean showAuthor = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, true);
             boolean showDate = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, false);
             boolean useStyleSheet = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, true);
+            String width = configurationService.getStringValue(app.getId(), ConfigurationProperty.WIDGET_WIDTH, "20");
+            String widthUnit = configurationService.getStringValue(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, "em");
+            String height = configurationService.getStringValue(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, "18");
+            String heightUnit = configurationService.getStringValue(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, "em");
 
             maintenanceWidgetViewModel.setShowAuthor(showAuthor);
             maintenanceWidgetViewModel.setShowDate(showDate);
             maintenanceWidgetViewModel.setShowStyleSheet(useStyleSheet);
-
-            if (maintenanceWidgetViewModel.getWidgetHeight() == null || maintenanceWidgetViewModel.getWidgetHeight().isEmpty()) {
-                maintenanceWidgetViewModel.setWidgetHeight("18");
-            }
-
-            if (maintenanceWidgetViewModel.getWidgetHeightUnit() == null || maintenanceWidgetViewModel.getWidgetHeightUnit().isEmpty()) {
-                maintenanceWidgetViewModel.setWidgetHeightUnit("em");
-            }
-
-            if (maintenanceWidgetViewModel.getWidgetWidth() == null || maintenanceWidgetViewModel.getWidgetWidth().isEmpty()) {
-                maintenanceWidgetViewModel.setWidgetWidth("20");
-            }
-
-            if (maintenanceWidgetViewModel.getWidgetWidthUnit() == null || maintenanceWidgetViewModel.getWidgetWidthUnit().isEmpty()) {
-                maintenanceWidgetViewModel.setWidgetWidthUnit("em");
-            }
+            maintenanceWidgetViewModel.setWidgetWidth(width);
+            maintenanceWidgetViewModel.setWidgetWidthUnit(widthUnit);
+            maintenanceWidgetViewModel.setWidgetHeight(height);
+            maintenanceWidgetViewModel.setWidgetHeightUnit(heightUnit);
 
             String heightUnitForCode = maintenanceWidgetViewModel.getWidgetHeightUnit();
             String widthUnitForCode = maintenanceWidgetViewModel.getWidgetWidthUnit();
