@@ -8,6 +8,7 @@
     <div th:if="${maintenanceThreadViewModel.isOnEditMessage() && !maintenanceThreadViewModel.isOnEditModifyMessage()}">
         <div style="padding-left:1em;">
             <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
+            <input type="hidden" name="editArticleParentId" th:value="${maintenanceThreadViewModel.getEditArticleParentId()}"/>
             <input type="hidden" name="onEditMessage" th:value="${maintenanceThreadViewModel.isOnEditMessage()}"/>
             <input type="hidden" name="onEditModifyMessage"
                    th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>
@@ -16,6 +17,7 @@
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="editArticle" value="Edit Message" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticles" value="Delete Message" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getEditArticleParentId() > 0}"  type="submit" name="makeThisTopLevelArticle" value="Make this a top level article" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
                 <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                 <input type="submit" name="editArticleCancelEdit" value="Return to Messages" class="button"/>
@@ -88,6 +90,7 @@
         <div style="padding-left:1em;">
 
             <input type="hidden" name="editArticleId" th:value="${maintenanceThreadViewModel.getEditArticleId()}"/>
+            <input type="hidden" name="editArticleParentId" th:value="${maintenanceThreadViewModel.getEditArticleParentId()}"/>
             <input type="hidden" name="onEditMessage" th:value="${maintenanceThreadViewModel.isOnEditMessage()}"/>
             <input type="hidden" name="onEditModifyMessage"
                    th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>

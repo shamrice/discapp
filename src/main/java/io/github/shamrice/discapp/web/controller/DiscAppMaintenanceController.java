@@ -932,6 +932,36 @@ public class DiscAppMaintenanceController {
                 }
             }
 
+            //make this a top level article
+            if (maintenanceThreadViewModel.getMakeThisTopLevelArticle() != null && !maintenanceThreadViewModel.getMakeThisTopLevelArticle().isEmpty()
+                    && maintenanceThreadViewModel.getEditArticleParentId() > 0) {
+
+                if (!accountHelper.checkUserHasEditorPermission(appId, UserPermission.EDIT)) {
+                    maintenanceThreadViewModel.setInfoMessage("Your account does not have permission to do this action.");
+                } else {
+
+                    boolean makeThreadTopLevelSuccess = true;
+
+                    //set top level from edit message screen
+                    if (maintenanceThreadViewModel.isOnEditMessage() && maintenanceThreadViewModel.getEditArticleId() != null) {
+                        if (!threadService.setThreadAsTopLevelArticle(app.getId(), maintenanceThreadViewModel.getEditArticleId())) {
+                            log.error("Failed to mark thread as top level thread: " + maintenanceThreadViewModel.getEditArticleId() + " for appId: " + app.getId());
+                            makeThreadTopLevelSuccess = false;
+                        }
+                    }
+
+                    //set message for user
+                    if (makeThreadTopLevelSuccess) {
+                        maintenanceThreadViewModel.setInfoMessage("Successfully made message top level article.");
+                    } else {
+                        maintenanceThreadViewModel.setInfoMessage("Failed to make message top level article.");
+                    }
+                    //return to thread list
+                    maintenanceThreadViewModel.setOnEditModifyMessage(false);
+                    maintenanceThreadViewModel.setOnEditMessage(false);
+                }
+            }
+
             //report abuse
             if (maintenanceThreadViewModel.getReportAbuse() != null && !maintenanceThreadViewModel.getReportAbuse().isEmpty()) {
 
@@ -1404,6 +1434,7 @@ public class DiscAppMaintenanceController {
             Thread editingThread = threadService.getThread(app.getId(), threadId);
             if (editingThread != null) {
                 maintenanceThreadViewModel.setEditArticleId(editingThread.getId());
+                maintenanceThreadViewModel.setEditArticleParentId(editingThread.getParentId());
                 maintenanceThreadViewModel.setEditArticleSubmitter(editingThread.getSubmitter());
                 maintenanceThreadViewModel.setEditArticleEmail(editingThread.getEmail());
                 maintenanceThreadViewModel.setEditArticleSubject(editingThread.getSubject());

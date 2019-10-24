@@ -29,6 +29,7 @@ public class MaintenanceThreadViewModel {
 
     private String deleteArticles;
     private String deleteArticlesAndReplies;
+    private String makeThisTopLevelArticle;
     private String reportAbuse;
     private boolean hasNextPage;
     private boolean hasPreviousPage;
@@ -61,6 +62,7 @@ public class MaintenanceThreadViewModel {
     private String editArticleChangeMessage;
     private String editArticleCancelEdit;
     private Long editArticleId;
+    private Long editArticleParentId;
     private String pagemark;
     private String editArticleSubmitter;
     private String editArticleEmail;

@@ -40,6 +40,20 @@ public class ThreadService {
     @Autowired
     private ApplicationService applicationService;
 
+    public boolean setThreadAsTopLevelArticle(long appId, long threadId) {
+        Thread thread = getThread(appId, threadId);
+        if (thread != null) {
+            thread.setParentId(0L);
+            thread.setModDt(new Date());
+            if (threadRepository.save(thread) != null) {
+                log.info("Successfully set threadId: " +threadId + " to a top level thread for appId: " + appId);
+                return true;
+            }
+        }
+        log.error("Failed to set threadId: " + threadId + " to top level thread. Either thread was not found or error while saving.");
+        return false;
+    }
+
     public List<Thread> getUnapprovedThreads(long appId) {
         return threadRepository.findByApplicationIdAndDeletedAndIsApprovedOrderByCreateDtDesc(appId, false, false);
     }
