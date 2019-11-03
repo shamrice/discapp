@@ -199,7 +199,7 @@ CREATE TABLE application_permission (
   FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
-CREATE TABLE editor_permission (
+CREATE TABLE user_permission (
   id int(255) NOT NULL AUTO_INCREMENT,
   application_id int NOT NULL,
   discapp_user_id int NOT NULL,

@@ -1,6 +1,6 @@
 package io.github.shamrice.discapp.web.model;
 
-import io.github.shamrice.discapp.data.model.EditorPermission;
+import io.github.shamrice.discapp.data.model.UserPermission;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,18 +21,17 @@ public class MaintenanceSecurityViewModel {
     private String changeOwnerEmail;
     private String ownerEmailMessage;
 
-
     private String unregisteredPermissions;
     private String registeredPermissions;
     private String changeDefaultAccess;
     private String permissionMessage;
 
     private String editUrl;
-    private List<EditorPermission> editorPermissions = new ArrayList<>();
+    private List<UserPermission> userPermissions = new ArrayList<>();
     private String changeUserAccess;
     private String deleteUsers;
     private String searchUsersForm;
-    private String editorPermissionMessage;
+    private String userPermissionMessage;
 
     private boolean showIp;
     private boolean blockBadWords;

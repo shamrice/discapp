@@ -14,12 +14,12 @@
                    th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>
             <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
             <div class="buttons" style="margin-bottom:1em;">
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="editArticle" value="Edit Message" class="button"/>
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticles" value="Delete Message" class="button"/>
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getEditArticleParentId() > 0}"  type="submit" name="makeThisTopLevelArticle" value="Make this a top level article" class="button"/>
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission() && maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
+                <input type="submit" name="editArticle" value="Edit Message" class="button"/>
+                <input type="submit" name="deleteArticles" value="Delete Message" class="button"/>
+                <input type="submit" name="deleteArticlesAndReplies" value="Delete Message and Replies" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.getEditArticleParentId() > 0}"  type="submit" name="makeThisTopLevelArticle" value="Make this a top level article" class="button"/>
+                <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
+                <input th:if="${maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                 <input type="submit" name="editArticleCancelEdit" value="Return to Messages" class="button"/>
             </div>
         </div>
@@ -136,7 +136,7 @@
             </div>
 
             <div class="buttons">
-                <input th:if="${maintenanceThreadViewModel.isHasEditPermission()}"  type="submit" name="editArticleChangeMessage" value="Change Message" class="button"/>
+                <input type="submit" name="editArticleChangeMessage" value="Change Message" class="button"/>
                 <input type="submit" name="editArticleCancelEdit" value="Cancel" class="button"/>
             </div>
 

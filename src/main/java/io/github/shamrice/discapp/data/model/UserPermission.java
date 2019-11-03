@@ -13,9 +13,9 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @ToString
-@Table(name = "editor_permission")
+@Table(name = "user_permission")
 @SecondaryTable(name = "discapp_user")
-public class EditorPermission {
+public class UserPermission {
 
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)

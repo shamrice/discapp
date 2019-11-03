@@ -4,7 +4,6 @@ import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
-import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
@@ -380,15 +379,15 @@ public class AccountController {
                 }
             }
 
-            List<EditorPermission> editorPermissions = applicationService.getEditorPermissionsForUser(user.getId());
-            if (editorPermissions != null) {
+            List<UserPermission> userPermissions = applicationService.getAllApplicationPermissionsForUser(user.getId());
+            if (userPermissions != null) {
                 List<AccountViewModel.AccountApplication> moderatingApplications = new ArrayList<>();
 
-                for (EditorPermission editorPermission : editorPermissions) {
+                for (UserPermission userPermission : userPermissions) {
 
-                    if (editorPermission.getUserPermissions().contains(UserPermission.EDIT)) {
+                    if (userPermission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT)) {
 
-                        Application application = applicationService.get(editorPermission.getApplicationId());
+                        Application application = applicationService.get(userPermission.getApplicationId());
                         if (application != null) {
                             AccountViewModel.AccountApplication accountApplication = new AccountViewModel.AccountApplication(
                                     application.getName(),

@@ -15,10 +15,6 @@ public class MaintenanceThreadViewModel {
 
     private long applicationId;
 
-    private boolean hasEditPermission;
-    private boolean hasPostPermission;
-    private boolean hasReadPermission;
-
     private boolean hasUnapprovedMessages;
     private String approve;
 

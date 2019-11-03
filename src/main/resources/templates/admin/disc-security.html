@@ -114,7 +114,7 @@
                 <input type="submit" name="changeDefaultAccess" value="Change Default Access Permissions" class="button" />
             </div>
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getEditorPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getEditorPermissionMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getUserPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getUserPermissionMessage()}"></h3>
                 <p style="font-size:smaller;">Editors can use the URL <a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank" th:text="${maintenanceSecurityViewModel.getEditUrl()}"></a> to edit articles.</p>
                 <table class="colored">
                     <tr class="hidden_text">
@@ -128,50 +128,50 @@
                             Be very selective about who you assign this privilege to.</p></a></th>
                         <th>Delete</th>
                     </tr>
-                    <tr th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getEditorPermissions())}"
-                        th:each="editorPermission, itemStat : *{editorPermissions}">
-                        <td th:text="${editorPermission.getDiscAppUser().getUsername()}">
+                    <tr th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}"
+                        th:each="userPermission, itemStat : *{userPermissions}">
+                        <td th:text="${userPermission.getDiscAppUser().getUsername()}">
                         </td>
                         <td>
-                            <input type="hidden" th:field="*{editorPermissions[__${itemStat.index}__].id}" th:value="${editorPermission.getId()}" />
+                            <input type="hidden" th:field="*{userPermissions[__${itemStat.index}__].id}" th:value="${userPermission.getId()}" />
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="n" th:checked="${editorPermission.getUserPermissions().equals('n')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="n" th:checked="${userPermission.getUserPermissions().equals('n')}" />
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="r" th:checked="${editorPermission.getUserPermissions().equals('r')}"/>
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="r" th:checked="${userPermission.getUserPermissions().equals('r')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="rf" th:checked="${editorPermission.getUserPermissions().equals('rf')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rf" th:checked="${userPermission.getUserPermissions().equals('rf')}" />
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}"  value="rfp" th:checked="${editorPermission.getUserPermissions().equals('rfp')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"  value="rfp" th:checked="${userPermission.getUserPermissions().equals('rfp')}" />
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="rfph" th:checked="${editorPermission.getUserPermissions().equals('rfph')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rfph" th:checked="${userPermission.getUserPermissions().equals('rfph')}" />
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="rfpe" th:checked="${editorPermission.getUserPermissions().equals('rfpe')}"/>
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rfpe" th:checked="${userPermission.getUserPermissions().equals('rfpe')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{editorPermissions[__${itemStat.index}__].userPermissions}" value="delete" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="delete" />
                             </label>
                         </td>
                     </tr>
                 </table>
-                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getEditorPermissions())}" type="submit" name="changeUserAccess" value="Change User Access Permissions" class="button" />
-                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getEditorPermissions())}" type="submit" name="deleteUsers" value="Delete Users" class="button" />
+                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit" name="changeUserAccess" value="Change User Access Permissions" class="button" />
+                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit" name="deleteUsers" value="Delete Users" class="button" />
                 <input type="submit" name="searchUsersForm" value="Add Users" class="button" />
             </div>
         </div>

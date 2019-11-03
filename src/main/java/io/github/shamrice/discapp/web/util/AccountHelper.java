@@ -1,10 +1,10 @@
 package io.github.shamrice.discapp.web.util;
 
 import io.github.shamrice.discapp.data.model.ApplicationPermission;
-import io.github.shamrice.discapp.data.model.EditorPermission;
+import io.github.shamrice.discapp.data.model.UserPermission;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
-import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,28 +20,8 @@ public class AccountHelper {
     @Autowired
     private ApplicationService applicationService;
 
-    public boolean checkUserHasEditorPermission(long appId, String permissionRequired) {
-        if (permissionRequired == null || permissionRequired.trim().isEmpty()) {
-            return false;
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            if (auth.isAuthenticated() && !auth.getPrincipal().equals(ANONYMOUS_USER)) {
-                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
-                if (applicationService.isOwnerOfApp(appId, principal.getEmail())) {
-                    log.info("User: " + principal.getEmail() + " is owner of the app. Has full editor permissions.");
-                    //owners do not have hold or none permissions. Return true for all else.
-                    return !permissionRequired.equalsIgnoreCase(UserPermission.HOLD);
-
-                } else {
-                    EditorPermission userPermissionForApp = applicationService.getEditorActivePermission(appId, principal.getId());
-                    return userPermissionForApp != null && userPermissionForApp.getUserPermissions().contains(permissionRequired);
-                }
-            }
-        }
-        return false;
-    }
+    @Autowired
+    private DiscAppUserDetailsService userDetailsService;
 
     public boolean checkUserHasPermission(long appId, String permissionRequired) {
         if (permissionRequired == null || permissionRequired.trim().isEmpty()) {
@@ -59,9 +39,16 @@ public class AccountHelper {
                     DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
                     isUserAccount = principal.isUserAccount();
                     isLoggedIn = true;
+
+                    //check to see if there's app specific permissions for that user.
+                    UserPermission userPermission = applicationService.getApplicationPermissionsForUser(appId, principal.getId());
+                    if (userPermission != null) {
+                        return userPermission.getUserPermissions().contains(permissionRequired);
+                    }
                 }
             }
 
+            //check default app permissions for logged in vs non logged in users.
             if (isLoggedIn && isUserAccount) {
                 return applicationPermission.getRegisteredUserPermissions().contains(permissionRequired);
             } else {
@@ -70,7 +57,7 @@ public class AccountHelper {
         }
         //return false that user has NONE permission if permissions are not set.
         //default to true if app permissions aren't set for other permissions.
-        return !permissionRequired.equalsIgnoreCase(UserPermission.NONE);
+        return !permissionRequired.equalsIgnoreCase(io.github.shamrice.discapp.service.application.permission.UserPermission.NONE);
     }
 
     public boolean isLoggedIn() {

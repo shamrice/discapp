@@ -6,7 +6,6 @@ import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
-import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.site.SiteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class ApplicationService {
     private ApplicationIpBlockRepository applicationIpBlockRepository;
 
     @Autowired
-    private EditorPermissionRepository editorPermissionRepository;
+    private UserPermissionRepository userPermissionRepository;
 
     @Autowired
     private PrologueRepository prologueRepository;
@@ -317,8 +316,8 @@ public class ApplicationService {
         appPermission.setBlockBadWords(false);
         appPermission.setBlockSearchEngines(false);
         appPermission.setAllowHtmlPermissions(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
-        appPermission.setUnregisteredUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
-        appPermission.setRegisteredUserPermissions(UserPermission.READ + UserPermission.REPLY + UserPermission.POST);
+        appPermission.setUnregisteredUserPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);
+        appPermission.setRegisteredUserPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);
 
         return appPermission;
     }
@@ -342,27 +341,27 @@ public class ApplicationService {
         return applicationIpBlockRepository.saveAll(applicationIpBlocks) != null;
     }
 
-    public List<EditorPermission> getEditorPermissions(long appId) {
-        return editorPermissionRepository.findByApplicationId(appId);
+    public List<UserPermission> getUserPermissions(long appId) {
+        return userPermissionRepository.findByApplicationId(appId);
     }
 
-    public EditorPermission getEditorActivePermission(long appId, long discAppUserId) {
-        return editorPermissionRepository.findOneByApplicationIdAndDiscAppUserIdAndIsActive(appId, discAppUserId, true);
+    public UserPermission getUserActivePermission(long appId, long discAppUserId) {
+        return userPermissionRepository.findOneByApplicationIdAndDiscAppUserIdAndIsActive(appId, discAppUserId, true);
     }
 
-    public boolean saveEditorPermissions(long appId, List<EditorPermission> editorPermissions) {
-        if (editorPermissions == null) {
+    public boolean saveUserPermissions(long appId, List<UserPermission> userPermissions) {
+        if (userPermissions == null) {
             return false;
         }
-        return editorPermissionRepository.saveAll(editorPermissions) != null;
+        return userPermissionRepository.saveAll(userPermissions) != null;
     }
 
-    public boolean setEditorActivation(long editorId, boolean isActive) {
+    public boolean setUserPermissionActivation(long userPermissionId, boolean isActive) {
 
-        EditorPermission editorToUpdate = editorPermissionRepository.findById(editorId).orElse(null);
-        if (editorToUpdate != null) {
-            editorToUpdate.setIsActive(isActive);
-            return editorPermissionRepository.save(editorToUpdate) != null;
+        UserPermission userPermissionToUpdate = userPermissionRepository.findById(userPermissionId).orElse(null);
+        if (userPermissionToUpdate != null) {
+            userPermissionToUpdate.setIsActive(isActive);
+            return userPermissionRepository.save(userPermissionToUpdate) != null;
         }
         return false;
     }
@@ -382,8 +381,12 @@ public class ApplicationService {
         return reportedAbuseRepository.findByApplicationId(appId);
     }
 
-    public List<EditorPermission> getEditorPermissionsForUser(long discAppUserId) {
-         return editorPermissionRepository.findByDiscAppUserId(discAppUserId);
+    public List<UserPermission> getAllApplicationPermissionsForUser(long discAppUserId) {
+        return userPermissionRepository.findByDiscAppUserIdAndIsActive(discAppUserId, true);
+    }
+
+    public UserPermission getApplicationPermissionsForUser(long appId, long discAppUserId) {
+         return userPermissionRepository.findOneByApplicationIdAndDiscAppUserIdAndIsActive(appId, discAppUserId, true);
     }
 
 }

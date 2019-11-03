@@ -192,7 +192,7 @@ CREATE TABLE application_permission (
   FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
-CREATE TABLE editor_permission (
+CREATE TABLE user_permission (
   id serial NOT NULL,
   application_id int NOT NULL,
   discapp_user_id int NOT NULL,

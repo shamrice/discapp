@@ -1,10 +1,9 @@
 package io.github.shamrice.discapp.web.filter;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.EditorPermission;
+import io.github.shamrice.discapp.data.model.UserPermission;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
-import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.web.controller.DiscAppMaintenanceController;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.attribute.UserPrincipalNotFoundException;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -81,17 +78,17 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
 
                                 if (url.contains(THREAD_EDIT_PAGE) || url.contains(THREADS_EDIT_PAGE)) {
                                     boolean isEditorOfApp = false;
-                                    EditorPermission editorPermission = applicationService.getEditorActivePermission(appId, discAppUser.getId());
+                                    UserPermission userPermission = applicationService.getUserActivePermission(appId, discAppUser.getId());
 
-                                    if (editorPermission != null) {
-                                        log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + editorPermission.getUserPermissions());
+                                    if (userPermission != null) {
+                                        log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + userPermission.getUserPermissions());
                                         //set editor permissions if permissions are not set to none.
-                                        isEditorOfApp = !editorPermission.getUserPermissions().contains(UserPermission.NONE);
+                                        isEditorOfApp = userPermission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT);
                                     }
 
                                     if (!isEditorOfApp) {
-                                        log.info("User: " + email + " is not an editor or has " + UserPermission.NONE
-                                                + "permission set for appId: " + appId
+                                        log.info("User: " + email + " is not an editor or does not have '" + io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT
+                                                + "' permission set for appId: " + appId
                                                 + " :: redirecting to permission denied");
                                         resp.sendRedirect(PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
                                         return;
