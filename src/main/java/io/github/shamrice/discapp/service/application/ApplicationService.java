@@ -59,6 +59,10 @@ public class ApplicationService {
         epilogueCache.setMaxCacheAgeMilliseconds(cacheDuration);
     }
 
+    public List<Application> searchByApplicationName(String appName) {
+        return applicationRepository.findByNameContainingAndDeletedOrderByNameAsc(appName, false);
+    }
+
     public Application save(Application application) {
         return applicationRepository.save(application);
     }

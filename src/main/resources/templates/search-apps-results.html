@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Application Search Results</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+    div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div class="grey_box" style="width:70%;margin:10px;display:inline-block;">
+    <table width="100%">
+        <tr>
+            <th style="text-align:left;font-size:large;">
+                Application Name
+            </th>
+            <th style="text-align:left;font-size:large;">
+                Url
+            </th>
+        </tr>
+
+        <tr style="padding: 5px;" th:each="resultMap : ${searchApplicationModel.getSearchResults()}">
+            <td th:text="${resultMap.key}" style="text-align:left;"></td>
+            <td style="text-align:left;">
+                <a target="_blank" th:href="${resultMap.value}" th:text="${resultMap.value}"></a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div th:replace="site_fragments/site-navigation :: site-navigation">
+    static thread prototyping placeholder
+</div>
+
+</body>
+</html>
