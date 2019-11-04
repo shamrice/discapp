@@ -60,7 +60,7 @@ public class ApplicationService {
     }
 
     public List<Application> searchByApplicationName(String appName) {
-        return applicationRepository.findByNameContainingAndDeletedOrderByNameAsc(appName, false);
+        return applicationRepository.findByNameContainingAndDeletedAndEnabledOrderByNameAsc(appName, false, true);
     }
 
     public Application save(Application application) {
@@ -167,7 +167,7 @@ public class ApplicationService {
             }
             //check if owner is enabled.
             Owner appOwner = accountService.getOwnerById(app.get().getOwnerId());
-            if (appOwner != null && appOwner.getEnabled()) {
+            if (appOwner != null && appOwner.getEnabled() != null && appOwner.getEnabled()) {
                 return app.get();
             } else {
                 log.warn("Owner of appId: " + id + " is either null or currently disabled. Returning null app.");

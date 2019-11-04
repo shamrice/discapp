@@ -464,6 +464,8 @@ public class DiscAppController {
 
                 boolean isApproved = true;
                 if (accountHelper.checkUserHasPermission(appId, UserPermission.HOLD)) {
+                    log.info("New thread must be approved before being visible. Setting isApproved to false for subject: "
+                            + subject + " on appId; " + appId);
                     isApproved = false;
                 }
 
