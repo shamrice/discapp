@@ -79,8 +79,11 @@ public class ThreadService {
         log.info("Deleting reported abuse record Id: " + reportedAbuseId);
         ReportedAbuse abuseToDelete = reportedAbuseRepository.findById(reportedAbuseId).orElse(null);
         if (abuseToDelete != null) {
+
             abuseToDelete.setIsDeleted(true);
             abuseToDelete.setModDt(new Date());
+            abuseToDelete.getThread().setModDt(new Date());
+            abuseToDelete.getThread().setDeleted(false);
             reportedAbuseRepository.save(abuseToDelete);
             log.info("Maked abuseId: " + reportedAbuseId + " as deleted. :: " + abuseToDelete.toString());
             return true;
