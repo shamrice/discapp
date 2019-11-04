@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -74,6 +75,24 @@ public class ThreadService {
         return false;
     }
 
+    public boolean deleteReportedAbuse(long reportedAbuseId) {
+        log.info("Deleting reported abuse record Id: " + reportedAbuseId);
+        ReportedAbuse abuseToDelete = reportedAbuseRepository.findById(reportedAbuseId).orElse(null);
+        if (abuseToDelete != null) {
+            abuseToDelete.setIsDeleted(true);
+            abuseToDelete.setModDt(new Date());
+            reportedAbuseRepository.save(abuseToDelete);
+            log.info("Maked abuseId: " + reportedAbuseId + " as deleted. :: " + abuseToDelete.toString());
+            return true;
+        }
+        log.warn("Could not find reported abuse to mark as deleted. Id attempted: " + reportedAbuseId);
+        return false;
+    }
+
+    public ReportedAbuse getReportedAbuse(long reportedAbuseId) {
+        return reportedAbuseRepository.findById(reportedAbuseId).orElse(null);
+    }
+
     public List<ReportedAbuse> searchForReportedAbuse(Long appId, String submitter, String email, String ipAddress, String subject, String body) {
 
         boolean searchByAppId = appId != null;
@@ -86,22 +105,29 @@ public class ThreadService {
         List<ReportedAbuse> results = new ArrayList<>(reportedAbuseRepository.findAll());
         List<ReportedAbuse> finalList = new ArrayList<>();
         for (ReportedAbuse result : results) {
-            boolean validResult = true;
-            if (searchByAppId && !result.getApplicationId().equals(appId)) validResult = false;
-            if (searchByIpAddress && result.getIpAddress() != null && !result.getIpAddress().contains(ipAddress)) validResult = false;
+            if (!result.getIsDeleted()) {
+                boolean validResult = true;
+                if (searchByAppId && !result.getApplicationId().equals(appId)) validResult = false;
+                if (searchByIpAddress && result.getIpAddress() != null && !result.getIpAddress().contains(ipAddress))
+                    validResult = false;
 
-            if (result.getThread() != null) {
-                if (searchBySubmitter && !result.getThread().getSubmitter().toLowerCase().contains(submitter.toLowerCase())) validResult = false;
-                if (searchByEmail && !result.getThread().getEmail().toLowerCase().contains(email.toLowerCase())) validResult = false;
-                if (searchBySubject && !result.getThread().getSubject().toLowerCase().contains(subject.toLowerCase())) validResult = false;
+                if (result.getThread() != null) {
+                    if (searchBySubmitter && !result.getThread().getSubmitter().toLowerCase().contains(submitter.toLowerCase()))
+                        validResult = false;
+                    if (searchByEmail && !result.getThread().getEmail().toLowerCase().contains(email.toLowerCase()))
+                        validResult = false;
+                    if (searchBySubject && !result.getThread().getSubject().toLowerCase().contains(subject.toLowerCase()))
+                        validResult = false;
 
-                if (result.getThread().getBody() != null) {
-                    if (searchByBody && !result.getThread().getBody().toLowerCase().contains(body.toLowerCase())) validResult = false;
+                    if (result.getThread().getBody() != null) {
+                        if (searchByBody && !result.getThread().getBody().toLowerCase().contains(body.toLowerCase()))
+                            validResult = false;
+                    }
                 }
-            }
 
-            if (validResult) {
-                finalList.add(result);
+                if (validResult) {
+                    finalList.add(result);
+                }
             }
         }
 
@@ -131,6 +157,7 @@ public class ThreadService {
             newAbuseReport.setReportedBy(reporterDiscAppUserId);
             newAbuseReport.setModDt(new Date());
             newAbuseReport.setCreateDt(new Date());
+            newAbuseReport.setIsDeleted(false);
 
             ReportedAbuse savedReport = reportedAbuseRepository.save(newAbuseReport);
             if (savedReport != null) {

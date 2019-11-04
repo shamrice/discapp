@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.data.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Table(name = "reported_abuse")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @SecondaryTable(name = "thread")
 public class ReportedAbuse {
@@ -25,6 +27,7 @@ public class ReportedAbuse {
 
     private String ipAddress;
     private Long reportedBy;
+    private Boolean isDeleted;
     private Date createDt;
     private Date modDt;
 

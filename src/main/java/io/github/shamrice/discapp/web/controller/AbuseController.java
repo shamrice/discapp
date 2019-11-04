@@ -1,11 +1,18 @@
 package io.github.shamrice.discapp.web.controller;
 
+import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.ReportedAbuse;
 import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.service.account.AccountService;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.AbuseViewModel;
+import io.github.shamrice.discapp.web.util.AccountHelper;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +33,56 @@ public class AbuseController {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private AccountHelper accountHelper;
+
+    @Autowired
+    private DiscAppUserDetailsService userDetailsService;
+
+    @Autowired
+    private ApplicationService applicationService;
+
+    @GetMapping("/abuse/delete")
+    public ModelAndView getAbuseView(@RequestParam(name = "abuseId") Long abuseId,
+                                     @RequestParam(name = "discId", required = false) Long appId,
+                                     @RequestParam(name = "submitter", required = false) String submitter,
+                                     @RequestParam(name = "email", required = false) String email,
+                                     @RequestParam(name = "ip", required = false) String ip,
+                                     @RequestParam(name = "subject", required = false) String subject,
+                                     @RequestParam(name = "body", required = false) String body,
+                                     AbuseViewModel abuseViewModel,
+                                     Model model) {
+        ReportedAbuse reportedAbuse = threadService.getReportedAbuse(abuseId);
+
+        if (reportedAbuse != null) {
+            //make sure user owns app that they're trying to delete entry for.
+            String userEmail = accountHelper.getLoggedInEmail();
+            DiscAppUser user = userDetailsService.getByEmail(userEmail);
+            if (user != null && user.getOwnerId() != null) {
+                boolean isOwnerFound = false;
+                for (Application ownedApp : applicationService.getByOwnerId(user.getOwnerId())) {
+                    if (ownedApp.getId().equals(reportedAbuse.getApplicationId())) {
+                        log.info("User: " + userEmail + " has deleted reported abuse: " + reportedAbuse.toString());
+                        threadService.deleteReportedAbuse(reportedAbuse.getId());
+                        abuseViewModel.setInfoMessage("Removed abuse record from database.");
+                        isOwnerFound = true;
+                        break;
+                    }
+                }
+                if (!isOwnerFound) {
+                    abuseViewModel.setErrorMessage("You cannot delete entries that you do not own.");
+                }
+            } else {
+                abuseViewModel.setErrorMessage("You must be the owner to remove a reported abuse record.");
+            }
+        } else {
+            abuseViewModel.setErrorMessage("Could not find record to remove.");
+        }
+
+
+        return getAbuseView(appId, submitter, email, ip, subject, body, abuseViewModel, model);
+    }
+
     @GetMapping("/abuse/abuse.cgi")
     public ModelAndView getAbuseView(@RequestParam(name = "id", required = false) Long appId,
                                      @RequestParam(name = "submitter", required = false) String submitter,
@@ -35,10 +92,53 @@ public class AbuseController {
                                      @RequestParam(name = "body", required = false) String body,
                                      AbuseViewModel abuseViewModel,
                                      Model model) {
+
+        if (appId != null) {
+            abuseViewModel.setDiscAppId(appId);
+        }
+        abuseViewModel.setSubmitter(submitter != null ? submitter : "");
+        abuseViewModel.setEmail(email != null ? email : "");
+        abuseViewModel.setIpAddress(ip != null ? ip : "");
+        abuseViewModel.setSubject(subject != null ? subject : "");
+        abuseViewModel.setMessage(body != null ? body : "");
+
         List<ReportedAbuse> reportedAbuses = threadService.searchForReportedAbuse(appId, submitter, email, ip, subject, body);
+
+        //get list of apps owned by logged in user.
+        List<Application> ownedApps = null;
+        String userEmail = accountHelper.getLoggedInEmail();
+        DiscAppUser user = userDetailsService.getByEmail(userEmail);
+        if (user != null && user.getOwnerId() != null) {
+            ownedApps = applicationService.getByOwnerId(user.getOwnerId());
+
+        }
 
         for (ReportedAbuse reportedAbuse : reportedAbuses) {
             if (reportedAbuse.getThread() != null) {
+
+                //if user owns app that abuse is reported for, flag it as deletable.
+                boolean isDeletable = false;
+                String deleteQueryParam = "";
+                if (ownedApps != null) {
+                    for (Application app : ownedApps) {
+                        if (reportedAbuse.getApplicationId().equals(app.getId())) {
+                            isDeletable = true;
+                            String appIdVal = "";
+                            if (appId != null) {
+                                appIdVal = appId.toString();
+                            }
+                            deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
+                                    + "&discId=" + appIdVal
+                                    + "&submitter=" + abuseViewModel.getSubmitter()
+                                    + "&email=" + abuseViewModel.getEmail()
+                                    + "&ip=" + abuseViewModel.getIpAddress()
+                                    + "&subject=" + abuseViewModel.getSubject()
+                                    + "&body=" + abuseViewModel.getMessage();
+                            break;
+                        }
+                    }
+                }
+
                 AbuseViewModel.ReportedThread reportedThread = new AbuseViewModel.ReportedThread(
                         reportedAbuse.getApplicationId(),
                         reportedAbuse.getThread().getCreateDt(),
@@ -46,8 +146,12 @@ public class AbuseController {
                         reportedAbuse.getThread().getSubmitter(),
                         reportedAbuse.getThread().getEmail(),
                         reportedAbuse.getThread().getSubject(),
-                        reportedAbuse.getThread().getId()
+                        reportedAbuse.getThread().getId(),
+                        isDeletable
                 );
+                if (isDeletable) {
+                    reportedThread.setDeleteUrlQueryParameter(deleteQueryParam);
+                }
                 abuseViewModel.getReportedThreads().add(reportedThread);
             }
         }

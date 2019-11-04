@@ -41,6 +41,7 @@
             <th>Author</th>
             <th>Email</th>
             <th>Subject</th>
+            <th>Delete Entry</th>
         </tr>
         <tr th:if="${not #lists.isEmpty(abuseViewModel.getReportedThreads())}"
             th:each="reportedThread : ${abuseViewModel.getReportedThreads()}">
@@ -52,6 +53,12 @@
             <td>
                 <a th:href="@{|abuse-view.cgi?articleId=${reportedThread.getThreadId()}|}"
                    th:text="${reportedThread.getSubject()}"></a>
+            </td>
+            <td style="text-align:center;">
+                <a th:if="${reportedThread.isDeletable()}"
+                   th:href="@{|/abuse/delete${reportedThread.getDeleteUrlQueryParameter()}|}">
+                    <img src="/images/red_x.png" alt="Delete Entry"/>
+                </a>
             </td>
         </tr>
     </TABLE>

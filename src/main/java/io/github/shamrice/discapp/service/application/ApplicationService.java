@@ -368,7 +368,7 @@ public class ApplicationService {
 
     public List<String> getReportedAbuseIpAddressesForApplication(long appId) {
         List<String> reportedAbuseIps = new ArrayList<>();
-        List<ReportedAbuse> reportedAbuses = reportedAbuseRepository.findByApplicationId(appId);
+        List<ReportedAbuse> reportedAbuses = reportedAbuseRepository.findByApplicationIdAndIsDeleted(appId, false);
         if (reportedAbuses != null) {
             for (ReportedAbuse reportedAbuse : reportedAbuses) {
                 reportedAbuseIps.add(reportedAbuse.getIpAddress());
@@ -378,7 +378,7 @@ public class ApplicationService {
     }
 
     public List<ReportedAbuse> getReportedAbuseForApplication(long appId) {
-        return reportedAbuseRepository.findByApplicationId(appId);
+        return reportedAbuseRepository.findByApplicationIdAndIsDeleted(appId, false);
     }
 
     public List<UserPermission> getAllApplicationPermissionsForUser(long discAppUserId) {

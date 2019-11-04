@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface ReportedAbuseRepository extends JpaRepository<ReportedAbuse, Long> {
 
-    List<ReportedAbuse> findByApplicationId(Long applicationId);
+    List<ReportedAbuse> findByApplicationIdAndIsDeleted(Long applicationId, Boolean isDeleted);
 }

@@ -23,6 +23,10 @@ public class AbuseViewModel {
         private @NonNull String emailAddress;
         private @NonNull String subject;
         private @NonNull long threadId;
+        private @NonNull boolean isDeletable;
+
+        @Setter
+        private String deleteUrlQueryParameter;
 
     }
 

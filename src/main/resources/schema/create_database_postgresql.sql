@@ -126,6 +126,7 @@ CREATE TABLE reported_abuse (
     thread_id int NOT NULL,
     ip_address varchar(64),
     reported_by int NOT NULL,
+    is_deleted boolean NOT NULL DEFAULT false,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
