@@ -324,8 +324,13 @@ public class AccountController {
                         if (app.getEnabled())
                             appStatus = ENABLED;
 
+                        String appSearchStatus = DISABLED;
+                        if (app.getSearchable()) {
+                            appSearchStatus = ENABLED;
+                        }
+
                         AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
-                                app.getName(), app.getId(), appStatus
+                                app.getName(), app.getId(), appStatus, appSearchStatus
                         );
                         accountApplications.add(application);
                     }
@@ -392,6 +397,7 @@ public class AccountController {
                             AccountViewModel.AccountApplication accountApplication = new AccountViewModel.AccountApplication(
                                     application.getName(),
                                     application.getId(),
+                                    ENABLED,
                                     ENABLED
                             );
                             moderatingApplications.add(accountApplication);
@@ -517,15 +523,22 @@ public class AccountController {
                                 app.setName(appName);
                                 app.setModDt(new Date());
 
-                                if (accountViewModel.getApplicationStatus().equalsIgnoreCase(ENABLED)) {
+                                if (ENABLED.equalsIgnoreCase(accountViewModel.getApplicationStatus())) {
                                     app.setEnabled(true);
-                                } else if (accountViewModel.getApplicationStatus().equalsIgnoreCase(DELETE)){
+                                } else if (DELETE.equalsIgnoreCase(accountViewModel.getApplicationStatus())){
                                     app.setEnabled(false);
+                                    app.setSearchable(false);
                                     app.setDeleted(true);
                                     //mark all threads as deleted in DB.
                                     threadService.deleteAllThreadsInApplication(app.getId());
                                 } else {
                                     app.setEnabled(false);
+                                }
+
+                                if (ENABLED.equalsIgnoreCase(accountViewModel.getApplicationSearchStatus())) {
+                                    app.setSearchable(true);
+                                } else {
+                                    app.setSearchable(false);
                                 }
 
                                 if (applicationService.save(app) != null) {
@@ -619,22 +632,10 @@ public class AccountController {
                     int appLimit = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
 
                     accountViewModel.setMaxDiscApps(appLimit);
-                    List<AccountViewModel.AccountApplication> accountApplications = new ArrayList<>();
-                    for (Application app : apps) {
 
-                        String appStatus = DISABLED;
-                        if (app.getEnabled())
-                            appStatus = ENABLED;
-
-                        AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
-                                app.getName(), app.getId(), appStatus
-                        );
-                        accountApplications.add(application);
-                    }
-                    accountViewModel.setAccountApplications(accountApplications);
-
-                    if (accountApplications.size() >= appLimit) {
+                    if (apps.size() >= appLimit) {
                         accountViewModel.setErrorMessage("Unable to add an additional application. You are already at your account limit.");
+                        return getAccountApplication(accountViewModel, modelMap);
                     }
                 }
             }
@@ -648,6 +649,11 @@ public class AccountController {
                                            ModelMap modelMap) {
 
         if (accountViewModel != null) {
+
+            //cancel button, return to manage applications
+            if (accountViewModel.getCancel() != null && !accountViewModel.getCancel().isEmpty()) {
+                return getAccountApplication(accountViewModel, modelMap);
+            }
 
             String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
             String appAdminPassword = inputHelper.sanitizeInput(accountViewModel.getApplicationAdminPassword());
@@ -711,11 +717,23 @@ public class AccountController {
                         Owner savedOwner = accountService.saveOwner(owner);
                         if (savedOwner != null) {
 
+                            //if owner is at app limit. Return with error.
+                            List<Application> apps = applicationService.getByOwnerId(owner.getId());
+                            int appLimit = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
+                            if (apps.size() >= appLimit) {
+                                log.warn("Cannot add additional app, User is already at the application limit of: " + appLimit);
+                                accountViewModel.setErrorMessage("You are at the max application limit of " + appLimit
+                                        + ". Please delete one or more apps to create a new one.");
+                                return getAccountApplication(accountViewModel, modelMap);
+                            }
+
+
                             Application newApp = new Application();
                             newApp.setName(appName);
                             newApp.setOwnerId(savedOwner.getId());
                             newApp.setEnabled(true);
                             newApp.setDeleted(false);
+                            newApp.setSearchable(true);
                             newApp.setCreateDt(new Date());
                             newApp.setModDt(new Date());
 

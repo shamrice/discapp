@@ -16,11 +16,18 @@ public class AccountViewModel {
         private @NonNull String applicationName;
         private @NonNull Long applicationId;
         private @NonNull String applicationStatus;
+        private @NonNull String applicationSearchStatus;
 
         public boolean isSelectedApplicationStatus(String dropDownValue) {
             return applicationStatus.equalsIgnoreCase(dropDownValue);
         }
+
+        public boolean isSelectedApplicationSearchStatus(String dropDownValue) {
+            return applicationSearchStatus.equalsIgnoreCase(dropDownValue);
+        }
     }
+
+    private String cancel;
 
     private String username;
     private String password;
@@ -45,6 +52,7 @@ public class AccountViewModel {
     private Long applicationId;
     private String applicationName;
     private String applicationStatus;
+    private String applicationSearchStatus;
 
     private Integer maxDiscApps;
 

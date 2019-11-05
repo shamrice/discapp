@@ -81,6 +81,21 @@
                 </tr>
                 <tr>
                     <td>
+                        <label>App Searchable:</label>
+                    </td>
+                    <td>
+                        <select name="applicationSearchStatus" class="button" style="border:1px solid black;width:100%;">
+                            <option th:selected="${accountApplication.isSelectedApplicationSearchStatus('enabled')}"
+                                    value="enabled">Enabled
+                            </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationSearchStatus('disabled')}"
+                                    value="disabled">Disabled
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <label>Status:</label>
                     </td>
                     <td>
@@ -110,13 +125,14 @@
                 </tr>
                 <tr th:if="${accountApplication.getApplicationStatus().equals('enabled')}">
                     <td colspan="2" style="padding:5px;">
-                        <a th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}|}">
+                        <a target="_blank" th:href="@{|/admin/disc-maint.cgi?id=${accountApplication.getApplicationId()}|}">
                             Click Here To Modify Disc Application Settings</a>
                     </td>
                 </tr>
                 <tr th:unless="${accountApplication.getApplicationStatus().equals('enabled')}">
                     <td colspan="2" style="padding:5px;">
-                        Disc App must be enabled to further modify application settings.
+                        Disc App must be enabled to further modify application settings. Disabled apps will also
+                        not be listed in site search regardless of search status.
                     </td>
                 </tr>
             </table>

@@ -60,7 +60,7 @@ public class ApplicationService {
     }
 
     public List<Application> searchByApplicationName(String appName) {
-        return applicationRepository.findByNameContainingAndDeletedAndEnabledOrderByNameAsc(appName, false, true);
+        return applicationRepository.findByNameContainingAndDeletedAndEnabledAndSearchableOrderByNameAsc(appName, false, true, true);
     }
 
     public Application save(Application application) {

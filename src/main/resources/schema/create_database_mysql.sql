@@ -56,6 +56,7 @@ CREATE TABLE application (
     owner_id int(20) NOT NULL,
     enabled bool NOT NULL DEFAULT TRUE,
     deleted bool NOT NULL DEFAULT FALSE,
+    searchable bool NOT NULL DEFAULT TRUE,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),

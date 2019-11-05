@@ -25,6 +25,7 @@ public class Application {
     private Long ownerId;
     private Boolean enabled;
     private Boolean deleted;
+    private Boolean searchable;
     private Date createDt;
     private Date modDt;
 }
