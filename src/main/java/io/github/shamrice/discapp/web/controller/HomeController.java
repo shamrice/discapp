@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Controller
 @Slf4j
-public class SiteController {
+public class HomeController {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -34,7 +34,7 @@ public class SiteController {
 
     @GetMapping("/")
     public ModelAndView getIndexView(Model model) {
-        return new ModelAndView("index", "model", model);
+        return new ModelAndView("home/index", "model", model);
     }
 
     @GetMapping("/search-apps")
@@ -56,7 +56,7 @@ public class SiteController {
             }
         }
         searchApplicationModel.setSearchResults(searchResults);
-        return new ModelAndView("search-apps-results", "searchApplicationModel", searchApplicationModel);
+        return new ModelAndView("home/search-apps-results", "searchApplicationModel", searchApplicationModel);
     }
 
     @RequestMapping(value = "/robots.txt", method = RequestMethod.GET, produces = "text/plain")
@@ -66,6 +66,6 @@ public class SiteController {
         response.setCharacterEncoding("UTF-8");
         String robotsTxtContents = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.ROBOTS_TXT_CONTENTS, "");
         model.addAttribute("robotsTxtContents", robotsTxtContents);
-        return "robots";
+        return "home/robots";
     }
 }
