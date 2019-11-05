@@ -63,15 +63,6 @@
 </head>
 <body>
 
-<script type="text/javascript">
-function switchElements(element1,element2) {
-    // hide the first element and show the second
-    document.getElementById(element1).style.display = "none";
-    document.getElementById(element2).style.display = "block";
-}
-parent.frames.preview.document.location.reload();
-</script>
-
 <div th:if="${maintenanceViewModel.getApplicationId()}" class="preview_div">
     <iframe id="preview_iframe" th:src="@{|/admin/appearance-preview.cgi?id=${appId}|}"></iframe>
 </div>
@@ -104,6 +95,8 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
+
+            <input type="hidden" name="windowState" value=""/>
             <table>
 
                 <tr>
@@ -166,8 +159,8 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
+            <input type="hidden" name="windowState" value=""/>
             <table>
-
                 <tr>
                     <td>Style Sheet URL:</td>
                     <td><input type="text" name="styleSheetUrl" id="styleSheetUrl"
@@ -240,7 +233,7 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
-
+            <input type="hidden" name="windowState" value=""/>
             <table id="app_prefs" style="">
                 <tr>
                     <th>Sort threads in order of</th>
@@ -378,7 +371,7 @@ parent.frames.preview.document.location.reload();
         <form th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}" enctype="multipart/form-data">
-
+            <input type="hidden" name="windowState" value=""/>
             <p><b>Header</b> (Text that appears at the top of every page):
                 <input type="text" name="header" th:value="${maintenanceViewModel.getHeader()}" size="35"
                        maxlength="128"/>
@@ -411,6 +404,7 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}|}"
               method="post"
               th:object="${maintenanceViewModel}">
+            <input type="hidden" name="windowState" value=""/>
             <table>
                 <tr>
                     <td>
@@ -479,7 +473,7 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
-
+            <input type="hidden" name="windowState" value=""/>
             <p>The following labels appear when posting a message to your DiscussionApp and also as column headers when
                 using collapsed threads.</p>
             <table>
@@ -540,8 +534,8 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
-
-            <input type="hidden" name="id" value="46108"/>
+            <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="id" th:value="${maintenanceViewModel.getApplicationId()}"/>
             <p>Here, you can change the appearance of the various buttons in your DiscussionApp. In each textbox, you
                 can specify the text for the corresponding button or you can enter the URL of a graphic image
                 instead.</p>
@@ -628,7 +622,7 @@ parent.frames.preview.document.location.reload();
               th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
-
+            <input type="hidden" name="windowState" value=""/>
             <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon URL</a>
             <input type="text" name="favicon" th:value="${maintenanceViewModel.getFavicon()}" size="40"
                    maxlength="128"/>
@@ -636,6 +630,44 @@ parent.frames.preview.document.location.reload();
         </form>
     </div>
 
+    <input type="hidden" id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}"/>
 </div>
+
+<script type="text/javascript">
+
+function switchElements(element1,element2) {
+    // hide the first element and show the second
+    document.getElementById(element1).style.display = 'none';
+    document.getElementById(element2).style.display = 'block';
+
+    var stateInputs = document.getElementsByName('windowState');
+
+    for (var i = 0; i < stateInputs.length; i++) {
+        stateInputs[i].value = stateInputs[i].value.replace(element1 + ',', '');
+        if (element2.indexOf('closed') === -1) {
+            stateInputs[i].value += element2 + ',';
+        }
+    }
+}
+
+function restoreWindowStates() {
+    var previousWindowStates = document.getElementById('previousWindowStates').value;
+    if (previousWindowStates != '') {
+        var stateArray = previousWindowStates.split(',');
+        for (var i = 0; i < stateArray.length; i++) {
+            if (stateArray[i] != '') {
+                var openElement = stateArray[i];
+                var closedElement = openElement.replace('_open', '_closed');
+                switchElements(closedElement, openElement);
+            }
+        }
+    }
+}
+
+window.onload = restoreWindowStates();
+
+ //parent.frames.preview.document.location.reload();
+</script>
+
 </body>
 </html>

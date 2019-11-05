@@ -64,6 +64,9 @@ public class MaintenanceViewModel {
     //favicon config
     private String favicon;
 
+    //window state config
+    private String windowState;
+
     public boolean isSelectedMaxThreadCountPerPage(int dropDownValue) {
         return maxThreadCountPerPage == dropDownValue;
     }
