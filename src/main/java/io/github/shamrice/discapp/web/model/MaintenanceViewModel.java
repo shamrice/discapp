@@ -66,6 +66,7 @@ public class MaintenanceViewModel {
 
     //window state config
     private String windowState;
+    private String submittedFromDiv;
 
     public boolean isSelectedMaxThreadCountPerPage(int dropDownValue) {
         return maxThreadCountPerPage == dropDownValue;

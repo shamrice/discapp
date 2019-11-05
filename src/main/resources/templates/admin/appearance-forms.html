@@ -97,6 +97,7 @@
               th:object="${maintenanceViewModel}">
 
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="app_configuration_open"/>
             <table>
 
                 <tr>
@@ -160,6 +161,7 @@
               method="post"
               th:object="${maintenanceViewModel}">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="css_configuration_open"/>
             <table>
                 <tr>
                     <td>Style Sheet URL:</td>
@@ -234,6 +236,7 @@
               method="post"
               th:object="${maintenanceViewModel}">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="thread_configuration_open"/>
             <table id="app_prefs" style="">
                 <tr>
                     <th>Sort threads in order of</th>
@@ -372,6 +375,7 @@
               method="post"
               th:object="${maintenanceViewModel}" enctype="multipart/form-data">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="headerbox_open"/>
             <p><b>Header</b> (Text that appears at the top of every page):
                 <input type="text" name="header" th:value="${maintenanceViewModel.getHeader()}" size="35"
                        maxlength="128"/>
@@ -405,6 +409,7 @@
               method="post"
               th:object="${maintenanceViewModel}">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="prologue_configuration_open"/>
             <table>
                 <tr>
                     <td>
@@ -474,6 +479,7 @@
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="labelbox_open"/>
             <p>The following labels appear when posting a message to your DiscussionApp and also as column headers when
                 using collapsed threads.</p>
             <table>
@@ -535,6 +541,7 @@
               th:object="${maintenanceViewModel}"
               enctype="multipart/form-data">
             <input type="hidden" name="windowState" value=""/>
+            <input type="hidden" name="submittedFromDiv" value="buttonbox_open"/>
             <input type="hidden" name="id" th:value="${maintenanceViewModel.getApplicationId()}"/>
             <p>Here, you can change the appearance of the various buttons in your DiscussionApp. In each textbox, you
                 can specify the text for the corresponding button or you can enter the URL of a graphic image
@@ -631,6 +638,7 @@
     </div>
 
     <input type="hidden" id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}"/>
+    <input type="hidden" id="previousSubmittedFromDiv" th:value="${maintenanceViewModel.getSubmittedFromDiv()}"/>
 </div>
 
 <script type="text/javascript">
@@ -651,6 +659,7 @@ function switchElements(element1,element2) {
 }
 
 function restoreWindowStates() {
+    //restore open and closed config boxes
     var previousWindowStates = document.getElementById('previousWindowStates').value;
     if (previousWindowStates != '') {
         var stateArray = previousWindowStates.split(',');
@@ -661,6 +670,13 @@ function restoreWindowStates() {
                 switchElements(closedElement, openElement);
             }
         }
+    }
+
+    //set window location back to where they submitted the form from.
+    var previousSubmittedFromDiv = document.getElementById('previousSubmittedFromDiv').value;
+    if (previousSubmittedFromDiv != "") {
+        var windowOffset = document.getElementById(previousSubmittedFromDiv).offsetTop;
+        window.scrollTo(0, windowOffset);
     }
 }
 
