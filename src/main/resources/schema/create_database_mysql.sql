@@ -224,6 +224,16 @@ CREATE TABLE application_ip_block (
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
+CREATE TABLE site_update_log (
+    id int(255) NOT NULL AUTO_INCREMENT,
+    subject varchar NOT NULL,
+    message varchar NOT NULL,
+    enabled boolean NOT NULL DEFAULT TRUE,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id)
+);
+
 
 commit;
 

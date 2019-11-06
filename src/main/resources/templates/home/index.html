@@ -28,6 +28,11 @@
         <p>
             To the left you will find links for more information as well as helpful account related pages.
         </p>
+        <hr />
+        <p th:if="${updateDate}" style="font-size:large;font-weight:bold;"
+           th:text="@{|Latest Update: ${updateDate} - ${updateSubject}|}">
+        </p>
+        <p th:if="${updateMessage}" th:utext="${updateMessage}"></p>
     </div>
 
 </div>

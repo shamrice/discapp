@@ -1,10 +1,14 @@
 package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
+import io.github.shamrice.discapp.data.model.SiteUpdateLog;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.web.model.SearchApplicationModel;
+import io.github.shamrice.discapp.web.util.AccountHelper;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +35,25 @@ public class HomeController {
     private ApplicationService applicationService;
 
     @Autowired
+    private SiteService siteService;
+
+    @Autowired
     private WebHelper webHelper;
 
     @GetMapping("/")
     public ModelAndView getIndexView(Model model) {
+
+        SiteUpdateLog latestUpdate = siteService.getLatestSiteUpdateLog();
+        if (latestUpdate != null) {
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-YYYY");
+            String updateDate = simpleDateFormat.format(latestUpdate.getCreateDt());
+
+            model.addAttribute("updateDate", updateDate);
+            model.addAttribute("updateSubject", latestUpdate.getSubject());
+            model.addAttribute("updateMessage", latestUpdate.getMessage());
+        }
+
         return new ModelAndView("home/index", "model", model);
     }
 
