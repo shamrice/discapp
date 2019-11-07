@@ -7,8 +7,6 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.web.model.SearchApplicationModel;
-import io.github.shamrice.discapp.web.util.AccountHelper;
-import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

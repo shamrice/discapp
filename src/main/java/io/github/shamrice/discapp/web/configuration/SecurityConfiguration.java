@@ -53,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/account/modify").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/modify/**").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/add/**").access("hasRole('ROLE_USER')")
-                    .antMatchers("/test/test").authenticated()
+                    .antMatchers("/site_admin/**").access("hasRole('ROLE_ROOT')")
                     .antMatchers("/auth/**").authenticated()
                     .anyRequest().authenticated()
                     .and()
