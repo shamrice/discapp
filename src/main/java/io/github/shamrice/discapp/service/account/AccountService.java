@@ -114,9 +114,8 @@ public class AccountService {
             emailParams.put(PASSWORD_RESET_URL, passwordResetUrl + "/" + passwordReset.getKey());
             emailParams.put(PASSWORD_RESET_CODE, passwordReset.getCode());
 
-            emailNotificationService.send(email, NotificationType.PASSWORD_RESET, emailParams);
-            log.info("Sent password reset to user: " + email);
-            return true;
+            return emailNotificationService.send(email, NotificationType.PASSWORD_RESET, emailParams);
+
         } else {
             log.error("Failed to create new password reset request for email: " + email);
         }

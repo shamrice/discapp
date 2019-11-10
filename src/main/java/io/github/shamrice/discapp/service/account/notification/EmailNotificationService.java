@@ -20,7 +20,7 @@ public class EmailNotificationService {
     @Autowired
     private ConfigurationService configurationService;
 
-    public void send(String to, NotificationType notificationType, Map<String, Object> templateParams) {
+    public boolean send(String to, NotificationType notificationType, Map<String, Object> templateParams) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
 
@@ -30,7 +30,7 @@ public class EmailNotificationService {
         if (subject == null || body == null) {
             log.error("Failed to find subject or message body for notification type: " + notificationType.name()
                     + " :: message not sent.");
-            return;
+            return false;
         }
 
         //replace template parameters with values in body
@@ -40,9 +40,17 @@ public class EmailNotificationService {
         body = body.replace("\\r\\n", "\r\n");
         message.setSubject(subject);
         message.setText(body);
-        emailSender.send(message);
-        log.info("Sent " + notificationType.name() + " email to: " + to + " message: " + message.toString());
+        try {
+            emailSender.send(message);
+            log.info("Sent " + notificationType.name() + " email to: " + to + " message: " + message.toString());
+        } catch (Exception sendExc) {
+            log.error("Failed to send email notification to: " + to + " : notificationType: " + notificationType.name()
+                    + " : subject: " + subject + " + body: " + body + " :: Error sending: "
+                    + sendExc.getMessage(), sendExc);
+            return false;
+        }
 
+        return true;
     }
 
     private String getSubjectForType(NotificationType notificationType) {
