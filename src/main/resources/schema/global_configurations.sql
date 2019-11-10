@@ -4,8 +4,8 @@
 INSERT INTO owner(id, first_name, last_name, phone, email, enabled)
 VALUES (0, 'Owner', 'Owner', '555-555-5555', 'owner.example.com', true);
 
-INSERT INTO application(id, name, owner_id)
-VALUES(0, 'DiscApp', 0);
+INSERT INTO application(id, name, owner_id, enabled, deleted, searchable)
+VALUES(0, 'DiscApp', 0, true, false, false);
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.passwordreset.subject', 'DiscApp: Reset Password Request');
