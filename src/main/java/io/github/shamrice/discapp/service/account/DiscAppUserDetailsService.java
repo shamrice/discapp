@@ -53,6 +53,13 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
     }
 
+    public DiscAppUser getByUsername(String username) {
+        if (username != null && !username.trim().isEmpty()) {
+            return discappUserRepository.findByUsername(username.trim());
+        }
+        return null;
+    }
+
     public DiscAppUser getByDiscAppUserId(long userId) {
         Optional<DiscAppUser> discAppUser = discappUserRepository.findById(userId);
         return discAppUser.orElse(null);

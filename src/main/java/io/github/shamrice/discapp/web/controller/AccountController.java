@@ -254,6 +254,23 @@ public class AccountController {
                 return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
             }
 
+            //let user know if username has already been taken before attempting to create new user.
+            //also make sure username is not all numbers which would interfere with system accounts.
+            if (username.matches("\\d+") || discAppUserDetailsService.getByUsername(username) != null) {
+                log.warn("Account creation failed for user: " + accountViewModel.getEmail()
+                        + " because username is already taken or is all numbers. Username: " + username);
+                accountViewModel.setErrorMessage("Display name: " + username + " has already been taken. Please specify a different disc app display name.");
+                return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
+            }
+
+            //let user know if email address has already been taken before attempting to create
+            if (discAppUserDetailsService.getByEmail(accountViewModel.getEmail()) != null) {
+                log.warn("Account creation failed for user: " + accountViewModel.getEmail()
+                        + " because email address is already taken.");
+                accountViewModel.setErrorMessage("Email: " + accountViewModel.getEmail() + " has already been taken. Please specify a different email address.");
+                return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
+            }
+
             DiscAppUser newUser = new DiscAppUser();
             newUser.setUsername(username);
             newUser.setPassword(password);
@@ -469,20 +486,45 @@ public class AccountController {
         return new ModelAndView("redirect:/account/modify");
     }
 
+    @GetMapping("/account/modify/account")
+    public ModelAndView getAccountModifyAccount(@ModelAttribute AccountViewModel accountViewModel,
+                                         HttpServletRequest request,
+                                         ModelMap modelMap) {
+        return getAccountModify(accountViewModel, request, modelMap);
+    }
+
     @PostMapping("/account/modify/account")
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
+                                          HttpServletRequest request,
                                           ModelMap modelMap) {
         if (accountViewModel != null) {
 
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
             String email = accountHelper.getLoggedInEmail();
 
+            if (username == null || username.trim().isEmpty()) {
+                log.warn("Account: " + email + " attempted to create an empty disc app username.");
+                accountViewModel.setErrorMessage("Disc App display name cannot be empty.");
+                return getAccountModify(accountViewModel, request, modelMap);
+            }
+
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
             if (user != null) {
 
+                //let user know if username has already been taken before attempting to modify user.
+                //also make sure username is not all numbers which would interfere with system accounts.
+                //and ignore if it exists what is the current username.
+                if (!user.getUsername().equalsIgnoreCase(username)
+                        && (username.matches("\\d+") || discAppUserDetailsService.getByUsername(username) != null)) {
+                    log.warn("Account modification failed for user: " + email
+                            + " because username is already taken or is all numbers. Username: " + username);
+                    accountViewModel.setErrorMessage("Display name: " + username + " has already been taken. Please specify a different disc app display name.");
+                    return getAccountModify(accountViewModel, request, modelMap);
+                }
+
                 boolean showEmail = accountViewModel.isShowEmail();
 
-                if (username == null || username.trim().isEmpty()) {
+                if (username.trim().isEmpty()) {
                     username = user.getUsername();
                 }
 
@@ -492,6 +534,7 @@ public class AccountController {
                 } else {
                     accountViewModel.setInfoMessage("Successfully updated user information.");
                     log.info("User " + email + " account information was updated.");
+
                 }
             }
         }
