@@ -36,6 +36,7 @@ public class MaintenanceStatsViewModel {
     private float averagePagesPerIp;
     private long selectedStatId;
     private String selectedDate;
+    private String whoIsUrl;
     private List<StatsUniqueIps> uniqueIps;
 
 }

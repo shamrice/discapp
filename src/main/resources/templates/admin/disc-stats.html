@@ -97,7 +97,7 @@
         <tr th:if="${not #lists.isEmpty(maintenanceStatsViewModel.getUniqueIps())}"
             th:each="uniqueIp : ${maintenanceStatsViewModel.getUniqueIps()}">
 
-            <td th:text="${uniqueIp.getIpAddress()}"></td>
+            <td><a th:href="@{|${maintenanceStatsViewModel.getWhoIsUrl()}${uniqueIp.getIpAddress()}|}" target="_blank" th:text="${uniqueIp.getIpAddress()}"></a></td>
             <td th:text="${uniqueIp.getCreateDt()}"></td>
         </tr>
     </table>

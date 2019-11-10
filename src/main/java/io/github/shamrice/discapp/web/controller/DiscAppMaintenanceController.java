@@ -21,6 +21,7 @@ import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -793,6 +794,9 @@ public class DiscAppMaintenanceController {
             long totalUniqueIps = 0L;
             float totalUniqueIpsPerDay = 0;
             int numDays = 30;
+
+            String whoIsUrl = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.WHOIS_URL, "https://www.whois.com/whois/");
+            maintenanceStatsViewModel.setWhoIsUrl(whoIsUrl);
 
             List<Stats> pastMonthStats = statisticsService.getLatestStatsForApp(app.getId(), numDays);
 
