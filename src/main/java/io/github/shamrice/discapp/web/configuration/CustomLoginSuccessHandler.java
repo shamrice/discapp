@@ -1,7 +1,11 @@
 package io.github.shamrice.discapp.web.configuration;
 
+import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.service.account.AccountService;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -12,6 +16,9 @@ import java.io.IOException;
 
 @Slf4j
 public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
+    @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
 
     public CustomLoginSuccessHandler(String defaultTargUrl) {
         setDefaultTargetUrl(defaultTargUrl);
@@ -24,6 +31,9 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)authentication.getPrincipal();
         if (userPrincipal != null) {
             log.debug("Login by user: " + userPrincipal.toString());
+
+            discAppUserDetailsService.setLastLoginDateToNow(userPrincipal.getId());
+
             if (!userPrincipal.isUserAccount()) {
                 log.info("Account: " + userPrincipal.toString() + " :: is System admin account. Redirecting to related admin page.");
                 //todo : probably should pull that string from somewhere instead of just hard coded...

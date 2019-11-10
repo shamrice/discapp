@@ -107,6 +107,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
                 user.setUsername(user.getUsername().trim());
                 user.setEmail(user.getEmail().trim());
+                user.setModDt(new Date());
 
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
@@ -125,6 +126,16 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             }
         }
 
+        return false;
+    }
+
+    public boolean setLastLoginDateToNow(long userId) {
+        try {
+            log.info("Setting last login date to now for userId: " + userId);
+            return discappUserRepository.updateDiscAppUserLastLoginDateById(userId, new Date(), new Date()) > 0;
+        } catch (Exception ex) {
+            log.error("Failed to set last log in date for userId: " + userId + " :: " + ex.getMessage(), ex);
+        }
         return false;
     }
 

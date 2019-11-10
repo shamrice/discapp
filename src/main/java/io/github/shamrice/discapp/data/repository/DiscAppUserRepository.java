@@ -28,6 +28,11 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
 
     @Modifying
     @Transactional
+    @Query(value = "UPDATE discapp_user SET lastLoginDate = :lastLoginDate, mod_dt = :modDt WHERE id = :id")
+    int updateDiscAppUserLastLoginDateById(Long id, Date lastLoginDate, Date modDt);
+
+    @Modifying
+    @Transactional
     @Query(value = "UPDATE discapp_user SET owner_id = :ownerId, is_admin = :isAdmin, mod_dt = :modDt WHERE id = :id")
     int updateDiscAppUserOwnerInfo(Long id, Long ownerId, Boolean isAdmin, Date modDt);
 

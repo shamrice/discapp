@@ -38,5 +38,6 @@ public class DiscAppUser {
 
     private Date createDt;
     private Date modDt;
+    private Date lastLoginDate;
 
 }
