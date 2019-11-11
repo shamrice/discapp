@@ -797,7 +797,7 @@ public class AccountController {
                                 newAdminAccount.setOwnerId(savedOwner.getId());
                                 newAdminAccount.setShowEmail(false);
                                 newAdminAccount.setEmail(savedApp.getId().toString()); //email and username set to appId
-                                newAdminAccount.setUsername(savedApp.getId().toString());
+                                newAdminAccount.setUsername(UUID.randomUUID().toString());
                                 newAdminAccount.setCreateDt(new Date());
                                 newAdminAccount.setModDt(new Date());
                                 newAdminAccount.setPassword(accountViewModel.getApplicationAdminPassword());

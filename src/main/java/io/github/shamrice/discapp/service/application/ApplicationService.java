@@ -191,7 +191,7 @@ public class ApplicationService {
                         if (user != null && user.getIsUserAccount()) {
                             log.info("User: " + email + " is owner of appId: " + appId + " :: and is regular user :: returning true.");
                             return true;
-                        } else if (user != null && !user.getIsUserAccount() && user.getUsername().equals(String.valueOf(appId))) {
+                        } else if (user != null && !user.getIsUserAccount() && user.getEmail().equals(String.valueOf(appId))) {
                             log.info("User: " + email + " is owner of appId: " + appId + " :: and is matching system account to appId :: returning true.");
                             return true;
                         }

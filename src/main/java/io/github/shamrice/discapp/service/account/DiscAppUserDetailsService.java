@@ -81,7 +81,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         if (user != null) {
             return user.getOwnerId();
         }
-        else return null;
+        return null;
     }
 
     public boolean saveDiscAppUser(DiscAppUser user) {
