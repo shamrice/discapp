@@ -28,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -238,7 +239,11 @@ public class DiscAppController {
     public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
                                         @ModelAttribute ThreadViewModel threadViewModel,
                                         @ModelAttribute NewThreadViewModel newThreadViewModel,
+                                        HttpServletResponse response,
                                         Model model) {
+
+        //allow caching on create thread POST action to avoid expired web page message.
+        response.setHeader("Cache-Control", "max-age=240, private"); // HTTP 1.1
 
         //check if user has posting permissions when creating a new post.
         if (newThreadViewModel != null) {
@@ -364,7 +369,8 @@ public class DiscAppController {
                                       @ModelAttribute NewThreadViewModel newThreadViewModel,
                                       ThreadViewModel threadViewModel,
                                       Model model,
-                                      HttpServletRequest request) {
+                                      HttpServletRequest request,
+                                      HttpServletResponse response) {
         if (newThreadViewModel != null) {
 
             if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
@@ -408,7 +414,7 @@ public class DiscAppController {
                     log.error("Cannot create thread so soon after creating previous thread. Returning user to page with error.");
                     //TODO : centralise error messages.
                     newThreadViewModel.setErrorMessage("New message too soon after previous post. Please try again.");
-                    return createNewThread(appId, null, newThreadViewModel, model);
+                    return createNewThread(appId, null, newThreadViewModel, response, model);
                 }
 
                 //set submitter to anon if not filled out
@@ -616,6 +622,7 @@ public class DiscAppController {
     @PostMapping("discussion.cgi")
     public ModelAndView postDiscussionForm(@RequestParam(name = "disc") Long appId,
                                            ThreadViewModel threadViewModel,
+                                           HttpServletResponse response,
                                            Model model) {
         if (threadViewModel != null) {
             if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
@@ -639,7 +646,7 @@ public class DiscAppController {
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
 
-                return createNewThread(appId, threadViewModel, null, model);
+                return createNewThread(appId, threadViewModel, null, response, model);
             }
         }
 
