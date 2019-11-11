@@ -255,10 +255,9 @@ public class AccountController {
             }
 
             //let user know if username has already been taken before attempting to create new user.
-            //also make sure username is not all numbers which would interfere with system accounts.
-            if (username.matches("\\d+") || discAppUserDetailsService.getByUsername(username) != null) {
+            if (discAppUserDetailsService.getByUsername(username) != null) {
                 log.warn("Account creation failed for user: " + accountViewModel.getEmail()
-                        + " because username is already taken or is all numbers. Username: " + username);
+                        + " because username is already taken. Username: " + username);
                 accountViewModel.setErrorMessage("Display name: " + username + " has already been taken. Please specify a different disc app display name.");
                 return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
             }
@@ -512,12 +511,11 @@ public class AccountController {
             if (user != null) {
 
                 //let user know if username has already been taken before attempting to modify user.
-                //also make sure username is not all numbers which would interfere with system accounts.
                 //and ignore if it exists what is the current username.
                 if (!user.getUsername().equalsIgnoreCase(username)
-                        && (username.matches("\\d+") || discAppUserDetailsService.getByUsername(username) != null)) {
+                        && (discAppUserDetailsService.getByUsername(username) != null)) {
                     log.warn("Account modification failed for user: " + email
-                            + " because username is already taken or is all numbers. Username: " + username);
+                            + " because username is already taken. Username: " + username);
                     accountViewModel.setErrorMessage("Display name: " + username + " has already been taken. Please specify a different disc app display name.");
                     return getAccountModify(accountViewModel, request, modelMap);
                 }
