@@ -56,6 +56,7 @@ public class AbuseController {
 
         if (reportedAbuse != null) {
             //make sure user owns app that they're trying to delete entry for.
+            boolean isRootAdmin = accountHelper.isRootAdminAccount();
             String userEmail = accountHelper.getLoggedInEmail();
             DiscAppUser user = userDetailsService.getByEmail(userEmail);
             if (user != null && user.getOwnerId() != null) {
@@ -72,6 +73,10 @@ public class AbuseController {
                 if (!isOwnerFound) {
                     abuseViewModel.setErrorMessage("You cannot delete entries that you do not own.");
                 }
+            } else if (isRootAdmin) {
+                log.info("User: " + userEmail + " (ROOT) has deleted reported abuse: " + reportedAbuse.toString());
+                threadService.deleteReportedAbuse(reportedAbuse.getId());
+                abuseViewModel.setInfoMessage("Removed abuse record from database.");
             } else {
                 abuseViewModel.setErrorMessage("You must be the owner to remove a reported abuse record.");
             }
@@ -137,6 +142,18 @@ public class AbuseController {
                             break;
                         }
                     }
+                }
+
+                //if logged in as site root admin, all entries should be deletable.
+                if (accountHelper.isRootAdminAccount()) {
+                    isDeletable = true;
+                    deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
+                            + "&discId=" + reportedAbuse.getApplicationId()
+                            + "&submitter=" + abuseViewModel.getSubmitter()
+                            + "&email=" + abuseViewModel.getEmail()
+                            + "&ip=" + abuseViewModel.getIpAddress()
+                            + "&subject=" + abuseViewModel.getSubject()
+                            + "&body=" + abuseViewModel.getMessage();
                 }
 
                 AbuseViewModel.ReportedThread reportedThread = new AbuseViewModel.ReportedThread(

@@ -30,6 +30,8 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     private String rootAccountEmail;
 
+    private boolean isRoot = false;
+
     public DiscAppUserPrincipal(DiscAppUser user, String rootAccountEmail) {
         this.user = user;
         this.rootAccountEmail = rootAccountEmail;
@@ -52,6 +54,7 @@ public class DiscAppUserPrincipal implements UserDetails {
         if (rootAccountEmail.equals(user.getEmail())) {
             log.warn("Granting user: " + user.toString() + " :: ROOT ACCESS.");
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ROOT));
+            this.isRoot = true;
         }
 
         return grantedAuthorityList;
@@ -105,5 +108,9 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     public long getId() {
         return user.getId();
+    }
+
+    public boolean isRoot() {
+        return isRoot;
     }
 }

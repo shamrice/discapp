@@ -80,6 +80,14 @@ public class AccountHelper {
         return null;
     }
 
+    public boolean isRootAdminAccount() {
+        DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (userPrincipal != null) {
+            return userPrincipal.isRoot();
+        }
+        return false;
+    }
+
     /*
     public String getLoggedInUserName() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
