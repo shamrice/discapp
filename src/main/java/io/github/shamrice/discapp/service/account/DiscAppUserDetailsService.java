@@ -9,6 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,6 +31,9 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     @Autowired
     private EmailNotificationService emailNotificationService;
 
+    @Value("${discapp.root.email}")
+    private String rootAccountEmail;
+
     private final static String NEW_ACCOUNT_EMAIL = "NEW_ACCOUNT_EMAIL";
 
     @Override
@@ -39,14 +43,13 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Email cannot be blank");
         }
 
-        //DiscAppUser user = discappUserRepository.findByUsername(username);
         DiscAppUser user = discappUserRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException(email);
         }
 
         //principal is returned back and verified by "spring magic"
-        return new DiscAppUserPrincipal(user);
+        return new DiscAppUserPrincipal(user, rootAccountEmail);
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {

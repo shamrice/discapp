@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,14 +26,13 @@ public class DiscAppUserPrincipal implements UserDetails {
     private static final String ROLE_SYSTEM = ROLE_PREFIX + "SYSTEM";
     private static final String ROLE_ROOT = ROLE_PREFIX + "ROOT";
 
-    //todo: this ain't working none.
-  //  @Value("${discapp.rootemail}")
-   // private String ROOT_ACCOUNT_EMAIL;
-
     private DiscAppUser user;
 
-    public DiscAppUserPrincipal(DiscAppUser user) {
+    private String rootAccountEmail;
+
+    public DiscAppUserPrincipal(DiscAppUser user, String rootAccountEmail) {
         this.user = user;
+        this.rootAccountEmail = rootAccountEmail;
     }
 
     @Override
@@ -46,15 +47,13 @@ public class DiscAppUserPrincipal implements UserDetails {
         } else {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_SYSTEM));
         }
-/*
-        log.warn("Entered email = " + user.getEmail() + " :: root = " + ROOT_ACCOUNT_EMAIL);
 
-        //todo : figure out a better way
-        if (user.getEmail().equals(ROOT_ACCOUNT_EMAIL)) {
+        //give root access to configured account. Don't store email address in db in case db gets compromised.
+        if (rootAccountEmail.equals(user.getEmail())) {
             log.warn("Granting user: " + user.toString() + " :: ROOT ACCESS.");
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ROOT));
         }
-*/
+
         return grantedAuthorityList;
     }
 

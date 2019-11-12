@@ -68,5 +68,7 @@ server:
       timeout: 1d
 
 discapp:
+  root:
+    email: ${ROOT_EMAIL_ADDRESS}
   cache:
     duration: ${CACHE_DURATION}
