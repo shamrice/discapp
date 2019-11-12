@@ -23,12 +23,61 @@
     static thread prototyping placeholder
 </div>
 
+<div th:if="${siteAdminApplicationViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminApplicationViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminApplicationViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminApplicationViewModel.getInfoMessage()}">
+</div>
+
 <div class="grey_box">
-    <p style="padding 10px;">
-        Welcome to the site administration page. Here you will be able to perform admin functions on accounts, applications,
-        threads, reported abuse as well as manage disc app imports. Please use the navigation links above to perform these
-        actions.
-    </p>
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Owner Id</th>
+            <th>Enabled</th>
+            <th>Deleted</th>
+            <th>Searchable</th>
+            <th>Create Date</th>
+            <th>Mod Date</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminApplicationViewModel.getApplicationList())}"
+            th:each="app : ${siteAdminApplicationViewModel.getApplicationList()}">
+            <td th:text="${app.getId()}"></td>
+            <td th:text="${app.getName()}"></td>
+            <td>
+                <a th:if="${app.getOwnerId()}"
+                   th:href="@{|/site_admin/owner?ownerId=${app.getOwnerId()}|}"
+                   th:text="@{|${app.getOwnerId()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/application/enabled?id=${app.getId()}&enabled=${!app.getEnabled()}|}"
+                   th:text="@{|${app.getEnabled()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/application/deleted?id=${app.getId()}&enabled=${!app.getDeleted()}|}"
+                   th:text="@{|${app.getDeleted()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/application/isSearchable?id=${app.getId()}&enabled=${!app.getSearchable()}|}"
+                   th:text="@{|${app.getSearchable()}|}">
+                </a>
+            </td>
+            <td th:text="${app.getCreateDt()}"></td>
+            <td th:text="${app.getModDt()}"></td>
+        </tr>
+    </TABLE>
+
 </div>
 
 </body>

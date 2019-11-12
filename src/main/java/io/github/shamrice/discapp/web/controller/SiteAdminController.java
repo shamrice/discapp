@@ -1,10 +1,13 @@
 package io.github.shamrice.discapp.web.controller;
 
+import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
+import io.github.shamrice.discapp.data.repository.ApplicationRepository;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.data.repository.OwnerRepository;
 import io.github.shamrice.discapp.web.model.SiteAdminAccountViewModel;
+import io.github.shamrice.discapp.web.model.SiteAdminApplicationViewModel;
 import io.github.shamrice.discapp.web.model.SiteAdminOwnerViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +26,13 @@ public class SiteAdminController {
 
     public static final String CONTROLLER_URL_DIRECTORY = "/site_admin/";
 
+    //TODO : this should speak to services, not the repos directly!!!
+
     @Autowired
     private DiscAppUserRepository discAppUserRepository;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
     @Autowired
     private OwnerRepository ownerRepository;
@@ -137,5 +145,89 @@ public class SiteAdminController {
         }
         return new ModelAndView("site_admin/owner", "siteAdminOwnerViewModel", siteAdminOwnerViewModel);
 
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "applications")
+    public ModelAndView getSiteAdminApplications(SiteAdminApplicationViewModel siteAdminApplicationViewModel,
+                                                 Model model) {
+        List<Application> fullApplicationList = applicationRepository.findAll();
+        fullApplicationList.sort((u1, u2) -> {
+            if (u1.getId().equals(u2.getId())) {
+                return 0;
+            }
+            return u1.getId() > u2.getId() ? 1 : -1;
+        });
+        siteAdminApplicationViewModel.setApplicationList(fullApplicationList);
+        return new ModelAndView("site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "application/enabled")
+    public ModelAndView getSiteAdminApplicationEnabled(@RequestParam(name = "id") Long appId,
+                                                       @RequestParam(name = "enabled") Boolean enabled,
+                                                       SiteAdminApplicationViewModel siteAdminApplicationViewModel,
+                                                       Model model) {
+        try {
+            if (appId <= 1) {
+                siteAdminApplicationViewModel.setErrorMessage("Cannot disable help forum or base web site.");
+                return getSiteAdminApplications(siteAdminApplicationViewModel, model);
+            }
+
+            log.info("Setting application id: " + appId + " enabled to: " + enabled);
+            Application app =  applicationRepository.getOne(appId);
+            app.setEnabled(enabled);
+            app.setModDt(new Date());
+            applicationRepository.save(app);
+            siteAdminApplicationViewModel.setInfoMessage("Updated application id: " + appId + " enabled to: " + enabled);
+        } catch (Exception ex) {
+            log.error("Failed to set enabled settings for application id: " + appId + " to: " + enabled);
+            siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " enabled to: " + enabled);
+        }
+        return new ModelAndView("redirect:/site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "application/deleted")
+    public ModelAndView getSiteAdminApplicationDeleted(@RequestParam(name = "id") Long appId,
+                                                       @RequestParam(name = "enabled") Boolean enabled,
+                                                       SiteAdminApplicationViewModel siteAdminApplicationViewModel,
+                                                       Model model) {
+
+        //TODO : use service to delete / undelete threads related t application being marked as deleted.
+
+        try {
+            if (appId <= 1) {
+                siteAdminApplicationViewModel.setErrorMessage("Cannot delete help forum or base web site.");
+                return getSiteAdminApplications(siteAdminApplicationViewModel, model);
+            }
+
+            log.info("Setting application id: " + appId + " deleted to: " + enabled);
+            Application app =  applicationRepository.getOne(appId);
+            app.setDeleted(enabled);
+            app.setModDt(new Date());
+            applicationRepository.save(app);
+            siteAdminApplicationViewModel.setInfoMessage("Updated application id: " + appId + " deleted to: " + enabled);
+        } catch (Exception ex) {
+            log.error("Failed to set deleted settings for application id: " + appId + " to: " + enabled);
+            siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " deleted to: " + enabled);
+        }
+        return new ModelAndView("redirect:/site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "application/isSearchable")
+    public ModelAndView getSiteAdminApplicationIsSearchable(@RequestParam(name = "id") Long appId,
+                                                       @RequestParam(name = "enabled") Boolean enabled,
+                                                       SiteAdminApplicationViewModel siteAdminApplicationViewModel,
+                                                       Model model) {
+        try {
+            log.info("Setting application id: " + appId + " is searchable to: " + enabled);
+            Application app =  applicationRepository.getOne(appId);
+            app.setSearchable(enabled);
+            app.setModDt(new Date());
+            applicationRepository.save(app);
+            siteAdminApplicationViewModel.setInfoMessage("Updated application id: " + appId + " searchable to: " + enabled);
+        } catch (Exception ex) {
+            log.error("Failed to set searchable settings for application id: " + appId + " to: " + enabled);
+            siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " searchable to: " + enabled);
+        }
+        return new ModelAndView("redirect:/site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
     }
 }
