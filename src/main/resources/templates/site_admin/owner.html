@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Site Administration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        li {
+            float:left;
+            display:block;
+            padding:5px;
+        }
+
+
+
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${siteAdminOwnerViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminOwnerViewModel.getErrorMessage()}">
+</div>
+
+<div class="grey_box">
+
+    <TABLE border="1" th:if="${siteAdminOwnerViewModel.getOwner()}">
+        <tr>
+            <td>Id</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getId()}"></td>
+        </tr>
+        <tr>
+            <td>First Name</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getFirstName()}"></td>
+        </tr>
+        <tr>
+            <td>Last Name</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getLastName()}"></td>
+        </tr>
+        <tr>
+            <td>Phone</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getPhone()}"></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getEmail()}"></td>
+        </tr>
+        <tr>
+            <td>Enabled</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getEnabled()}"></td>
+        </tr>
+        <tr>
+            <td>Create Date</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getCreateDt()}"></td>
+        </tr>
+        <tr>
+            <td>Mod Date</td>
+            <td th:text="${siteAdminOwnerViewModel.getOwner().getModDt()}"></td>
+        </tr>
+    </TABLE>
+    <p>
+        <a href="/site_admin/accounts">Return to Accounts page</a>
+    </p>
+</div>
+
+</body>
+</html>

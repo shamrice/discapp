@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Site Administration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        li {
+            float:left;
+            display:block;
+            padding:5px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${siteAdminAccountViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminAccountViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminAccountViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminAccountViewModel.getInfoMessage()}">
+</div>
+
+<div class="grey_box">
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Show Email</th>
+            <th>Owner Id</th>
+            <th>Enabled</th>
+            <th>Admin</th>
+            <th>User Account</th>
+            <th>Last Login Date</th>
+            <th>Create Date</th>
+            <th>Mod Date</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminAccountViewModel.getUserList())}"
+            th:each="user : ${siteAdminAccountViewModel.getUserList()}">
+            <td th:text="${user.getId()}"></td>
+            <td th:text="${user.getUsername()}"></td>
+            <td th:text="${user.getEmail()}"></td>
+            <td>
+                <a
+                   th:href="@{|/site_admin/account/showEmail?id=${user.getId()}&enabled=${!user.getShowEmail()}|}"
+                   th:text="@{|${user.getShowEmail()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:if="${user.getOwnerId()}"
+                   th:href="@{|/site_admin/owner?ownerId=${user.getOwnerId()}|}"
+                   th:text="@{|${user.getOwnerId()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/account/enabled?id=${user.getId()}&enabled=${!user.getEnabled()}|}"
+                   th:text="@{|${user.getEnabled()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/account/isAdmin?id=${user.getId()}&enabled=${!user.getIsAdmin()}|}"
+                   th:text="@{|${user.getIsAdmin()}|}">
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/account/isUserAccount?id=${user.getId()}&enabled=${!user.getIsUserAccount()}|}"
+                   th:text="@{|${user.getIsUserAccount()}|}">
+                </a>
+            </td>
+            <td th:text="${user.getLastLoginDate()}"></td>
+            <td th:text="${user.getCreateDt()}"></td>
+            <td th:text="${user.getModDt()}"></td>
+        </tr>
+    </TABLE>
+
+</div>
+
+</body>
+</html>
