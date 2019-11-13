@@ -23,12 +23,60 @@
     static thread prototyping placeholder
 </div>
 
+<div th:if="${siteAdminThreadViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminThreadViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminThreadViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminThreadViewModel.getInfoMessage()}">
+</div>
+
 <div class="grey_box">
-    <p style="padding 10px;">
-        Welcome to the site administration page. Here you will be able to perform admin functions on accounts, applications,
-        threads, reported abuse as well as manage disc app imports. Please use the navigation links above to perform these
-        actions.
-    </p>
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Application Id</th>
+            <th>Submitter</th>
+            <th>Email</th>
+            <th>Ip Address</th>
+            <th>Subject</th>
+            <th>Show Email</th>
+            <th>Parent Id</th>
+            <th>DiscApp User Id</th>
+            <th>User Agent</th>
+            <th>Is Approved</th>
+            <th>Create Date</th>
+            <th>Mod Date</th>
+            <th>Restore</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminThreadViewModel.getThreadList())}"
+            th:each="thread : ${siteAdminThreadViewModel.getThreadList()}">
+            <td th:text="${thread.getId()}"></td>
+            <td th:text="${thread.getApplicationId()}"></td>
+            <td th:text="${thread.getSubmitter()}"></td>
+            <td th:text="${thread.getEmail()}"></td>
+            <td th:text="${thread.getIpAddress()}"></td>
+            <td th:text="${thread.getSubject()}"></td>
+            <td th:text="${thread.isShowEmail()}"></td>
+            <td th:text="${thread.getParentId()}"></td>
+            <td th:if="${thread.getDiscAppUser() != null}" th:text="${thread.getDiscAppUser().getId()}"></td>
+            <td th:unless="${thread.getDiscAppUser() != null}"></td>
+            <td th:text="${thread.getUserAgent()}"></td>
+            <td th:text="${thread.isApproved()}"></td>
+            <td th:text="${thread.getCreateDt()}"></td>
+            <td th:text="${thread.getModDt()}"></td>
+            <td>
+                <a th:href="@{|/site_admin/thread/restore?id=${thread.getId()}|}">
+                    Restore
+                </a>
+            </td>
+        </tr>
+    </TABLE>
 </div>
 
 </body>

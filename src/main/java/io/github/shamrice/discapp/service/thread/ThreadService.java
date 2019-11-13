@@ -41,6 +41,10 @@ public class ThreadService {
     @Autowired
     private ApplicationService applicationService;
 
+    public List<Thread> getAllDeletedThreads() {
+        return threadRepository.findByDeletedOrderByCreateDtDesc(true);
+    }
+
     public boolean setThreadAsTopLevelArticle(long appId, long threadId) {
         Thread thread = getThread(appId, threadId);
         if (thread != null) {

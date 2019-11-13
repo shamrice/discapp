@@ -36,9 +36,12 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
 
     List<Thread> findByApplicationIdAndDeletedAndIsApprovedOrderByCreateDtDesc(Long applicationId, Boolean deleted, Boolean isApproved);
 
+    List<Thread> findByDeletedOrderByCreateDtDesc(Boolean deleted);
+
     Thread getOneByApplicationIdAndId(Long applicationId, Long id);
 
     Thread findTopByApplicationIdAndIpAddressOrderByCreateDtDesc(Long applicationId, String ipAddress);
+
 
     //todo add approved
 

@@ -2,19 +2,23 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.data.model.ImportData;
 import io.github.shamrice.discapp.data.model.Owner;
-import io.github.shamrice.discapp.data.repository.ApplicationRepository;
-import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
-import io.github.shamrice.discapp.data.repository.OwnerRepository;
-import io.github.shamrice.discapp.web.model.SiteAdminAccountViewModel;
-import io.github.shamrice.discapp.web.model.SiteAdminApplicationViewModel;
-import io.github.shamrice.discapp.web.model.SiteAdminOwnerViewModel;
+import io.github.shamrice.discapp.data.model.Thread;
+import io.github.shamrice.discapp.data.repository.*;
+import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.web.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Date;
@@ -36,6 +40,12 @@ public class SiteAdminController {
 
     @Autowired
     private OwnerRepository ownerRepository;
+
+    @Autowired
+    private ImportDataRepository importDataRepository;
+
+    @Autowired
+    private ThreadService threadService;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY)
     public ModelAndView getSiteAdmin(ModelAndView model) {
@@ -229,5 +239,91 @@ public class SiteAdminController {
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " searchable to: " + enabled);
         }
         return new ModelAndView("redirect:/site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "imports")
+    public ModelAndView getSiteAdminImports(SiteAdminImportViewModel siteAdminImportViewModel,
+                                            Model model) {
+        List<ImportData> fullImportDataList = importDataRepository.findAll();
+        fullImportDataList.sort((u1, u2) -> {
+            if (u1.getId().equals(u2.getId())) {
+                return 0;
+            }
+            return u1.getId() > u2.getId() ? 1 : -1;
+        });
+        siteAdminImportViewModel.setImportDataList(fullImportDataList);
+        return new ModelAndView("site_admin/imports", "siteAdminImportViewModel", siteAdminImportViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "import/delete")
+    public ModelAndView getSiteAdminImportDelete(@RequestParam(name = "id") Long importId,
+                                                 SiteAdminImportViewModel siteAdminImportViewModel) {
+
+        try {
+            log.info("Deleting import id: " + importId);
+            importDataRepository.deleteById(importId);
+        } catch (Exception ex) {
+            log.error("Failed to delete import id: " + importId);
+        }
+        return new ModelAndView("redirect:/site_admin/imports", "siteAdminImportViewModel", siteAdminImportViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "import/download")
+    @ResponseBody
+    public ResponseEntity<Resource> getSiteAdminImportDownload(@RequestParam(name = "id") long importId) {
+
+        try {
+
+            ImportData importData = importDataRepository.findById(importId).orElse(null);
+
+            if (importData != null) {
+                Resource file = new ByteArrayResource(importData.getImportData());
+                return ResponseEntity.ok().header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + importData.getImportName() + "\"")
+                        .body(file);
+            }
+
+        } catch (Exception ex) {
+            log.error("Error downloading import id: " + importId + " :: " + ex.getMessage(), ex);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "threads")
+    public ModelAndView getSiteAdminThreads(SiteAdminThreadViewModel siteAdminThreadViewModel,
+                                            Model model) {
+        List<Thread> fullThreadList = threadService.getAllDeletedThreads();
+        /*
+        fullImportDataList.sort((u1, u2) -> {
+            if (u1.getId().equals(u2.getId())) {
+                return 0;
+            }
+            return u1.getId() > u2.getId() ? 1 : -1;
+        });
+
+         */
+        siteAdminThreadViewModel.setThreadList(fullThreadList);
+        return new ModelAndView("site_admin/threads", "siteAdminThreadViewModel", siteAdminThreadViewModel);
+    }
+
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "thread/restore")
+    public ModelAndView getSiteAdminThreadRestore(@RequestParam(name = "id") Long threadId,
+                                                 SiteAdminThreadViewModel siteAdminThreadViewModel) {
+
+        try {
+            log.info("Restoring thread id: " + threadId);
+            Thread thread = threadService.getThreadById(threadId);
+            thread.setDeleted(false);
+            thread.setModDt(new Date());
+            if (threadService.saveThread(thread, thread.getBody()) > 0) {
+                log.info("Thread id: " + threadId + " restored successfully.");
+            } else {
+                log.warn("Failed to restore thread id: " + threadId);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to restore thread id: " + threadId + " :: " + ex.getMessage(), ex);
+        }
+        return new ModelAndView("redirect:/site_admin/threads", "siteAdminThreadViewModel", siteAdminThreadViewModel);
     }
 }

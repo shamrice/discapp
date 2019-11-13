@@ -182,8 +182,7 @@ CREATE TABLE import_data (
   import_name varchar(100) NOT NULL,
   import_data bytea NOT NULL,
   create_dt TIMESTAMP DEFAULT NOW(),
-  PRIMARY KEY (id),
-  FOREIGN KEY (application_id) REFERENCES application(id)
+  PRIMARY KEY (id)
 );
 
 

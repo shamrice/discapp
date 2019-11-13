@@ -23,12 +23,47 @@
     static thread prototyping placeholder
 </div>
 
+<div th:if="${siteAdminImportViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminImportViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminImportViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminImportViewModel.getInfoMessage()}">
+</div>
+
 <div class="grey_box">
-    <p style="padding 10px;">
-        Welcome to the site administration page. Here you will be able to perform admin functions on accounts, applications,
-        threads, reported abuse as well as manage disc app imports. Please use the navigation links above to perform these
-        actions.
-    </p>
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Application Id</th>
+            <th>Import Name</th>
+            <th>Create Date</th>
+            <th>Download</th>
+            <th>Delete</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminImportViewModel.getImportDataList())}"
+            th:each="import : ${siteAdminImportViewModel.getImportDataList()}">
+            <td th:text="${import.getId()}"></td>
+            <td th:text="${import.getApplicationId()}"></td>
+            <td th:text="${import.getImportName()}"></td>
+            <td th:text="${import.getCreateDt()}"></td>
+            <td>
+                <a th:href="@{|/site_admin/import/download?id=${import.getId()}|}">
+                   Download
+                </a>
+            </td>
+            <td>
+                <a th:href="@{|/site_admin/import/delete?id=${import.getId()}|}">
+                   Delete
+                </a>
+            </td>
+        </tr>
+    </TABLE>
 </div>
 
 </body>
