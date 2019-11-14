@@ -72,6 +72,9 @@ WHERE deleted = false and approved = true;
 CREATE INDEX idx_thread_body_thread_id
 ON thread_body(thread_id);
 
+CREATE INDEX idx_thread_body_id
+ON thread_body (id);
+
 CREATE INDEX idx_configuration_application_id_name
 ON configuration(application_id, name);
 
