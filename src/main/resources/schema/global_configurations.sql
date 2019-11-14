@@ -69,6 +69,9 @@ CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
 ON thread(application_id, parent_id, deleted, is_approved)
 WHERE deleted = false and approved = true;
 
+CREATE INDEX idx_thread_body_thread_id
+ON thread_body(thread_id);
+
 CREATE INDEX idx_configuration_application_id_name
 ON configuration(application_id, name);
 
@@ -83,3 +86,9 @@ ON prologue(application_id);
 
 CREATE INDEX idx_epilogue_application_id
 ON epilogue(application_id);
+
+CREATE INDEX idx_discapp_user_id
+ON discapp_user(id);
+
+CREATE INDEX idx_discapp_user_email
+ON discapp_user(email);
