@@ -62,3 +62,24 @@ Disallow: /application
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'whois.url', 'https://www.whois.com/whois/');
+
+
+-- INDEXES
+CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
+ON thread(application_id, parent_id, deleted, is_approved)
+WHERE deleted = false and approved = true;
+
+CREATE INDEX idx_configuration_application_id_name
+ON configuration(application_id, name);
+
+CREATE INDEX idx_stats_unique_ips_stats_id
+ON stats_unique_ips(stats_id);
+
+CREATE INDEX idx_stats_application_id_stat_date
+ON stats(application_id, stat_date);
+
+CREATE INDEX idx_prologue_application_id
+ON prologue(application_id);
+
+CREATE INDEX idx_epilogue_application_id
+ON epilogue(application_id);

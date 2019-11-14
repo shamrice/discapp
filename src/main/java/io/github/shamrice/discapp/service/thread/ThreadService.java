@@ -409,7 +409,8 @@ public class ThreadService {
         return uniqueThreadList;
     }
 
-    public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads, ThreadSortOrder threadSortOrder) {
+    public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads,
+                                                 ThreadSortOrder threadSortOrder, boolean isExpandOnIndex) {
 
         //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(page, numThreads);
@@ -421,10 +422,17 @@ public class ThreadService {
                 limit
         );
 
-        //create full thread node list based on parent threads.
         List<ThreadTreeNode> threadList = new ArrayList<>();
-        for (Thread parentThread : parentThreads) {
-            threadList.add(getFullThreadTree(parentThread.getId()));
+
+        if (isExpandOnIndex) {
+            //create full thread node list based on parent threads.
+            for (Thread parentThread : parentThreads) {
+                threadList.add(getFullThreadTree(parentThread.getId()));
+            }
+        } else {
+            for (Thread parent : parentThreads) {
+                threadList.add(new ThreadTreeNode(parent));
+            }
         }
 
         //sort by activity if needed.

@@ -131,7 +131,7 @@ public class DiscAppController {
                 boolean isExpandOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
                 String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
 
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), page, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()));
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), page, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
 
                 //if there are less than max threads returned, we must be on the last page.
                 if (threadTreeNodeList.size() < maxThreads) {

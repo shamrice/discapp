@@ -1296,7 +1296,7 @@ public class DiscAppMaintenanceController {
                 //get edit threads html
                 List<String> threadTreeHtml = new ArrayList<>();
 
-                List<ThreadTreeNode> threadTreeNodeList = threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION);
+                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION, true);
 
                 //if threads returned is less than asked for, there is no next page.
                 if (threadTreeNodeList.size() < 20) {
