@@ -4,8 +4,7 @@ import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.UserPermission;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
-import io.github.shamrice.discapp.web.controller.DiscAppMaintenanceController;
-import io.github.shamrice.discapp.web.define.CommonUrls;
+import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +52,8 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
             String url = req.getRequestURL().toString();
 
-            if (url.contains(DiscAppMaintenanceController.CONTROLLER_URL_DIRECTORY)
-                    && !url.contains(CommonUrls.MAINTENANCE_PERMISSION_DENIED_URL)) {
+            if (url.contains(MaintenanceUrl.CONTROLLER_DIRECTORY_URL)
+                    && !url.contains(MaintenanceUrl.PERMISSION_DENIED_URL)) {
 
                 String email = accountHelper.getLoggedInEmail();
                 DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(email);
@@ -74,7 +73,7 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                             if (!applicationService.isOwnerOfApp(appId, email)) {
                                 log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
 
-                                if (url.contains(CommonUrls.MAINTENANCE_THREAD_EDIT_PAGE) || url.contains(CommonUrls.MAINTENANCE_THREADS_EDIT_PAGE)) {
+                                if (url.contains(MaintenanceUrl.THREAD_EDIT_PAGE) || url.contains(MaintenanceUrl.THREADS_EDIT_PAGE)) {
                                     boolean isEditorOfApp = false;
                                     UserPermission userPermission = applicationService.getUserActivePermission(appId, discAppUser.getId());
 
@@ -88,13 +87,13 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                                         log.info("User: " + email + " is not an editor or does not have '" + io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT
                                                 + "' permission set for appId: " + appId
                                                 + " :: redirecting to permission denied");
-                                        resp.sendRedirect(CommonUrls.MAINTENANCE_PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
+                                        resp.sendRedirect(MaintenanceUrl.PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
                                         return;
                                     }
                                 } else {
                                     log.info("User: " + email + " is not the owner of appId: " + appId
                                             + " :: redirecting to permission denied");
-                                    resp.sendRedirect(CommonUrls.MAINTENANCE_PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
+                                    resp.sendRedirect(MaintenanceUrl.PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
                                     return;
                                 }
                             }

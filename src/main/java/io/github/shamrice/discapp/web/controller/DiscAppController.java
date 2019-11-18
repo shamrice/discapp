@@ -14,7 +14,6 @@ import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
-import io.github.shamrice.discapp.web.define.CommonUrls;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -37,6 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
 
 @Controller
 @Slf4j
@@ -655,7 +655,7 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @GetMapping(CommonUrls.APP_SEARCH_URL)
+    @GetMapping(APP_SEARCH_URL)
     public ModelAndView getSearchDiscApp(@RequestParam(name = "disc") Long appId,
                                          Model model) {
         log.debug("Attempted GET on search. Only POST is allowed. AppId: " + appId);
@@ -663,7 +663,7 @@ public class DiscAppController {
     }
 
 
-    @PostMapping(CommonUrls.APP_SEARCH_URL)
+    @PostMapping(APP_SEARCH_URL)
     public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
                                       @RequestParam(name = "searchTerm", required = false) String searchTerm,
                                       @RequestParam(name = "returnToApp", required = false) String returnToApp,

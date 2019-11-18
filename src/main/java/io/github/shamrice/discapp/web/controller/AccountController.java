@@ -7,7 +7,6 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
-import io.github.shamrice.discapp.web.define.CommonUrls;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -25,6 +24,8 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
+import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENANCE_PAGE;
 
 @Controller
 @Slf4j
@@ -790,8 +791,7 @@ public class AccountController {
                                 }
 
                                 //save default new epilogue for app with maintenance link
-                                String maintenanceBaseUrl = CommonUrls.MAINTENANCE_CONTROLLER_DIRECTORY_URL + CommonUrls.MAINTENANCE_HOME_PAGE;
-                                if (!applicationService.createDefaultEpilogue(savedApp.getId(), maintenanceBaseUrl, CommonUrls.APP_SEARCH_URL)) {
+                                if (!applicationService.createDefaultEpilogue(savedApp.getId(), MAINTENANCE_PAGE, APP_SEARCH_URL)) {
                                     log.warn("Failed to create default epilogue for new appId: " + savedApp.getId());
                                 }
 
