@@ -6,6 +6,8 @@ import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ public class ApplicationService {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private ApplicationCache<Prologue> prologueCache = new ApplicationCache<>();
     private ApplicationCache<Epilogue> epilogueCache = new ApplicationCache<>();
@@ -391,6 +396,26 @@ public class ApplicationService {
 
     public UserPermission getApplicationPermissionsForUser(long appId, long discAppUserId) {
          return userPermissionRepository.findOneByApplicationIdAndDiscAppUserIdAndIsActive(appId, discAppUserId, true);
+    }
+
+    public boolean createDefaultEpilogue(Long appId, String maintenanceUrl, String searchUrl) {
+        log.info("Saving new default epilogue for appId: " + appId + " :: using maintenance url: " + maintenanceUrl
+                + " :: using search url: " + searchUrl);
+
+        String epilogueDefaultText = configurationService.getStringValue(
+                ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
+                ConfigurationProperty.EPILOGUE_DEFAULT_VALUE, "");
+
+        epilogueDefaultText = epilogueDefaultText.replaceAll("APP_ID", appId.toString());
+        epilogueDefaultText = epilogueDefaultText.replaceAll("MAINTENANCE_URL", maintenanceUrl);
+        epilogueDefaultText = epilogueDefaultText.replaceAll("SEARCH_URL", searchUrl);
+
+        Epilogue epilogue = new Epilogue();
+        epilogue.setApplicationId(appId);
+        epilogue.setModDt(new Date());
+        epilogue.setCreateDt(new Date());
+        epilogue.setText(epilogueDefaultText);
+        return saveEpilogue(epilogue) != null;
     }
 
 }

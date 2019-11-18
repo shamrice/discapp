@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.web.define.CommonUrls;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -788,6 +789,12 @@ public class AccountController {
                                             + " with new ownerId: " + savedOwner.getId());
                                 }
 
+                                //save default new epilogue for app with maintenance link
+                                String maintenanceBaseUrl = CommonUrls.MAINTENANCE_CONTROLLER_DIRECTORY_URL + CommonUrls.MAINTENANCE_HOME_PAGE;
+                                if (!applicationService.createDefaultEpilogue(savedApp.getId(), maintenanceBaseUrl, CommonUrls.APP_SEARCH_URL)) {
+                                    log.warn("Failed to create default epilogue for new appId: " + savedApp.getId());
+                                }
+
                                 //create new disc app admin user.
                                 DiscAppUser newAdminAccount = new DiscAppUser();
                                 newAdminAccount.setEnabled(true);
@@ -835,4 +842,5 @@ public class AccountController {
         }
         return getAccountApplication(accountViewModel, modelMap);
     }
+
 }

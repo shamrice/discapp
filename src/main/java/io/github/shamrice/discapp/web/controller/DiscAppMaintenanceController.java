@@ -15,13 +15,13 @@ import io.github.shamrice.discapp.service.storage.FileSystemStorageService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.define.CommonUrls;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -43,7 +43,7 @@ import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 @Slf4j
 public class DiscAppMaintenanceController {
 
-    public static final String CONTROLLER_URL_DIRECTORY = "/admin/";
+    public static final String CONTROLLER_URL_DIRECTORY = CommonUrls.MAINTENANCE_CONTROLLER_DIRECTORY_URL;
 
     private static final String THREAD_TAB = "threads";
     private static final String DATE_TAB = "date";
@@ -578,7 +578,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/permissionDenied");
     }
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-maint.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + CommonUrls.MAINTENANCE_HOME_PAGE)
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
                                                Model model,
                                                HttpServletResponse response) {
@@ -870,7 +870,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-info");
     }
 
-    @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-edit.cgi")
+    @PostMapping(CONTROLLER_URL_DIRECTORY + CommonUrls.MAINTENANCE_THREADS_EDIT_PAGE)
     public ModelAndView postDiscEditView(HttpServletRequest request,
                                          @RequestParam(name = "id") long appId,
                                          @RequestParam(name = "tab", required = false) String currentTab,
@@ -1241,7 +1241,7 @@ public class DiscAppMaintenanceController {
         return getDiscEditView(appId, currentTab, maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel, model, response);
     }
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-edit.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + CommonUrls.MAINTENANCE_THREADS_EDIT_PAGE)
     public ModelAndView getDiscEditView(@RequestParam(name = "id") long appId,
                                         @RequestParam(name = "tab", required = false) String currentTab,
                                         @RequestParam(name = "page", required = false) Integer page,
@@ -1353,7 +1353,7 @@ public class DiscAppMaintenanceController {
         return new ModelAndView("admin/disc-edit", "maintenanceThreadViewModel", maintenanceThreadViewModel);
     }
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "edit-thread.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + CommonUrls.MAINTENANCE_THREAD_EDIT_PAGE)
     public ModelAndView getEditThreadView(@RequestParam(name = "id") long appId,
                                           @RequestParam(name = "article") long threadId,
                                           @RequestParam(name = "page", required = false) Integer page,

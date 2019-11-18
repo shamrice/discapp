@@ -14,6 +14,7 @@ import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.define.CommonUrls;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -654,7 +655,7 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @GetMapping("/indices/search")
+    @GetMapping(CommonUrls.APP_SEARCH_URL)
     public ModelAndView getSearchDiscApp(@RequestParam(name = "disc") Long appId,
                                          Model model) {
         log.debug("Attempted GET on search. Only POST is allowed. AppId: " + appId);
@@ -662,7 +663,7 @@ public class DiscAppController {
     }
 
 
-    @PostMapping("/indices/search")
+    @PostMapping(CommonUrls.APP_SEARCH_URL)
     public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
                                       @RequestParam(name = "searchTerm", required = false) String searchTerm,
                                       @RequestParam(name = "returnToApp", required = false) String returnToApp,

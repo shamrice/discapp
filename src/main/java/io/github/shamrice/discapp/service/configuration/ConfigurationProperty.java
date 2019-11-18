@@ -52,7 +52,8 @@ public enum ConfigurationProperty {
     MAX_APPS_PER_ACCOUNT("account.max.apps"),
     BAD_WORDS_LIST("filter.badwords.list"),
     ROBOTS_TXT_CONTENTS("robots.txt.contents"),
-    WHOIS_URL("whois.url");
+    WHOIS_URL("whois.url"),
+    EPILOGUE_DEFAULT_VALUE("epilogue.default.value");
 
     private final String propName;
 

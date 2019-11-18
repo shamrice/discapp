@@ -60,6 +60,21 @@ Disallow: /auth
 Disallow: /application
 ');
 
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'epilogue.default.value', '<p align="center">
+<a href="/indices/APP_ID">Return to the Top</a>
+</p>
+<P><FORM METHOD="POST" ACTION="SEARCH_URL?disc=APP_ID">
+<INPUT TYPE="hidden" NAME="id" VALUE="APP_ID">
+<INPUT TYPE="text" NAME="searchTerm">
+<INPUT TYPE="submit" NAME="submit" VALUE="Search">
+</FORM>
+</P>
+<BR><BR>
+<font color="#FFFFFF" size="-2"><a href="MAINTENANCE_URL?id=APP_ID">Admin</a></font>
+');
+
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'whois.url', 'https://www.whois.com/whois/');
 
