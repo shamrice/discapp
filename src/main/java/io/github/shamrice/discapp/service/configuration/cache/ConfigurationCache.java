@@ -80,7 +80,7 @@ public class ConfigurationCache {
 
     @Synchronized
     public void updateCache(Long applicationId, ConfigurationProperty configurationProperty, Configuration configuration) {
-        if (applicationId != null && applicationId > 0 && configuration != null) {
+        if (applicationId != null && applicationId >= 0 && configuration != null) {
             log.debug("Updating configuration cache with updated value for appId: " + applicationId + " : prop: "
                     + configuration.getName() + " = " + configuration.getValue());
 
