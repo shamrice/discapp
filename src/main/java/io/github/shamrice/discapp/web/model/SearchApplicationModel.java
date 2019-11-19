@@ -1,8 +1,6 @@
 package io.github.shamrice.discapp.web.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Map;
 
@@ -11,7 +9,16 @@ import java.util.Map;
 @Setter
 public class SearchApplicationModel {
 
-    Map<String, String> searchResults;
-    String baseUrl;
-    String searchText;
+    @RequiredArgsConstructor
+    @Getter
+    public static class SearchResult {
+        private @NonNull String applicationName;
+        private @NonNull String applicationUrl;
+    }
+
+    private String infoMessage;
+
+    private Map<Long, SearchResult> searchResults;
+    private String baseUrl;
+    private String searchText;
 }

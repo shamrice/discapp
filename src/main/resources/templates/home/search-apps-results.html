@@ -16,7 +16,10 @@
 <body>
 
 <div class="grey_box" style="width:70%;margin:10px;display:inline-block;">
-    <table width="100%">
+    <p th:if="${searchApplicationModel.getInfoMessage()}"
+       th:text="${searchApplicationModel.getInfoMessage()}" style="text-align:center;">
+    </p>
+    <table th:if="${not #lists.isEmpty(searchApplicationModel.getSearchResults())}" width="100%">
         <tr>
             <th style="text-align:left;font-size:large;">
                 Application Name
@@ -27,9 +30,9 @@
         </tr>
 
         <tr style="padding: 5px;" th:each="resultMap : ${searchApplicationModel.getSearchResults()}">
-            <td th:text="${resultMap.key}" style="text-align:left;"></td>
+            <td th:text="${resultMap.value.getApplicationName()}" style="text-align:left;"></td>
             <td style="text-align:left;">
-                <a target="_blank" th:href="${resultMap.value}" th:text="${resultMap.value}"></a>
+                <a target="_blank" th:href="${resultMap.value.getApplicationUrl()}" th:text="${resultMap.value.getApplicationUrl()}"></a>
             </td>
         </tr>
     </table>

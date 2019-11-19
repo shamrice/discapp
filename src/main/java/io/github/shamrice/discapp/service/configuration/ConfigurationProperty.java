@@ -53,7 +53,8 @@ public enum ConfigurationProperty {
     BAD_WORDS_LIST("filter.badwords.list"),
     ROBOTS_TXT_CONTENTS("robots.txt.contents"),
     WHOIS_URL("whois.url"),
-    EPILOGUE_DEFAULT_VALUE("epilogue.default.value");
+    EPILOGUE_DEFAULT_VALUE("epilogue.default.value"),
+    HOME_PAGE_SEARCH_MIN_LENGTH("home.search.length.min");
 
     private final String propName;
 

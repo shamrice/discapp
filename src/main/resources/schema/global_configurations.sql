@@ -78,6 +78,9 @@ VALUES (0, 'epilogue.default.value', '<p align="center">
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'whois.url', 'https://www.whois.com/whois/');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'home.search.length.min', '2');
+
 
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved

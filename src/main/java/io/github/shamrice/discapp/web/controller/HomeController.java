@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
+import io.github.shamrice.discapp.web.define.url.AppUrl;
 import io.github.shamrice.discapp.web.model.SearchApplicationModel;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -66,14 +69,38 @@ public class HomeController {
         searchApplicationModel.setBaseUrl(baseUrl);
         model.addAttribute("searchText", searchValue);
 
-        Map<String, String> searchResults = new HashMap<>();
-        List<Application> foundApps = applicationService.searchByApplicationName(searchValue);
-        if (foundApps != null) {
-            for (Application app : foundApps) {
-                searchResults.put(app.getName(), baseUrl + "/Indices/" + app.getId().toString() + ".html");
+        int minSearchLength = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.HOME_PAGE_SEARCH_MIN_LENGTH, 1);
+
+        Map<Long, SearchApplicationModel.SearchResult> searchResults = new HashMap<>();
+        if (searchValue != null && searchValue.trim().length() >= minSearchLength) {
+            List<Application> foundApps = applicationService.searchByApplicationName(searchValue.trim());
+            if (foundApps != null && foundApps.size() > 0) {
+                for (Application app : foundApps) {
+
+                    SearchApplicationModel.SearchResult searchResult = new SearchApplicationModel.SearchResult(
+                            app.getName(),
+                            baseUrl + AppUrl.CONTROLLER_DIRECTORY_URL_ALTERNATE
+                                    + app.getId().toString() + AppUrl.APP_NUMBER_SUFFIX_ALTERNATE);
+                    searchResults.put(app.getId(), searchResult);
+                }
+
+                searchResults = searchResults.entrySet().stream().sorted(
+                        Map.Entry.comparingByKey())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (e1, e2) -> e1,
+                                LinkedHashMap::new)
+                        );
+                searchApplicationModel.setSearchResults(searchResults);
+                searchApplicationModel.setInfoMessage("Found " + searchResults.size() + " search results.");
+            } else {
+                searchApplicationModel.setInfoMessage("No results found.");
             }
+
+        } else {
+            searchApplicationModel.setInfoMessage("Please enter a search criteria of at least " + minSearchLength + " characters.");
         }
-        searchApplicationModel.setSearchResults(searchResults);
         return new ModelAndView("home/search-apps-results", "searchApplicationModel", searchApplicationModel);
     }
 

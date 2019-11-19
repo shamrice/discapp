@@ -11,6 +11,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findByOwnerIdAndDeleted(Long ownerId, Boolean deleted);
 
-    List<Application> findByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchableOrderByNameAsc(String applicationName, Boolean deleted, Boolean enabled, Boolean searchable);
+    List<Application> findByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchableOrderByIdAsc(String applicationName, Boolean deleted, Boolean enabled, Boolean searchable);
 
 }
