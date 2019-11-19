@@ -51,11 +51,21 @@ public class AccountService {
     }
 
     public Owner getOwnerById(Long ownerId) {
-        Optional<Owner> owner = ownerRepository.findById(ownerId);
-        if (owner.isPresent()) {
-            return owner.get();
+
+        if (ownerId == null) {
+            log.warn("Owner id is null. Cannot get owner by null ID. Returning null.");
+            return null;
         }
-        log.info("No owner record found for owner id: " + ownerId);
+
+        try {
+            Optional<Owner> owner = ownerRepository.findById(ownerId);
+            if (owner.isPresent()) {
+                return owner.get();
+            }
+            log.info("No owner record found for owner id: " + ownerId);
+        } catch (Exception ex) {
+            log.error("Failed to find owner by id: " + ownerId + " :: " + ex.getMessage());
+        }
         return null;
     }
 

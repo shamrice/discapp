@@ -821,6 +821,7 @@ public class AccountController {
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
                                 log.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
                                 accountViewModel.setInfoMessage("Successfully created new application.");
+                                return new ModelAndView("redirect:/account/application", "accountViewModel", accountViewModel);
 
                             } else {
                                 log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + owner.getId());
