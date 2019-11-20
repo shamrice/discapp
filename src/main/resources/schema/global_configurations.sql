@@ -22,6 +22,13 @@ VALUES (0, 'email.newaccount.message',
 'A new account creation request has been created for the email address: NEW_ACCOUNT_EMAIL \r\n \r\n If this account is valid, please approve and send approval message.');
 
 INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.accountlocked.subject', 'DiscApp: User Account Locked Due To Invalid Password Attempts');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.accountlocked.message',
+'Your account ACCOUNT_EMAIL has been locked due to multiple failed password attempts.\r\n \r\n Please wait at least ACCOUNT_LOCK_DURATION before trying to log in again.\r\n\r\nIf you do not remember your password. Please reset the password of your account here: PASSWORD_RESET_URL');
+
+INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.admin.address', 'ADMIN_EMAIL@EXAMPLE.COM');
 
 

@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.configuration;
 
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +21,9 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
 
+    @Autowired
+    private WebHelper webHelper;
+
     public CustomLoginFailureHandler() {
         super.setDefaultFailureUrl(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_ERROR_PARAMETER);
     }
@@ -29,7 +33,7 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
         String username = httpServletRequest.getParameter(USERNAME_REQUEST_PARAMETER);
         if (username != null && username.trim().length() > 0) {
-            discAppUserDetailsService.incrementPasswordLastFailCount(username);
+            discAppUserDetailsService.incrementPasswordLastFailCount(username, webHelper.getBaseUrl(httpServletRequest));
         }
 
         super.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);

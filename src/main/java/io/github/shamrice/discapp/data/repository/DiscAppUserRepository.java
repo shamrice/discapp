@@ -49,7 +49,6 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
             "WHERE id = :id")
     int updateDiscAppUserPasswordFailCountAndLastPasswordFailDateById(Long id, Integer passwordFailCount, Date lastPasswordFailDate);
 
-
     @Modifying
     @Transactional
     @Query(value = "UPDATE discapp_user SET owner_id = :ownerId, is_admin = :isAdmin, mod_dt = :modDt WHERE id = :id")

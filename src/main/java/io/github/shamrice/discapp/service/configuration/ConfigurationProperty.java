@@ -42,6 +42,8 @@ public enum ConfigurationProperty {
     EMAIL_PASSWORD_RESET_MESSAGE("email.passwordreset.message"),
     EMAIL_NEW_ACCOUNT_CREATED_SUBJECT("email.newaccount.subject"),
     EMAIL_NEW_ACCOUNT_CREATED_MESSAGE("email.newaccount.message"),
+    EMAIL_ACCOUNT_LOCKED_SUBJECT("email.accountlocked.subject"),
+    EMAIL_ACCOUNT_LOCKED_MESSAGE("email.accountlocked.message"),
     EMAIL_ADMIN_ADDRESS("email.admin.address"),
     RE_CAPTCHA_VERIFY_URL("recaptcha.verify.url"),
     RE_CAPTCHA_SECRET("recaptcha.secret"),

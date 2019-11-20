@@ -59,6 +59,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_PASSWORD_RESET_SUBJECT, null);
             case NEW_ACCOUNT_CREATED:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_SUBJECT, null);
+            case ACCOUNT_LOCKED:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ACCOUNT_LOCKED_SUBJECT, null);
         }
 
         return null;
@@ -70,6 +72,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_PASSWORD_RESET_MESSAGE, null);
             case NEW_ACCOUNT_CREATED:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_ACCOUNT_CREATED_MESSAGE, null);
+            case ACCOUNT_LOCKED:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ACCOUNT_LOCKED_MESSAGE, null);
         }
         return  null;
     }

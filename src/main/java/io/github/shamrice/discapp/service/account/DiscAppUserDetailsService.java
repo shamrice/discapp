@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         //check if user account is locked. if so, block log in
         if (user.getLockedUntilDate() != null && user.getLockedUntilDate().getTime() > new Date().getTime()) {
             log.warn("User: " + email + " attempted to log in but their account is locked until: " + user.getLockedUntilDate().toString());
+
+            //reset password fail count back to zero on locked accounts if not already set.
+            if (user.getPasswordFailCount() != null && user.getPasswordFailCount() > 0) {
+                discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateById(user.getId(), 0, new Date());
+            }
+
             throw new LockedException("User: " + email + " account is currently locked until: " + user.getLockedUntilDate());
         }
 
@@ -149,7 +156,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return false;
     }
 
-    public void incrementPasswordLastFailCount(String email) {
+    public void incrementPasswordLastFailCount(String email, String baseUrl) {
         try {
             DiscAppUser user = discappUserRepository.findByEmail(email);
             if (user != null) {
@@ -173,8 +180,16 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                             ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
                             ConfigurationProperty.LOGIN_LOCK_DURATION_FAILED_AUTH,
                             300000);
+
                     Date lockedUntilDate = new Date(new Date().getTime() + lockDurationMills);
                     log.warn("User: " + email + " has passed maximum login attempts before account lock. Locking account until: " + lockedUntilDate.toString());
+
+                    Map<String, Object> templateParams = new HashMap<>();
+                    templateParams.put("ACCOUNT_EMAIL", email);
+                    templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
+                    templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.PASSWORD_RESET);
+
+                    emailNotificationService.send(email, NotificationType.ACCOUNT_LOCKED, templateParams);
 
                     discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(
                             user.getId(),
