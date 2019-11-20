@@ -43,6 +43,9 @@ CREATE TABLE discapp_user (
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     last_login_date TIMESTAMP DEFAULT NOW(),
+    locked_until_date TIMESTAMP DEFAULT NULL,
+    password_fail_count INT DEFAULT 0,
+    last_password_fail_date TIMESTAMP DEFAULT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES owner(id)
 );

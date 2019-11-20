@@ -81,6 +81,11 @@ VALUES (0, 'whois.url', 'https://www.whois.com/whois/');
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'home.search.length.min', '2');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'login.failed.attempts.max', '5');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'login.failed.lock.duration', '300000');
 
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved

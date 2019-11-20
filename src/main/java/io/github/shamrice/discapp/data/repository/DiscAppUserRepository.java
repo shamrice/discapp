@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository(value = "discapp_user")
 public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> {
@@ -28,8 +29,26 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE discapp_user SET lastLoginDate = :lastLoginDate WHERE id = :id")
-    int updateDiscAppUserLastLoginDateById(Long id, Date lastLoginDate);
+    @Query(value = "UPDATE discapp_user SET last_login_date = :lastLoginDate, password_fail_count = :passwordFailCount WHERE id = :id")
+    int updateDiscAppUserLastLoginDateAndPasswordFailCountById(Long id, Date lastLoginDate, Integer passwordFailCount);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE discapp_user " +
+            "SET password_fail_count = :passwordFailCount, " +
+            "last_password_fail_date = :lastPasswordFailDate, " +
+            "locked_until_date = :lockedUntilDate " +
+            "WHERE id = :id")
+    int updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(Long id, Integer passwordFailCount, Date lastPasswordFailDate, Date lockedUntilDate);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE discapp_user " +
+            "SET password_fail_count = :passwordFailCount, " +
+            "last_password_fail_date = :lastPasswordFailDate " +
+            "WHERE id = :id")
+    int updateDiscAppUserPasswordFailCountAndLastPasswordFailDateById(Long id, Integer passwordFailCount, Date lastPasswordFailDate);
+
 
     @Modifying
     @Transactional

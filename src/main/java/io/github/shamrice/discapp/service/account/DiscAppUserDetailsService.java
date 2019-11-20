@@ -10,6 +10,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +47,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         DiscAppUser user = discappUserRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException(email);
+        }
+
+        //check if user account is locked. if so, block log in
+        if (user.getLockedUntilDate() != null && user.getLockedUntilDate().getTime() > new Date().getTime()) {
+            log.warn("User: " + email + " attempted to log in but their account is locked until: " + user.getLockedUntilDate().toString());
+            throw new LockedException("User: " + email + " account is currently locked until: " + user.getLockedUntilDate());
         }
 
         //principal is returned back and verified by "spring magic"
@@ -135,11 +142,59 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     public boolean setLastLoginDateToNow(long userId) {
         try {
             log.info("Setting last login date to now for userId: " + userId);
-            return discappUserRepository.updateDiscAppUserLastLoginDateById(userId, new Date()) > 0;
+            return discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, new Date(), 0) > 0;
         } catch (Exception ex) {
             log.error("Failed to set last log in date for userId: " + userId + " :: " + ex.getMessage(), ex);
         }
         return false;
+    }
+
+    public void incrementPasswordLastFailCount(String email) {
+        try {
+            DiscAppUser user = discappUserRepository.findByEmail(email);
+            if (user != null) {
+
+                int currentFailCount = user.getPasswordFailCount() + 1;
+
+                //if account is already locked, just return back as there is nothing to do
+                if (user.getLockedUntilDate() != null && user.getLockedUntilDate().getTime() > new Date().getTime()) {
+                    log.warn("Account: " + email + " is already locked until: + " + user.getLockedUntilDate());
+                    return;
+                }
+
+                int maxFailuresBeforeLock = configurationService.getIntegerValue(
+                        ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
+                        ConfigurationProperty.MAX_LOGIN_ATTEMPTS_BEFORE_LOCK,
+                        5);
+
+                //lock account if they surpass max attempts.
+                if (currentFailCount > maxFailuresBeforeLock) {
+                    int lockDurationMills = configurationService.getIntegerValue(
+                            ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
+                            ConfigurationProperty.LOGIN_LOCK_DURATION_FAILED_AUTH,
+                            300000);
+                    Date lockedUntilDate = new Date(new Date().getTime() + lockDurationMills);
+                    log.warn("User: " + email + " has passed maximum login attempts before account lock. Locking account until: " + lockedUntilDate.toString());
+
+                    discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(
+                            user.getId(),
+                            currentFailCount,
+                            new Date(),
+                            lockedUntilDate);
+                } else {
+                    //increment login failure count.
+                    log.warn("User: " + email + " failed authentication but is not at max attempt: "
+                            + maxFailuresBeforeLock + " current fail count: " + currentFailCount);
+                    discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateById(
+                            user.getId(),
+                            currentFailCount,
+                            new Date());
+                }
+
+            }
+        } catch (Exception ex) {
+            log.error("Failed to update password fail count for email: " + email + " :: " + ex.getMessage(), ex);
+        }
     }
 
     public boolean updateDiscAppUser(long userId, String username, boolean isShowEmail) {

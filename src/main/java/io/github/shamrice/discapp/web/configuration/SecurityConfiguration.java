@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -61,6 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .loginPage("/login")
                     .permitAll()
                     .successHandler(successHandler())
+                    .failureHandler(failureHandler())
                     .and()
                 .logout()
                     .logoutUrl("/logout")
@@ -78,6 +80,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         return new CustomLoginSuccessHandler("/");
+    }
+
+    @Bean
+    public AuthenticationFailureHandler failureHandler() {
+        return new CustomLoginFailureHandler();
     }
 
     @Bean

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @ToString
@@ -34,6 +35,8 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     public DiscAppUserPrincipal(DiscAppUser user, String rootAccountEmail) {
         this.user = user;
+
+        //todo : this string should live somewhere else and not be attached to every user object.
         this.rootAccountEmail = rootAccountEmail;
     }
 
@@ -112,5 +115,16 @@ public class DiscAppUserPrincipal implements UserDetails {
 
     public boolean isRoot() {
         return isRoot;
+    }
+
+    public Integer getPasswordFailCount() {
+        return user.getPasswordFailCount();
+    }
+
+    public boolean isAccountLocked() {
+        if (user.getLockedUntilDate() == null) {
+            return false;
+        }
+        return (user.getLockedUntilDate().getTime() > (new Date().getTime()));
     }
 }

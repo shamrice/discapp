@@ -40,4 +40,12 @@ public class DiscAppUser {
     private Date modDt;
     private Date lastLoginDate;
 
+    @Column(name = "locked_until_date", nullable = true)
+    private Date lockedUntilDate;
+
+    private Integer passwordFailCount;
+
+    @Column(name = "last_password_fail_date")
+    private Date lastPasswordFailDate;
+
 }

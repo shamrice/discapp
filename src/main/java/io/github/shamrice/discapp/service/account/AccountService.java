@@ -98,6 +98,8 @@ public class AccountService {
         }
 
         user.setPassword(newPassword);
+        user.setPasswordFailCount(0);
+        user.setLockedUntilDate(null);
         if (!discAppUserDetailsService.saveDiscAppUser(user)) {
             log.error("Failed to update password for user: " + email);
             return false;

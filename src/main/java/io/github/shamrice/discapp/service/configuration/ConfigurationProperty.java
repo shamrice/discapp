@@ -54,7 +54,9 @@ public enum ConfigurationProperty {
     ROBOTS_TXT_CONTENTS("robots.txt.contents"),
     WHOIS_URL("whois.url"),
     EPILOGUE_DEFAULT_VALUE("epilogue.default.value"),
-    HOME_PAGE_SEARCH_MIN_LENGTH("home.search.length.min");
+    HOME_PAGE_SEARCH_MIN_LENGTH("home.search.length.min"),
+    MAX_LOGIN_ATTEMPTS_BEFORE_LOCK("login.failed.attempts.max"),
+    LOGIN_LOCK_DURATION_FAILED_AUTH("login.failed.lock.duration");
 
     private final String propName;
 

@@ -1,7 +1,5 @@
 package io.github.shamrice.discapp.web.configuration;
 
-import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.service.account.AccountService;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import lombok.extern.slf4j.Slf4j;
