@@ -17,6 +17,10 @@
             Invalid Username and Password
         </div>
 
+        <div th:if="${param.locked}" class="alert alert-error">
+            Account is currently locked due to too many authentication failures. Please try again in a few minutes.
+        </div>
+
         <div th:if="${param.logout}" class="alert alert-success">
             You have been logged out.
         </div>

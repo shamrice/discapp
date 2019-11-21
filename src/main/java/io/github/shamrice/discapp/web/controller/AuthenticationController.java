@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.web.controller;
 
+import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class AuthenticationController {
     @Autowired
     private AccountHelper accountHelper;
 
-    @GetMapping("/login")
+    @GetMapping(AuthenticationUrl.LOGIN)
     public ModelAndView login(@RequestParam(required = false) String relogin,
                               HttpServletRequest request,
                               ModelMap modelMap) {
@@ -46,7 +47,7 @@ public class AuthenticationController {
         return new ModelAndView("auth/login", modelMap);
     }
 
-    @GetMapping("/logout")
+    @GetMapping(AuthenticationUrl.LOGOUT)
     public ModelAndView logout(ModelMap modelMap) {
         return new ModelAndView("auth/logout", modelMap);
     }
@@ -58,7 +59,7 @@ public class AuthenticationController {
      * @param modelMap model map. not used.
      * @return redirects user to base page of disc app.
      */
-    @GetMapping("/auth/indices")
+    @GetMapping(AuthenticationUrl.AUTH_INDICES_URL)
     public ModelAndView getAuthIndices(@RequestParam(required = false, name = "id") Long appId,
                                ModelMap modelMap) {
         if (appId == null || appId <= 0) {

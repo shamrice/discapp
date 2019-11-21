@@ -5,7 +5,9 @@ import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 import javax.servlet.ServletException;
@@ -36,7 +38,12 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
             discAppUserDetailsService.incrementPasswordLastFailCount(username, webHelper.getBaseUrl(httpServletRequest));
         }
 
-        super.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);
+        if (e.getCause() != null && e.getCause() instanceof LockedException) {
+            logger.error("Account locked: " + username + " :: setting login error message to locked.");
+            httpServletResponse.sendRedirect(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_LOCKED_PARAMETER);
+        } else{
+            super.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);
+        }
 
     }
 }
