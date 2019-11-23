@@ -230,6 +230,17 @@ CREATE TABLE site_update_log (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE application_subscription (
+    id serial NOT NULL,
+    application_id INT NOT NULL,
+    subscriber_email VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    last_send_dt TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
 
 commit;
 
