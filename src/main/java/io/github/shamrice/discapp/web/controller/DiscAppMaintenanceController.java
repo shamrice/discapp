@@ -15,6 +15,7 @@ import io.github.shamrice.discapp.service.storage.FileSystemStorageService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -90,6 +91,57 @@ public class DiscAppMaintenanceController {
 
     @Autowired
     private DiscAppController discAppController;
+
+    @GetMapping(LIST_MAINTENANCE_PAGE)
+    public ModelAndView getListMaintenanceView(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "tab", required = false) String tab,
+                                               HttpServletRequest request,
+                                               Model model) {
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
+
+        setCommonModelAttributes(model, app, username);
+
+        MaintenanceMailingListViewModel listViewModel = new MaintenanceMailingListViewModel();
+        listViewModel.setApplicationId(app.getId());
+
+        String baseUrl = webHelper.getBaseUrl(request);
+        String subscribeUrl = baseUrl + ApplicationSubscriptionUrl.SUBSCRIBE_URL;
+        String unsubscribeUrl = baseUrl + ApplicationSubscriptionUrl.UNSUBSCRIBE_URL;
+
+        listViewModel.setSubscribeUrl(subscribeUrl);
+        listViewModel.setUnsubscribeUrl(unsubscribeUrl);
+
+        String subscribeFormHtml = "" +
+                "<FORM METHOD=\"POST\" ACTION=\"SUBSCRIBE_URL\">\n" +
+                "<INPUT TYPE=\"text\" NAME=\"email\" SIZE=40>\n" +
+                "<INPUT TYPE=\"hidden\" NAME=\"id\" VALUE=APPLICATION_ID>\n" +
+                "<INPUT TYPE=\"submit\" NAME=\"submit\" VALUE=\"Subscribe\">\n" +
+                "</FORM>";
+        subscribeFormHtml = subscribeFormHtml
+                .replace("SUBSCRIBE_URL", subscribeUrl)
+                .replace("APPLICATION_ID", app.getId().toString());
+
+        String unsubscribeFormHtml = "<FORM METHOD=\"POST\" ACTION=\"UNSUBSCRIBE_URL\">\n" +
+                "<INPUT TYPE=\"text\" NAME=\"email\" SIZE=40>\n" +
+                "<INPUT TYPE=\"hidden\" NAME=\"id\" VALUE=APPLICATION_ID>\n" +
+                "<INPUT TYPE=\"submit\" NAME=\"submit\" VALUE=\"Unsubscribe\">\n" +
+                "</FORM>";
+        unsubscribeFormHtml = unsubscribeFormHtml
+                .replace("UNSUBSCRIBE_URL", unsubscribeUrl)
+                .replace("APPLICATION_ID", app.getId().toString());
+
+        listViewModel.setSubscribeHtmlForm(subscribeFormHtml);
+        listViewModel.setUnsubscribeHtmlForm(unsubscribeFormHtml);
+
+        if (tab == null || tab.isEmpty()) {
+            tab = MaintenanceMailingListViewModel.FORMS_TAB;
+        }
+        listViewModel.setCurrentTab(tab);
+
+
+        return new ModelAndView("admin/disc-list-maint", "maintenanceMailingListViewModel", listViewModel);
+    }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "disc-user-search.cgi")
     public ModelAndView postUserSearchView(@RequestParam(name = "id") long appId,

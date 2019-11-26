@@ -9,6 +9,7 @@ public class MaintenanceUrl {
     public static final String THREADS_EDIT_PAGE = CONTROLLER_DIRECTORY_URL + "disc-edit.cgi";
     public static final String THREAD_EDIT_PAGE = CONTROLLER_DIRECTORY_URL + "edit-thread.cgi";
     public static final String MAINTENANCE_PAGE = CONTROLLER_DIRECTORY_URL + "disc-maint.cgi";
+    public static final String LIST_MAINTENANCE_PAGE = CONTROLLER_DIRECTORY_URL + "disc-list-maint.cgi";
     public static final String PERMISSION_DENIED_URL = CONTROLLER_DIRECTORY_URL + "permission-denied";
 
 }

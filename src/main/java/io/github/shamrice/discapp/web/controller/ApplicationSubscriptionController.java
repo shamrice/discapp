@@ -37,6 +37,8 @@ public class ApplicationSubscriptionController {
     private WebHelper webHelper;
 
 
+    //TODO : should ask to verify subscriptions with email message to confirm.
+
     @GetMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
     public ModelAndView getUnsubscribeView(@RequestParam(name = "id") long appId,
                                            @RequestParam(name = "email") String email,
@@ -124,6 +126,36 @@ public class ApplicationSubscriptionController {
         }
 
         return new ModelAndView("subscription/subscriptionResponse", "applicationSubscriptionModel", applicationSubscriptionModel);
+    }
+
+    @PostMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
+    public ModelAndView postUnsubscribeView(@RequestParam(name = "id") long appId,
+                                            @ModelAttribute ApplicationSubscriptionModel model,
+                                            HttpServletRequest request) {
+
+        model.setApplicationId(appId);
+        model.setBaseUrl(webHelper.getBaseUrl(request));
+
+        Application app = applicationService.get(appId);
+        if (app != null) {
+            model.setReturnToApplicationText("Return to " + app.getName());
+
+            model.setApplicationStyleSheetUrl(configurationService.getStringValue(
+                    app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+
+            model.setApplicationFaviconUrl(configurationService.getStringValue(
+                    app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        }
+
+        try {
+            applicationSubscriptionService.unsubscribeFromApplication(appId, model.getEmail());
+            model.setSubscriptionResponseMessage("You have been successfully unsubscribed.");
+        } catch (Exception ex) {
+            log.error("Failed to unsubscribe user: " + ex.getMessage(), ex);
+            model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+        }
+
+        return new ModelAndView("subscription/subscriptionResponse", "applicationSubscriptionModel", model);
     }
 
 }

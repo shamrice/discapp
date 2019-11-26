@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
+
+<div id="tabs">
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Forms</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Forms|}">Forms</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Appearance</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Appearance|}">Appearance</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Subscribers</span>
+    <a  th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
+        th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Subscribers|}">Subscribers</a>
+</div>
+
+
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" method="post" th:action="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}|}" enctype="multipart/form-data">
+
+    <h3 th:if="${maintenanceMailingListViewModel.getInfoMessage()}" th:text="${maintenanceMailingListViewModel.getInfoMessage()}"></h3>
+
+    <div style="width:50em; margin:auto;"><b><p>This is the maintenance page for your DiscussionApp mailing list. Subscribers to your mailing list
+        will get a daily email message containing links to new articles on your DiscussionApp.</p></b>
+        <div class="grey_box">
+            <p>People may use the URL
+                <a th:href="@{|${maintenanceMailingListViewModel.getSubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}"
+                   target="_blank"
+                   th:text="@{|${maintenanceMailingListViewModel.getSubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}">
+                </a> to
+                <I>subscribe</I> to your list.</p>
+            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people sign up for this list.</p>
+            <PRE th:text="${maintenanceMailingListViewModel.getSubscribeHtmlForm()}">
+</PRE>
+        </div>
+        <div class="grey_box">
+            <p>People may use the URL
+                <a th:href="@{|${maintenanceMailingListViewModel.getUnsubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}"
+                   target="_blank"
+                   th:text="@{|${maintenanceMailingListViewModel.getUnsubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}">
+                </a> to
+                <I>unsubscribe</I> to your list.</p>
+            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people unsubscribe from this list.</p>
+            <PRE th:text="${maintenanceMailingListViewModel.getUnsubscribeHtmlForm()}"></PRE>
+        </div>
+    </div>
+    <div class="grey_box" style="width:52ex;">
+        <fieldset>
+            <legend>Email updates for...</legend>
+            <label>
+                <input type="radio" name="disclist_behavior" value="all" checked="checked" />all messages</label>
+            <br />
+            <label>
+                <input type="radio" name="disclist_behavior" value="first" />first messages in threads</label>
+            <br />
+            <label>
+                <input type="radio" name="disclist_behavior" value="preview" />first messages with previews of message bodies</label>
+            <br />
+            <div style="margin-top:1ex; text-align:center;">
+                <input type="submit" name="ChangeBehavior" value="Update" class="button" />
+            </div>
+        </fieldset>
+    </div>
+    <input type="hidden" name="id" value="46108" />
+    <div>
+        <input type="hidden" name=".cgifields" value="disclist_behavior" />
+    </div>
+</form>
+
+
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post" action="/disc-list-maint.cgi?id=46108&tab=Appearance" enctype="multipart/form-data">
+    <div class="grey_box" style="width:40em; text-align:left;">
+        <p>
+        <div><b>Description</b> (Description of your mailing list. You may use up to 512 characters.)</div>
+        <textarea name="description" rows="8" wrap="soft">Enter your email address in order to receive daily updates.</textarea>
+        </p>
+        <p>
+        <div><b>Followup page</b> (Text to appear after users submit their address. 512 chars max.)</div>
+        <textarea name="subscribe_page" rows="8" wrap="soft">A confirmation message has been sent to your address. &lt;br&gt; &lt;br&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        </p>
+        <p>
+        <div><b>Confirmation message</b> (Text to appear in the confirmation message sent to users after they subscribe. 512 chars max.)</div>
+        <textarea name="confirm_message" rows="4" wrap="soft">Please click on the link below to confirm your subscription.</textarea>
+        </p>
+        <p>
+        <div><b>Confirmation page</b> (Text to appear after users confirm their subscription. 512 chars max.)</div>
+        <textarea name="confirm_page" rows="8" wrap="soft">You are now subscribed. You will receive updates when new articles are posted. &lt;br&gt; &lt;BR&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        </p>
+        <p>
+        <div><b>Unsubscription page</b> (Text to appear after users unsubscribe from your DiscList. 512 chars max.)</div>
+        <textarea name="unsub_page" rows="4" wrap="soft">You are unsubscribed from this mailing list. &lt;BR&gt; &lt;BR&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        </p>
+        <div style="margin-top:1em; text-align:center;">
+            <input type="submit" name="SaveChanges" value="Update" class="button" />
+        </div>
+    </div>
+    <input type="hidden" name="id" value="46108" />
+    <input type="hidden" name="tab" value="Appearance" />
+</form>
+
+
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" method="post" action="/disc-list-maint.cgi?id=46108&tab=Subscribers" enctype="multipart/form-data">
+    <div style="text-align:center;">
+        <div>There are 2 subscribers.</div>
+        <table class="colored">
+            <tr>
+                <th>Address</th>
+                <th>Subscribed</th>
+            </tr>
+            <tr>
+                <td>shamrice@gmail.com</td>
+                <td>Aug 08 2019, 03:10AM</td>
+            </tr>
+            <tr>
+                <td>mutilatedincorporated@yahoo.com</td>
+                <td>Jul 31 2016, 02:14PM</td>
+            </tr>
+        </table>
+        <input type="hidden" name="id" value="46108" />
+        <input type="hidden" name="tab" value="Subscribers" />
+    </div>
+</form>
+
+</body>
+</html>
