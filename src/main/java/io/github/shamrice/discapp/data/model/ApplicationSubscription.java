@@ -27,4 +27,5 @@ public class ApplicationSubscription {
     private Date createDt;
     private Date modDt;
     private Date lastSendDt;
+    private Integer confirmationCode;
 }

@@ -58,7 +58,14 @@ public enum ConfigurationProperty {
     EPILOGUE_DEFAULT_VALUE("epilogue.default.value"),
     HOME_PAGE_SEARCH_MIN_LENGTH("home.search.length.min"),
     MAX_LOGIN_ATTEMPTS_BEFORE_LOCK("login.failed.attempts.max"),
-    LOGIN_LOCK_DURATION_FAILED_AUTH("login.failed.lock.duration");
+    LOGIN_LOCK_DURATION_FAILED_AUTH("login.failed.lock.duration"),
+    MAILING_LIST_CONFIRMATION_EMAIL_SUBJECT_TEMPLATE("mailing.list.email.confirmation.subject.template"),
+    MAILING_LIST_CONFIRMATION_EMAIL_BODY_TEMPLATE("mailing.list.email.confirmation.body.template"),
+    MAILING_LIST_DESCRIPTION_PAGE_HTML("mailing.list.page.description.html"),
+    MAILING_LIST_FOLLOW_UP_PAGE_HTML("mailing.list.page.followup.html"),
+    MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE("mailing.list.email.confirmation.message"),
+    MAILING_LIST_CONFIRMATION_PAGE_HTML("mailing.list.page.confirmation.html"),
+    MAILING_LIST_UNSUBSCRIBE_PAGE_HTML("mailing.list.page.unsubscribe.html");
 
     private final String propName;
 

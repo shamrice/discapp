@@ -11,7 +11,6 @@ import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,21 +35,18 @@ public class ApplicationSubscriptionController {
     @Autowired
     private WebHelper webHelper;
 
-
-    //TODO : should ask to verify subscriptions with email message to confirm.
-
     @GetMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
     public ModelAndView getUnsubscribeView(@RequestParam(name = "id") long appId,
-                                           @RequestParam(name = "email") String email,
+                                           @RequestParam(name = "email", required = false) String email,
                                            HttpServletRequest request) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
         model.setApplicationId(appId);
         model.setBaseUrl(webHelper.getBaseUrl(request));
+        model.setEmail(email);
 
         Application app = applicationService.get(appId);
         if (app != null) {
-            model.setReturnToApplicationText("Return to " + app.getName());
 
             model.setApplicationStyleSheetUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
@@ -59,15 +55,41 @@ public class ApplicationSubscriptionController {
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
         }
 
-        try {
-            applicationSubscriptionService.unsubscribeFromApplication(appId, email);
-            model.setSubscriptionResponseMessage("You have been successfully unsubscribed.");
-        } catch (Exception ex) {
-            log.error("Failed to unsubscribe user: " + ex.getMessage(), ex);
-            model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+        return new ModelAndView("subscription/unsubscribe", "applicationSubscriptionModel", model);
+    }
+
+    @PostMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
+    public ModelAndView postUnsubscribeView(@RequestParam(name = "id") long appId,
+                                            @ModelAttribute ApplicationSubscriptionModel model,
+                                            HttpServletRequest request) {
+
+        model.setApplicationId(appId);
+        model.setBaseUrl(webHelper.getBaseUrl(request));
+
+        Application app = applicationService.get(appId);
+        if (app != null) {
+
+            model.setApplicationStyleSheetUrl(configurationService.getStringValue(
+                    app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+
+            model.setApplicationFaviconUrl(configurationService.getStringValue(
+                    app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
         }
 
-        return new ModelAndView("subscription/subscriptionResponse", "applicationSubscriptionModel", model);
+        if (model.getEmail() != null && !model.getEmail().trim().isEmpty()) {
+            try {
+                applicationSubscriptionService.unsubscribeFromApplication(appId, model.getEmail());
+                String unsubscribeHtml = configurationService.getStringValue(appId, ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are now unsubscribed from the mailing list.");
+                model.setUnsubscribeHtml(unsubscribeHtml);
+            } catch (Exception ex) {
+                log.error("Failed to unsubscribe user: " + ex.getMessage(), ex);
+                model.setUnsubscribeHtml("An error occurred. Please try again later.");
+            }
+        } else {
+            model.setUnsubscribeHtml("Please enter a valid email address and try again.");
+        }
+
+        return new ModelAndView("subscription/unsubscribed", "applicationSubscriptionModel", model);
     }
 
     @GetMapping(ApplicationSubscriptionUrl.SUBSCRIBE_URL)
@@ -96,18 +118,27 @@ public class ApplicationSubscriptionController {
         return new ModelAndView("subscription/subscribe", "applicationSubscriptionModel", model);
     }
 
+    /**
+     * Create subscription request and redirect user to follow up page. Email is generated with subscription request.
+     * @param appId
+     * @param applicationSubscriptionModel
+     * @param request
+     * @return
+     */
     @PostMapping(ApplicationSubscriptionUrl.SUBSCRIBE_URL)
     public ModelAndView postSubscribeView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute ApplicationSubscriptionModel applicationSubscriptionModel,
                                           HttpServletRequest request) {
 
-
-        applicationSubscriptionModel.setBaseUrl(webHelper.getBaseUrl(request));
+        String baseUrl = webHelper.getBaseUrl(request);
+        applicationSubscriptionModel.setBaseUrl(baseUrl);
         applicationSubscriptionModel.setApplicationId(appId);
 
         Application app = applicationService.get(appId);
         if (app != null) {
-            applicationSubscriptionModel.setReturnToApplicationText("Return to " + app.getName());
+            applicationSubscriptionModel.setFollowUpHtml(configurationService.getStringValue(
+                    app.getId(), ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML,
+                    "A confirmation message has been sent to your address."));
 
             applicationSubscriptionModel.setApplicationStyleSheetUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
@@ -115,26 +146,51 @@ public class ApplicationSubscriptionController {
             applicationSubscriptionModel.setApplicationFaviconUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
 
-            try {
-                applicationSubscriptionService.subscribeToApplication(app.getId(), applicationSubscriptionModel.getEmail());
-                //todo : get from app config.
-                applicationSubscriptionModel.setSubscriptionResponseMessage("You have been successfully subscribed.");
-            } catch (Exception ex) {
-                log.error("Failed to subscribe user: " + ex.getMessage(), ex);
-                applicationSubscriptionModel.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+            //make sure email address attempted was not blank before continuing.
+            if (applicationSubscriptionModel.getEmail() != null && !applicationSubscriptionModel.getEmail().isEmpty()) {
+
+                //code query param value will be added by service.
+                String confirmUrl = baseUrl + ApplicationSubscriptionUrl.CONFIRM_URL + "?id=" + app.getId()
+                        + "&email=" + applicationSubscriptionModel.getEmail() + "&code=";
+
+                String confirmationMessage = configurationService.getStringValue(
+                        app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE,
+                        "Please click on the link below to confirm your subscription.");
+
+                try {
+                    applicationSubscriptionService.createSubscriptionRequest(app.getId(), app.getName(), confirmUrl,
+                            confirmationMessage, applicationSubscriptionModel.getEmail());
+
+                } catch (Exception ex) {
+                    log.error("Failed to subscribe user: " + ex.getMessage(), ex);
+                    applicationSubscriptionModel.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+                }
+            } else {
+                log.warn("Invalid email address attempted to be subscribed to appId: " + appId);
             }
         }
 
-        return new ModelAndView("subscription/subscriptionResponse", "applicationSubscriptionModel", applicationSubscriptionModel);
+        return new ModelAndView("subscription/followup", "applicationSubscriptionModel", applicationSubscriptionModel);
     }
 
-    @PostMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
-    public ModelAndView postUnsubscribeView(@RequestParam(name = "id") long appId,
-                                            @ModelAttribute ApplicationSubscriptionModel model,
-                                            HttpServletRequest request) {
+    /**
+     * Mailing list confirmation page that gets linked in email sent out.
+     * @param appId
+     * @param email
+     * @param confirmationCode
+     * @param request
+     * @return
+     */
+    @GetMapping(ApplicationSubscriptionUrl.CONFIRM_URL)
+    public ModelAndView getConfirmationView(@RequestParam(name = "id") long appId,
+                                           @RequestParam(name = "email") String email,
+                                           @RequestParam(name = "code") int confirmationCode,
+                                           HttpServletRequest request) {
 
+        ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
         model.setApplicationId(appId);
         model.setBaseUrl(webHelper.getBaseUrl(request));
+        model.setEmail(email);
 
         Application app = applicationService.get(appId);
         if (app != null) {
@@ -145,17 +201,22 @@ public class ApplicationSubscriptionController {
 
             model.setApplicationFaviconUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-        }
 
-        try {
-            applicationSubscriptionService.unsubscribeFromApplication(appId, model.getEmail());
-            model.setSubscriptionResponseMessage("You have been successfully unsubscribed.");
-        } catch (Exception ex) {
-            log.error("Failed to unsubscribe user: " + ex.getMessage(), ex);
-            model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+            if (email != null && !email.trim().isEmpty()) {
+                try {
+                    if (applicationSubscriptionService.subscribeToApplication(app.getId(), email, confirmationCode)) {
+                        String confirmationHtml = configurationService.getStringValue(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "Your are now subscribed. Your will receive updates when new articles are posted.");
+                        model.setConfirmationHtml(confirmationHtml);
+                    } else {
+                        model.setConfirmationHtml("Failed to confirm subscription. Please try again.");
+                    }
+                } catch (Exception ex) {
+                    log.error("Failed to confirm subscription for user: " + ex.getMessage(), ex);
+                    model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+                }
+            }
         }
-
-        return new ModelAndView("subscription/subscriptionResponse", "applicationSubscriptionModel", model);
+        return new ModelAndView("subscription/confirm", "applicationSubscriptionModel", model);
     }
 
 }

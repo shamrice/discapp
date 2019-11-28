@@ -20,5 +20,8 @@ public class ApplicationSubscriptionModel {
     private String baseUrl;
 
     private String subscriptionResponseMessage;
+    private String unsubscribeHtml;
+    private String followUpHtml;
+    private String confirmationHtml;
 
 }

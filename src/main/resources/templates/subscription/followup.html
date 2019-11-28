@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Subscribe to Mailing List</title>
+    <link rel="stylesheet" type="text/css" th:href="${applicationSubscriptionModel.getApplicationStyleSheetUrl()}"/>
+    <link rel="shortcut icon" th:href="${applicationSubscriptionModel.getApplicationFaviconUrl()}" type="image/x-icon">
+    <link rel="icon" th:href="${applicationSubscriptionModel.getApplicationFaviconUrl()}"  type="image/x-icon">
+</head>
+<body>
+
+<div style="width:30em; margin:auto; margin-top:5%; margin-bottom:2%"
+     th:utext="${applicationSubscriptionModel.getFollowUpHtml()}">
+</div>
+
+<p style="margin:2em;">
+    <a th:href="@{|/Indices/${applicationSubscriptionModel.getApplicationId()}.html|}"
+       th:text="${applicationSubscriptionModel.getReturnToApplicationText()}">
+    </a>
+</p>
+
+<div style="clear:both; font-size:smaller; text-align:center; margin-top:2em; margin-bottom:1em;">
+    <a th:href="${applicationSubscriptionModel.getBaseUrl()}" target="_top">
+        Forum by <span style="color:#d44;" th:text="${applicationSubscriptionModel.getBaseUrl()}"></span>
+    </a>
+</div>
+
+
+</body>
+</html>

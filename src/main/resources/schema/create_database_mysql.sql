@@ -244,6 +244,7 @@ CREATE TABLE application_subscription (
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     last_send_dt TIMESTAMP,
+    confirmation_code INT NOT NULL
     PRIMARY KEY (id),
     FOREIGN KEY (application_id) REFERENCES application(id)
 );

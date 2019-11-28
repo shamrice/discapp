@@ -94,6 +94,30 @@ VALUES (0, 'login.failed.attempts.max', '5');
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'login.failed.lock.duration', '300000');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'mailing.list.email.confirmation.subject.template', 'Please confirm your subscription to APPLICATION_NAME');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'mailing.list.email.confirmation.body.template', '<HTML><BODY>
+<P>CONFIRMATION_MESSAGE</P>
+<p><a href="CONFIRMATION_URL">CONFIRMATION_URL</a></p>
+<PRE>
+-------------------------------------------------------------------
+
+Message from NE Disc App:
+
+This is an automated message. Please do not respond to this message.
+
+We received a request to add you to the APPLICATION_NAME  mailing list.
+
+You will not receive any messages if you do not confirm your subscription.
+
+</PRE>
+</BODY>
+</HTML>
+');
+
+
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
 ON thread(application_id, parent_id, deleted, is_approved)

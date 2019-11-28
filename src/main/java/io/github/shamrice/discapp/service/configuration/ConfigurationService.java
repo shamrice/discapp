@@ -70,6 +70,13 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.WIDGET_HEIGHT, "18");
         configsToSet.put(ConfigurationProperty.WIDGET_HEIGHT_UNIT, "em");
 
+        //todo : store app base url in config and use that to set default mailing list html values instead of hard coded...
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML, "Enter your email address in order to receive daily updates.");
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML, "A confirmation message has been sent to your address. <br> <br> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, "Please click on the link below to confirm your subscription.");
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "You are now subscribed. You will receive updates when new articles are posted. <br> <BR> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are unsubscribed from this mailing list. <BR> <BR> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
+
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
 
