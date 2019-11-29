@@ -94,6 +94,10 @@
         <div class="responses" th:utext="${subThreadsHtml}">
         </div>
 
+        <div style="font-size:smaller; padding-top:6px;">
+            <a th:href="@{|disc-list-subscribe.cgi?id=${threadViewModel.getAppId()}|}">Click here to receive daily updates</a>
+        </div>
+
     </div>
 
     <div th:utext="${footerText}"></div>

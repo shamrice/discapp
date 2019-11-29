@@ -70,6 +70,7 @@ public class CommonModelAttributeNames {
     public static final String SUBJECT = "subject";
     public static final String BODY = "body";
     public static final String SHOW_EMAIL = "showEmail";
+    public static final String SUBSCRIBE = "subscribe";
 
     public static final String SEARCH_RESULTS = "searchResults";
     public static final String SEARCH_TERM = "searchTerm";

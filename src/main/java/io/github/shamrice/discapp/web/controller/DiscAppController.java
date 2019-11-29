@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.application.ApplicationSubscriptionService;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
@@ -14,6 +15,7 @@ import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -70,6 +72,9 @@ public class DiscAppController {
 
     @Autowired
     private ErrorController errorController;
+
+    @Autowired
+    private ApplicationSubscriptionService applicationSubscriptionService;
 
     @GetMapping("/Indices/{applicationId}.html")
     public ModelAndView getAppViewOriginalUrl(@PathVariable(name = "applicationId") Long appId,
@@ -514,6 +519,14 @@ public class DiscAppController {
 
                 Long newThreadId = threadService.saveThread(newThread, body);
                 if (newThreadId != null) {
+
+                    //redirect them to subscribe url if they clicked subscribe.
+                    if (email != null && !email.isEmpty() && newThreadViewModel.getSubscribe() != null && !newThreadViewModel.getSubscribe().isEmpty()) {
+                        return new ModelAndView("redirect:" + ApplicationSubscriptionUrl.SUBSCRIBE_URL
+                                + "?id=" + appId + "&email=" + email);
+                    }
+
+                    //otherwise, give regular view thread posted page.
                     return new ModelAndView("redirect:/discussion.cgi?disc=" + appId + "&article=" + newThreadId +"&page=" + page);
                 }
             }

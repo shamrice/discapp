@@ -27,5 +27,6 @@ public class NewThreadViewModel {
     private String parentThreadBody;
     private Integer currentPage;
     private String errorMessage;
+    private String subscribe;
 
 }

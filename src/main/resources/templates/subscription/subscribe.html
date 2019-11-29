@@ -15,7 +15,7 @@
 
             [[${applicationSubscriptionModel.getSubscriptionEmailTextBoxLabel()}]]
 
-            <input type="email" name="email" size="40" />
+            <input type="email" name="email" th:value="${applicationSubscriptionModel.getEmail()}" size="40" />
             <input type="submit" name="Subscribe" th:value="${applicationSubscriptionModel.getSubscribeButtonText()}" />
         </div>
         <p style="margin:2em;">

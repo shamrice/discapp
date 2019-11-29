@@ -89,6 +89,12 @@
                                maxlength="16384"></textarea></div>
             </div>
 
+            <div>
+                <label>
+                    <input type="checkbox" name="subscribe" value="subscribe" th:checked="${subscribe}" th:text="@{|Check here to get daily updates for ${appName}|}" />
+                </label>
+            </div>
+
             <input type="hidden" name="postcode" value="20zs7YlBa7nf."/>
             <input type="hidden" name="parentThreadSubmitter" th:value="${parentThreadSubmitter}"/>
             <input type="hidden" name="parentThreadSubject" th:value="${parentThreadSubject}"/>

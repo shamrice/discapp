@@ -94,6 +94,7 @@ public class ApplicationSubscriptionController {
 
     @GetMapping(ApplicationSubscriptionUrl.SUBSCRIBE_URL)
     public ModelAndView getSubscribeView(@RequestParam(name = "id") long appId,
+                                         @RequestParam(name = "email", required = false) String email,
                                          HttpServletRequest request) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
@@ -102,6 +103,11 @@ public class ApplicationSubscriptionController {
 
         Application app = applicationService.get(appId);
         if (app != null) {
+
+            if (email != null && !email.trim().isEmpty()) {
+                model.setEmail(email);
+            }
+
             model.setReturnToApplicationText("Return to " + app.getName());
 
             model.setApplicationStyleSheetUrl(configurationService.getStringValue(
@@ -139,6 +145,8 @@ public class ApplicationSubscriptionController {
 
         Application app = applicationService.get(appId);
         if (app != null) {
+
+            applicationSubscriptionModel.setReturnToApplicationText("Return to " + app.getName());
 
             applicationSubscriptionModel.setApplicationStyleSheetUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
