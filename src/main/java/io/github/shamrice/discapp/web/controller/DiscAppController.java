@@ -626,6 +626,8 @@ public class DiscAppController {
 
             model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
             model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+
+            model.addAttribute(SUBSCRIBE_URL, ApplicationSubscriptionUrl.SUBSCRIBE_URL + "?id=" + appId);
         } else {
             log.warn("Attempted to view thread: " + threadId + " on appId: " + appId + " but does not belong to app or is not approved. Redirecting to appView.");
             return "redirect:/indices/" + appId;
