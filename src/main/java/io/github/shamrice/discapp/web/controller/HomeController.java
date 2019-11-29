@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.web.define.url.AppUrl;
+import io.github.shamrice.discapp.web.model.HomeOlderUpdatesViewModel;
 import io.github.shamrice.discapp.web.model.SearchApplicationModel;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.github.shamrice.discapp.web.define.url.HomeUrl.*;
 
 @Controller
 @Slf4j
@@ -41,7 +41,7 @@ public class HomeController {
     @Autowired
     private WebHelper webHelper;
 
-    @GetMapping("/")
+    @GetMapping(CONTROLLER_URL_DIRECTORY)
     public ModelAndView getIndexView(Model model) {
 
         SiteUpdateLog latestUpdate = siteService.getLatestSiteUpdateLog();
@@ -58,12 +58,41 @@ public class HomeController {
         return new ModelAndView("home/index", "model", model);
     }
 
-    @GetMapping("/search-apps")
+    @GetMapping(OLDER_UPDATES)
+    public ModelAndView getOlderUpdatesView(HomeOlderUpdatesViewModel model) {
+
+        List<SiteUpdateLog> updates = siteService.getSiteUpdateLogs();
+        if (updates != null) {
+
+            List<HomeOlderUpdatesViewModel.Update> updateList = new ArrayList<>();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-YYYY");
+
+            for (SiteUpdateLog update : updates) {
+
+                //only show enabled updates
+                if (update.getEnabled()) {
+                    String updateDate = simpleDateFormat.format(update.getCreateDt());
+
+                    HomeOlderUpdatesViewModel.Update updateModel = new HomeOlderUpdatesViewModel.Update();
+                    updateModel.setDate(updateDate);
+                    updateModel.setSubject(update.getSubject());
+                    updateModel.setMessage(update.getMessage());
+
+                    updateList.add(updateModel);
+                }
+            }
+
+            model.setUpdateList(updateList);
+        }
+
+        return new ModelAndView("home/olderUpdates", "model", model);
+    }
+
+    @GetMapping(SEARCH_APPS)
     public ModelAndView getSearchAppsView(@RequestParam String searchValue,
                                           SearchApplicationModel searchApplicationModel,
                                           HttpServletRequest request,
                                           Model model) {
-
 
         String baseUrl = webHelper.getBaseUrl(request);
         searchApplicationModel.setBaseUrl(baseUrl);
@@ -104,7 +133,7 @@ public class HomeController {
         return new ModelAndView("home/search-apps-results", "searchApplicationModel", searchApplicationModel);
     }
 
-    @RequestMapping(value = "/robots.txt", method = RequestMethod.GET, produces = "text/plain")
+    @RequestMapping(value = ROBOTS_TXT, method = RequestMethod.GET, produces = "text/plain")
     public String getRobotsTxt(Model model, HttpServletResponse response) {
 
         response.setContentType("text/plain");
