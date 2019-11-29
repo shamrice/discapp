@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Site Administration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        li {
+            float:left;
+            display:block;
+            padding:5px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+
+<div th:if="${siteAdminUpdateViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminUpdateViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminUpdateViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminUpdateViewModel.getInfoMessage()}">
+</div>
+
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
+
+<div class="grey_box">
+
+    <div>
+        <form method="post" action="/site_admin/update" enctype="application/x-www-form-urlencoded" >
+            <label>Post New Update:</label>
+            <br />
+            <hr />
+            <br />
+            <table style="width:100%;text-align:left;">
+                <tr>
+                    <td style="text-align:right;">
+                        <label>Subject:</label>
+                    </td>
+                    <td>
+                        <input style="width:90%;" class="button" type="text" name="newUpdateSubject" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:right;">
+                        <label>Body:</label>
+                    </td>
+                    <td>
+                        <textarea style="height:100px;" class="button" name="newUpdateText"></textarea>
+                    </td>
+                </tr>
+            </table>
+            <input class="button" type="submit" name="submit" value="Submit" />
+            <br />
+        </form>
+    </div>
+
+    <div>
+        <a href="/site_admin/update/manage">Click here to manage previous updates.</a>
+    </div>
+</div>
+
+</body>
+</html>

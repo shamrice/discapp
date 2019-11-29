@@ -8,9 +8,11 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,7 +30,7 @@ public class SiteService {
     @Value("${discapp.cache.duration}")
     private Long cacheDuration;
 
-    public boolean saveUpdateLog(SiteUpdateLog siteUpdateLog) {
+    public boolean saveAndPostUpdateLog(SiteUpdateLog siteUpdateLog) {
         log.info("Saving site update log: " + siteUpdateLog.toString());
         this.siteUpdateLog = siteUpdateLog;
         return siteUpdateLogRepository.save(siteUpdateLog) != null;
@@ -41,6 +43,19 @@ public class SiteService {
             lastUpdateChecked = new Date();
         }
         return siteUpdateLog;
+    }
+
+    public List<SiteUpdateLog> getSiteUpdateLogs() {
+        return siteUpdateLogRepository.findAll(Sort.by("id").descending());
+    }
+
+    public SiteUpdateLog getSiteUpdateLog(long id) {
+        return siteUpdateLogRepository.findById(id).orElse(null);
+    }
+
+    public void saveUpdateLog(SiteUpdateLog siteUpdateLog) {
+        log.info("Saving site update log: " + siteUpdateLog.toString());
+        siteUpdateLogRepository.save(siteUpdateLog);
     }
 
     public void updateDiscAppRobotsTxtBlock(long appId, boolean isBlocked) {
