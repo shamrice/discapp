@@ -289,6 +289,7 @@ public class DiscAppController {
             model.addAttribute(PARENT_THREAD_SUBJECT, newThreadViewModel.getParentThreadSubject());
             model.addAttribute(PARENT_THREAD_BODY, newThreadViewModel.getParentThreadBody());
             model.addAttribute(CURRENT_PAGE, newThreadViewModel.getCurrentPage());
+            model.addAttribute(SUBSCRIBE, newThreadViewModel.getSubscribe());
 
             if (newThreadViewModel.getErrorMessage() != null) {
                 model.addAttribute(ERROR_MESSAGE, newThreadViewModel.getErrorMessage());
