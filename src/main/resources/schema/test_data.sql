@@ -129,3 +129,30 @@ values (46108, 'page.index.thread.count.max', '25');
 
 
 
+
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.page.description.html', 'Enter your email address in order to receive daily updates.');
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.page.followup.html', 'A confirmation message has been sent to your address. <br> <br> <a href="http://nediscapp.herokuapp.com/Indices/46108.html">Return to the Message Board</a>');
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.email.confirmation.message', 'Please click on the link below to confirm your subscription.');
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.page.confirmation.html', 'You are now subscribed. You will receive updates when new articles are posted. <br> <BR> <a href="http://nediscapp.herokuapp.com/Indices/46108.html">Return to the Message Board</a>');
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.page.unsubscribe.html', 'You are unsubscribed from this mailing list. <BR> <BR> <a href="http://nediscapp.herokuapp.com/Indices/46108.html">Return to the Message Board</a>');
+
+insert into configuration
+(application_id, name, value)
+values (46108, 'mailing.list.email.update.settings', 'all');
+
+

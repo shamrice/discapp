@@ -110,9 +110,12 @@ public class ApplicationSubscriptionController {
             model.setApplicationFaviconUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
 
-            //todo : pull these from app configuration.
             model.setSubscribeButtonText("Subscribe");
-            model.setSubscriptionEmailTextBoxLabel("Enter your email address in order to receive daily updates.");
+            model.setSubscriptionEmailTextBoxLabel(
+                    configurationService.getStringValue(
+                            app.getId(), ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML,
+                            "Enter your email address in order to receive daily updates. ")
+            );
         }
 
         return new ModelAndView("subscription/subscribe", "applicationSubscriptionModel", model);
@@ -136,9 +139,6 @@ public class ApplicationSubscriptionController {
 
         Application app = applicationService.get(appId);
         if (app != null) {
-            applicationSubscriptionModel.setFollowUpHtml(configurationService.getStringValue(
-                    app.getId(), ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML,
-                    "A confirmation message has been sent to your address."));
 
             applicationSubscriptionModel.setApplicationStyleSheetUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
@@ -146,27 +146,39 @@ public class ApplicationSubscriptionController {
             applicationSubscriptionModel.setApplicationFaviconUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
 
-            //make sure email address attempted was not blank before continuing.
-            if (applicationSubscriptionModel.getEmail() != null && !applicationSubscriptionModel.getEmail().isEmpty()) {
+            //check to see if the user is already subscribed before resubscribing them.
+            if (applicationSubscriptionService.isEmailAlreadySubscribed(app.getId(), applicationSubscriptionModel.getEmail())) {
+                log.info("Email address: " + applicationSubscriptionModel.getEmail() + " is already subscribed to appId: " + appId);
+                applicationSubscriptionModel.setFollowUpHtml("You are already subscribed to this mailing list.");
 
-                //code query param value will be added by service.
-                String confirmUrl = baseUrl + ApplicationSubscriptionUrl.CONFIRM_URL + "?id=" + app.getId()
-                        + "&email=" + applicationSubscriptionModel.getEmail() + "&code=";
-
-                String confirmationMessage = configurationService.getStringValue(
-                        app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE,
-                        "Please click on the link below to confirm your subscription.");
-
-                try {
-                    applicationSubscriptionService.createSubscriptionRequest(app.getId(), app.getName(), confirmUrl,
-                            confirmationMessage, applicationSubscriptionModel.getEmail());
-
-                } catch (Exception ex) {
-                    log.error("Failed to subscribe user: " + ex.getMessage(), ex);
-                    applicationSubscriptionModel.setSubscriptionResponseMessage("An error occurred. Please try again later.");
-                }
             } else {
-                log.warn("Invalid email address attempted to be subscribed to appId: " + appId);
+                //subscribe user.
+                applicationSubscriptionModel.setFollowUpHtml(configurationService.getStringValue(
+                        app.getId(), ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML,
+                        "A confirmation message has been sent to your address."));
+
+                //make sure email address attempted was not blank before continuing.
+                if (applicationSubscriptionModel.getEmail() != null && !applicationSubscriptionModel.getEmail().isEmpty()) {
+
+                    //code query param value will be added by service.
+                    String confirmUrl = baseUrl + ApplicationSubscriptionUrl.CONFIRM_URL + "?id=" + app.getId()
+                            + "&email=" + applicationSubscriptionModel.getEmail() + "&code=";
+
+                    String confirmationMessage = configurationService.getStringValue(
+                            app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE,
+                            "Please click on the link below to confirm your subscription.");
+
+                    try {
+                        applicationSubscriptionService.createSubscriptionRequest(app.getId(), app.getName(), confirmUrl,
+                                confirmationMessage, applicationSubscriptionModel.getEmail());
+
+                    } catch (Exception ex) {
+                        log.error("Failed to subscribe user: " + ex.getMessage(), ex);
+                        applicationSubscriptionModel.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+                    }
+                } else {
+                    log.warn("Invalid email address attempted to be subscribed to appId: " + appId);
+                }
             }
         }
 

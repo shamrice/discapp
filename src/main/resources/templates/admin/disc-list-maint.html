@@ -18,6 +18,10 @@
     static thread prototyping placeholder
 </div>
 
+<div th:if="${maintenanceMailingListViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceMailingListViewModel.getInfoMessage()}">
+</div>
+
 <div id="tabs">
     <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" class="tab"
           style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Forms</span>
@@ -36,9 +40,8 @@
 </div>
 
 
-<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" method="post" th:action="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}|}" enctype="multipart/form-data">
-
-    <h3 th:if="${maintenanceMailingListViewModel.getInfoMessage()}" th:text="${maintenanceMailingListViewModel.getInfoMessage()}"></h3>
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" method="post"
+      action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
 
     <div style="width:50em; margin:auto;"><b><p>This is the maintenance page for your DiscussionApp mailing list. Subscribers to your mailing list
         will get a daily email message containing links to new articles on your DiscussionApp.</p></b>
@@ -68,75 +71,82 @@
         <fieldset>
             <legend>Email updates for...</legend>
             <label>
-                <input type="radio" name="disclist_behavior" value="all" checked="checked" />all messages</label>
+                <input type="radio" name="emailUpdateSetting" value="all" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('all')}" />all messages</label>
             <br />
             <label>
-                <input type="radio" name="disclist_behavior" value="first" />first messages in threads</label>
+                <input type="radio" name="emailUpdateSetting" value="first" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('first')}" />first messages in threads</label>
             <br />
             <label>
-                <input type="radio" name="disclist_behavior" value="preview" />first messages with previews of message bodies</label>
+                <input type="radio" name="emailUpdateSetting" value="preview" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('preview')}" />first messages with previews of message bodies</label>
             <br />
             <div style="margin-top:1ex; text-align:center;">
-                <input type="submit" name="ChangeBehavior" value="Update" class="button" />
+                <input type="submit" name="changeBehaviorButton" value="Update" class="button" />
             </div>
         </fieldset>
     </div>
-    <input type="hidden" name="id" value="46108" />
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
+    <input type="hidden" name="tab" th:value="Forms" />
     <div>
         <input type="hidden" name=".cgifields" value="disclist_behavior" />
     </div>
 </form>
 
 
-<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post" action="/disc-list-maint.cgi?id=46108&tab=Appearance" enctype="multipart/form-data">
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post" action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
     <div class="grey_box" style="width:40em; text-align:left;">
         <p>
         <div><b>Description</b> (Description of your mailing list. You may use up to 512 characters.)</div>
-        <textarea name="description" rows="8" wrap="soft">Enter your email address in order to receive daily updates.</textarea>
+        <textarea name="descriptionText" rows="8" wrap="soft" maxlength="512"
+                  th:text="${maintenanceMailingListViewModel.getDescriptionText()}"></textarea>
         </p>
         <p>
         <div><b>Followup page</b> (Text to appear after users submit their address. 512 chars max.)</div>
-        <textarea name="subscribe_page" rows="8" wrap="soft">A confirmation message has been sent to your address. &lt;br&gt; &lt;br&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        <textarea name="followUpPageText" rows="8" wrap="soft" th:text="${maintenanceMailingListViewModel.getFollowUpPageText()}"></textarea>
         </p>
         <p>
         <div><b>Confirmation message</b> (Text to appear in the confirmation message sent to users after they subscribe. 512 chars max.)</div>
-        <textarea name="confirm_message" rows="4" wrap="soft">Please click on the link below to confirm your subscription.</textarea>
+        <textarea name="confirmationMessageText" rows="4" wrap="soft" maxlength="512"
+                  th:text="${maintenanceMailingListViewModel.getConfirmationMessageText()}"></textarea>
         </p>
         <p>
         <div><b>Confirmation page</b> (Text to appear after users confirm their subscription. 512 chars max.)</div>
-        <textarea name="confirm_page" rows="8" wrap="soft">You are now subscribed. You will receive updates when new articles are posted. &lt;br&gt; &lt;BR&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        <textarea name="confirmationPageText" rows="8" wrap="soft" maxlength="512"
+                  th:text="${maintenanceMailingListViewModel.getConfirmationPageText()}"></textarea>
         </p>
         <p>
         <div><b>Unsubscription page</b> (Text to appear after users unsubscribe from your DiscList. 512 chars max.)</div>
-        <textarea name="unsub_page" rows="4" wrap="soft">You are unsubscribed from this mailing list. &lt;BR&gt; &lt;BR&gt; &lt;a href=&quot;http://disc.yourwebapps.com/Indices/46108.html&quot;&gt;Return to the Message Board&lt;/a&gt;</textarea>
+        <textarea name="unsubscribePageText" rows="4" wrap="soft" maxlength="512"
+                  th:text="${maintenanceMailingListViewModel.getUnsubscribePageText()}"></textarea>
         </p>
         <div style="margin-top:1em; text-align:center;">
-            <input type="submit" name="SaveChanges" value="Update" class="button" />
+            <input type="submit" name="updateFormsButton" value="Update" class="button" />
         </div>
     </div>
-    <input type="hidden" name="id" value="46108" />
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
     <input type="hidden" name="tab" value="Appearance" />
 </form>
 
 
-<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" method="post" action="/disc-list-maint.cgi?id=46108&tab=Subscribers" enctype="multipart/form-data">
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" method="post"
+      action="/admin/disc-list-maint.cgi"
+      enctype="multipart/form-data">
     <div style="text-align:center;">
-        <div>There are 2 subscribers.</div>
+        <div th:text="@{|There are ${maintenanceMailingListViewModel.getSubscriberCount()} subscribers.|}"></div>
         <table class="colored">
             <tr>
                 <th>Address</th>
                 <th>Subscribed</th>
             </tr>
-            <tr>
-                <td>shamrice@gmail.com</td>
-                <td>Aug 08 2019, 03:10AM</td>
+
+            <tr th:if="${not #lists.isEmpty(maintenanceMailingListViewModel.getSubscribers())}"
+                th:each="subscriber : ${maintenanceMailingListViewModel.getSubscribers()}">
+
+                <td th:text="${subscriber.getEmail()}"></td>
+                <td th:text="${subscriber.getSubscribeDate()}"></td>
             </tr>
-            <tr>
-                <td>mutilatedincorporated@yahoo.com</td>
-                <td>Jul 31 2016, 02:14PM</td>
-            </tr>
+
         </table>
-        <input type="hidden" name="id" value="46108" />
+        <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
         <input type="hidden" name="tab" value="Subscribers" />
     </div>
 </form>

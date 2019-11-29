@@ -22,6 +22,20 @@ public class ApplicationSubscriptionService {
     @Autowired
     private EmailNotificationService emailNotificationService;
 
+    public List<ApplicationSubscription> getSubscribers(long appId) {
+        return applicationSubscriptionRepository.findByApplicationIdAndEnabled(appId, true);
+    }
+
+    public boolean isEmailAlreadySubscribed(long appId, String emailAddress) {
+
+        if (emailAddress == null || emailAddress.trim().isEmpty()) {
+            return false;
+        }
+
+        ApplicationSubscription subscription = applicationSubscriptionRepository.findByApplicationIdAndSubscriberEmail(appId, emailAddress);
+        return subscription != null && subscription.getEnabled();
+    }
+
     public void unsubscribeFromApplication(long appId, String emailAddress) {
         ApplicationSubscription subscription = applicationSubscriptionRepository.findByApplicationIdAndSubscriberEmail(appId, emailAddress);
         if (subscription != null) {

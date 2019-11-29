@@ -65,7 +65,8 @@ public enum ConfigurationProperty {
     MAILING_LIST_FOLLOW_UP_PAGE_HTML("mailing.list.page.followup.html"),
     MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE("mailing.list.email.confirmation.message"),
     MAILING_LIST_CONFIRMATION_PAGE_HTML("mailing.list.page.confirmation.html"),
-    MAILING_LIST_UNSUBSCRIBE_PAGE_HTML("mailing.list.page.unsubscribe.html");
+    MAILING_LIST_UNSUBSCRIBE_PAGE_HTML("mailing.list.page.unsubscribe.html"),
+    MAILING_LIST_EMAIL_UPDATE_SETTINGS("mailing.list.email.update.settings");
 
     private final String propName;
 

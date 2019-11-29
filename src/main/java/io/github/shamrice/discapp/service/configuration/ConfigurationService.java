@@ -76,6 +76,7 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, "Please click on the link below to confirm your subscription.");
         configsToSet.put(ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "You are now subscribed. You will receive updates when new articles are posted. <br> <BR> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
         configsToSet.put(ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are unsubscribed from this mailing list. <BR> <BR> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, "all");
 
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
