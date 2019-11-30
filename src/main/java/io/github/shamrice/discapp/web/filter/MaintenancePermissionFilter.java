@@ -48,62 +48,66 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
         //app service is only auto wired in some instances when called. if not set, skip check.
         if (applicationService != null && servletRequest instanceof HttpServletRequest) {
 
-            HttpServletRequest req = (HttpServletRequest) servletRequest;
-            HttpServletResponse resp = (HttpServletResponse) servletResponse;
-            String url = req.getRequestURL().toString();
+            //root accounts are not filtered.
+            if (!accountHelper.isRootAdminAccount()) {
 
-            if (url.contains(MaintenanceUrl.CONTROLLER_DIRECTORY_URL)
-                    && !url.contains(MaintenanceUrl.PERMISSION_DENIED_URL)) {
+                HttpServletRequest req = (HttpServletRequest) servletRequest;
+                HttpServletResponse resp = (HttpServletResponse) servletResponse;
+                String url = req.getRequestURL().toString();
 
-                String email = accountHelper.getLoggedInEmail();
-                DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(email);
+                if (url.contains(MaintenanceUrl.CONTROLLER_DIRECTORY_URL)
+                        && !url.contains(MaintenanceUrl.PERMISSION_DENIED_URL)) {
 
-                if (discAppUser != null ) {
+                    String email = accountHelper.getLoggedInEmail();
+                    DiscAppUser discAppUser = discAppUserDetailsService.getByEmail(email);
 
-                    try {
-                        MultiValueMap<String, String> params = UriComponentsBuilder
-                                .fromUriString(req.getRequestURL().toString() + "?" + req.getQueryString())
-                                .build()
-                                .getQueryParams();
-                        String appIdStr = params.getFirst(APP_ID_QUERY_STRING_KEY);
+                    if (discAppUser != null) {
 
-                        if (appIdStr != null) {
-                            long appId = Long.parseLong(appIdStr);
+                        try {
+                            MultiValueMap<String, String> params = UriComponentsBuilder
+                                    .fromUriString(req.getRequestURL().toString() + "?" + req.getQueryString())
+                                    .build()
+                                    .getQueryParams();
+                            String appIdStr = params.getFirst(APP_ID_QUERY_STRING_KEY);
 
-                            if (!applicationService.isOwnerOfApp(appId, email)) {
-                                log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
+                            if (appIdStr != null) {
+                                long appId = Long.parseLong(appIdStr);
 
-                                if (url.contains(MaintenanceUrl.THREAD_EDIT_PAGE) || url.contains(MaintenanceUrl.THREADS_EDIT_PAGE)) {
-                                    boolean isEditorOfApp = false;
-                                    UserPermission userPermission = applicationService.getUserActivePermission(appId, discAppUser.getId());
+                                if (!applicationService.isOwnerOfApp(appId, email)) {
+                                    log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
 
-                                    if (userPermission != null) {
-                                        log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + userPermission.getUserPermissions());
-                                        //set editor permissions if permissions are not set to none.
-                                        isEditorOfApp = userPermission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT);
-                                    }
+                                    if (url.contains(MaintenanceUrl.THREAD_EDIT_PAGE) || url.contains(MaintenanceUrl.THREADS_EDIT_PAGE)) {
+                                        boolean isEditorOfApp = false;
+                                        UserPermission userPermission = applicationService.getUserActivePermission(appId, discAppUser.getId());
 
-                                    if (!isEditorOfApp) {
-                                        log.info("User: " + email + " is not an editor or does not have '" + io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT
-                                                + "' permission set for appId: " + appId
+                                        if (userPermission != null) {
+                                            log.info("User: " + email + " is an editor of appId: " + appId + " with perm: " + userPermission.getUserPermissions());
+                                            //set editor permissions if permissions are not set to none.
+                                            isEditorOfApp = userPermission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT);
+                                        }
+
+                                        if (!isEditorOfApp) {
+                                            log.info("User: " + email + " is not an editor or does not have '" + io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT
+                                                    + "' permission set for appId: " + appId
+                                                    + " :: redirecting to permission denied");
+                                            resp.sendRedirect(MaintenanceUrl.PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
+                                            return;
+                                        }
+                                    } else {
+                                        log.info("User: " + email + " is not the owner of appId: " + appId
                                                 + " :: redirecting to permission denied");
                                         resp.sendRedirect(MaintenanceUrl.PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
                                         return;
                                     }
-                                } else {
-                                    log.info("User: " + email + " is not the owner of appId: " + appId
-                                            + " :: redirecting to permission denied");
-                                    resp.sendRedirect(MaintenanceUrl.PERMISSION_DENIED_URL + "?" + APP_ID_QUERY_STRING_KEY + "=" + appId);
-                                    return;
                                 }
                             }
+                        } catch (Exception ex) {
+                            log.error("Error checking for url: " + url + " queryString= " + req.getQueryString()
+                                    + " :: error: " + ex.getMessage(), ex);
                         }
-                    } catch (Exception ex) {
-                        log.error("Error checking for url: " + url + " queryString= " + req.getQueryString()
-                                + " :: error: " + ex.getMessage(), ex);
-                    }
 
-                    log.info("User: " + email + " is owner of app. Allowing pass to maintenance page. :: Url: " + req.getRequestURL().toString());
+                        log.info("User: " + email + " is owner of app. Allowing pass to maintenance page. :: Url: " + req.getRequestURL().toString());
+                    }
                 }
             }
         }

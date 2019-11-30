@@ -81,9 +81,12 @@ public class AccountHelper {
     }
 
     public boolean isRootAdminAccount() {
-        DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (userPrincipal != null) {
-            return userPrincipal.isRoot();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof DiscAppUserPrincipal) {
+            DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (userPrincipal != null) {
+                return userPrincipal.isRoot();
+            }
         }
         return false;
     }
