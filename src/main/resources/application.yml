@@ -19,9 +19,9 @@ spring:
       max-request-size: 5MB
 
   datasource:
-  #  url: jdbc:mysql://localhost:3306/discapp?serverTimezone=UTC
-  #  username: root
-  #  password: password
+    #  url: jdbc:mysql://localhost:3306/discapp?serverTimezone=UTC
+    #  username: root
+    #  password: password
 
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -68,6 +68,9 @@ server:
       timeout: 1d
 
 discapp:
+  notifier:
+    url: ${NOTIFIER_URL}
+    send-hour: ${NOTIFIER_SEND_HOUR}
   root:
     email: ${ROOT_EMAIL_ADDRESS}
   cache:
