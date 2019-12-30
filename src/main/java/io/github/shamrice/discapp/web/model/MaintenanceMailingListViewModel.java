@@ -14,6 +14,7 @@ public class MaintenanceMailingListViewModel {
     public static final String FORMS_TAB = "Forms";
     public static final String APPEARANCE_TAB = "Appearance";
     public static final String SUBSCRIBERS_TAB = "Subscribers";
+    public static final String REPLY_TAB = "Reply";
 
     @Getter
     @Setter
@@ -48,6 +49,9 @@ public class MaintenanceMailingListViewModel {
     private String unsubscribePageText;
     private String updateFormsButton;
 
+    private String emailReplySetting;
+    private String changeReplyBehaviorButton;
+
     public int getSubscriberCount() {
         return this.subscribers.size();
     }
@@ -59,5 +63,14 @@ public class MaintenanceMailingListViewModel {
             return false;
         }
         return emailUpdateSetting.equalsIgnoreCase(value);
+    }
+
+    public boolean isEmailReplySettingChecked(String value) {
+        if (value == null || value.isEmpty())
+            return false;
+        if (emailReplySetting == null || emailReplySetting.isEmpty()) {
+            return false;
+        }
+        return emailReplySetting.equalsIgnoreCase(value);
     }
 }

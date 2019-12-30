@@ -117,6 +117,16 @@ You will not receive any messages if you do not confirm your subscription.
 </HTML>
 ');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.reply.subject.template', 'response to your article on APPLICATION_NAME');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.reply.body.template', '<html><body>
+<p>This is an automated message. Please do not respond to this message.</p>
+<p>A response has been posted to your article on "APPLICATION_NAME".</p>
+<p>The URL for the response is <a href="APP_DISCUSSION_URL?disc=APP_ID&article=THREAD_ID">APP_DISCUSSION_URL?disc=APP_ID&article=THREAD_ID</a></p>
+</body></html>');
+
 
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved

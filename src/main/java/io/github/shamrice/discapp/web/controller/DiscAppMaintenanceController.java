@@ -41,8 +41,7 @@ import java.util.List;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.*;
-import static io.github.shamrice.discapp.web.model.MaintenanceMailingListViewModel.APPEARANCE_TAB;
-import static io.github.shamrice.discapp.web.model.MaintenanceMailingListViewModel.FORMS_TAB;
+import static io.github.shamrice.discapp.web.model.MaintenanceMailingListViewModel.*;
 
 @Controller
 @Slf4j
@@ -170,7 +169,7 @@ public class DiscAppMaintenanceController {
             listViewModel.setConfirmationPageText(confirmationPageText);
             listViewModel.setUnsubscribePageText(unsubscribePageText);
 
-        } else {
+        } else if (tab.equalsIgnoreCase(SUBSCRIBERS_TAB)) {
 
             List<ApplicationSubscription> subscriptions = applicationSubscriptionService.getSubscribers(app.getId());
 
@@ -182,6 +181,15 @@ public class DiscAppMaintenanceController {
                 }
                 listViewModel.setSubscribers(subscribers);
             }
+        } else {
+
+            String emailReplySetting = "off";
+            boolean emailReplySettingValue = configurationService.getBooleanValue(app.getId(), ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, false);
+            if (emailReplySettingValue) {
+                emailReplySetting = "on";
+            }
+
+            listViewModel.setEmailReplySetting(emailReplySetting);
         }
 
         return new ModelAndView("admin/disc-list-maint", "maintenanceMailingListViewModel", listViewModel);
@@ -200,7 +208,7 @@ public class DiscAppMaintenanceController {
             if (saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
                 log.info("Updated email update settings for appId: " + appId + " to: " + listViewModel.getEmailUpdateSetting());
             } else {
-                log.info("Failed to update mailing list email settings for appId: " + appId);
+                log.warn("Failed to update mailing list email settings for appId: " + appId);
                 status = "Failed to save mailing list email settings.";
             }
         }
@@ -214,6 +222,16 @@ public class DiscAppMaintenanceController {
 
             if (!(descriptionSaved && followUpPageSaved && confirmationMessageSaved && confirmationPageSaved && unsubscribePageSaved)) {
                 status = "Failed to save one more of mailing list appearance forms.";
+            }
+        }
+
+        if (listViewModel.getChangeReplyBehaviorButton() != null && !listViewModel.getChangeReplyBehaviorButton().isEmpty()) {
+            boolean replyNotificationEnabled = "on".equalsIgnoreCase(listViewModel.getEmailReplySetting());
+            if (saveUpdatedConfiguration(appId, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, String.valueOf(replyNotificationEnabled))) {
+                log.info("Updated reply notification settings for appId: " + appId + " to: " + replyNotificationEnabled);
+            } else {
+                log.warn("Failed to update email reply notification settings for appId: " + appId);
+                status = "Failed to save reply notification settings.";
             }
         }
 

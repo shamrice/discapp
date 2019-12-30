@@ -66,7 +66,10 @@ public enum ConfigurationProperty {
     MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE("mailing.list.email.confirmation.message"),
     MAILING_LIST_CONFIRMATION_PAGE_HTML("mailing.list.page.confirmation.html"),
     MAILING_LIST_UNSUBSCRIBE_PAGE_HTML("mailing.list.page.unsubscribe.html"),
-    MAILING_LIST_EMAIL_UPDATE_SETTINGS("mailing.list.email.update.settings");
+    MAILING_LIST_EMAIL_UPDATE_SETTINGS("mailing.list.email.update.settings"),
+    EMAIL_REPLY_NOTIFICATION_ENABLED("email.notification.reply.enabled"),
+    EMAIL_REPLY_NOTIFICATION_SUBJECT_TEMPLATE("email.notification.reply.subject.template"),
+    EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE("email.notification.reply.body.template");
 
     private final String propName;
 

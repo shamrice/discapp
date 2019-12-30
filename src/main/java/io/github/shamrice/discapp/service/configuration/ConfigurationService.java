@@ -78,6 +78,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are unsubscribed from this mailing list. <BR> <BR> <a href=\"https://nediscapp.herokuapp.com/Indices/" + applicationId + ".html\">Return to the Message Board</a>");
         configsToSet.put(ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, "all");
 
+        configsToSet.put(ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, "true");
+
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
 

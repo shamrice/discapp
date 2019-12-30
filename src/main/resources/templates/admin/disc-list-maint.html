@@ -9,6 +9,7 @@
 
     <style type="text/css">
         div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
@@ -35,15 +36,22 @@
 
     <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
           style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Subscribers</span>
-    <a  th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
-        th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Subscribers|}">Subscribers</a>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Subscribers|}">Subscribers</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Reply')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Reply Notifications</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Reply')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Reply|}">Reply
+        Notifications</a>
 </div>
 
 
 <form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" method="post"
       action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
 
-    <div style="width:50em; margin:auto;"><b><p>This is the maintenance page for your DiscussionApp mailing list. Subscribers to your mailing list
+    <div style="width:50em; margin:auto;"><b><p>This is the maintenance page for your DiscussionApp mailing list.
+        Subscribers to your mailing list
         will get a daily email message containing links to new articles on your DiscussionApp.</p></b>
         <div class="grey_box">
             <p>People may use the URL
@@ -52,7 +60,8 @@
                    th:text="@{|${maintenanceMailingListViewModel.getSubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}">
                 </a> to
                 <I>subscribe</I> to your list.</p>
-            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people sign up for this list.</p>
+            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people
+                sign up for this list.</p>
             <PRE th:text="${maintenanceMailingListViewModel.getSubscribeHtmlForm()}">
 </PRE>
         </div>
@@ -63,7 +72,8 @@
                    th:text="@{|${maintenanceMailingListViewModel.getUnsubscribeUrl()}?id=${maintenanceMailingListViewModel.getApplicationId()}|}">
                 </a> to
                 <I>unsubscribe</I> to your list.</p>
-            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people unsubscribe from this list.</p>
+            <p>You can also copy and paste the following HTML code into the webpages where you would like to let people
+                unsubscribe from this list.</p>
             <PRE th:text="${maintenanceMailingListViewModel.getUnsubscribeHtmlForm()}"></PRE>
         </div>
     </div>
@@ -71,28 +81,34 @@
         <fieldset>
             <legend>Email updates for...</legend>
             <label>
-                <input type="radio" name="emailUpdateSetting" value="all" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('all')}" />all messages</label>
-            <br />
+                <input type="radio" name="emailUpdateSetting" value="all"
+                       th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('all')}"/>all messages</label>
+            <br/>
             <label>
-                <input type="radio" name="emailUpdateSetting" value="first" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('first')}" />first messages in threads</label>
-            <br />
+                <input type="radio" name="emailUpdateSetting" value="first"
+                       th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('first')}"/>first
+                messages in threads</label>
+            <br/>
             <label>
-                <input type="radio" name="emailUpdateSetting" value="preview" th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('preview')}" />first messages with previews of message bodies</label>
-            <br />
+                <input type="radio" name="emailUpdateSetting" value="preview"
+                       th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('preview')}"/>first
+                messages with previews of message bodies</label>
+            <br/>
             <div style="margin-top:1ex; text-align:center;">
-                <input type="submit" name="changeBehaviorButton" value="Update" class="button" />
+                <input type="submit" name="changeBehaviorButton" value="Update" class="button"/>
             </div>
         </fieldset>
     </div>
-    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
-    <input type="hidden" name="tab" th:value="Forms" />
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}"/>
+    <input type="hidden" name="tab" th:value="Forms"/>
     <div>
-        <input type="hidden" name=".cgifields" value="disclist_behavior" />
+        <input type="hidden" name=".cgifields" value="disclist_behavior"/>
     </div>
 </form>
 
 
-<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post" action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post"
+      action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
     <div class="grey_box" style="width:40em; text-align:left;">
         <p>
         <div><b>Description</b> (Description of your mailing list. You may use up to 512 characters.)</div>
@@ -101,10 +117,13 @@
         </p>
         <p>
         <div><b>Followup page</b> (Text to appear after users submit their address. 512 chars max.)</div>
-        <textarea name="followUpPageText" rows="8" wrap="soft" th:text="${maintenanceMailingListViewModel.getFollowUpPageText()}"></textarea>
+        <textarea name="followUpPageText" rows="8" wrap="soft"
+                  th:text="${maintenanceMailingListViewModel.getFollowUpPageText()}"></textarea>
         </p>
         <p>
-        <div><b>Confirmation message</b> (Text to appear in the confirmation message sent to users after they subscribe. 512 chars max.)</div>
+        <div><b>Confirmation message</b> (Text to appear in the confirmation message sent to users after they subscribe.
+            512 chars max.)
+        </div>
         <textarea name="confirmationMessageText" rows="4" wrap="soft" maxlength="512"
                   th:text="${maintenanceMailingListViewModel.getConfirmationMessageText()}"></textarea>
         </p>
@@ -114,16 +133,17 @@
                   th:text="${maintenanceMailingListViewModel.getConfirmationPageText()}"></textarea>
         </p>
         <p>
-        <div><b>Unsubscription page</b> (Text to appear after users unsubscribe from your DiscList. 512 chars max.)</div>
+        <div><b>Unsubscription page</b> (Text to appear after users unsubscribe from your DiscList. 512 chars max.)
+        </div>
         <textarea name="unsubscribePageText" rows="4" wrap="soft" maxlength="512"
                   th:text="${maintenanceMailingListViewModel.getUnsubscribePageText()}"></textarea>
         </p>
         <div style="margin-top:1em; text-align:center;">
-            <input type="submit" name="updateFormsButton" value="Update" class="button" />
+            <input type="submit" name="updateFormsButton" value="Update" class="button"/>
         </div>
     </div>
-    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
-    <input type="hidden" name="tab" value="Appearance" />
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}"/>
+    <input type="hidden" name="tab" value="Appearance"/>
 </form>
 
 
@@ -146,9 +166,42 @@
             </tr>
 
         </table>
-        <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}" />
-        <input type="hidden" name="tab" value="Subscribers" />
+        <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}"/>
+        <input type="hidden" name="tab" value="Subscribers"/>
     </div>
+</form>
+
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Reply')}" method="post"
+      action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
+
+    <div style="width:50em; margin:auto;"><b><p>
+        Here you can specify the instant email notifications settings for when an article is replied to on your
+        DiscussionApp.
+        When this setting is enabled, users who have entered an email address in their article will receive an email
+        each time someone replies to their message.
+    </p></b>
+    </div>
+
+    <div class="grey_box" style="width:52ex;">
+        <fieldset>
+            <legend>Reply Email Notification Settings</legend>
+            <label>
+                <input type="radio" name="emailReplySetting" value="on"
+                       th:checked="${maintenanceMailingListViewModel.isEmailReplySettingChecked('on')}"/>Enable instant
+                email reply notifications</label>
+            <br/>
+            <label>
+                <input type="radio" name="emailReplySetting" value="off"
+                       th:checked="${maintenanceMailingListViewModel.isEmailReplySettingChecked('off')}"/>Disable
+                instant email reply notifications</label>
+            <br/>
+            <div style="margin-top:1ex; text-align:center;">
+                <input type="submit" name="changeReplyBehaviorButton" value="Update" class="button"/>
+            </div>
+        </fieldset>
+    </div>
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}"/>
+    <input type="hidden" name="tab" th:value="Reply"/>
 </form>
 
 </body>
