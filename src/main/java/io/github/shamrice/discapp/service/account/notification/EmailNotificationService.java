@@ -101,6 +101,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ACCOUNT_LOCKED_SUBJECT, null);
             case MAILING_LIST_CONFIRMATION:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_SUBJECT_TEMPLATE, null);
+            case REPLY_NOTIFICATION:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_SUBJECT_TEMPLATE, null);
         }
 
         return null;
@@ -116,6 +118,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ACCOUNT_LOCKED_MESSAGE, null);
             case MAILING_LIST_CONFIRMATION:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_BODY_TEMPLATE, null);
+            case REPLY_NOTIFICATION:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE, null);
         }
         return  null;
     }

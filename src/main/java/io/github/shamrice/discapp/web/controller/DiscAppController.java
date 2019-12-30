@@ -20,6 +20,7 @@ import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
+import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +40,7 @@ import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
+import static io.github.shamrice.discapp.web.define.url.AppUrl.DISCUSSION_URL;
 
 @Controller
 @Slf4j
@@ -69,6 +71,9 @@ public class DiscAppController {
 
     @Autowired
     private InputHelper inputHelper;
+
+    @Autowired
+    private WebHelper webHelper;
 
     @Autowired
     private ErrorController errorController;
@@ -521,6 +526,29 @@ public class DiscAppController {
                 Long newThreadId = threadService.saveThread(newThread, body);
                 if (newThreadId != null) {
 
+                    //send reply notification email if enabled to parent thread being replied to.
+                    //todo : this should at some point be sent to a queue instead of done in-line in the thread.
+                    try {
+                        if (parentId != 0L) {
+                            boolean isReplyNotificationsEnabled = configurationService.getBooleanValue(appId, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, false);
+
+                            if (isReplyNotificationsEnabled) {
+
+                                Thread parentThread = threadService.getThread(appId, parentId);
+
+                                if (parentThread != null && parentThread.getEmail() != null && !parentThread.getEmail().isEmpty()) {
+
+                                    Application app = applicationService.get(appId);
+                                    String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
+
+                                    applicationSubscriptionService.sendReplyEmailNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
+                                }
+                            }
+                        }
+                    } catch (Throwable t) {
+                        log.error("Failed to send reply notification email: " + t.getMessage(), t);
+                    }
+
                     //redirect them to subscribe url if they clicked subscribe.
                     if (email != null && !email.isEmpty() && newThreadViewModel.getSubscribe() != null && !newThreadViewModel.getSubscribe().isEmpty()) {
                         return new ModelAndView("redirect:" + ApplicationSubscriptionUrl.SUBSCRIBE_URL
@@ -536,7 +564,7 @@ public class DiscAppController {
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @GetMapping("discussion.cgi")
+    @GetMapping(DISCUSSION_URL)
     public String getViewThread(@RequestParam(name = "disc") Long appId,
                                 @RequestParam(name = "article", required = false) Long threadId,
                                 @RequestParam(name = "page", required = false) Integer currentPage,
@@ -636,7 +664,7 @@ public class DiscAppController {
         return "indices/viewThread";
     }
 
-    @PostMapping("discussion.cgi")
+    @PostMapping(DISCUSSION_URL)
     public ModelAndView postDiscussionForm(@RequestParam(name = "disc") Long appId,
                                            ThreadViewModel threadViewModel,
                                            HttpServletResponse response,
