@@ -104,6 +104,7 @@ public class ApplicationSubscriptionService {
         }
     }
 
+    //todo : should this be moved to just email notification service or somewhere else besides this service?
     public void sendReplyEmailNotification(long appId, String appName, String discussionUrl, String emailAddress, long newThreadId) {
 
         //send out email message

@@ -22,6 +22,7 @@ import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
@@ -527,7 +528,7 @@ public class DiscAppController {
                 if (newThreadId != null) {
 
                     //send reply notification email if enabled to parent thread being replied to.
-                    //todo : this should at some point be sent to a queue instead of done in-line in the thread.
+                    //todo : this should at some point be sent to a queue instead of done in-line in the thread. (ticket #210)
                     try {
                         if (parentId != 0L) {
                             boolean isReplyNotificationsEnabled = configurationService.getBooleanValue(appId, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, false);
@@ -538,10 +539,14 @@ public class DiscAppController {
 
                                 if (parentThread != null && parentThread.getEmail() != null && !parentThread.getEmail().trim().isEmpty()) {
 
-                                    Application app = applicationService.get(appId);
-                                    String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
-
-                                    applicationSubscriptionService.sendReplyEmailNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
+                                    if (EmailValidator.getInstance().isValid(parentThread.getEmail().trim())) {
+                                        Application app = applicationService.get(appId);
+                                        String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
+                                        //todo : move to just email notification service?
+                                        applicationSubscriptionService.sendReplyEmailNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
+                                    } else {
+                                        log.warn("Reply notification failed for email: " + parentThread.getEmail() + " : email address is not valid.");
+                                    }
                                 }
                             }
                         }
