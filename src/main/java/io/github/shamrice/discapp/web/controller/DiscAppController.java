@@ -536,7 +536,7 @@ public class DiscAppController {
 
                                 Thread parentThread = threadService.getThread(appId, parentId);
 
-                                if (parentThread != null && parentThread.getEmail() != null && !parentThread.getEmail().isEmpty()) {
+                                if (parentThread != null && parentThread.getEmail() != null && !parentThread.getEmail().trim().isEmpty()) {
 
                                     Application app = applicationService.get(appId);
                                     String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
