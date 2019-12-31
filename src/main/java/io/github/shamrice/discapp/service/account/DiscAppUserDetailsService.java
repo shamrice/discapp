@@ -62,8 +62,13 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             throw new LockedException("User: " + email + " account is currently locked until: " + user.getLockedUntilDate());
         }
 
+        boolean isRoot = false;
+        if (rootAccountEmail != null && !rootAccountEmail.trim().isEmpty()) {
+            isRoot = rootAccountEmail.equalsIgnoreCase(user.getEmail());
+        }
+
         //principal is returned back and verified by "spring magic"
-        return new DiscAppUserPrincipal(user, rootAccountEmail);
+        return new DiscAppUserPrincipal(user, isRoot);
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {

@@ -28,16 +28,11 @@ public class DiscAppUserPrincipal implements UserDetails {
     private static final String ROLE_ROOT = ROLE_PREFIX + "ROOT";
 
     private DiscAppUser user;
+    private boolean isRoot;
 
-    private String rootAccountEmail;
-
-    private boolean isRoot = false;
-
-    public DiscAppUserPrincipal(DiscAppUser user, String rootAccountEmail) {
+    public DiscAppUserPrincipal(DiscAppUser user, boolean isRoot) {
         this.user = user;
-
-        //todo : this string should live somewhere else and not be attached to every user object.
-        this.rootAccountEmail = rootAccountEmail;
+        this.isRoot = isRoot;
     }
 
     @Override
@@ -54,10 +49,9 @@ public class DiscAppUserPrincipal implements UserDetails {
         }
 
         //give root access to configured account. Don't store email address in db in case db gets compromised.
-        if (rootAccountEmail.equals(user.getEmail())) {
+        if (this.isRoot) {
             log.warn("Granting user: " + user.toString() + " :: ROOT ACCESS.");
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ROOT));
-            this.isRoot = true;
         }
 
         return grantedAuthorityList;
