@@ -31,9 +31,15 @@
         <div th:utext="${searchResults}"></div>
 
         <form method="post" th:action="@{|~/indices/search?disc=${appId}|}" enctype="multipart/form-data">
-            <input type="hidden" name="appId" th:value="${appId}"  />
-            <input type="text" name="searchTerm" th:value="${searchTerm}" />
+            <input type="hidden" name="appId" th:value="${appId}" />
+            <input type="hidden" name="page" th:value="${page}" />
 
+            <div style="text-align:center;padding:5px;">
+                <input th:if="${hasPreviousPage}" type="submit" name="previousPage" value="Previous Page" class="button" />
+                <input th:if="${hasNextPage}" type="submit" name="nextPage" value="Next Page" class="button" />
+            </div>
+
+            <input type="text" name="searchTerm" th:value="${searchTerm}" />
             <input type="submit" name="searchAgain" value="Search Again" class="button" />
 
             <div class="buttons">

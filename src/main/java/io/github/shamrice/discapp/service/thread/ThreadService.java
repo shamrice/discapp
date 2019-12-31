@@ -12,12 +12,12 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -326,87 +326,58 @@ public class ThreadService {
         return threadRepository.findByApplicationIdAndDeletedAndIsApproved(applicationId, false, true);
     }
 
-    public List<Thread> searchThreads(Long applicationId, String searchText) {
-        List<Thread> foundThreads = threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, true, searchText);
-        List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, searchText);
+    public List<Thread> searchThreads(Long applicationId, String searchText, int page, int numThreads) {
 
-        for (ThreadBody threadBody : resultsInBody) {
-            Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-            if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false) && foundThread.get().isApproved()) {
-                foundThread.ifPresent(foundThreads::add);
-            }
-        }
-
-        return foundThreads;
+        Pageable limit = PageRequest.of(page, numThreads);
+        return threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrApplicationIdAndDeletedAndIsApprovedAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, true, searchText, applicationId, false, true, searchText, limit);
     }
 
-    public List<Thread> searchThreadsByFields(long applicationId, String submitter, String email, String subject, String ipAddress, String messageBody, boolean isApproved) {
+    public Page<Thread> searchThreadsByFields(long applicationId, String submitter, String email, String subject, String ipAddress, String messageBody, boolean isApproved, int page, int numThreads) {
 
-        //todo : refactor this so the query is on an "and" instead of querying each and then trimming
+        Pageable limit = PageRequest.of(page, numThreads, Sort.by("createDt").descending());
+        Thread searchThread = new Thread();
 
-        List<Thread> foundThreads = new ArrayList<>();
-
-        //search
-        if (subject != null && !subject.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(applicationId, false, isApproved, subject));
+        //treat empty strings as null values so they are ignored in query.
+        if (submitter.isEmpty()) {
+            submitter = null;
+        }
+        if (email.isEmpty()) {
+            email = null;
+        }
+        if (ipAddress.isEmpty()) {
+            ipAddress = null;
+        }
+        if (subject.isEmpty()) {
+            subject = null;
+        }
+        if (messageBody.isEmpty()) {
+            messageBody = null;
         }
 
-        if (messageBody != null && !messageBody.trim().isEmpty()) {
+        searchThread.setApplicationId(applicationId);
+        searchThread.setSubmitter(submitter);
+        searchThread.setSubject(subject);
+        searchThread.setEmail(email);
+        searchThread.setIpAddress(ipAddress);
+        searchThread.setBody(messageBody);
+        searchThread.setApproved(isApproved);
 
-            List<ThreadBody> resultsInBody = threadBodyRepository.findByApplicationIdAndBodyContainingIgnoreCaseOrderByCreateDtDesc(applicationId, messageBody);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withIgnoreNullValues()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
 
-            for (ThreadBody threadBody : resultsInBody) {
-                Optional<Thread> foundThread = threadRepository.findById(threadBody.getThreadId());
-                if (foundThread.isPresent() && foundThread.get().getDeleted().equals(false) && (foundThread.get().isApproved() == isApproved)) {
-                    foundThread.get().setBody(threadBody.getBody());
-                    foundThread.ifPresent(foundThreads::add);
-                }
-            }
-        }
+        Example<Thread> searchQuery = Example.of(searchThread, matcher);
 
-        if (submitter != null && !submitter.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndSubmitterContainingIgnoreCase(applicationId, false, isApproved, submitter));
-        }
-
-        if (email != null && !email.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndEmailContainingIgnoreCase(applicationId, false, isApproved, email));
-        }
-
-        if (ipAddress != null && !ipAddress.trim().isEmpty()) {
-            foundThreads.addAll(threadRepository.findByApplicationIdAndDeletedAndIsApprovedAndIpAddressContainingIgnoreCase(applicationId, false, isApproved, ipAddress));
-        }
-
-        if (subject == null) subject = "";
-        if (messageBody == null) messageBody = "";
-        if (submitter == null) submitter = "";
-        if (email == null) email = "";
-        if (ipAddress == null) ipAddress = "";
-
-        //remove duplicates and gross way to make sure threads are searched as "and" instead of "or"...
-        List<Thread> uniqueThreadList = new ArrayList<>();
-        for (Thread thread : foundThreads) {
-            if (!uniqueThreadList.contains(thread)) {
-
-                if (thread.getSubmitter().toLowerCase().contains(submitter.toLowerCase())
-                        && thread.getSubject().toLowerCase().contains(subject.toLowerCase())
-                        && (thread.getEmail() == null || thread.getEmail().toLowerCase().contains(email.toLowerCase()))
-                        && (thread.getIpAddress() == null ||  thread.getIpAddress().contains(ipAddress))
-                        && (thread.getBody() == null || thread.getBody().toLowerCase().contains(messageBody.toLowerCase()))) {
-
-                    uniqueThreadList.add(thread);
-                }
-            }
-        }
-
-        //sort threads
-        uniqueThreadList.sort((t1, t2) -> {
-            if (t1.getId().equals(t2.getId())) {
+        return threadRepository.findAll(searchQuery, limit);
+        /*
+        return pagedSearchResults.get().sorted((t1, t2) -> {
+            if (t1.getCreateDt().equals(t2.getCreateDt())) {
                 return 0;
             }
-            return t1.getId() > t2.getId() ? -1 : 1;
-        });
-
-        return uniqueThreadList;
+            return t1.getCreateDt().after(t2.getCreateDt()) ? -1 : 1;
+        }).collect(Collectors.toList());
+        */
     }
 
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads,

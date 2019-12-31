@@ -83,10 +83,17 @@
                     <input th:if="${maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                     <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
-                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
+                    <!--input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
                            type="submit"
                            name="previousPageSubmit" value="Previous Page" class="button"/>
                     <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasNextPage()}"
+                           type="submit"
+                           name="nextPageSubmit" value="Next Page" class="button"/-->
+                    <input th:if="${maintenanceThreadViewModel.isHasPreviousPage()}"
+                           type="submit"
+                           name="previousPageSubmit" value="Previous Page" class="button"/>
+
+                    <input th:if="${maintenanceThreadViewModel.isHasNextPage()}"
                            type="submit"
                            name="nextPageSubmit" value="Next Page" class="button"/>
 
@@ -105,10 +112,10 @@
                     <input th:if="${maintenanceThreadViewModel.getTab().equals('unapproved')}"  type="submit" name="approve" value="Approve" class="button"/>
                     <input type="submit" name="reportAbuse" value="Report as Abuse" class="button"/>
 
-                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasPreviousPage()}"
+                    <input th:if="${maintenanceThreadViewModel.isHasPreviousPage()}"
                            type="submit"
                            name="previousPageSubmit" value="Previous Page" class="button"/>
-                    <input th:if="${!maintenanceThreadViewModel.getTab().equals('search') && maintenanceThreadViewModel.isHasNextPage()}"
+                    <input th:if="${maintenanceThreadViewModel.isHasNextPage()}"
                            type="submit"
                            name="nextPageSubmit" value="Next Page" class="button"/>
 

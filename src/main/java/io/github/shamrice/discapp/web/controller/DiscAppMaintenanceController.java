@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.*;
@@ -1220,28 +1222,53 @@ public class DiscAppMaintenanceController {
             }
 
             //search messages
-            if (maintenanceThreadViewModel.getFindMessages() != null && !maintenanceThreadViewModel.getFindMessages().isEmpty()) {
+            if ((maintenanceThreadViewModel.getFindMessages() != null
+                    && !maintenanceThreadViewModel.getFindMessages().isEmpty())
+                    || (maintenanceThreadViewModel.isSearchSubmitted()
+                    && (maintenanceThreadViewModel.getNextPageSubmit() != null || maintenanceThreadViewModel.getPreviousPageSubmit() != null))) {
 
                 //set off of unapproved so default is approved if user does not have permission to search unapproved threads
                 boolean isApproved = !"unapproved".equalsIgnoreCase(maintenanceThreadViewModel.getApprovedSearch());
 
-                List<Thread> searchResults = threadService.searchThreadsByFields(
+                //weird paging for search because it goes post code first, then get. backwards from other tabs for
+                //next and previous pages.
+                int pageToSearch = 0;
+
+                if (maintenanceThreadViewModel.getNextPageSubmit() != null) {
+                    pageToSearch = maintenanceThreadViewModel.getCurrentPage() + 1;
+                } else if (maintenanceThreadViewModel.getPreviousPageSubmit() != null) {
+                    pageToSearch = maintenanceThreadViewModel.getCurrentPage() - 1;
+                }
+
+                //new search. reset current page number.
+                if (maintenanceThreadViewModel.getFindMessages() != null || pageToSearch < 0) {
+                    pageToSearch = 0;
+                }
+
+                Page<Thread> pagedSearchResults = threadService.searchThreadsByFields(
                         app.getId(),
                         maintenanceThreadViewModel.getAuthorSearch(),
                         maintenanceThreadViewModel.getEmailSearch(),
                         maintenanceThreadViewModel.getSubjectSearch(),
                         maintenanceThreadViewModel.getIpSearch(),
                         maintenanceThreadViewModel.getMessageSearch(),
-                        isApproved
+                        isApproved,
+                        pageToSearch,
+                        20
                 );
 
-                String searchResultsHtml = getListThreadHtml(searchResults, SEARCH_TAB);
+                List<Thread> threadList = pagedSearchResults.get().collect(Collectors.toList());
+
+                String searchResultsHtml = getListThreadHtml(threadList, SEARCH_TAB);
                 List<String> threadHtml = new ArrayList<>();
                 threadHtml.add(searchResultsHtml);
                 maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
-                maintenanceThreadViewModel.setNumberOfMessages(searchResults.size());
+                maintenanceThreadViewModel.setNumberOfMessages(pagedSearchResults.getTotalElements());
                 maintenanceThreadViewModel.setSearchSubmitted(true);
 
+                if (pagedSearchResults.getTotalElements() > 20) {
+                    maintenanceThreadViewModel.setHasNextPage(true);
+                }
             }
 
             //search again
@@ -1422,7 +1449,7 @@ public class DiscAppMaintenanceController {
             maintenanceThreadViewModel.setCurrentPage(maintenanceThreadViewModel.getPreviousPage());
         }
 
-        //if current page isn't 0, there's a previous page.
+        //if current page is greater than 0, there is a previous page..
         if (maintenanceThreadViewModel.getCurrentPage() > 0) {
             maintenanceThreadViewModel.setHasPreviousPage(true);
         }

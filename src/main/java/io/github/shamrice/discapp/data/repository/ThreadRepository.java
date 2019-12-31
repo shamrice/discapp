@@ -25,7 +25,10 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
     List<Thread> findByApplicationIdAndParentIdAndDeletedAndIsApprovedOrderByCreateDtDesc(Long applicationId, Long parentId, Boolean deleted, Boolean isApproved, Pageable pageable);
 
     //List<Thread> findByApplicationIdAndDeletedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, String subject);
-    List<Thread> findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, Boolean isApproved, String subject);
+    List<Thread> findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, Boolean isApproved, String subject, Pageable pageable);
+
+    //oof... this is ugly! (Search query)
+    List<Thread> findByApplicationIdAndDeletedAndIsApprovedAndSubjectContainingIgnoreCaseOrApplicationIdAndDeletedAndIsApprovedAndBodyContainingIgnoreCaseOrderByCreateDtDesc(Long applicationId, Boolean deleted, Boolean isApproved, String subject, Long applicationId2, Boolean deleted2, Boolean isApproved2, String body, Pageable pageable);
 
     //List<Thread> findByApplicationIdAndDeletedAndSubmitterContainingIgnoreCase(Long applicationId, Boolean deleted, String submitter);
     List<Thread> findByApplicationIdAndDeletedAndIsApprovedAndSubmitterContainingIgnoreCase(Long applicationId, Boolean deleted, Boolean isApproved, String submitter);

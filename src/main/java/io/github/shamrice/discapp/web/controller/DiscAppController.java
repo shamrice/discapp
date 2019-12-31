@@ -715,12 +715,31 @@ public class DiscAppController {
     @PostMapping(APP_SEARCH_URL)
     public ModelAndView searchDiscApp(@RequestParam(name = "disc") Long appId,
                                       @RequestParam(name = "searchTerm", required = false) String searchTerm,
+                                      @RequestParam(name = "searchAgain", required = false) String searchAgain,
                                       @RequestParam(name = "returnToApp", required = false) String returnToApp,
+                                      @RequestParam(name = "page", required = false) Integer page,
+                                      @RequestParam(name = "nextPage", required = false) String nextPage,
+                                      @RequestParam(name = "previousPage", required = false) String previousPage,
+                                      HttpServletResponse response,
                                       Model model) {
 
         if (searchTerm == null || searchTerm.isEmpty() || returnToApp != null) {
             log.info("Empty search term entered for appId: " + appId + " : returning to app view page.");
             return new ModelAndView("redirect:/indices/" + appId);
+        }
+
+        //allow caching on search POST action to avoid expired web page message if back button is pressed from linked thread.
+        response.setHeader("Cache-Control", "max-age=240, private"); // HTTP 1.1
+
+        //if page is not set or they clicked the search again button, reset page to zero
+        if ((page == null || page < 0) || (searchAgain != null && !searchAgain.isEmpty())) {
+            page = 0;
+        }
+
+        if (nextPage != null && !nextPage.isEmpty()) {
+            page++;
+        } else if (previousPage != null && !previousPage.isEmpty() && page > 0) {
+            page--;
         }
 
         try {
@@ -730,9 +749,10 @@ public class DiscAppController {
 
                 model.addAttribute(APP_NAME, app.getName());
                 model.addAttribute(APP_ID, app.getId());
+                model.addAttribute("page", page);
 
                 //get search results
-                List<Thread> foundThreads = threadService.searchThreads(appId, searchTerm);
+                List<Thread> foundThreads = threadService.searchThreads(appId, searchTerm, page, 20);
                 String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
                 model.addAttribute(SEARCH_RESULTS, getSearchThreadHtml(foundThreads, entryBreakString));
                 model.addAttribute(SEARCH_TERM, searchTerm);
@@ -742,6 +762,9 @@ public class DiscAppController {
                 model.addAttribute(THREAD_SEPARATOR, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
                 model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
                 model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
+
+                model.addAttribute(HAS_NEXT_PAGE, foundThreads.size() == 20);
+                model.addAttribute(HAS_PREVIOUS_PAGE, page > 0);
 
                 return new ModelAndView("indices/search", "model", model);
 
