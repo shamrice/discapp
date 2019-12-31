@@ -1473,16 +1473,12 @@ public class DiscAppMaintenanceController {
                 //get edit threads html
                 List<String> threadTreeHtml = new ArrayList<>();
 
-                List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION, true);
-
-                //if threads returned is less than asked for, there is no next page.
-                if (threadTreeNodeList.size() < 20) {
-                    maintenanceThreadViewModel.setHasNextPage(false);
-                } else {
-                    maintenanceThreadViewModel.setHasNextPage(true);
-                }
+                List<ThreadTreeNode> threadTreeNodeList = null;
 
                 if (maintenanceThreadViewModel.getTab().equals(THREAD_TAB)) {
+
+                    threadTreeNodeList = threadService.getLatestThreads(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 20, ThreadSortOrder.CREATION, true);
+
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
                         String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>", false, true,
                                 maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
@@ -1490,9 +1486,19 @@ public class DiscAppMaintenanceController {
                         threadTreeHtml.add(currentHtml);
                     }
                 } else if (maintenanceThreadViewModel.getTab().equals(DATE_TAB)) {
+
+                    threadTreeNodeList = threadService.getLatestThreadNodes(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 40);
+
                     String currentHtml = getEditThreadListHtml(threadTreeNodeList, maintenanceThreadViewModel.getCurrentPage(),
                             maintenanceThreadViewModel.getTab());
                     threadTreeHtml.add(currentHtml);
+                }
+
+                //if threads returned is less than asked for, there is no next page.
+                if (threadTreeNodeList != null && threadTreeNodeList.size() < 20) {
+                    maintenanceThreadViewModel.setHasNextPage(false);
+                } else {
+                    maintenanceThreadViewModel.setHasNextPage(true);
                 }
 
                 //todo : something wonky going on here. this is set here but the others are set in the above method..?

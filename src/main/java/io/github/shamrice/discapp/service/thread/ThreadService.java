@@ -370,14 +370,6 @@ public class ThreadService {
         Example<Thread> searchQuery = Example.of(searchThread, matcher);
 
         return threadRepository.findAll(searchQuery, limit);
-        /*
-        return pagedSearchResults.get().sorted((t1, t2) -> {
-            if (t1.getCreateDt().equals(t2.getCreateDt())) {
-                return 0;
-            }
-            return t1.getCreateDt().after(t2.getCreateDt()) ? -1 : 1;
-        }).collect(Collectors.toList());
-        */
     }
 
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads,
@@ -426,7 +418,6 @@ public class ThreadService {
      * @return
      */
     public List<Thread> getLatestThreads(long applicationId, int page, int numThreads) {
-        //query to get latest parent threads (parentId = 0L) for an application
         Pageable limit = PageRequest.of(page, numThreads);
         return threadRepository.findByApplicationIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
                 applicationId,
@@ -434,6 +425,25 @@ public class ThreadService {
                 true,
                 limit
         );
+    }
+
+    /**
+     * Returns a list of thread tree nodes of latest threads.
+     * @param applicationId
+     * @param page
+     * @param numThreads
+     * @return
+     */
+    public List<ThreadTreeNode> getLatestThreadNodes(long applicationId, int page, int numThreads) {
+
+        List<ThreadTreeNode> threadTreeNodes = new ArrayList<>();
+        List<Thread> threadList = getLatestThreads(applicationId, page, numThreads);
+
+        for (Thread thread : threadList) {
+            threadTreeNodes.add(new ThreadTreeNode(thread));
+        }
+
+        return threadTreeNodes;
     }
 
     /**
