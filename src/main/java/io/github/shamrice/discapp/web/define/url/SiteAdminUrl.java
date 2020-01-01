@@ -4,6 +4,9 @@ public class SiteAdminUrl {
 
     public static final String CONTROLLER_URL_DIRECTORY = "/site_admin/";
 
+    public static final String SUBSCRIBERS_URL = CONTROLLER_URL_DIRECTORY + "subscribers";
+    public static final String SUBSCRIBER_ENABLED = CONTROLLER_URL_DIRECTORY + "subscriber/enabled";
+
     public static final String ACCOUNTS_URL = CONTROLLER_URL_DIRECTORY + "accounts";
     public static final String ACCOUNT_SHOW_EMAIL = CONTROLLER_URL_DIRECTORY + "account/showEmail";
     public static final String ACCOUNT_ENABLED = CONTROLLER_URL_DIRECTORY + "account/enabled";

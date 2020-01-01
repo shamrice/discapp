@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Site Administration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        li {
+            float:left;
+            display:block;
+            padding:5px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${siteAdminSubscriberViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminSubscriberViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminSubscriberViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminSubscriberViewModel.getInfoMessage()}">
+</div>
+
+<div class="grey_box">
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Application Id</th>
+            <th>Subscriber Email</th>
+            <th>Enabled</th>
+            <th>Create Date</th>
+            <th>Mod Date</th>
+            <th>Email Last Send Date</th>
+            <th>Confirmation Code</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminSubscriberViewModel.getApplicationSubscriptions())}"
+            th:each="subscriber : ${siteAdminSubscriberViewModel.getApplicationSubscriptions()}">
+            <td th:text="${subscriber.getId()}"></td>
+            <td th:text="${subscriber.getApplicationId()}"></td>
+            <td th:text="${subscriber.getSubscriberEmail()}"></td>
+            <td>
+                <a th:href="@{|/site_admin/subscriber/enabled?id=${subscriber.getId()}&enabled=${!subscriber.getEnabled()}|}"
+                   th:text="@{|${subscriber.getEnabled()}|}">
+                </a>
+            </td>
+            <td th:text="${subscriber.getCreateDt()}"></td>
+            <td th:text="${subscriber.getModDt()}"></td>
+            <td th:text="${subscriber.getLastSendDt()}"></td>
+            <td th:text="${subscriber.getConfirmationCode()}"></td>
+        </tr>
+    </TABLE>
+
+</div>
+
+</body>
+</html>

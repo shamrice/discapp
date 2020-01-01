@@ -3,16 +3,27 @@
 <head>
 </head>
 <body>
-<div id="navigation" th:fragment="navigation" style="background-color:#dde;padding-bottom:11px;">
-    <ul>
-        <li><a href="/site_admin/update">Update News</a> |</li>
-        <li><a href="/site_admin/accounts">Accounts</a> |</li>
-        <li><a href="/site_admin/applications">Applications</a> |</li>
-        <li><a href="/site_admin/threads">Threads</a> |</li>
-        <li><a href="/site_admin/imports">Imports</a> |</li>
-        <li><a target="_blank" href="/abuse/abuse.cgi">Reported Abuse</a> |</li>
-        <li><a href="/">Exit</a></li>
-    </ul>
+
+
+<div id="navigation" th:fragment="navigation">
+
+    <div id="site_admin_title" style="text-align:right;margin:5px;">
+        <h2>
+            NE Disc App Site Administration
+        </h2>
+    </div>
+    <div style="background-color:#dde;padding-bottom:11px;" >
+        <ul>
+            <li><a href="/site_admin/update">Update News</a> |</li>
+            <li><a href="/site_admin/accounts">Accounts</a> |</li>
+            <li><a href="/site_admin/applications">Applications</a> |</li>
+            <li><a href="/site_admin/threads">Threads</a> |</li>
+            <li><a href="/site_admin/imports">Imports</a> |</li>
+            <li><a href="/site_admin/subscribers">Subscribers</a> |</li>
+            <li><a href="/abuse/abuse.cgi" target="_blank">Reported Abuse</a> |</li>
+            <li><a href="/">Exit</a></li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>

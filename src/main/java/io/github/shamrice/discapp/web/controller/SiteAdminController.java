@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.web.controller;
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.repository.*;
+import io.github.shamrice.discapp.service.application.ApplicationSubscriptionService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.*;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -44,6 +46,9 @@ public class SiteAdminController {
     private ThreadService threadService;
 
     @Autowired
+    private ApplicationSubscriptionRepository applicationSubscriptionRepository;
+
+    @Autowired
     private SiteService siteService;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY)
@@ -51,16 +56,39 @@ public class SiteAdminController {
         return new ModelAndView("site_admin/admin", "model", model);
     }
 
+    @GetMapping(SUBSCRIBERS_URL)
+    public ModelAndView getSiteAdminSubscribers(SiteAdminSubscriberViewModel siteAdminSubscriberViewModel, Model model) {
+        List<ApplicationSubscription> subscriptionList = applicationSubscriptionRepository.findAll(Sort.by("applicationId").ascending());
+        siteAdminSubscriberViewModel.setApplicationSubscriptions(subscriptionList);
+        return new ModelAndView("site_admin/subscribers", "siteAdminSubscriberViewModel", siteAdminSubscriberViewModel);
+    }
+
+    @GetMapping(SUBSCRIBER_ENABLED)
+    public ModelAndView getSiteAdminSubscriberEnabled(@RequestParam(name = "id") Long applicationSubscriptionId,
+                                                      @RequestParam(name = "enabled") Boolean enabled,
+                                                      SiteAdminSubscriberViewModel siteAdminSubscriberViewModel,
+                                                      Model model) {
+        try {
+            log.info("Setting application subscription id: " + applicationSubscriptionId + " enabled to: " + enabled);
+            ApplicationSubscription subscription = applicationSubscriptionRepository.findById(applicationSubscriptionId).orElse(null);
+
+            if (subscription != null) {
+                subscription.setEnabled(enabled);
+                subscription.setModDt(new Date());
+                applicationSubscriptionRepository.save(subscription);
+                siteAdminSubscriberViewModel.setInfoMessage("Updated " + subscription.getSubscriberEmail() + " enabled to: " + enabled);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to set enabled settings for subscriber id: " + applicationSubscriptionId + " to: " + enabled);
+            siteAdminSubscriberViewModel.setErrorMessage("Failed to set subscriber Id: " + applicationSubscriptionId + " enabled to: " + enabled);
+        }
+        return getSiteAdminSubscribers(siteAdminSubscriberViewModel, model);
+    }
+
     @GetMapping(ACCOUNTS_URL)
     public ModelAndView getSiteAdminAccounts(SiteAdminAccountViewModel siteAdminAccountViewModel,
                                              Model model) {
-        List<DiscAppUser> fullUserList = discAppUserRepository.findAll();
-        fullUserList.sort((u1, u2) -> {
-            if (u1.getId().equals(u2.getId())) {
-                return 0;
-            }
-            return u1.getId() > u2.getId() ? 1 : -1;
-        });
+        List<DiscAppUser> fullUserList = discAppUserRepository.findAll(Sort.by("id").ascending());
         siteAdminAccountViewModel.setUserList(fullUserList);
         return new ModelAndView("site_admin/accounts", "siteAdminAccountViewModel", siteAdminAccountViewModel);
     }
@@ -81,7 +109,7 @@ public class SiteAdminController {
             log.error("Failed to set show email settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " email enabled to: " + enabled);
         }
-        return new ModelAndView("redirect:" + ACCOUNTS_URL, "siteAdminAccountViewModel", siteAdminAccountViewModel);
+        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_ENABLED)
@@ -100,7 +128,7 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " enabled to: " + enabled);
         }
-        return new ModelAndView("redirect:" + ACCOUNTS_URL, "siteAdminAccountViewModel", siteAdminAccountViewModel);
+        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_IS_ADMIN)
@@ -119,7 +147,7 @@ public class SiteAdminController {
             log.error("Failed to set is admin settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is admin to: " + enabled);
         }
-        return new ModelAndView("redirect:" + ACCOUNTS_URL, "siteAdminAccountViewModel", siteAdminAccountViewModel);
+        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_IS_USER_ACCOUNT)
@@ -138,7 +166,7 @@ public class SiteAdminController {
             log.error("Failed to set is user account settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is user account to: " + enabled);
         }
-        return new ModelAndView("redirect:" + ACCOUNTS_URL, "siteAdminAccountViewModel", siteAdminAccountViewModel);
+        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
     }
 
     @GetMapping(OWNER_URL)
@@ -159,13 +187,7 @@ public class SiteAdminController {
     @GetMapping(APPLICATIONS_URL)
     public ModelAndView getSiteAdminApplications(SiteAdminApplicationViewModel siteAdminApplicationViewModel,
                                                  Model model) {
-        List<Application> fullApplicationList = applicationRepository.findAll();
-        fullApplicationList.sort((u1, u2) -> {
-            if (u1.getId().equals(u2.getId())) {
-                return 0;
-            }
-            return u1.getId() > u2.getId() ? 1 : -1;
-        });
+        List<Application> fullApplicationList = applicationRepository.findAll(Sort.by("id").ascending());
         siteAdminApplicationViewModel.setApplicationList(fullApplicationList);
         return new ModelAndView("site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
     }
@@ -191,7 +213,7 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " enabled to: " + enabled);
         }
-        return new ModelAndView("redirect:" + APPLICATIONS_URL, "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+        return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
     @GetMapping(APPLICATION_DELETED)
@@ -218,7 +240,7 @@ public class SiteAdminController {
             log.error("Failed to set deleted settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " deleted to: " + enabled);
         }
-        return new ModelAndView("redirect:" + APPLICATIONS_URL, "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+        return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
     @GetMapping(APPLICATION_IS_SEARCHABLE)
@@ -237,19 +259,13 @@ public class SiteAdminController {
             log.error("Failed to set searchable settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " searchable to: " + enabled);
         }
-        return new ModelAndView("redirect:" + APPLICATIONS_URL, "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
+        return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
     @GetMapping(IMPORTS_URL)
     public ModelAndView getSiteAdminImports(SiteAdminImportViewModel siteAdminImportViewModel,
                                             Model model) {
-        List<ImportData> fullImportDataList = importDataRepository.findAll();
-        fullImportDataList.sort((u1, u2) -> {
-            if (u1.getId().equals(u2.getId())) {
-                return 0;
-            }
-            return u1.getId() > u2.getId() ? 1 : -1;
-        });
+        List<ImportData> fullImportDataList = importDataRepository.findAll(Sort.by("id").ascending());
         siteAdminImportViewModel.setImportDataList(fullImportDataList);
         return new ModelAndView("site_admin/imports", "siteAdminImportViewModel", siteAdminImportViewModel);
     }
@@ -261,10 +277,12 @@ public class SiteAdminController {
         try {
             log.info("Deleting import id: " + importId);
             importDataRepository.deleteById(importId);
+            siteAdminImportViewModel.setInfoMessage("Successfully deleted import id: " + importId);
         } catch (Exception ex) {
             log.error("Failed to delete import id: " + importId);
+            siteAdminImportViewModel.setErrorMessage("Failed to delete import id: " + importId + " :: " + ex.getMessage());
         }
-        return new ModelAndView("redirect:" + IMPORTS_URL, "siteAdminImportViewModel", siteAdminImportViewModel);
+        return getSiteAdminImports(siteAdminImportViewModel, null);
     }
 
     @GetMapping(IMPORT_DOWNLOAD)
@@ -272,7 +290,6 @@ public class SiteAdminController {
     public ResponseEntity<Resource> getSiteAdminImportDownload(@RequestParam(name = "id") long importId) {
 
         try {
-
             ImportData importData = importDataRepository.findById(importId).orElse(null);
 
             if (importData != null) {
@@ -293,15 +310,6 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminThreads(SiteAdminThreadViewModel siteAdminThreadViewModel,
                                             Model model) {
         List<Thread> fullThreadList = threadService.getAllDeletedThreads();
-        /*
-        fullImportDataList.sort((u1, u2) -> {
-            if (u1.getId().equals(u2.getId())) {
-                return 0;
-            }
-            return u1.getId() > u2.getId() ? 1 : -1;
-        });
-
-         */
         siteAdminThreadViewModel.setThreadList(fullThreadList);
         return new ModelAndView("site_admin/threads", "siteAdminThreadViewModel", siteAdminThreadViewModel);
     }
@@ -317,13 +325,16 @@ public class SiteAdminController {
             thread.setModDt(new Date());
             if (threadService.saveThread(thread, thread.getBody()) > 0) {
                 log.info("Thread id: " + threadId + " restored successfully.");
+                siteAdminThreadViewModel.setInfoMessage("Thread id: " + threadId + " restored successfully.");
             } else {
                 log.warn("Failed to restore thread id: " + threadId);
+                siteAdminThreadViewModel.setErrorMessage("Failed to restore thread id: " + threadId);
             }
         } catch (Exception ex) {
             log.error("Failed to restore thread id: " + threadId + " :: " + ex.getMessage(), ex);
+            siteAdminThreadViewModel.setErrorMessage("Failed to restore thread id: " + threadId + " :: " + ex.getMessage());
         }
-        return new ModelAndView("redirect:" + THREADS_URL, "siteAdminThreadViewModel", siteAdminThreadViewModel);
+        return getSiteAdminThreads(siteAdminThreadViewModel, null);
     }
 
     @GetMapping(UPDATE_URL)
