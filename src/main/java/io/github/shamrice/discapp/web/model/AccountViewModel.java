@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.web.model;
 
+import io.github.shamrice.discapp.data.model.Application;
 import lombok.*;
 
 import java.util.Date;
@@ -63,6 +64,8 @@ public class AccountViewModel {
 
     private List<AccountApplication> accountApplications;
     private List<AccountApplication> moderatingApplications;
+
+    private List<Application> userReadThreadApplications;
 
     public boolean isBelowAppLimit() {
         if (maxDiscApps == null) {

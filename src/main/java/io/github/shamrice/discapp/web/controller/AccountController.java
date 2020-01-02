@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
+import io.github.shamrice.discapp.service.thread.UserReadThreadService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -51,6 +52,9 @@ public class AccountController {
     private ThreadService threadService;
 
     @Autowired
+    private UserReadThreadService userReadThreadService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @Autowired
@@ -58,6 +62,16 @@ public class AccountController {
 
     @Autowired
     private WebHelper webHelper;
+
+    @GetMapping("/account/modify/read/reset")
+    public ModelAndView getAccountModifyReadReset(@RequestParam(name = "appId") long appId) {
+        Long userId = accountHelper.getLoggedInDiscAppUserId();
+        if (userId != null) {
+            userReadThreadService.resetReadThreads(appId, userId);
+        }
+
+        return new ModelAndView("redirect:/account/modify");
+    }
 
     @GetMapping("/account/delete/status")
     public ModelAndView getAccountDeleteStatus(ModelMap modelMap) {
@@ -427,6 +441,20 @@ public class AccountController {
 
                 accountViewModel.setModeratingApplications(moderatingApplications);
             }
+
+            //get list of applications with read thread tracking has a value.
+            List<UserReadThread> readThreads = userReadThreadService.getAllUserReadThreads(user.getId());
+            if (readThreads != null) {
+                List<Application> appsWithReadThreads = new ArrayList<>();
+                for (UserReadThread readThread : readThreads) {
+                    Application app = applicationService.get(readThread.getApplicationId());
+                    if (app != null) {
+                        appsWithReadThreads.add(app);
+                    }
+                }
+                accountViewModel.setUserReadThreadApplications(appsWithReadThreads);
+            }
+
         }
 
         return new ModelAndView("account/modifyAccount", "accountViewModel", accountViewModel);

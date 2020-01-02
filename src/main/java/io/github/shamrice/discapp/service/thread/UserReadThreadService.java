@@ -3,10 +3,13 @@ package io.github.shamrice.discapp.service.thread;
 import io.github.shamrice.discapp.data.model.UserReadThread;
 import io.github.shamrice.discapp.data.repository.UserReadThreadRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -14,6 +17,31 @@ public class UserReadThreadService {
 
     @Autowired
     private UserReadThreadRepository userReadThreadRepository;
+
+
+    public void resetReadThreads(long applicationId, long discappUserId) {
+        UserReadThread readThread = userReadThreadRepository.findOneByApplicationIdAndDiscappUserId(applicationId, discappUserId);
+        if (readThread != null) {
+            readThread.setReadThreads("");
+            readThread.setModDt(new Date());
+            userReadThreadRepository.save(readThread);
+            log.info("Reset read threads for userId: " + discappUserId + " on appId: " + applicationId + " to empty string.");
+        }
+    }
+
+    public List<UserReadThread> getAllUserReadThreads(long discappUserId) {
+
+        List<UserReadThread> results = new ArrayList<>();
+
+        List<UserReadThread> readThreads = userReadThreadRepository.findAllByDiscappUserId(discappUserId);
+        for (UserReadThread userReadThread : readThreads) {
+            if (userReadThread.getReadThreads() != null && !userReadThread.getReadThreads().trim().isEmpty()) {
+                results.add(userReadThread);
+            }
+        }
+
+        return results;
+    }
 
     public void markThreadAsRead(long applicationId, long discappUserId, long threadId) {
 
