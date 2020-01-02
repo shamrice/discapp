@@ -196,7 +196,7 @@ public class DiscAppController {
 
                     List<ThreadViewModel> threads = new ArrayList<>();
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-//todo : add read to view model so can be checked during rendering.
+
                         ThreadViewModel threadViewModel = new ThreadViewModel();
 
                         threadViewModel.setSubmitter(threadTreeNode.getCurrent().getSubmitter());
@@ -841,12 +841,13 @@ public class DiscAppController {
         String messageHeaderText = "first_message_header";
         String messageSpanText = "first_message_span";
 
-        if (isNewMessageHighlighted(currentNode)) {
-            messageSpanText += " new_message";
-        }
-
         //check if thread is read.
         boolean isRead = userReadThreadService.csvContainsThreadId(readThreads, currentNode.getCurrent().getId());
+
+        //only highlight unread messages.
+        if (!isRead && isNewMessageHighlighted(currentNode)) {
+            messageSpanText += " new_message";
+        }
 
         String topThreadHtml = "" +
                 "        <div class=\"" + messageDivText + "\">" +
@@ -932,7 +933,8 @@ public class DiscAppController {
                         " <div class=\"response_headers\">";
             }
 
-            if (isNewMessageHighlighted(currentNode)) {
+            //only highlight new messages if they're not read.
+            if (!isRead && isNewMessageHighlighted(currentNode)) {
                 currentHtml += "   <span class=\"response_headers new_message\">";
             } else if (!isNewMessageHighlighted(currentNode) && currentNode.getCurrent().getId().equals(currentlyViewedId)) {
                 //if current thread, apply different css class to span
