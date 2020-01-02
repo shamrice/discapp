@@ -15,6 +15,12 @@ DROP TABLE IF EXISTS thread;
 DROP TABLE IF EXISTS configuration;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS owner;
+DROP TABLE IF EXISTS site_update_log;
+DROP TABLE IF EXISTS user_read_thread;
+
+/*
+todo: add missing tables here
+*/
 
 commit;
 
@@ -238,10 +244,24 @@ CREATE TABLE application_subscription (
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     last_send_dt TIMESTAMP,
-    confirmation_code INT NOT NULL
+    confirmation_code INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
+
+
+CREATE TABLE user_read_thread (
+    id serial NOT NULL,
+    application_id INT NOT NULL,
+    discapp_user_id INT NOT NULL,
+    read_threads VARCHAR,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (discapp_user_id) REFERENCES discapp_user(id)
+);
+
 
 commit;
 

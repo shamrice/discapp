@@ -249,6 +249,20 @@ CREATE TABLE application_subscription (
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
+
+CREATE TABLE user_read_thread (
+    id int(255) NOT NULL,
+    application_id INT NOT NULL,
+    discapp_user_id INT NOT NULL,
+    read_threads VARCHAR,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (discapp_user_id) REFERENCES discapp_user(id)
+);
+
+
 commit;
 
 

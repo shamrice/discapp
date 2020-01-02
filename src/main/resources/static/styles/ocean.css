@@ -114,3 +114,11 @@ table#widget_table {margin:auto;}
     font-weight: bold;
     text-align: center;
 }
+
+a:visited {
+    color: #551A8B;
+}
+
+.read {
+    color: #551A8B;
+}

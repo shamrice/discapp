@@ -181,3 +181,11 @@ table#widget_table td.date_cell { width:4em; }
     font-weight: bold;
     text-align: center;
 }
+
+a:visited {
+    color: #551A8B;
+}
+
+.read {
+    color: #551A8B;
+}

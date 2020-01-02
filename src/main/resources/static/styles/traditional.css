@@ -6,6 +6,9 @@ body {	background-image: url(/images/paper_texture.gif);
 
 a { color: #000; }
 a:visited { color: #888; }
+.read {
+    color: #888;
+}
 a:hover { background-color: #FFB; }
 
 img {

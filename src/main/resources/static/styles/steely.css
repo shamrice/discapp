@@ -33,6 +33,10 @@ A { color:#008;
 
 A:VISITED { color:#a0a; }
 
+.read {
+    color: #a0a;
+}
+
 A:HOVER {  background-color:#EE0;  }
 
 UL {	list-style-position: outside;

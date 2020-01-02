@@ -80,6 +80,17 @@ public class AccountHelper {
         return null;
     }
 
+    public Long getLoggedInDiscAppUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            if (auth.isAuthenticated() && !auth.getPrincipal().equals(ANONYMOUS_USER)) {
+                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
+                return principal.getId();
+            }
+        }
+        return null;
+    }
+
     public boolean isRootAdminAccount() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof DiscAppUserPrincipal) {

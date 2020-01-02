@@ -40,6 +40,10 @@ A { color: #66f; }
 
 A:VISITED { color: #C0C; }
 
+.read {
+    color: #C0C;
+}
+
 A:HOVER {  	background-color:#ddd;  }
 
 DIV.prologue {	text-align: left;

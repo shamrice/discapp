@@ -15,6 +15,7 @@ import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.service.thread.UserReadThreadService;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.ThreadViewModel;
@@ -66,6 +67,9 @@ public class DiscAppController {
 
     @Autowired
     private StatisticsService statisticsService;
+
+    @Autowired
+    private UserReadThreadService userReadThreadService;
 
     @Autowired
     private AccountHelper accountHelper;
@@ -150,6 +154,13 @@ public class DiscAppController {
                     model.addAttribute(HAS_NEXT_PAGE, false);
                 }
 
+                //get read threads if user is logged in.
+                String readThreadsCsv = "";
+                Long userId = accountHelper.getLoggedInDiscAppUserId();
+                if (userId != null) {
+                    readThreadsCsv = userReadThreadService.getReadThreadsCsv(appId, userId);
+                }
+
                 if (isExpandOnIndex) {
 
                     List<String> threadTreeHtml = new ArrayList<>();
@@ -160,14 +171,16 @@ public class DiscAppController {
 
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
 
-                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview, page, maxPreviewLengthTopLevelThread);
+                        String currentHtml = getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview,
+                                page, maxPreviewLengthTopLevelThread, readThreadsCsv);
 
                         //get replies if they exist and add on HTML.
                         if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
                             currentHtml += "<div class=\"responses\">";
                             currentHtml += getAppViewThreadHtml(threadTreeNode, "",
                                     entryBreakString, true, -1,
-                                    false, page, maxPreviewLengthReplies, 0, maxThreadDepth);
+                                    false, page, maxPreviewLengthReplies,
+                                    0, maxThreadDepth, readThreadsCsv);
                             currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
                             currentHtml += "</div>";
                         }
@@ -183,7 +196,7 @@ public class DiscAppController {
 
                     List<ThreadViewModel> threads = new ArrayList<>();
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
-
+//todo : add read to view model so can be checked during rendering.
                         ThreadViewModel threadViewModel = new ThreadViewModel();
 
                         threadViewModel.setSubmitter(threadTreeNode.getCurrent().getSubmitter());
@@ -191,6 +204,9 @@ public class DiscAppController {
                         threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, threadTreeNode.getCurrent().getCreateDt(), false));
                         threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
                         threadViewModel.setShowMoreOnPreviewText(false);
+
+                        //mark thread as read or not.
+                        threadViewModel.setRead(userReadThreadService.csvContainsThreadId(readThreadsCsv, threadTreeNode.getCurrent().getId()));
 
                         String body = threadTreeNode.getCurrent().getBody();
                         String previewText = null;
@@ -594,11 +610,24 @@ public class DiscAppController {
         Thread currentThread = threadService.getThread(appId, threadId);
         if (currentThread != null && currentThread.isApproved()) {
 
+            String readThreadsCsv = "";
+
+            //mark thread as read if user is logged in.
+            Long userId = accountHelper.getLoggedInDiscAppUserId();
+            if (userId != null) {
+                log.info("User logged in. Marking thread: " + threadId + " as read for userId: " + userId
+                        + " on appId: " + appId + " :: and getting list of read threads");
+                userReadThreadService.markThreadAsRead(appId, userId, threadId);
+
+                //get list of read threads.
+                readThreadsCsv = userReadThreadService.getReadThreadsCsv(appId, userId);
+            }
+
             int maxPreviewLength = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
             int maxThreadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 30);
 
             String threadBody = threadService.getThreadBodyText(threadId);
-            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage, maxPreviewLength, maxThreadDepth);
+            String subThreadsHtml = getThreadViewThreadHtml(currentThread, currentPage, maxPreviewLength, maxThreadDepth, readThreadsCsv);
 
             DiscAppUser sourceUser = currentThread.getDiscAppUser();
 
@@ -806,7 +835,7 @@ public class DiscAppController {
     }
 
     private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString,
-                                           boolean showPreviewText, int currentPage, int maxPreviewLength) {
+                                           boolean showPreviewText, int currentPage, int maxPreviewLength, String readThreads) {
 
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
@@ -816,11 +845,21 @@ public class DiscAppController {
             messageSpanText += " new_message";
         }
 
+        //check if thread is read.
+        boolean isRead = userReadThreadService.csvContainsThreadId(readThreads, currentNode.getCurrent().getId());
+
         String topThreadHtml = "" +
                 "        <div class=\"" + messageDivText + "\">" +
                 "            <div class=\"" + messageHeaderText + "\">" +
                 "               <span class=\"" + messageSpanText + "\">" +
-                "                   <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                "                   <a class=\"article_link";
+
+        //add read thread css to link if thread has been marked as read.
+        if (isRead) {
+            topThreadHtml += " read";
+        }
+
+        topThreadHtml +=        "\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
                 "&amp;article=" + currentNode.getCurrent().getId() +
                 "&amp;page=" + currentPage + "\"" +
                 " name=\"" + currentNode.getCurrent().getId() + "\">" +
@@ -867,9 +906,12 @@ public class DiscAppController {
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
                                         boolean skipCurrentNode, long currentlyViewedId,
                                         boolean showPreviewText, int currentPage, int maxPreviewLength,
-                                        int currentThreadDepth, int maxThreadDepth) {
+                                        int currentThreadDepth, int maxThreadDepth, String readThreads) {
 
         if (!skipCurrentNode) {
+
+            //check if thread is read.
+            boolean isRead = userReadThreadService.csvContainsThreadId(readThreads, currentNode.getCurrent().getId());
 
             //increment thread depth. if hit max, set html and return back.
             currentThreadDepth++;
@@ -903,7 +945,14 @@ public class DiscAppController {
             if (currentNode.getCurrent().getId().equals(currentlyViewedId)) {
                 currentHtml += currentNode.getCurrent().getSubject();
             } else {
-                currentHtml += "      <a class=\"article_link\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
+                currentHtml += "      <a class=\"article_link";
+
+                //if thread is read, add css style to anchor tag.
+                if (isRead) {
+                    currentHtml += " read";
+                }
+
+                currentHtml += "\" href=\"/discussion.cgi?disc=" + currentNode.getCurrent().getApplicationId() +
                         "&amp;article=" + currentNode.getCurrent().getId() +
                         "&amp;page=" + currentPage + "\"" +
                         " name=\"" + currentNode.getCurrent().getId() + "\">" +
@@ -952,7 +1001,8 @@ public class DiscAppController {
 
             currentHtml += "<li class=\"nested_list\"><ul>";
             currentHtml = getAppViewThreadHtml(node, currentHtml, entryBreakString, false,
-                    currentlyViewedId, showPreviewText, currentPage, maxPreviewLength, currentThreadDepth, maxThreadDepth);
+                    currentlyViewedId, showPreviewText, currentPage, maxPreviewLength, currentThreadDepth, maxThreadDepth,
+                    readThreads);
             currentHtml += "</li>";
         }
 
@@ -969,7 +1019,8 @@ public class DiscAppController {
      * @param currentThread Current thread being viewed on the view thread page.
      * @return Returns formatted HTML block for reply threads.
      */
-    private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength, int maxThreadDepth) {
+    private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength,
+                                           int maxThreadDepth, String readThreads) {
 
         //default reply thread values
         boolean skipCurrent = true;
@@ -1013,7 +1064,8 @@ public class DiscAppController {
                     ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
 
             currentHtml += getAppViewThreadHtml(subThreadNode, currentHtml, entryBreakString,
-                    skipCurrent, currentThread.getId(), true, currentPage, maxPreviewLength, 0, maxThreadDepth);
+                    skipCurrent, currentThread.getId(), true, currentPage, maxPreviewLength,
+                    0, maxThreadDepth, readThreads);
 
             //first child thread needs additional html tags added
             if (isFirstChild) {
