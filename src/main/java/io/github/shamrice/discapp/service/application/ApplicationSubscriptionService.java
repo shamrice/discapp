@@ -6,6 +6,8 @@ import io.github.shamrice.discapp.service.account.notification.EmailNotification
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.utility.ReplyNotification;
+import io.github.shamrice.discapp.service.utility.ReplyNotificationUtilityService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,22 +104,5 @@ public class ApplicationSubscriptionService {
             log.warn("Pending subscription was either not found or confirmation codes do not match. No subscription added for email address: " + emailAddress);
             return false;
         }
-    }
-
-    //todo : should this be moved to just email notification service or somewhere else besides this service?
-    public void sendReplyEmailNotification(long appId, String appName, String discussionUrl, String emailAddress, long newThreadId) {
-
-        //send out email message
-        Map<String, Object> subjectParams = new HashMap<>();
-        subjectParams.put("APPLICATION_NAME", appName);
-
-        Map<String, Object> bodyParams = new HashMap<>();
-        bodyParams.put("APPLICATION_NAME", appName);
-        bodyParams.put("APP_ID", appId);
-        bodyParams.put("APP_DISCUSSION_URL", discussionUrl);
-        bodyParams.put("THREAD_ID", newThreadId);
-
-        emailNotificationService.sendMimeMessage(emailAddress, NotificationType.REPLY_NOTIFICATION, subjectParams, bodyParams);
-        log.info("Sent reply notification for thread: " + newThreadId + " to: " + emailAddress);
     }
 }
