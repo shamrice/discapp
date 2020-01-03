@@ -34,9 +34,9 @@ public class UserConfigurationCache {
     }
 
     public void setMaxCacheAgeMilliseconds(long milliseconds) {
-        log.debug("Calling max cache age in user config cache: " + milliseconds);
+        log.debug("Calling max user configuration cache age in user config cache: " + milliseconds);
         if (!cacheDurationSet) {
-            log.info("Setting cache duration to: " + milliseconds);
+            log.info("Setting user configuration cache duration to: " + milliseconds);
             maxCacheAgeMilliseconds = milliseconds;
             cacheDurationSet = true;
         }
