@@ -67,6 +67,8 @@ public class AccountViewModel {
 
     private List<Application> userReadThreadApplications;
 
+    private boolean readTrackingEnabled;
+
     public boolean isBelowAppLimit() {
         if (maxDiscApps == null) {
             return true;

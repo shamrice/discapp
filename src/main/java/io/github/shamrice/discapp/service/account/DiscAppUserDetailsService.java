@@ -136,6 +136,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                     log.info("Saved disc app user: " + createdUser.getEmail() + " : username: "
                             + createdUser.getUsername());
 
+                    //create default user configurations
+                    if (isNewUser) {
+                        log.info("Setting default user configuration values for new user: " + createdUser.getId());
+                        configurationService.setDefaultUserConfigurationValuesForUser(createdUser.getId());
+                    }
+
                     //send email notification
                     if (isNewUser && sendNewUserEmailNotification) {
                         sendNewUserEmailNotification(createdUser.getEmail());

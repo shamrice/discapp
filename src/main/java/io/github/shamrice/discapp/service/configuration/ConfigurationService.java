@@ -1,8 +1,11 @@
 package io.github.shamrice.discapp.service.configuration;
 
 import io.github.shamrice.discapp.data.model.Configuration;
+import io.github.shamrice.discapp.data.model.UserConfiguration;
 import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
+import io.github.shamrice.discapp.data.repository.UserConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
+import io.github.shamrice.discapp.service.configuration.cache.UserConfigurationCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +20,14 @@ public class ConfigurationService {
     @Autowired
     private ConfigurationRepository configurationRepository;
 
+    @Autowired
+    private UserConfigurationRepository userConfigurationRepository;
+
     public static final long SITE_WIDE_CONFIGURATION_APP_ID = 0L;
 
     public ConfigurationService(@Value("${discapp.cache.duration}") Long cacheDuration) {
         ConfigurationCache.getInstance().setMaxCacheAgeMilliseconds(cacheDuration);
+        UserConfigurationCache.getInstance().setMaxCacheAgeMilliseconds(cacheDuration);
     }
 
     public List<Configuration> list() {
@@ -93,6 +100,32 @@ public class ConfigurationService {
             configurationRepository.save(newConfig);
             log.info("Added new default configuration : " + newConfig.getName() + " = " + newConfig.getValue()
                     + " for appId: " + applicationId);
+        }
+    }
+
+    public void setDefaultUserConfigurationValuesForUser(Long discappUserId) {
+
+        log.info("Setting up default user configuration values for userId: " + discappUserId + " in database.");
+
+        //todo: pull these default values from properties file
+        Map<UserConfigurationProperty, String> configsToSet = new HashMap<>();
+        configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "true");
+        configsToSet.put(UserConfigurationProperty.USER_TIMEZONE_ENABLED, "false");
+        configsToSet.put(UserConfigurationProperty.USER_TIMEZONE_LOCATION, "UTC");
+
+        for (UserConfigurationProperty configurationProperty : configsToSet.keySet()) {
+            String value = configsToSet.getOrDefault(configurationProperty, "");
+
+            UserConfiguration newConfig = new UserConfiguration();
+            newConfig.setDiscappUserId(discappUserId);
+            newConfig.setName(configurationProperty.getPropName());
+            newConfig.setValue(value);
+            newConfig.setCreateDt(new Date());
+            newConfig.setModDt(new Date());
+
+            userConfigurationRepository.save(newConfig);
+            log.info("Added new default user configuration : " + newConfig.getName() + " = " + newConfig.getValue()
+                    + " for userId: " + discappUserId);
         }
     }
 
@@ -199,6 +232,83 @@ public class ConfigurationService {
         }
         log.error("Cannot save null configuration value.");
         return false;
+    }
+
+    public boolean saveUserConfiguration(UserConfigurationProperty configurationProperty, UserConfiguration configuration) {
+        if (configuration != null) {
+            if (configuration.getName().equalsIgnoreCase(configurationProperty.getPropName())) {
+                log.info("Saving valid user configuration " + configurationProperty.getPropName() + " : "
+                        + configuration.getValue() + " for userId: " + configuration.getDiscappUserId());
+                //always update mod date
+                configuration.setModDt(new Date());
+                //only update create if it's not set
+                if (configuration.getCreateDt() == null) {
+                    configuration.setCreateDt(new Date());
+                }
+
+                UserConfiguration savedConfig = userConfigurationRepository.save(configuration);
+                if (savedConfig != null) {
+                    UserConfigurationCache.getInstance().updateCache(savedConfig.getDiscappUserId(), configurationProperty, savedConfig);
+                    return true;
+                } else {
+                    log.error("Failed to save user configuration. Value returned was null from save.");
+                    return false;
+                }
+
+            } else {
+                log.error("User Configuration property: " + configurationProperty.getPropName()
+                        + " does not match property name set in configuration to save: " + configuration.getName()
+                        + " for userId: " + configuration.getDiscappUserId());
+                return false;
+            }
+        }
+        log.error("Cannot save null user configuration value.");
+        return false;
+    }
+
+    public boolean getUserConfigBooleanValue(long discappUserId, UserConfigurationProperty configurationProperty, boolean defaultValue) {
+        String foundStrVal = getUserConfigStringValue(discappUserId, configurationProperty, "");
+
+        if (foundStrVal != null && !foundStrVal.isEmpty()) {
+            try {
+                return Boolean.parseBoolean(foundStrVal);
+            } catch (NumberFormatException ex) {
+                log.error("Unable to parse found user config value for " + configurationProperty.getPropName()
+                        + " : value: " + foundStrVal + " + for userId: " + discappUserId, ex);
+            }
+        }
+
+        log.info("Failed to find user configuration value. Returning default value of: " + defaultValue
+                + " : for userId: " + discappUserId);
+        return defaultValue;
+    }
+
+
+    public String getUserConfigStringValue(Long discappUserId, UserConfigurationProperty configurationProperty, String defaultValue) {
+
+        //try to get from cache first:
+        UserConfiguration configFromCache = UserConfigurationCache.getInstance().getFromCache(discappUserId, configurationProperty);
+        if (configFromCache != null) {
+            return configFromCache.getValue();
+        }
+
+        //search database if cache doesn't exist
+        UserConfiguration configuration = userConfigurationRepository.findOneByDiscappUserIdAndName(
+                discappUserId,
+                configurationProperty.getPropName()
+        );
+
+        if (configuration != null) {
+            log.info("Found user configuration property: " + configurationProperty.getPropName()
+                    + " for userId: " + discappUserId + ". Returning value of: " + configuration.getValue());
+
+            UserConfigurationCache.getInstance().updateCache(discappUserId, configurationProperty, configuration);
+            return configuration.getValue();
+        }
+
+        log.info("Unable to find user configuration property: " + configurationProperty.getPropName()
+                + " for userId: " + discappUserId + ". Returning default value of: " + defaultValue);
+        return defaultValue;
     }
 
     public Configuration getConfiguration(long applicationId, String configurationName) {
