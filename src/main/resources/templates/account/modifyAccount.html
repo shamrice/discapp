@@ -203,16 +203,17 @@
     </form>
 </div>
 
-<div th:if="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}" class="grey_box" style="width:40em;">
-    <h2 id="user_read_threads_banner">Reset Read Threads</h2>
+<div class="grey_box" style="width:40em;">
+    <h2 id="user_read_threads_banner">Read Thread History</h2>
     <hr/>
     <!-- todo : move inline style tags to css -->
-    <p>
-        Clicking the reset links below will reset any viewed threads you've accessed on that DiscApp back to unread. Doing so
-        will reset any account side visited thread tracking. Note that browser based visited link styling will
-        not be affected and you will need to clear your browser history separately.
-    </p>
-    <div>
+
+    <div th:if="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}" >
+        <p>
+            Clicking the reset links below will reset any viewed threads you've accessed on that DiscApp back to unread. Doing so
+            will reset any account side visited thread history. Note that browser based visited link styling will
+            not be affected and you will need to clear your browser history separately.
+        </p>
         <table style="border:1px solid black;border-collapse:collapse;">
             <tr style="color:white;background:#99e;">
                 <th style="text-align:center;padding:10px;border:1px solid black;">
@@ -235,6 +236,26 @@
             </tr>
         </table>
     </div>
+    <div th:unless="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}" >
+        <p>
+            You currently do not have any read thread history to reset.
+        </p>
+    </div>
+    <hr />
+    <p th:if="${accountViewModel.isReadTrackingEnabled()}" style="text-align:center;">
+        <a href="/account/modify/read/disable">
+            Click here to disable read thread history</a>
+        <br />
+        <br />
+        By disabling this feature, no new threads will be added to your read thread history.
+    </p>
+    <p th:unless="${accountViewModel.isReadTrackingEnabled()}" style="text-align:center;">
+        <a href="/account/modify/read/enable">Click here to enable read thread history</a>
+        <br />
+        <br />
+        By enabling this feature, the threads you read on each DiscApp will be marked as read when you read
+        them.
+    </p>
 </div>
 
 <div class="grey_box" style="width:40em;">

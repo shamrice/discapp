@@ -2,8 +2,9 @@ package io.github.shamrice.discapp.service.thread;
 
 import io.github.shamrice.discapp.data.model.UserReadThread;
 import io.github.shamrice.discapp.data.repository.UserReadThreadRepository;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ public class UserReadThreadService {
     @Autowired
     private UserReadThreadRepository userReadThreadRepository;
 
+    @Autowired
+    private ConfigurationService configurationService;
 
     public void resetReadThreads(long applicationId, long discappUserId) {
         UserReadThread readThread = userReadThreadRepository.findOneByApplicationIdAndDiscappUserId(applicationId, discappUserId);
@@ -44,6 +47,12 @@ public class UserReadThreadService {
     }
 
     public void markThreadAsRead(long applicationId, long discappUserId, long threadId) {
+
+        //check to see if thread history is enabled before continuing.
+        if (!configurationService.getUserConfigBooleanValue(discappUserId, UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, false)) {
+            log.info("UserId: " + discappUserId + " has read thread history turned off. Not marking thread as read.");
+            return;
+        }
 
         String threadIdStr = String.valueOf(threadId);
 

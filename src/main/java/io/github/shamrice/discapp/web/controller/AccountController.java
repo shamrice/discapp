@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.UserReadThreadService;
 import io.github.shamrice.discapp.web.model.AccountViewModel;
@@ -70,7 +71,39 @@ public class AccountController {
             userReadThreadService.resetReadThreads(appId, userId);
         }
 
-        return new ModelAndView("redirect:/account/modify");
+        return new ModelAndView("redirect:/account/modify#user_read_threads_banner");
+    }
+
+    @GetMapping("/account/modify/read/{status}")
+    public ModelAndView getAccountModifyReadReset(@PathVariable(name = "status") String status) {
+        Long userId = accountHelper.getLoggedInDiscAppUserId();
+        if (userId != null) {
+
+            UserConfiguration readTracking = configurationService.getUserConfiguration(userId, UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED.getPropName());
+            if (readTracking == null) {
+                readTracking = new UserConfiguration();
+                readTracking.setDiscappUserId(userId);
+                readTracking.setName(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED.getPropName());
+                readTracking.setCreateDt(new Date());
+            } else {
+                readTracking.setModDt(new Date());
+            }
+
+            if ("enable".equalsIgnoreCase(status)) {
+                readTracking.setValue("true");
+            } else {
+                readTracking.setValue("false");
+            }
+
+            if (configurationService.saveUserConfiguration(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, readTracking)) {
+                log.info("Updated userId: " + userId + " configuration value for " + UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED.getPropName() + " to true.");
+            } else {
+                log.info("Updated userId: " + userId + " configuration value for " + UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED.getPropName() + " to false.");
+            }
+
+        }
+
+        return new ModelAndView("redirect:/account/modify#user_read_threads_banner");
     }
 
     @GetMapping("/account/delete/status")
@@ -455,6 +488,14 @@ public class AccountController {
                 accountViewModel.setUserReadThreadApplications(appsWithReadThreads);
             }
 
+            //get config value for read tracking
+            accountViewModel.setReadTrackingEnabled(configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, false));
+        }
+
+        //NPE safety net.
+        if (accountViewModel == null) {
+            log.error("Entered into modify account page with null account view model. Setting to empty");
+            accountViewModel = new AccountViewModel();
         }
 
         return new ModelAndView("account/modifyAccount", "accountViewModel", accountViewModel);

@@ -314,4 +314,8 @@ public class ConfigurationService {
     public Configuration getConfiguration(long applicationId, String configurationName) {
         return configurationRepository.findOneByApplicationIdAndName(applicationId, configurationName);
     }
+
+    public UserConfiguration getUserConfiguration(long discappUserId, String configurationName) {
+        return userConfigurationRepository.findOneByDiscappUserIdAndName(discappUserId, configurationName);
+    }
 }
