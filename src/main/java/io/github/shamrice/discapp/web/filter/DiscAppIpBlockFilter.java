@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static io.github.shamrice.discapp.web.define.url.AuthenticationUrl.AUTH_INDICES_URL;
+
 @Component
 @Slf4j
 public class DiscAppIpBlockFilter extends GenericFilterBean {
@@ -45,7 +47,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             String url = req.getRequestURL().toString();
 
             //todo : fix so filter works correctly on /indices/search?disc=appid urls.
-            if (url.toLowerCase().contains(APP_INDICES_URL)) {
+            if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains(AUTH_INDICES_URL)) {
 
                 String ipAddress = req.getHeader("X-FORWARDED-FOR");
                 if (ipAddress == null || ipAddress.isEmpty()) {
