@@ -99,6 +99,18 @@ public class DiscAppMaintenanceController {
     @Autowired
     private DiscAppController discAppController;
 
+    @GetMapping(DOCUMENTATION_URL)
+    public ModelAndView getDocumentationMaintenanceView(@RequestParam(name = "id") long appId,
+                                                        Model model) {
+
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
+
+        setCommonModelAttributes(model, app, username);
+
+        return new ModelAndView("admin/disc-docs", "docModel", model);
+    }
+
     @GetMapping(LIST_MAINTENANCE_PAGE)
     public ModelAndView getListMaintenanceView(@RequestParam(name = "id") long appId,
                                                @RequestParam(name = "tab", required = false) String tab,

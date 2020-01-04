@@ -11,6 +11,7 @@ public class MaintenanceUrl {
     public static final String MAINTENANCE_PAGE = CONTROLLER_DIRECTORY_URL + "disc-maint.cgi";
     public static final String LIST_MAINTENANCE_PAGE = CONTROLLER_DIRECTORY_URL + "disc-list-maint.cgi";
     public static final String PERMISSION_DENIED_URL = CONTROLLER_DIRECTORY_URL + "permission-denied";
+    public static final String DOCUMENTATION_URL = CONTROLLER_DIRECTORY_URL + "disc-docs.cgi";
 
 }
 
