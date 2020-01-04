@@ -101,12 +101,30 @@ public class DiscAppMaintenanceController {
 
     @GetMapping(DOCUMENTATION_URL)
     public ModelAndView getDocumentationMaintenanceView(@RequestParam(name = "id") long appId,
+                                                        HttpServletRequest request,
                                                         Model model) {
 
         Application app = applicationService.get(appId);
         String username = accountHelper.getLoggedInEmail();
 
         setCommonModelAttributes(model, app, username);
+
+        String baseUrl = webHelper.getBaseUrl(request);
+
+        String searchHtml = "" +
+                "    <b>Search the message board:</b>\n" +
+                "    <FORM METHOD=\"POST\" ACTION=\"" + baseUrl + "/indices/search?disc=" + appId +"\">\n" +
+                "        <INPUT TYPE=\"hidden\" NAME=\"id\" VALUE=\"" + appId + "\">\n" +
+                "        <INPUT TYPE=\"text\" NAME=\"searchTerm\">\n" +
+                "        <INPUT TYPE=\"submit\" NAME=\"submit\" VALUE=\"Search\">\n" +
+                "    </FORM>";
+
+        model.addAttribute("searchHtml", searchHtml);
+
+        String adminLinkHtml = "" +
+                "    <a href=\"" + baseUrl + "/admin/disc-maint.cgi?id=" + appId + "\">Admin</a>";
+
+        model.addAttribute("adminLinkHtml", adminLinkHtml);
 
         return new ModelAndView("admin/disc-docs", "docModel", model);
     }
