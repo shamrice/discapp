@@ -23,6 +23,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
+import static io.github.shamrice.discapp.web.define.url.AbuseUrl.*;
+
 @Slf4j
 @Controller
 public class AbuseController {
@@ -42,7 +44,7 @@ public class AbuseController {
     @Autowired
     private ApplicationService applicationService;
 
-    @GetMapping("/abuse/delete")
+    @GetMapping(ABUSE_DELETE)
     public ModelAndView getAbuseView(@RequestParam(name = "abuseId") Long abuseId,
                                      @RequestParam(name = "discId", required = false) Long appId,
                                      @RequestParam(name = "submitter", required = false) String submitter,
@@ -88,7 +90,7 @@ public class AbuseController {
         return getAbuseView(appId, submitter, email, ip, subject, body, abuseViewModel, model);
     }
 
-    @GetMapping("/abuse/abuse.cgi")
+    @GetMapping(ABUSE_VIEW)
     public ModelAndView getAbuseView(@RequestParam(name = "id", required = false) Long appId,
                                      @RequestParam(name = "submitter", required = false) String submitter,
                                      @RequestParam(name = "email", required = false) String email,
@@ -178,13 +180,13 @@ public class AbuseController {
         return new ModelAndView("abuse/abuse-results", "abuseViewModel", abuseViewModel);
     }
 
-    @GetMapping("/abuse/abuse-search.cgi")
+    @GetMapping(ABUSE_SEARCH)
     public ModelAndView getAbuseSearchView(AbuseViewModel abuseViewModel,
                                            Model model) {
         return new ModelAndView("abuse/abuse-search", "abuseViewModel", abuseViewModel);
     }
 
-    @GetMapping("/abuse/abuse-view.cgi")
+    @GetMapping(ABUSE_SEARCH_VIEW)
     public ModelAndView getAbuseSearchView(@RequestParam(name = "articleId") long threadId,
                                            AbuseViewModel abuseViewModel,
                                            Model model) {

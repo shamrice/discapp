@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+import static io.github.shamrice.discapp.web.define.url.AccountUrl.*;
 import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENANCE_PAGE;
 
@@ -64,7 +65,7 @@ public class AccountController {
     @Autowired
     private WebHelper webHelper;
 
-    @GetMapping("/account/modify/read/reset")
+    @GetMapping(ACCOUNT_MODIFY_READ_RESET)
     public ModelAndView getAccountModifyReadReset(@RequestParam(name = "appId") long appId) {
         Long userId = accountHelper.getLoggedInDiscAppUserId();
         if (userId != null) {
@@ -74,7 +75,7 @@ public class AccountController {
         return new ModelAndView("redirect:/account/modify#user_read_threads_banner");
     }
 
-    @GetMapping("/account/modify/read/{status}")
+    @GetMapping(ACCOUNT_MODIFY_READ_STATUS)
     public ModelAndView getAccountModifyReadReset(@PathVariable(name = "status") String status) {
         Long userId = accountHelper.getLoggedInDiscAppUserId();
         if (userId != null) {
@@ -106,17 +107,17 @@ public class AccountController {
         return new ModelAndView("redirect:/account/modify#user_read_threads_banner");
     }
 
-    @GetMapping("/account/delete/status")
+    @GetMapping(ACCOUNT_DELETE_STATUS)
     public ModelAndView getAccountDeleteStatus(ModelMap modelMap) {
         return new ModelAndView("account/delete/deleteAccountStatus", modelMap);
     }
 
-    @GetMapping("/account/delete")
+    @GetMapping(ACCOUNT_DELETE)
     public ModelAndView getAccountDelete(ModelMap modelMap) {
         return new ModelAndView("account/delete/deleteAccount", modelMap);
     }
 
-    @PostMapping("/account/delete")
+    @PostMapping(ACCOUNT_DELETE)
     public ModelAndView postAccountDelete(@RequestParam(name = "reCaptchaResponse") String reCaptchaResponse,
                                           ModelMap modelMap, HttpSession session) {
 
@@ -163,7 +164,7 @@ public class AccountController {
         return new ModelAndView("account/delete/deleteAccountStatus", "model", modelMap);
     }
 
-    @PostMapping("/password/reset/{resetKey}")
+    @PostMapping(ACCOUNT_PASSWORD_RESET)
     public ModelAndView postPasswordResetForm(@PathVariable(name = "resetKey") String resetKey,
                                               @RequestParam(name = "email") String email,
                                               @RequestParam(name = "password") String newPassword,
@@ -223,19 +224,19 @@ public class AccountController {
         return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
     }
 
-    @GetMapping("/password/reset/{resetKey}")
+    @GetMapping(ACCOUNT_PASSWORD_RESET)
     public ModelAndView getPasswordResetFormView(@PathVariable(name = "resetKey") String resetKey,
                                              ModelMap modelMap) {
         modelMap.addAttribute(PASSWORD_RESET_KEY, resetKey);
         return new ModelAndView("account/password/passwordResetForm", "model", modelMap);
     }
 
-    @GetMapping("/account/password")
+    @GetMapping(ACCOUNT_PASSWORD)
     public ModelAndView getAccountPasswordResetRequestView(ModelMap modelMap) {
         return new ModelAndView("account/password/resetPasswordRequest");
     }
 
-    @PostMapping("/account/password")
+    @PostMapping(ACCOUNT_PASSWORD)
     public ModelAndView postAccountPasswordRequestView(@RequestParam(name = "email") String email,
                                                        @RequestParam(name = "reCaptchaResponse") String reCaptchaResponse,
                                                        ModelMap modelMap,
@@ -260,7 +261,7 @@ public class AccountController {
                 return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
             }
 
-            if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + "/password/reset")) {
+            if (!accountService.createPasswordResetRequest(email, webHelper.getBaseUrl(request) + ACCOUNT_PASSWORD)) {
                 log.warn("Failed to create password request for email: " + email);
             }
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
@@ -269,13 +270,13 @@ public class AccountController {
         return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
     }
 
-    @GetMapping("/account/create")
+    @GetMapping(ACCOUNT_CREATE)
     public ModelAndView getCreateAccount(@ModelAttribute AccountViewModel accountViewModel,
                                          ModelMap modelMap) {
         return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
     }
 
-    @PostMapping("/account/create")
+    @PostMapping(ACCOUNT_CREATE)
     public ModelAndView postCreateAccount(@ModelAttribute AccountViewModel accountViewModel, ModelMap modelMap) {
 
         if (accountViewModel != null) {
@@ -344,14 +345,14 @@ public class AccountController {
 
     }
 
-    @GetMapping("/account/createAccountSuccess")
+    @GetMapping(ACCOUNT_CREATE_ACCOUNT_SUCCESS)
     public String getCreateSuccess(ModelMap modelMap) {
         modelMap.addAttribute("status", "Successfully created new user");
         return "account/createAccountSuccess";
     }
 
 
-    @GetMapping("/account/application")
+    @GetMapping(ACCOUNT_APPLICATION)
     public ModelAndView getAccountApplication(@ModelAttribute AccountViewModel accountViewModel,
                                          ModelMap modelMap) {
 
@@ -417,7 +418,7 @@ public class AccountController {
     }
 
 
-    @GetMapping("/account/modify")
+    @GetMapping(ACCOUNT_MODIFY)
     public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                          HttpServletRequest request,
                                          ModelMap modelMap) {
@@ -501,7 +502,7 @@ public class AccountController {
         return new ModelAndView("account/modifyAccount", "accountViewModel", accountViewModel);
     }
 
-    @PostMapping("/account/modify/password")
+    @PostMapping(ACCOUNT_MODIFY_PASSWORD)
     public ModelAndView postAccountModifyPassword(@ModelAttribute AccountViewModel accountViewModel,
                                                   HttpServletRequest request,
                                                   ModelMap modelMap) {
@@ -556,14 +557,14 @@ public class AccountController {
         return new ModelAndView("redirect:/account/modify");
     }
 
-    @GetMapping("/account/modify/account")
+    @GetMapping(ACCOUNT_MODIFY_ACCOUNT)
     public ModelAndView getAccountModifyAccount(@ModelAttribute AccountViewModel accountViewModel,
                                          HttpServletRequest request,
                                          ModelMap modelMap) {
         return getAccountModify(accountViewModel, request, modelMap);
     }
 
-    @PostMapping("/account/modify/account")
+    @PostMapping(ACCOUNT_MODIFY_ACCOUNT)
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                           HttpServletRequest request,
                                           ModelMap modelMap) {
@@ -612,7 +613,7 @@ public class AccountController {
     }
 
 
-    @PostMapping("/account/modify/application")
+    @PostMapping(ACCOUNT_MODIFY_APPLICATION)
     public ModelAndView postApplicationModify(@ModelAttribute AccountViewModel accountViewModel,
                                               ModelMap modelMap) {
         if (accountViewModel != null) {
@@ -677,7 +678,7 @@ public class AccountController {
     }
 
 
-    @PostMapping("/account/modify/owner")
+    @PostMapping(ACCOUNT_MODIFY_OWNER)
     public ModelAndView postOwnerModify(@ModelAttribute AccountViewModel accountViewModel,
                                         HttpServletRequest request,
                                         ModelMap modelMap) {
@@ -722,7 +723,7 @@ public class AccountController {
         return getAccountModify(accountViewModel, request, modelMap);
     }
 
-    @GetMapping("/account/add/application")
+    @GetMapping(ACCOUNT_ADD_APPLICATION)
     public ModelAndView getAddApplication(@ModelAttribute AccountViewModel accountViewModel,
                                           ModelMap modelMap) {
 
@@ -755,7 +756,7 @@ public class AccountController {
         return new ModelAndView("account/application/createApplication", "accountViewModel", accountViewModel);
     }
 
-    @PostMapping("/account/add/application")
+    @PostMapping(ACCOUNT_ADD_APPLICATION)
     public ModelAndView postAddApplication(@ModelAttribute AccountViewModel accountViewModel,
                                            HttpServletRequest request,
                                            ModelMap modelMap) {

@@ -18,6 +18,7 @@ import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
+import io.github.shamrice.discapp.web.define.url.WidgetUrl;
 import io.github.shamrice.discapp.web.model.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -2286,7 +2287,7 @@ public class DiscAppMaintenanceController {
                 "\n" +
                 " Here's your widget! Put your header here.\n" +
                 "\n" +
-                "<iframe src=\"" + baseUrl + WidgetController.CONTROLLER_URL_DIRECTORY + "disc-widget.cgi?disc=" + appId + "\" \n" +
+                "<iframe src=\"" + baseUrl + WidgetUrl.CONTROLLER_URL_DIRECTORY + "disc-widget.cgi?disc=" + appId + "\" \n" +
                 "        width=\"99%\" height=\"80%\" frameborder=\"no\" scrolling=\"no\">\n" +
                 "</iframe>\n" +
                 "\n" +

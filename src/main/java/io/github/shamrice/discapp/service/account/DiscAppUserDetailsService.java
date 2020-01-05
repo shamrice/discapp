@@ -198,7 +198,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                     Map<String, Object> templateParams = new HashMap<>();
                     templateParams.put("ACCOUNT_EMAIL", email);
                     templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
-                    templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.PASSWORD_RESET);
+                    templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
 
                     emailNotificationService.send(email, NotificationType.ACCOUNT_LOCKED, templateParams);
 

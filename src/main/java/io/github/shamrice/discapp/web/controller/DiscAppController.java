@@ -43,8 +43,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
-import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
-import static io.github.shamrice.discapp.web.define.url.AppUrl.DISCUSSION_URL;
+import static io.github.shamrice.discapp.web.define.url.AppUrl.*;
 
 @Controller
 @Slf4j
@@ -88,7 +87,7 @@ public class DiscAppController {
     @Autowired
     private ApplicationSubscriptionService applicationSubscriptionService;
 
-    @GetMapping("/Indices/{applicationId}.html")
+    @GetMapping(ALTERNATE_APPLICATION_VIEW_URL)
     public ModelAndView getAppViewOriginalUrl(@PathVariable(name = "applicationId") Long appId,
                                               @RequestParam(name = "page", required = false) Integer page,
                                               Model model,
@@ -96,7 +95,7 @@ public class DiscAppController {
         return getAppView(appId, page, model, request);
     }
 
-    @GetMapping("/indices/{applicationId}")
+    @GetMapping(APPLICATION_VIEW_URL)
     public ModelAndView getAppView(@PathVariable(name = "applicationId") Long appId,
                                    @RequestParam(name = "page", required = false) Integer page,
                                    Model model,
@@ -253,19 +252,19 @@ public class DiscAppController {
         //return new ModelAndView("redirect:/error/notfound", "errorText", "Disc App with ID of " + appId + " does not exist.");
     }
 
-    @GetMapping("/createThread")
+    @GetMapping(CREATE_THREAD)
     public ModelAndView getCreateNewThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
         log.warn("Attempted GET on create thread page. Redirecting to main view for appId: " + appId);
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @GetMapping("/postThread")
+    @GetMapping(POST_THREAD)
     public ModelAndView getPostThreadRedirect(@RequestParam(name = "disc") Long appId, Model model) {
         log.warn("Attempted GET on post thread page. Redirecting to main view for appId: " + appId);
         return new ModelAndView("redirect:/indices/" + appId);
     }
 
-    @PostMapping("/createThread")
+    @PostMapping(CREATE_THREAD)
     public ModelAndView createNewThread(@RequestParam(name = "disc") Long appId,
                                         @ModelAttribute ThreadViewModel threadViewModel,
                                         @ModelAttribute NewThreadViewModel newThreadViewModel,
@@ -366,7 +365,7 @@ public class DiscAppController {
         return new ModelAndView("indices/createThread");
     }
 
-    @PostMapping("/previewThread")
+    @PostMapping(PREVIEW_THREAD)
     public ModelAndView postPreviewThread(@RequestParam(name = "disc") Long appId,
                              NewThreadViewModel newThreadViewModel,
                              Model model) {
@@ -395,7 +394,7 @@ public class DiscAppController {
         return new ModelAndView("indices/previewThread", "model", model);
     }
 
-    @PostMapping("/postThread")
+    @PostMapping(POST_THREAD)
     public ModelAndView postNewThread(@RequestParam(name = "disc") Long appId,
                                       @ModelAttribute NewThreadViewModel newThreadViewModel,
                                       ThreadViewModel threadViewModel,

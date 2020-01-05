@@ -20,11 +20,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static io.github.shamrice.discapp.web.define.url.WidgetUrl.WIDGET_VIEW_URL;
+
 @Controller
 @Slf4j
 public class WidgetController {
-
-    public static final String CONTROLLER_URL_DIRECTORY = "/widget/";
 
     @Autowired
     private ConfigurationService configurationService;
@@ -32,7 +32,7 @@ public class WidgetController {
     @Autowired
     private ThreadService threadService;
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-widget.cgi")
+    @GetMapping(WIDGET_VIEW_URL)
     public ModelAndView getWidgetView(@RequestParam(name = "disc") long appId,
                                       WidgetViewModel widgetViewModel,
                                       Model model) {
