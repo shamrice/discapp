@@ -78,7 +78,7 @@ public class UserReadThreadService {
 
         String userReadThreads = userReadThread.getReadThreads();
 
-        if (csvContainsThreadId(userReadThreads, threadIdStr)) {
+        if (csvContainsThreadId(userReadThreads.split(","), threadIdStr)) {
             log.info("Thread: " + threadIdStr + " for user: " + discappUserId + " and application: "
                     + applicationId + " already marked as read. Nothing to do.");
         } else {
@@ -91,12 +91,12 @@ public class UserReadThreadService {
         }
     }
 
-    public String getReadThreadsCsv(long applicationId, long discappUserId) {
+    public String[] getReadThreadsCsv(long applicationId, long discappUserId) {
         UserReadThread readThreads = userReadThreadRepository.findOneByApplicationIdAndDiscappUserId(applicationId, discappUserId);
         if (readThreads != null && readThreads.getReadThreads() != null) {
-            return readThreads.getReadThreads();
+            return readThreads.getReadThreads().split(",");
         }
-        return "";
+        return null;
     }
 
     public boolean isThreadRead(long applicationId, long discappUserId, long threadId) {
@@ -108,24 +108,26 @@ public class UserReadThreadService {
             return false;
         }
 
-        return csvContainsThreadId(userReadThread.getReadThreads(), String.valueOf(threadId));
+        if (userReadThread.getReadThreads() != null) {
+            return csvContainsThreadId(userReadThread.getReadThreads().split(","), String.valueOf(threadId));
+        }
+        return false;
     }
 
-    public boolean csvContainsThreadId(String readThreadsCsv, Long threadId) {
+    public boolean csvContainsThreadId(String[] readThreadsCsv, Long threadId) {
         if (threadId == null) {
             return false;
         }
         return csvContainsThreadId(readThreadsCsv, String.valueOf(threadId));
     }
 
-    public boolean csvContainsThreadId(String readThreadsCsv, String threadId) {
+    public boolean csvContainsThreadId(String[] readThreadsCsv, String threadId) {
 
-        if (threadId == null || threadId.isEmpty() || readThreadsCsv == null || readThreadsCsv.isEmpty()) {
+        if (threadId == null || threadId.isEmpty() || readThreadsCsv == null || readThreadsCsv.length == 0) {
             return false;
         }
 
-        String[] readThreads = readThreadsCsv.split(",");
-        for (String readThread : readThreads) {
+        for (String readThread : readThreadsCsv) {
             if (threadId.equals(readThread)) {
                 log.debug("Thread id: " + threadId + " found in read threads list provided.");
                 return true;

@@ -157,7 +157,7 @@ public class DiscAppController {
                 }
 
                 //get read threads if user is logged in.
-                String readThreadsCsv = "";
+                String[] readThreadsCsv = null;
                 Long userId = accountHelper.getLoggedInDiscAppUserId();
                 if (userId != null) {
                     readThreadsCsv = userReadThreadService.getReadThreadsCsv(appId, userId);
@@ -613,7 +613,7 @@ public class DiscAppController {
         Thread currentThread = threadService.getThread(appId, threadId);
         if (currentThread != null && currentThread.isApproved()) {
 
-            String readThreadsCsv = "";
+            String[] readThreadsCsv = null;
 
             //mark thread as read if user is logged in.
             Long userId = accountHelper.getLoggedInDiscAppUserId();
@@ -838,7 +838,7 @@ public class DiscAppController {
     }
 
     private String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString,
-                                           boolean showPreviewText, int currentPage, int maxPreviewLength, String readThreads) {
+                                           boolean showPreviewText, int currentPage, int maxPreviewLength, String[] readThreads) {
 
         String messageDivText = "first_message_div";
         String messageHeaderText = "first_message_header";
@@ -910,7 +910,7 @@ public class DiscAppController {
     private String getAppViewThreadHtml(ThreadTreeNode currentNode, String currentHtml, String entryBreakString,
                                         boolean skipCurrentNode, long currentlyViewedId,
                                         boolean showPreviewText, int currentPage, int maxPreviewLength,
-                                        int currentThreadDepth, int maxThreadDepth, String readThreads) {
+                                        int currentThreadDepth, int maxThreadDepth, String[] readThreads) {
 
         if (!skipCurrentNode) {
 
@@ -1025,7 +1025,7 @@ public class DiscAppController {
      * @return Returns formatted HTML block for reply threads.
      */
     private String getThreadViewThreadHtml(Thread currentThread, int currentPage, int maxPreviewLength,
-                                           int maxThreadDepth, String readThreads) {
+                                           int maxThreadDepth, String[] readThreads) {
 
         //default reply thread values
         boolean skipCurrent = true;
