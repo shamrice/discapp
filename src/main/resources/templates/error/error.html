@@ -17,8 +17,9 @@
     <div th:text="${errorText}"></div>
     <br/>
 
-    <form>
-        <input class="button" type="button" value="Click here to return to previous page" onclick="history.back()">
+    <form method="post" action="/error">
+        <input class="button" type="button" value="Click here to return to previous page" onclick="history.back()"/>
+        <input class="button" type="submit" name="returnToHomePage" value="Click here to return to the home page" />
     </form>
 
 </div>
