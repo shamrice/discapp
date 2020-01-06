@@ -3,7 +3,9 @@ package io.github.shamrice.discapp.web.configuration;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.filter.DiscAppIpBlockFilter;
 import io.github.shamrice.discapp.web.filter.MaintenancePermissionFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,10 +18,14 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
+@Slf4j
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
+
+    @Value("${discapp.security.bcrypt.strength:15}")
+    private int bcryptStrength;
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
@@ -73,8 +79,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+        if (bcryptStrength == 15) {
+            log.info("Using default bcrypt strength value.");
+        } else {
+            log.info("Using custom bcrypt strength value.");
+        }
+
         auth.userDetailsService(discAppUserDetailsService)
-                .passwordEncoder(new BCryptPasswordEncoder(15));
+                .passwordEncoder(new BCryptPasswordEncoder(bcryptStrength));
     }
 
     @Bean

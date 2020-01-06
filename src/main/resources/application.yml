@@ -75,3 +75,6 @@ discapp:
     email: ${ROOT_EMAIL_ADDRESS}
   cache:
     duration: ${CACHE_DURATION}
+  security:
+    bcrypt:
+      strength: ${BCRYPT_STRENGTH}

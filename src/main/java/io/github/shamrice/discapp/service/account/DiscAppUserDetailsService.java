@@ -192,6 +192,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                             ConfigurationProperty.LOGIN_LOCK_DURATION_FAILED_AUTH,
                             300000);
 
+                    //todo : send this to email queue
                     Date lockedUntilDate = new Date(new Date().getTime() + lockDurationMills);
                     log.warn("User: " + email + " has passed maximum login attempts before account lock. Locking account until: " + lockedUntilDate.toString());
 
