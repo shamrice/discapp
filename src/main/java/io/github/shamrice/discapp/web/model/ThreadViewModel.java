@@ -27,6 +27,7 @@ public class ThreadViewModel {
     private boolean showEmail;
     private boolean isShowIpAddress;
     private boolean isRead;
+    private boolean isHighlighted;
     private Integer currentPage;
 
 }

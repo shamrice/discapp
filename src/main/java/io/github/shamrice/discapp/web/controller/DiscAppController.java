@@ -205,6 +205,7 @@ public class DiscAppController {
                         threadViewModel.setCreateDt(getAdjustedDateStringForConfiguredTimeZone(appId, threadTreeNode.getCurrent().getCreateDt(), false));
                         threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
                         threadViewModel.setShowMoreOnPreviewText(false);
+                        threadViewModel.setHighlighted(isNewMessageHighlighted(threadTreeNode));
 
                         //mark thread as read or not.
                         threadViewModel.setRead(userReadThreadService.csvContainsThreadId(readThreadsCsv, threadTreeNode.getCurrent().getId()));

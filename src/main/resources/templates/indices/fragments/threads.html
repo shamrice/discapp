@@ -31,7 +31,11 @@
                            th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}&amp;page=${currentPage}|}"
                            th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
 
-                        <a th:unless="${thread.isRead()}" class="article_link"
+                        <a th:if="${!thread.isRead() && !thread.isHighlighted()}" class="article_link"
+                           th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}&amp;page=${currentPage}|}"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+
+                        <a th:if="${!thread.isRead() && thread.isHighlighted()}" class="article_link new_message"
                            th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}&amp;page=${currentPage}|}"
                            th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
                     </td>
