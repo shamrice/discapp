@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.model;
+package io.github.shamrice.discapp.web.model.account;
 
 import io.github.shamrice.discapp.data.model.Application;
 import lombok.*;

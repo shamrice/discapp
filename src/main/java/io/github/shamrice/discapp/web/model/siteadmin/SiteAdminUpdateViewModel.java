@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.model;
+package io.github.shamrice.discapp.web.model.siteadmin;
 
 import io.github.shamrice.discapp.data.model.SiteUpdateLog;
 import lombok.Getter;

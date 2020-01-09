@@ -4,7 +4,7 @@ import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
-import io.github.shamrice.discapp.web.model.WidgetViewModel;
+import io.github.shamrice.discapp.web.model.widget.WidgetViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.model;
+package io.github.shamrice.discapp.web.model.applicationsubscription;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

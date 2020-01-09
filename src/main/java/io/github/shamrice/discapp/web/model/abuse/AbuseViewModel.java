@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.model;
+package io.github.shamrice.discapp.web.model.abuse;
 
 import io.github.shamrice.discapp.data.model.ReportedAbuse;
 import lombok.*;

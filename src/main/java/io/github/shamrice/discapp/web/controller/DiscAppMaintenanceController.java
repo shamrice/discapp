@@ -19,7 +19,7 @@ import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.define.url.WidgetUrl;
-import io.github.shamrice.discapp.web.model.*;
+import io.github.shamrice.discapp.web.model.maintenance.*;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.*;
-import static io.github.shamrice.discapp.web.model.MaintenanceMailingListViewModel.*;
+import static io.github.shamrice.discapp.web.model.maintenance.MaintenanceMailingListViewModel.*;
 
 @Controller
 @Slf4j

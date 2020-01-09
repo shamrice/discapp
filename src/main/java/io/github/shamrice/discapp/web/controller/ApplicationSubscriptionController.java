@@ -6,7 +6,7 @@ import io.github.shamrice.discapp.service.application.ApplicationSubscriptionSer
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
-import io.github.shamrice.discapp.web.model.ApplicationSubscriptionModel;
+import io.github.shamrice.discapp.web.model.applicationsubscription.ApplicationSubscriptionModel;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

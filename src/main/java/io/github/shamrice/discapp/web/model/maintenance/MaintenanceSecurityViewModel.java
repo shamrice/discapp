@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.model;
+package io.github.shamrice.discapp.web.model.maintenance;
 
 import io.github.shamrice.discapp.data.model.UserPermission;
 import lombok.Getter;

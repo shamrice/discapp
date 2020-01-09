@@ -9,7 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.UserReadThreadService;
-import io.github.shamrice.discapp.web.model.AccountViewModel;
+import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
