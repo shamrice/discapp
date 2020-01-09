@@ -55,6 +55,13 @@ public class AccountHelper {
                 return applicationPermission.getUnregisteredUserPermissions().contains(permissionRequired);
             }
         }
+
+        //if permissions don't exist and checking for hold permissions, return false so threads do not need approval.
+        if (io.github.shamrice.discapp.service.application.permission.UserPermission.HOLD.equalsIgnoreCase(permissionRequired)) {
+            log.warn("User permissions are null when attempting to check if user has hold permissions. Defaulting permission to false.");
+            return false;
+        }
+
         //return false that user has NONE permission if permissions are not set.
         //default to true if app permissions aren't set for other permissions.
         return !permissionRequired.equalsIgnoreCase(io.github.shamrice.discapp.service.application.permission.UserPermission.NONE);
