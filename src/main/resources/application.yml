@@ -25,15 +25,15 @@ spring:
 
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: ${MAX_DB_CONNECTION_POOL_SIZE}
       idle-timeout: 1000
       pool-name: discapp_pool
 
     url: jdbc:postgresql://localhost:5432/discapp
     username: postgres
     password: password
-    maxActive: 10
-    maxIdle: 5
+    maxActive: ${MAX_DB_ACTIVE_CONNECTIONS}
+    maxIdle: ${MAX_DB_IDLE_CONNECTIONS}
     removeAbandoned: true
 
   #  testWhileIdle: true
