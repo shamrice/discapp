@@ -132,6 +132,8 @@ public class AbuseController {
                             if (appId != null) {
                                 appIdVal = appId.toString();
                             }
+
+                            //TODO : store these strings somewhere.
                             deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
                                     + "&discId=" + appIdVal
                                     + "&submitter=" + abuseViewModel.getSubmitter()
