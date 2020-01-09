@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.controller;
+package io.github.shamrice.discapp.web.controller.authentication;
 
 import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;

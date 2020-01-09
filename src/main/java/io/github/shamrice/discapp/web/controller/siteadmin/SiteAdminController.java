@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.controller;
+package io.github.shamrice.discapp.web.controller.siteadmin;
 
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;

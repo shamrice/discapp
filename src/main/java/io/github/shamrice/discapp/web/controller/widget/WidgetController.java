@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.controller;
+package io.github.shamrice.discapp.web.controller.widget;
 
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;

@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.controller;
+package io.github.shamrice.discapp.web.controller.abuse;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;

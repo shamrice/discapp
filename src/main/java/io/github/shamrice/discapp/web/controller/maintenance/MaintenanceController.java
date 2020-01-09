@@ -13,7 +13,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.storage.FileSystemStorageService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
-import io.github.shamrice.discapp.web.controller.DiscAppController;
+import io.github.shamrice.discapp.web.controller.application.DiscAppController;
 import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.InputHelper;

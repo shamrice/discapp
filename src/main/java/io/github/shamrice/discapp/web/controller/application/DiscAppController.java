@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.web.controller;
+package io.github.shamrice.discapp.web.controller.application;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.ApplicationPermission;
@@ -18,6 +18,7 @@ import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.service.thread.UserReadThreadService;
 import io.github.shamrice.discapp.service.utility.ReplyNotification;
 import io.github.shamrice.discapp.service.utility.ReplyNotificationUtilityService;
+import io.github.shamrice.discapp.web.controller.ErrorController;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.discapp.NewThreadViewModel;
 import io.github.shamrice.discapp.web.model.discapp.ThreadViewModel;
