@@ -64,8 +64,8 @@ server:
   servlet:
     session:
       cookie:
-        max-age: 14d
-      timeout: 1d
+        max-age: ${COOKIE_MAX_AGE}
+      timeout: ${SESSION_TIME_OUT}
 
 discapp:
   notifier:
