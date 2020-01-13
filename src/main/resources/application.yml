@@ -68,6 +68,9 @@ server:
       timeout: ${SESSION_TIME_OUT}
 
 discapp:
+  auth.remember-me:
+    key: ${REMEMBER_ME_PRIVATE_KEY}
+    token.duration: ${REMEMBER_ME_TOKEN_DURATION}
   notifier:
     url: ${NOTIFIER_URL}
     send-hour: ${NOTIFIER_SEND_HOUR}

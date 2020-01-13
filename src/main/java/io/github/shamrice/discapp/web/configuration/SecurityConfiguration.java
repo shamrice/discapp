@@ -2,7 +2,6 @@ package io.github.shamrice.discapp.web.configuration;
 
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.filter.DiscAppIpBlockFilter;
-import io.github.shamrice.discapp.web.filter.MaintenancePermissionFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +15,10 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @Slf4j
@@ -24,11 +27,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
 
+    @Autowired
+    private DataSource dataSource;
+
+    @Value("${discapp.auth.remember-me.key:nediscapp_remember_me}")
+    private String rememberMeKey;
+
+    @Value("${discapp.auth.remember-me.token.duration:2592000}")
+    private int rememberMeTokenDuration;
+
     @Value("${discapp.security.bcrypt.strength:15}")
     private int bcryptStrength;
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
+
+        log.info("Using remember me key: " + rememberMeKey + " and duration of: " + rememberMeTokenDuration);
 
         //TODO : see https://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/html5/#csrf-include-csrf-token-ajax
         //TODO : _csrf token is not getting passed in the search function. One option is to include it, one to switch
@@ -70,6 +84,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .successHandler(successHandler())
                     .failureHandler(failureHandler())
                     .and()
+                .rememberMe()
+                    .key(rememberMeKey)
+                    .tokenRepository(persistentTokenRepository())
+                    .rememberMeParameter("remember-me")
+                    .rememberMeCookieName("nediscapp-remember-me")
+                    .tokenValiditySeconds(rememberMeTokenDuration)
+                    .and()
                 .logout()
                     .logoutUrl("/logout")
                     .deleteCookies("JSESSIONID")
@@ -103,5 +124,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        return tokenRepository;
     }
 }
