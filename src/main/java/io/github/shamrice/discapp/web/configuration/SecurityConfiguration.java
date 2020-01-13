@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.configuration;
 
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
+import io.github.shamrice.discapp.service.account.UserPersistentLoginService;
 import io.github.shamrice.discapp.web.filter.DiscAppIpBlockFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
 
+    //@Autowired
+    //private DataSource dataSource;
+
     @Autowired
-    private DataSource dataSource;
+    private UserPersistentLoginService userPersistentLoginService;
 
     @Value("${discapp.auth.remember-me.key:nediscapp_remember_me}")
     private String rememberMeKey;
@@ -86,7 +90,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .and()
                 .rememberMe()
                     .key(rememberMeKey)
-                    .tokenRepository(persistentTokenRepository())
+                    .tokenRepository(userPersistentLoginService)
                     .rememberMeParameter("remember-me")
                     .rememberMeCookieName("nediscapp-remember-me")
                     .tokenValiditySeconds(rememberMeTokenDuration)
@@ -125,11 +129,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
     }
-
+/*
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
         tokenRepository.setDataSource(dataSource);
         return tokenRepository;
     }
+
+ */
 }
