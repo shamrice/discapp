@@ -289,7 +289,7 @@ public class DiscAppController {
 
         long parentId = 0L;
 
-        //if coming from view page
+        //if coming from thread view page
         if (threadViewModel != null && threadViewModel.getId() != null) {
             try {
                 parentId = Long.parseLong(threadViewModel.getId());
@@ -304,17 +304,22 @@ public class DiscAppController {
         }
 
         //if coming from preview page
-        if (newThreadViewModel != null) {
+        if (newThreadViewModel != null && newThreadViewModel.getParentId() != null) {
             model.addAttribute(SUBMITTER, newThreadViewModel.getSubmitter());
             model.addAttribute(SUBJECT, newThreadViewModel.getSubject());
             model.addAttribute(EMAIL, newThreadViewModel.getEmail());
             model.addAttribute(BODY, newThreadViewModel.getBody());
             model.addAttribute(SHOW_EMAIL, newThreadViewModel.isShowEmail());
+            model.addAttribute(POST_CODE, newThreadViewModel.getPostCode());
             model.addAttribute(PARENT_THREAD_SUBMITTER, newThreadViewModel.getParentThreadSubmitter());
             model.addAttribute(PARENT_THREAD_SUBJECT, newThreadViewModel.getParentThreadSubject());
             model.addAttribute(PARENT_THREAD_BODY, newThreadViewModel.getParentThreadBody());
             model.addAttribute(CURRENT_PAGE, newThreadViewModel.getCurrentPage());
-            model.addAttribute(SUBSCRIBE, newThreadViewModel.getSubscribe());
+
+            //preview always returns empty string if checkbox was not previously selected. update accordingly.
+            if (newThreadViewModel.getSubscribe() != null && !newThreadViewModel.getSubscribe().trim().isEmpty()) {
+                model.addAttribute(SUBSCRIBE, newThreadViewModel.getSubscribe());
+            }
 
             if (newThreadViewModel.getErrorMessage() != null) {
                 model.addAttribute(ERROR_MESSAGE, newThreadViewModel.getErrorMessage());
@@ -329,6 +334,12 @@ public class DiscAppController {
                             + " : attempted parentId: " + newThreadViewModel.getParentId());
                 }
             }
+        } else {
+            //if coming from app view post new thread or thread view post reply.
+
+            //generate new post code
+            String postCode = threadService.generatePostCode(appId);
+            model.addAttribute(POST_CODE, postCode);
         }
 
         //pre-fill form with user info if they are logged in
@@ -446,6 +457,13 @@ public class DiscAppController {
                     log.error("Cannot create thread so soon after creating previous thread. Returning user to page with error.");
                     //TODO : centralise error messages.
                     newThreadViewModel.setErrorMessage("New message too soon after previous post. Please try again.");
+                    return createNewThread(appId, null, newThreadViewModel, response, model);
+                }
+
+                //redeem post code.
+                if (!threadService.redeemPostCode(appId, newThreadViewModel.getPostCode())) {
+                    log.error("Invalid post code attempted to be redeemed for appId: " + appId + " :: postcode: " + newThreadViewModel.getPostCode());
+                    newThreadViewModel.setErrorMessage("You have already posted this message.");
                     return createNewThread(appId, null, newThreadViewModel, response, model);
                 }
 
