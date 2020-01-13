@@ -159,3 +159,24 @@ ON discapp_user(id);
 
 CREATE INDEX idx_discapp_user_email
 ON discapp_user(email);
+
+
+-- STORED PROC
+
+--stored proc to remove old unique ip records from db.
+CREATE FUNCTION delete_old_unique_ips() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    DELETE FROM stats_unique_ips WHERE create_dt < NOW() - INTERVAL '90 days';
+    RETURN NULL;
+END;
+$$;
+
+-- TRIGGERS
+
+--trigger to delete old unique ip records on stat insert
+CREATE TRIGGER trigger_delete_old_unique_ips
+    AFTER INSERT ON stats_unique_ips
+    EXECUTE PROCEDURE delete_old_unique_ips();
+
