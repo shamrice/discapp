@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @Slf4j
@@ -47,13 +46,26 @@ public class StatsMaintenanceController extends MaintenanceController {
                 numDays = pastMonthStats.size();
             }
 
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -90);
+            Date maxStatAge = calendar.getTime();
+
             List<MaintenanceStatsViewModel.StatView> statViews = new ArrayList<>();
+
             for (Stats dayStat : pastMonthStats) {
+
+                boolean isUniqueIpAvailable = true;
+                if (dayStat.getCreateDt().before(maxStatAge)) {
+                    maintenanceStatsViewModel.setUnavailableStatsPresent(true);
+                    isUniqueIpAvailable = false;
+                }
+
                 MaintenanceStatsViewModel.StatView statView = new MaintenanceStatsViewModel.StatView(
                         dayStat.getStatDate(),
                         dayStat.getId(),
                         dayStat.getUniqueIps(),
-                        dayStat.getPageViews()
+                        dayStat.getPageViews(),
+                        isUniqueIpAvailable
                 );
                 statViews.add(statView);
 

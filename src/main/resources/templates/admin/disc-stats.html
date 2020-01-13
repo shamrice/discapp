@@ -61,10 +61,13 @@
             th:each="statView : ${maintenanceStatsViewModel.getStatViews()}">
 
             <td th:text="${statView.getDate()}"></td>
-            <td>
+
+            <td th:if="${statView.isUniqueIpsAvailable()}">
               <a th:href="@{|?id=${maintenanceStatsViewModel.getApplicationId()}&amp;selectedStatsId=${statView.getStatId()}#ip_results|}"
                  th:text="${statView.getUniqueIps()}"></a>
             </td>
+            <td th:unless="${statView.isUniqueIpsAvailable()}" th:text="${statView.getUniqueIps()}"></td>
+
             <td th:text="${statView.getPageViews()}"></td>
             <td th:text="${statView.getPagesPerIp()}"></td>
         </tr>
@@ -82,6 +85,9 @@
         </tr>
     </table>
 
+    <div th:if="${maintenanceStatsViewModel.isUnavailableStatsPresent()}" style="text-align:center;">
+        <i>Note: Unique IPs are not available for stats older than 90 days.</i>
+    </div>
 
     <div id="ip_results" th:if="${maintenanceStatsViewModel.getSelectedStatId()}">
 

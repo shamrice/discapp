@@ -18,6 +18,7 @@ public class MaintenanceStatsViewModel {
         private @NonNull long statId;
         private @NonNull long uniqueIps;
         private @NonNull long pageViews;
+        private @NonNull boolean isUniqueIpsAvailable;
 
         public float getPagesPerIp() {
             if (uniqueIps != 0) {
@@ -38,5 +39,6 @@ public class MaintenanceStatsViewModel {
     private String selectedDate;
     private String whoIsUrl;
     private List<StatsUniqueIps> uniqueIps;
+    private boolean isUnavailableStatsPresent = false;
 
 }
