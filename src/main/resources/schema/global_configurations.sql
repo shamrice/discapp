@@ -173,10 +173,26 @@ BEGIN
 END;
 $$;
 
+--stored proc to remove old post code records from db.
+CREATE FUNCTION delete_old_thread_post_codes() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    DELETE FROM thread_post_code WHERE create_dt < NOW() - INTERVAL '1 days';
+    RETURN NULL;
+END;
+$$;
+
+
 -- TRIGGERS
 
 --trigger to delete old unique ip records on stat insert
 CREATE TRIGGER trigger_delete_old_unique_ips
     AFTER INSERT ON stats_unique_ips
     EXECUTE PROCEDURE delete_old_unique_ips();
+
+--trigger to delete old post code records on post code insert
+CREATE TRIGGER trigger_delete_old_thread_post_codes
+    AFTER INSERT ON thread_post_code
+    EXECUTE PROCEDURE delete_old_thread_post_codes();
 
