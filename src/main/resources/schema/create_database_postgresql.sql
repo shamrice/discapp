@@ -281,6 +281,13 @@ CREATE TABLE persistent_logins (
     last_used timestamp not null
 );
 
+CREATE TABLE thread_post_code (
+    post_code VARCHAR(255) NOT NULL,
+    application_id INT NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (post_code)
+);
+
 commit;
 
 

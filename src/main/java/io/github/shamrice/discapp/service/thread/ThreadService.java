@@ -1,11 +1,10 @@
 package io.github.shamrice.discapp.service.thread;
 
-import io.github.shamrice.discapp.data.model.ApplicationPermission;
-import io.github.shamrice.discapp.data.model.ReportedAbuse;
+import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
-import io.github.shamrice.discapp.data.model.ThreadBody;
 import io.github.shamrice.discapp.data.repository.ReportedAbuseRepository;
 import io.github.shamrice.discapp.data.repository.ThreadBodyRepository;
+import io.github.shamrice.discapp.data.repository.ThreadPostCodeRepository;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
@@ -36,10 +35,57 @@ public class ThreadService {
     private ReportedAbuseRepository reportedAbuseRepository;
 
     @Autowired
+    private ThreadPostCodeRepository threadPostCodeRepository;
+
+    @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
     private ApplicationService applicationService;
+
+    /**
+     * Generates a new post code and persists it in the database to be claimed later on post
+     * @param applicationId application id to create post code for
+     * @return the generated post code
+     */
+    public String generatePostCode(long applicationId) {
+        UUID newPostCode = UUID.randomUUID();
+
+        ThreadPostCode threadPostCode = new ThreadPostCode();
+        threadPostCode.setPostCode(newPostCode.toString());
+        threadPostCode.setApplicationId(applicationId);
+        threadPostCode.setCreateDt(new Date());
+
+        threadPostCodeRepository.save(threadPostCode);
+
+        log.info("Generated new post code: " + threadPostCode.toString());
+
+        return threadPostCode.getPostCode();
+    }
+
+    /**
+     * Redeems post code and returns true if success, otherwise returns failure.
+     * @param applicationId application id post code is owned by
+     * @param postCode post code to redeem
+     * @return returns true if post code is valid, otherwise returns false.
+     */
+    public boolean redeemPostCode(long applicationId, String postCode) {
+
+        if (postCode == null || postCode.trim().isEmpty()) {
+            log.warn("Cannot redeem null or empty post code.");
+            return false;
+        }
+
+        ThreadPostCode threadPostCode = threadPostCodeRepository.findById(postCode).orElse(null);
+        if (threadPostCode != null && threadPostCode.getApplicationId() != null && threadPostCode.getApplicationId().equals(applicationId)) {
+            log.info("Successfully redeemed post code: " + threadPostCode.toString() + " :: deleting entry and returning true.");
+            threadPostCodeRepository.delete(threadPostCode);
+            return true;
+        }
+        log.warn("Invalid or already redeemed post code attempted for appId: " + applicationId + " : postCode: "
+                + postCode + " :: returning false");
+        return false;
+    }
 
     public List<Thread> getAllDeletedThreads() {
         return threadRepository.findByDeletedOrderByCreateDtDesc(true);

@@ -56,6 +56,7 @@
                     <input type="hidden" name="parentThreadBody" th:value="${newThreadViewModel.getParentThreadBody()}"/>
                     <input type="hidden" name="currentPage" th:value="${newThreadViewModel.getCurrentPage()}"/>
                     <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}" />
+                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}" />
 
                     <input type="submit" name="editMessage" th:value="${editButtonText}" class="button" id="editMessage" style="float:left;" />
 
@@ -74,6 +75,7 @@
                     <input type="hidden" name="showEmail" th:value="${newThreadViewModel.isShowEmail()}"/>
                     <input type="hidden" name="currentPage" th:value="${newThreadViewModel.getCurrentPage()}"/>
                     <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}" />
+                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}" />
 
                     <input type="submit" name="submitNewThread" th:value="${postButtonText}" class="button" id="submitNewThread"
                            style="float:left;"/>

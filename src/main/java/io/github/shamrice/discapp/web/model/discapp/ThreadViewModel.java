@@ -29,5 +29,6 @@ public class ThreadViewModel {
     private boolean isRead;
     private boolean isHighlighted;
     private Integer currentPage;
+    //private String postCode;
 
 }

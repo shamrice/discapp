@@ -28,5 +28,6 @@ public class NewThreadViewModel {
     private Integer currentPage;
     private String errorMessage;
     private String subscribe;
+    private String postCode;
 
 }
