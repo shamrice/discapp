@@ -48,7 +48,6 @@ public class AccountViewModel {
 
     private String ownerFirstName;
     private String ownerLastName;
-    private String ownerPhone;
     private String ownerEmail;
     private Long applicationId;
     private String applicationName;

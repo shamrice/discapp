@@ -30,7 +30,7 @@ public class AccountService {
     private PasswordResetRepository passwordResetRepository;
 
     private static final String PASSWORD_RESET_URL = "PASSWORD_RESET_URL";
-    private static final String PASSWORD_RESET_CODE= "PASSWORD_RESET_CODE";
+    private static final String PASSWORD_RESET_CODE = "PASSWORD_RESET_CODE";
 
     public List<Owner> listOwners() {
         return ownerRepository.findAll();
@@ -38,8 +38,7 @@ public class AccountService {
 
     public Owner saveOwner(Owner owner) {
         if (owner != null) {
-            log.info("Saving owner " + owner.getFirstName() + " " + owner.getLastName()
-                    + " : email: " + owner.getEmail() + " : phone: " + owner.getPhone());
+            log.info("Saving owner " + owner.toString());
             if (owner.getCreateDt() == null) {
                 owner.setCreateDt(new Date());
             }

@@ -28,7 +28,6 @@ CREATE TABLE owner (
     id serial NOT NULL,
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
-    phone varchar(50),
     email varchar(255) UNIQUE NOT NULL,
     enabled BOOL NOT NULL DEFAULT false,
     create_dt TIMESTAMP DEFAULT NOW(),

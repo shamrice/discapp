@@ -21,7 +21,6 @@ public class Owner {
 
     private String firstName;
     private String lastName;
-    private String phone;
     private String email;
     private Boolean enabled;
     private Date createDt;

@@ -58,7 +58,6 @@ public class AccountApplicationController extends AccountController {
                     accountViewModel.setOwnerFirstName(owner.getFirstName());
                     accountViewModel.setOwnerLastName(owner.getLastName());
                     accountViewModel.setOwnerEmail(owner.getEmail());
-                    accountViewModel.setOwnerPhone(owner.getPhone());
 
                     //get list of applications for an account.
                     List<Application> apps = applicationService.getByOwnerId(owner.getId());
@@ -185,7 +184,6 @@ public class AccountApplicationController extends AccountController {
                     accountViewModel.setOwnerFirstName(owner.getFirstName());
                     accountViewModel.setOwnerLastName(owner.getLastName());
                     accountViewModel.setOwnerEmail(owner.getEmail());
-                    accountViewModel.setOwnerPhone(owner.getPhone());
 
                     List<Application> apps = applicationService.getByOwnerId(owner.getId());
                     int appLimit = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1);
@@ -240,7 +238,6 @@ public class AccountApplicationController extends AccountController {
 
                         String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
                         String ownerLastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
-                        String ownerPhone = inputHelper.sanitizeInput(accountViewModel.getOwnerPhone());
                         String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
 
@@ -267,7 +264,6 @@ public class AccountApplicationController extends AccountController {
                             owner.setFirstName(ownerFirstName);
                             owner.setLastName(ownerLastName);
                             owner.setEmail(user.getEmail()); //use same user email
-                            owner.setPhone(ownerPhone);
                             owner.setEnabled(true);
                             owner.setCreateDt(new Date());
                             owner.setModDt(new Date());

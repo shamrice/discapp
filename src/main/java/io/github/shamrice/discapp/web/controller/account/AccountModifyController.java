@@ -51,7 +51,6 @@ public class AccountModifyController extends AccountController {
                     accountViewModel.setOwnerFirstName(owner.getFirstName());
                     accountViewModel.setOwnerLastName(owner.getLastName());
                     accountViewModel.setOwnerEmail(owner.getEmail());
-                    accountViewModel.setOwnerPhone(owner.getPhone());
                 }
             }
 
@@ -239,11 +238,9 @@ public class AccountModifyController extends AccountController {
 
                         String firstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
                         String lastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
-                        String phone = inputHelper.sanitizeInput(accountViewModel.getOwnerPhone());
 
                         owner.setFirstName(firstName);
                         owner.setLastName(lastName);
-                        owner.setPhone(phone);
                         owner.setModDt(new Date());
 
                         if (accountService.saveOwner(owner) != null) {

@@ -27,8 +27,6 @@
                    th:value="${accountViewModel.getOwnerFirstName()}"/>
             <input type="hidden" id="existingOwnerLastName" name="ownerLastName"
                    th:value="${accountViewModel.getOwnerLastName()}"/>
-            <input type="hidden" id="existingOwnerPhone" name="ownerPhone"
-                   th:value="${accountViewModel.getOwnerPhone()}"/>
         </span>
 
         <table>
@@ -76,15 +74,6 @@
                 <td>
                     <input class="button" type="text" id="ownerLastName" name="ownerLastName"
                            th:value="${accountViewModel.getOwnerLastName()}"/>
-                </td>
-            </tr>
-            <tr th:unless="${accountViewModel.isOwner()}">
-                <td>
-                    <label>Phone Number:</label>
-                </td>
-                <td>
-                    <input class="button" type="text" id="ownerPhone" name="ownerPhone"
-                           th:value="${accountViewModel.getOwnerPhone()}" maxlength="50"/>
                 </td>
             </tr>
             <tr>

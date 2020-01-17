@@ -24,7 +24,6 @@ CREATE TABLE owner (
     id int(20) NOT NULL AUTO_INCREMENT,
     first_name varchar(255) NOT NULL,
     last_name varchar(255) NOT NULL,
-    phone varchar(50),
     email varchar(255) UNIQUE NOT NULL,
     enabled BOOL DEFAULT false,
     create_dt TIMESTAMP DEFAULT NOW(),
