@@ -15,11 +15,34 @@ VALUES (0, 'email.passwordreset.message',
 'Please use the following URL to reset the password for your account: PASSWORD_RESET_URL \r\n \r\n Your password reset code is: PASSWORD_RESET_CODE');
 
 INSERT INTO configuration (application_id, name, value)
-VALUES (0, 'email.newaccount.subject', 'DiscApp: New Account Creation Request');
+VALUES (0, 'email.newaccount.subject', 'DiscApp: New Account Registration');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.newaccount.message',
-'A new account creation request has been created for the email address: NEW_ACCOUNT_EMAIL \r\n \r\n If this account is valid, please approve and send approval message.');
+'
+This email has been sent from SITE_URL
+
+You have received this email because this email address
+was used during registration for our forums.
+If you did not register at our forums, please disregard this
+email. You do not need to unsubscribe or take any further action.
+
+------------------------------------------------
+Activation Instructions
+------------------------------------------------
+
+Thank you for registering.
+We require that you "validate" your registration to ensure that
+the email address you entered was correct. This protects against
+unwanted spam and malicious abuse.
+
+To activate your account, simply click on the following link:
+
+USER_REGISTRATION_URL
+
+(Some email client users may need to copy and paste the link into your web
+browser).
+');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.accountlocked.subject', 'DiscApp: User Account Locked Due To Invalid Password Attempts');

@@ -321,7 +321,7 @@ public class AccountApplicationController extends AccountController {
                                 newAdminAccount.setIsUserAccount(false);
 
                                 //save new user and don't create email notification as account is active from the get go.
-                                if (!discAppUserDetailsService.saveDiscAppUser(newAdminAccount, false)) {
+                                if (!discAppUserDetailsService.saveDiscAppUser(newAdminAccount)) {
                                     log.error("Failed to create new admin user for new disc app: " + savedApp.getId());
                                 }
 

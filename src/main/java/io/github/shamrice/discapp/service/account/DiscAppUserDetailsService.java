@@ -1,7 +1,9 @@
 package io.github.shamrice.discapp.service.account;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.data.model.UserRegistration;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
+import io.github.shamrice.discapp.data.repository.UserRegistrationRepository;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_USER_REGISTRATION;
+
 @Service
 @Slf4j
 public class DiscAppUserDetailsService implements UserDetailsService {
@@ -29,12 +33,16 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     private DiscAppUserRepository discappUserRepository;
 
     @Autowired
+    private UserRegistrationRepository userRegistrationRepository;
+
+    @Autowired
     private ConfigurationService configurationService;
 
     @Value("${discapp.root.email}")
     private String rootAccountEmail;
 
-    private final static String NEW_ACCOUNT_EMAIL = "NEW_ACCOUNT_EMAIL";
+    private final static String SITE_URL = "SITE_URL";
+    private final static String USER_REGISTRATION_URL = "USER_REGISTRATION_URL";
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -105,10 +113,6 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     }
 
     public boolean saveDiscAppUser(DiscAppUser user) {
-        return saveDiscAppUser(user, true);
-    }
-
-    public boolean saveDiscAppUser(DiscAppUser user, boolean sendNewUserEmailNotification) {
 
         if (user != null) {
 
@@ -128,6 +132,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                 user.setUsername(user.getUsername().trim());
                 user.setEmail(user.getEmail().trim());
                 user.setModDt(new Date());
+                user.setPasswordFailCount(0);
 
                 DiscAppUser createdUser = discappUserRepository.save(user);
                 if (createdUser != null && createdUser.getUsername().equalsIgnoreCase(user.getUsername())) {
@@ -140,11 +145,6 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                         configurationService.setDefaultUserConfigurationValuesForUser(createdUser.getId());
                     }
 
-                    //send email notification
-                    if (isNewUser && sendNewUserEmailNotification) {
-                        sendNewUserEmailNotification(createdUser.getEmail());
-                    }
-
                     return true;
                 }
             } catch (Exception ex) {
@@ -155,14 +155,13 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return false;
     }
 
-    public boolean setLastLoginDateToNow(long userId) {
+    public void setLastLoginDateToNow(long userId) {
         try {
             log.info("Setting last login date to now for userId: " + userId);
-            return discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, new Date(), 0) > 0;
+            discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, new Date(), 0);
         } catch (Exception ex) {
             log.error("Failed to set last log in date for userId: " + userId + " :: " + ex.getMessage(), ex);
         }
-        return false;
     }
 
     public void incrementPasswordLastFailCount(String email, String baseUrl) {
@@ -238,18 +237,52 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return discappUserRepository.updateDiscAppUserEnabled(userId, isEnabled, new Date()) > 0;
     }
 
-    private void sendNewUserEmailNotification(String newUserEmail) {
-        Map<String, Object> templateParams = new HashMap<>();
-        templateParams.put(NEW_ACCOUNT_EMAIL, newUserEmail);
+    public void createNewUserRegistrationRequest(String newUserEmail, String baseSiteUrl) {
 
-        String adminEmail = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
-        if (adminEmail == null) {
-            log.error("Could not find admin email address in configuration property: "
-                    + ConfigurationProperty.EMAIL_ADMIN_ADDRESS.getPropName() + " : new account email notification not sent.");
-            return;
+        String registrationKey = UUID.randomUUID().toString();
+
+        //check if they have an existing record, if so... refresh it otherwise create new.
+        UserRegistration newUserRegistration = userRegistrationRepository.findOneByEmail(newUserEmail);
+
+        if (newUserRegistration == null) {
+            newUserRegistration = new UserRegistration();
+            newUserRegistration.setEmail(newUserEmail);
+            newUserRegistration.setCreateDt(new Date());
         }
+        newUserRegistration.setRedeemed(false);
+        newUserRegistration.setRedeemDt(null);
+        newUserRegistration.setKey(registrationKey);
 
-        TemplateEmail newUserCreatedEmail = new TemplateEmail(adminEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams, false);
+        userRegistrationRepository.save(newUserRegistration);
+        log.info("Created new user registration record: " + newUserRegistration.toString());
+
+        Map<String, Object> templateParams = new HashMap<>();
+        templateParams.put(SITE_URL, baseSiteUrl);
+        templateParams.put(USER_REGISTRATION_URL, baseSiteUrl + ACCOUNT_USER_REGISTRATION + "?email=" + newUserEmail + "&key=" + registrationKey);
+
+        TemplateEmail newUserCreatedEmail = new TemplateEmail(newUserEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams, false);
         EmailNotificationQueueService.addTemplateEmailToSend(newUserCreatedEmail);
+    }
+
+    public boolean redeemNewUserRegistrationKey(String email, String registrationKey) {
+        UserRegistration userRegistration = userRegistrationRepository.findOneByEmailAndKey(email, registrationKey);
+        if (userRegistration != null) {
+            if (userRegistration.isRedeemed()) {
+                log.warn("User registration is already redeemed. Not redeeming again. Returning true");
+                return true;
+            }
+            DiscAppUser user = discappUserRepository.findByEmail(email);
+            if (user != null) {
+                if (updateDiscAppUserEnabled(user.getId(), true)) {
+                    userRegistration.setRedeemDt(new Date());
+                    userRegistration.setRedeemed(true);
+                    userRegistrationRepository.save(userRegistration);
+                    log.info("Successfully redeemed activation and enabled user: " + email);
+                    return true;
+                }
+            }
+        }
+        log.warn("Failed to activate user registration for email: " + email + " : key: " + registrationKey);
+        return false;
     }
 }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Create Account - User Registration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<div th:if="${success}"  class="grey_box" style="width:40em;">
+    <h1 class="alert-success" id="success_banner">Account Registration Success.</h1>
+    <h4>Your account registration and activation is complete. You can now log in.</h4>
+    <div>
+        <a href="/login">Click Here to Log In</a>
+    </div>
+</div>
+
+<div th:unless="${success}"  class="grey_box" style="width:40em;">
+    <h1 class="alert-error" id="banner">Account Registration Failed.</h1>
+    <h4>
+        An error occurred while attempting to activate your account. Please verify the registration key from your email
+        and try again. If error continues, please contact the site admin at the email address below.
+    </h4>
+    <div>
+        For help, please email: <a th:href="@{|mailto:${adminEmail}|}" th:text="${adminEmail}"></a>
+        <br />
+        <br />
+        <a href="/">Return to home page</a>
+    </div>
+</div>
+
+
+</body>
+</html>

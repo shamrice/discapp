@@ -19,6 +19,7 @@ public class AccountUrl {
 
     public static final String ACCOUNT_CREATE = CONTROLLER_DIRECTORY_URL + "create";
     public static final String ACCOUNT_CREATE_ACCOUNT_SUCCESS = CONTROLLER_DIRECTORY_URL + "createAccountSuccess";
+    public static final String ACCOUNT_USER_REGISTRATION = CONTROLLER_DIRECTORY_URL + "registration";
     public static final String ACCOUNT_DELETE = CONTROLLER_DIRECTORY_URL + "delete";
     public static final String ACCOUNT_DELETE_STATUS = ACCOUNT_DELETE + "/status";
     public static final String ACCOUNT_PASSWORD = CONTROLLER_DIRECTORY_URL + "password";

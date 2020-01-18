@@ -1,6 +1,8 @@
 package io.github.shamrice.discapp.web.controller.account;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -8,12 +10,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_CREATE;
-import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_CREATE_ACCOUNT_SUCCESS;
+import static io.github.shamrice.discapp.web.define.url.AccountUrl.*;
 
 @Controller
 @Slf4j
@@ -26,7 +29,7 @@ public class AccountCreateController extends AccountController {
     }
 
     @PostMapping(ACCOUNT_CREATE)
-    public ModelAndView postCreateAccount(@ModelAttribute AccountViewModel accountViewModel, ModelMap modelMap) {
+    public ModelAndView postCreateAccount(@ModelAttribute AccountViewModel accountViewModel, ModelMap modelMap, HttpServletRequest request) {
 
         if (accountViewModel != null) {
             log.info("Attempting to create new account with username: " + accountViewModel.getUsername());
@@ -82,6 +85,9 @@ public class AccountCreateController extends AccountController {
             newUser.setCreateDt(new Date());
 
             if (discAppUserDetailsService.saveDiscAppUser(newUser)) {
+
+                discAppUserDetailsService.createNewUserRegistrationRequest(newUser.getEmail(), webHelper.getBaseUrl(request));
+
                 log.info("Successfully created new user: " + newUser.getUsername() + " : email: " + newUser.getEmail());
                 return new ModelAndView("account/createAccountSuccess");
             } else {
@@ -100,5 +106,19 @@ public class AccountCreateController extends AccountController {
         return "account/createAccountSuccess";
     }
 
+    @GetMapping(ACCOUNT_USER_REGISTRATION)
+    public ModelAndView getUserRegistration(@RequestParam(name = "email") String email,
+                                            @RequestParam(name = "key") String registrationKey,
+                                            ModelMap modelMap) {
+
+        if (discAppUserDetailsService.redeemNewUserRegistrationKey(email, registrationKey)) {
+            modelMap.addAttribute("success", true);
+        } else {
+            modelMap.addAttribute("adminEmail", configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, ""));
+            modelMap.addAttribute("success", false);
+        }
+
+        return new ModelAndView("account/registration/redeem", "model", modelMap);
+    }
 
 }

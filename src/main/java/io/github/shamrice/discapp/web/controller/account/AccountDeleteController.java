@@ -60,6 +60,7 @@ public class AccountDeleteController extends AccountController {
                 }
 
                 //mark disc app account as disabled
+                //todo : this should also turn username and email into a UUID so email/username can be reused by someone else
                 if (discAppUserDetailsService.updateDiscAppUserEnabled(user.getId(), false)) {
                     log.info("Successfully disabled disc app user: " + user.toString());
                     modelMap.addAttribute("status", "User successfully deleted.");

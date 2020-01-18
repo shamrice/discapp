@@ -286,6 +286,18 @@ CREATE TABLE thread_post_code (
     PRIMARY KEY (post_code)
 );
 
+CREATE TABLE user_registration (
+  id serial NOT NULL,
+  email varchar(255) UNIQUE NOT NULL,
+  key varchar(64) NOT NULL,
+  is_redeemed boolean NOT NULL DEFAULT false,
+  create_dt TIMESTAMP DEFAULT NOW(),
+  redeem_dt TIMESTAMP NULL,
+  PRIMARY KEY (id)
+);
+
+
+
 commit;
 
 
