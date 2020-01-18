@@ -2,12 +2,10 @@ package io.github.shamrice.discapp.service.application;
 
 import io.github.shamrice.discapp.data.model.ApplicationSubscription;
 import io.github.shamrice.discapp.data.repository.ApplicationSubscriptionRepository;
-import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
-import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
-import io.github.shamrice.discapp.service.utility.ReplyNotification;
-import io.github.shamrice.discapp.service.utility.ReplyNotificationUtilityService;
+import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +20,6 @@ public class ApplicationSubscriptionService {
 
     @Autowired
     private ApplicationSubscriptionRepository applicationSubscriptionRepository;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -78,6 +73,7 @@ public class ApplicationSubscriptionService {
         applicationSubscriptionRepository.save(subscription);
         log.info("Added pending application subscription to appId: " + appId + " for email address: " + emailAddress);
 
+        //todo : put string constants somewhere.
         //send out email message to user for confirmation.
         Map<String, Object> subjectParams = new HashMap<>();
         subjectParams.put("APPLICATION_NAME", appName);
@@ -87,7 +83,10 @@ public class ApplicationSubscriptionService {
         bodyParams.put("CONFIRMATION_MESSAGE", confirmationMessage);
         bodyParams.put("CONFIRMATION_URL", confirmationUrl);
 
-        emailNotificationService.sendMimeMessage(emailAddress, NotificationType.MAILING_LIST_CONFIRMATION, subjectParams, bodyParams);
+        TemplateEmail subscriptionEmail = new TemplateEmail(emailAddress, NotificationType.MAILING_LIST_CONFIRMATION, bodyParams, true);
+        subscriptionEmail.setSubjectTemplateParams(subjectParams);
+
+        EmailNotificationQueueService.addTemplateEmailToSend(subscriptionEmail);
     }
 
     public boolean subscribeToApplication(long appId, String emailAddress, int confirmationCode) {

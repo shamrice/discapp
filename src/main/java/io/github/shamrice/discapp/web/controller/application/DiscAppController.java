@@ -16,8 +16,8 @@ import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.service.thread.UserReadThreadService;
-import io.github.shamrice.discapp.service.utility.ReplyNotification;
-import io.github.shamrice.discapp.service.utility.ReplyNotificationUtilityService;
+import io.github.shamrice.discapp.service.utility.email.ReplyNotification;
+import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
 import io.github.shamrice.discapp.web.controller.ErrorController;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.discapp.NewThreadViewModel;
@@ -580,7 +580,7 @@ public class DiscAppController {
                                         String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
 
                                         ReplyNotification replyNotification = new ReplyNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
-                                        ReplyNotificationUtilityService.addReplyToSend(replyNotification);
+                                        EmailNotificationQueueService.addReplyToSend(replyNotification);
 
                                     } else {
                                         log.warn("Reply notification failed for email: " + parentThread.getEmail() + " : email address is not valid.");

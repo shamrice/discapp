@@ -2,11 +2,12 @@ package io.github.shamrice.discapp.service.account;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
-import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
 import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,6 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
 
     @Value("${discapp.root.email}")
     private String rootAccountEmail;
@@ -201,7 +199,8 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                     templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
                     templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
 
-                    emailNotificationService.send(email, NotificationType.ACCOUNT_LOCKED, templateParams);
+                    TemplateEmail accountLockedEmail = new TemplateEmail(email, NotificationType.ACCOUNT_LOCKED, templateParams, false);
+                    EmailNotificationQueueService.addTemplateEmailToSend(accountLockedEmail);
 
                     discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(
                             user.getId(),
@@ -250,6 +249,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             return;
         }
 
-        emailNotificationService.send(adminEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams);
+        TemplateEmail newUserCreatedEmail = new TemplateEmail(adminEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams, false);
+        EmailNotificationQueueService.addTemplateEmailToSend(newUserCreatedEmail);
     }
 }

@@ -5,8 +5,9 @@ import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.model.PasswordReset;
 import io.github.shamrice.discapp.data.repository.OwnerRepository;
 import io.github.shamrice.discapp.data.repository.PasswordResetRepository;
-import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,6 @@ public class AccountService {
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
 
     @Autowired
     private PasswordResetRepository passwordResetRepository;
@@ -125,7 +123,9 @@ public class AccountService {
             emailParams.put(PASSWORD_RESET_URL, passwordResetUrl + "/" + passwordReset.getKey());
             emailParams.put(PASSWORD_RESET_CODE, passwordReset.getCode());
 
-            return emailNotificationService.send(email, NotificationType.PASSWORD_RESET, emailParams);
+            TemplateEmail passwordResetEmail = new TemplateEmail(email, NotificationType.PASSWORD_RESET, emailParams, false);
+            EmailNotificationQueueService.addTemplateEmailToSend(passwordResetEmail);
+            return true;
 
         } else {
             log.error("Failed to create new password reset request for email: " + email);

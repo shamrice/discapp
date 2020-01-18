@@ -17,6 +17,8 @@ import java.util.*;
 @Slf4j
 public class EmailNotificationService {
 
+    //todo : this has become disjointed from EmailNotificationQueueService
+
     @Autowired
     private JavaMailSender emailSender;
 

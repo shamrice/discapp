@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.service.utility;
+package io.github.shamrice.discapp.service.utility.email;
 
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package io.github.shamrice.discapp.service.utility;
+package io.github.shamrice.discapp.service.utility.email;
 
 import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
@@ -12,18 +12,34 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 @Slf4j
-public class ReplyNotificationUtilityService {
-
+public class EmailNotificationQueueService {
 
     private static LinkedBlockingQueue<ReplyNotification> replyNotificationQueue = new LinkedBlockingQueue<>();
+
+    private static LinkedBlockingQueue<TemplateEmail> templateEmailQueue = new LinkedBlockingQueue<>();
 
     @Autowired
     private EmailNotificationService emailNotificationService;
 
     public void start() {
-        Thread replyNotificationThread = new Thread(this::run);
-        replyNotificationThread.setName(ReplyNotificationUtilityService.class.getSimpleName());
+        Thread replyNotificationThread = new Thread(this::runReplySender);
+        replyNotificationThread.setName("ReplySender");
         replyNotificationThread.start();
+
+        Thread templateEmailSendingThread = new Thread(this::runTemplateEmailSender);
+        templateEmailSendingThread.setName("TemplateEmailSender");
+        templateEmailSendingThread.start();
+    }
+
+    public static void addTemplateEmailToSend(TemplateEmail templateEmail) {
+        if (templateEmail == null) {
+            log.error("Cannot add null template email to queue.");
+            return;
+        }
+        log.info("Adding template email to queue to be sent: " + templateEmail.toString());
+        if (!templateEmailQueue.offer(templateEmail)) {
+            log.error("Failed to add template email to queue. Queue is full. Email: " + templateEmail.toString());
+        }
     }
 
     public static void addReplyToSend(ReplyNotification replyNotification) {
@@ -39,7 +55,36 @@ public class ReplyNotificationUtilityService {
         }
     }
 
-    private void run() {
+    private void runTemplateEmailSender() {
+        log.info("Starting template email sending service.");
+        while (true) {
+            try {
+
+                TemplateEmail templateEmail = templateEmailQueue.take();
+
+                if (templateEmail.isMimeMessage()) {
+                    emailNotificationService.sendMimeMessage(
+                            templateEmail.getTo(),
+                            templateEmail.getNotificationType(),
+                            templateEmail.getSubjectTemplateParams(),
+                            templateEmail.getBodyTemplateParams()
+                    );
+                } else {
+                    emailNotificationService.send(
+                            templateEmail.getTo(),
+                            templateEmail.getNotificationType(),
+                            templateEmail.getBodyTemplateParams()
+                    );
+                }
+                log.info("Sent email: " + templateEmail.toString());
+
+            } catch (Exception ex) {
+                log.error("Error sending template email: " + ex.getMessage(), ex);
+            }
+        }
+    }
+
+    private void runReplySender() {
         log.info("Starting reply notification service.");
 
         while (true) {
@@ -64,7 +109,7 @@ public class ReplyNotificationUtilityService {
                         + replyNotification.getEmailAddress());
 
             } catch (Exception ex) {
-                log.error("Error reading reply notification queue " + ReplyNotificationUtilityService.class.getSimpleName()
+                log.error("Error reading reply notification queue " + EmailNotificationQueueService.class.getSimpleName()
                         + " :: " + ex.getMessage(), ex);
             }
         }

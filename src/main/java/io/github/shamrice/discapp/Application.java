@@ -1,7 +1,7 @@
 package io.github.shamrice.discapp;
 
 import io.github.shamrice.discapp.service.utility.NotifierKeepAliveUtilityService;
-import io.github.shamrice.discapp.service.utility.ReplyNotificationUtilityService;
+import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
 import lombok.var;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +15,7 @@ public class Application {
         var notifierKeepAliveUtilityService = app.getBean(NotifierKeepAliveUtilityService.class);
         notifierKeepAliveUtilityService.start();
 
-        var replyNotificationService = app.getBean(ReplyNotificationUtilityService.class);
-        replyNotificationService.start();
+        var emailNotificationQueueService = app.getBean(EmailNotificationQueueService.class);
+        emailNotificationQueueService.start();
     }
 }
