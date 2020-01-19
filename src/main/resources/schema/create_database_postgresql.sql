@@ -37,9 +37,9 @@ CREATE TABLE owner (
 
 CREATE TABLE discapp_user (
     id serial NOT NULL,
-    username varchar(50) UNIQUE NOT NULL,
+    username varchar UNIQUE NOT NULL,
     password varchar(255) NOT NULL,
-    email varchar(255) UNIQUE NOT NULL,
+    email varchar UNIQUE NOT NULL,
     show_email bool NOT NULL DEFAULT FALSE,
     owner_id int,
     enabled bool NOT NULL DEFAULT TRUE,

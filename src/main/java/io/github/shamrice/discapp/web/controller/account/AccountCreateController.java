@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +70,13 @@ public class AccountCreateController extends AccountController {
                 log.warn("Account creation failed for user: " + accountViewModel.getEmail()
                         + " because email address is already taken.");
                 accountViewModel.setErrorMessage("Email: " + accountViewModel.getEmail() + " has already been taken. Please specify a different email address.");
+                return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
+            }
+
+            //check if email entered is valid.
+            if (!EmailValidator.getInstance().isValid(accountViewModel.getEmail())) {
+                log.warn("Account creation failed because email: " + accountViewModel.getEmail() + " is not a valid email adddress.");
+                accountViewModel.setErrorMessage("Please enter a valid email address.");
                 return new ModelAndView("account/createAccount", "accountViewModel", accountViewModel);
             }
 

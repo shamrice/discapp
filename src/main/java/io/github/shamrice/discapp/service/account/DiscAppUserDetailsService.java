@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_USER_REGISTRATION;
+import static java.util.UUID.randomUUID;
 
 @Service
 @Slf4j
@@ -232,6 +233,28 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         return discappUserRepository.updateDiscAppUserOwnerInfo(userId, ownerId, isAdmin, new Date()) > 0;
     }
 
+    public boolean deactivateUser(long userId) {
+        DiscAppUser user = discappUserRepository.findById(userId).orElse(null);
+        if (user != null) {
+
+            String deactivatedUsername = user.getUsername() + "_DELETED_" + UUID.randomUUID().toString();
+            String deactivatedEmail = user.getEmail() + "_DELETED_" + UUID.randomUUID().toString();
+
+            user.setEnabled(false);
+            user.setUsername(deactivatedUsername);
+            user.setEmail(deactivatedEmail);
+            user.setShowEmail(false);
+            user.setModDt(new Date());
+
+            discappUserRepository.save(user);
+            log.info("User deactivated: " + user.toString());
+            return true;
+        } else {
+            log.warn("User id: " + userId + " does not exist and cannot be deactivated.");
+            return false;
+        }
+    }
+
     public boolean updateDiscAppUserEnabled(long userId, boolean isEnabled) {
         log.info("Updating user enabled status: userId: " + userId + " : isEnabled: " + isEnabled);
         return discappUserRepository.updateDiscAppUserEnabled(userId, isEnabled, new Date()) > 0;
@@ -239,7 +262,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     public void createNewUserRegistrationRequest(String newUserEmail, String baseSiteUrl) {
 
-        String registrationKey = UUID.randomUUID().toString();
+        String registrationKey = randomUUID().toString();
 
         //check if they have an existing record, if so... refresh it otherwise create new.
         UserRegistration newUserRegistration = userRegistrationRepository.findOneByEmail(newUserEmail);

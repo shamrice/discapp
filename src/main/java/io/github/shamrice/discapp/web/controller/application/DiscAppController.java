@@ -576,11 +576,18 @@ public class DiscAppController {
                                 if (parentThread != null && parentThread.getEmail() != null && !parentThread.getEmail().trim().isEmpty()) {
 
                                     if (EmailValidator.getInstance().isValid(parentThread.getEmail().trim())) {
-                                        Application app = applicationService.get(appId);
-                                        String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
 
-                                        ReplyNotification replyNotification = new ReplyNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
-                                        EmailNotificationQueueService.addReplyToSend(replyNotification);
+                                        //email to non-disc app user replies or only enabled disc app users.
+                                        if (parentThread.getDiscAppUser() == null || parentThread.getDiscAppUser().getEnabled()) {
+
+                                            //todo : if discapp user, check that they want email replies sent in settings
+
+                                            Application app = applicationService.get(appId);
+                                            String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
+
+                                            ReplyNotification replyNotification = new ReplyNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
+                                            EmailNotificationQueueService.addReplyToSend(replyNotification);
+                                        }
 
                                     } else {
                                         log.warn("Reply notification failed for email: " + parentThread.getEmail() + " : email address is not valid.");
