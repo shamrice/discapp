@@ -551,14 +551,12 @@ public class DiscAppController {
                     newThread.setSubmitter(submitter);
 
                     //only set email if it's valid.
-                    if (EmailValidator.getInstance().isValid(email)) {
+                    if (!email.isEmpty() && EmailValidator.getInstance().isValid(email)) {
                         newThread.setEmail(email);
 
                         //only use input from checkbox if there's an email address entered
-                        newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
+                        newThread.setShowEmail(newThreadViewModel.isShowEmail());
                     } else {
-                        log.warn("Attempted to create thread with invalid email address: " + email
-                                + " : not setting value. appId: " + appId);
                         newThread.setEmail("");
                         newThread.setShowEmail(false);
                     }
