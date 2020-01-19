@@ -81,4 +81,17 @@ public class MaintenanceThreadViewModel {
         return currentPage == null ? 0 : currentPage - 1;
     }
 
+    public boolean isApprovedSearchChecked(String value) {
+        if (value == null) {
+            return false;
+        }
+
+        //if value isn't set yet, say true for approved.
+        if (approvedSearch.isEmpty() && "approved".equalsIgnoreCase(value)) {
+            return true;
+        }
+
+        return value.equalsIgnoreCase(approvedSearch);
+    }
+
 }

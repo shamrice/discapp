@@ -237,9 +237,12 @@ public class ThreadsMaintenanceController extends MaintenanceController {
             //search messages
             if ((maintenanceThreadViewModel.getFindMessages() != null
                     && !maintenanceThreadViewModel.getFindMessages().isEmpty())
+                    || (maintenanceThreadViewModel.isSearchSubmitted())) {
+/*                    && (maintenanceThreadViewModel.getNextPageSubmit() != null || maintenanceThreadViewModel.getPreviousPageSubmit() != null))
                     || (maintenanceThreadViewModel.isSearchSubmitted()
-                    && (maintenanceThreadViewModel.getNextPageSubmit() != null || maintenanceThreadViewModel.getPreviousPageSubmit() != null))) {
-
+                    && maintenanceThreadViewModel.getEditArticleCancelEdit() != null)
+            ) {
+*/
                 //set off of unapproved so default is approved if user does not have permission to search unapproved threads
                 boolean isApproved = !"unapproved".equalsIgnoreCase(maintenanceThreadViewModel.getApprovedSearch());
 
@@ -272,7 +275,17 @@ public class ThreadsMaintenanceController extends MaintenanceController {
 
                 List<Thread> threadList = pagedSearchResults.get().collect(Collectors.toList());
 
-                String searchResultsHtml = getListThreadHtml(threadList, SEARCH_TAB);
+                String searchResultsHtml = getListThreadHtml(
+                        threadList,
+                        SEARCH_TAB,
+                        true,
+                        maintenanceThreadViewModel.getAuthorSearch(),
+                        maintenanceThreadViewModel.getEmailSearch(),
+                        maintenanceThreadViewModel.getSubjectSearch(),
+                        maintenanceThreadViewModel.getIpSearch(),
+                        maintenanceThreadViewModel.getMessageSearch(),
+                        maintenanceThreadViewModel.getApprovedSearch()
+                );
                 List<String> threadHtml = new ArrayList<>();
                 threadHtml.add(searchResultsHtml);
                 maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
@@ -370,7 +383,8 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
                     if (subThreads != null) {
                         String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
-                                maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
+                                maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab(),
+                                maintenanceThreadViewModel.isSearchSubmitted());
                         maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
                     }
 
@@ -414,9 +428,11 @@ public class ThreadsMaintenanceController extends MaintenanceController {
             }
 
             //cancel button clicked on edit modify message screen
-            if (maintenanceThreadViewModel.getEditArticleCancelEdit() != null && !maintenanceThreadViewModel.getEditArticleCancelEdit().isEmpty()) {
+            if (maintenanceThreadViewModel.getEditArticleCancelEdit() != null
+                    && !maintenanceThreadViewModel.getEditArticleCancelEdit().isEmpty()) {
                 maintenanceThreadViewModel.setOnEditModifyMessage(false);
                 maintenanceThreadViewModel.setOnEditMessage(false);
+
             }
 
         } catch (Exception ex) {
@@ -494,7 +510,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
 
                     for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
                         String currentHtml = getEditThreadHtml(threadTreeNode, "<ul>", false, true,
-                                maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
+                                maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab(), maintenanceThreadViewModel.isSearchSubmitted());
                         currentHtml += "</ul>";
                         threadTreeHtml.add(currentHtml);
                     }
@@ -503,7 +519,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     threadTreeNodeList = threadService.getLatestThreadNodes(app.getId(), maintenanceThreadViewModel.getCurrentPage(), 40);
 
                     String currentHtml = getEditThreadListHtml(threadTreeNodeList, maintenanceThreadViewModel.getCurrentPage(),
-                            maintenanceThreadViewModel.getTab());
+                            maintenanceThreadViewModel.getTab(), maintenanceThreadViewModel.isSearchSubmitted());
                     threadTreeHtml.add(currentHtml);
                 }
 
@@ -523,7 +539,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                         ThreadTreeNode subThreads = threadService.getFullThreadTree(threadToEdit.getId());
                         if (subThreads != null) {
                             String subThreadHtml = getEditThreadHtml(subThreads, "", true, false,
-                                    maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab());
+                                    maintenanceThreadViewModel.getCurrentPage(), maintenanceThreadViewModel.getTab(), maintenanceThreadViewModel.isSearchSubmitted());
                             maintenanceThreadViewModel.setEditArticleReplyThreadsHtml(subThreadHtml);
                         }
                     }
@@ -535,7 +551,15 @@ public class ThreadsMaintenanceController extends MaintenanceController {
             } else if (maintenanceThreadViewModel.getTab().equalsIgnoreCase(UNAPPROVED_TAB)) {
                 //unapproved thread tab is selected.
                 if (unapprovedThreads != null) {
-                    String unapprovedThreadsResultHtml = getListThreadHtml(unapprovedThreads, UNAPPROVED_TAB);
+                    String unapprovedThreadsResultHtml = getListThreadHtml(
+                            unapprovedThreads, UNAPPROVED_TAB,
+                            maintenanceThreadViewModel.isSearchSubmitted(),
+                            maintenanceThreadViewModel.getAuthorSearch(),
+                            maintenanceThreadViewModel.getEmailSearch(),
+                            maintenanceThreadViewModel.getSubjectSearch(),
+                            maintenanceThreadViewModel.getIpSearch(),
+                            maintenanceThreadViewModel.getMessageSearch(),
+                            maintenanceThreadViewModel.getApprovedSearch());
                     List<String> threadHtml = new ArrayList<>();
                     threadHtml.add(unapprovedThreadsResultHtml);
                     maintenanceThreadViewModel.setEditThreadTreeHtml(threadHtml);
@@ -554,6 +578,13 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                                           @RequestParam(name = "article") long threadId,
                                           @RequestParam(name = "page", required = false) Integer page,
                                           @RequestParam(name = "tab", required = false) String tab,
+                                          @RequestParam(name = "isSearching", required = false) Boolean isSearching,
+                                          @RequestParam(name = "authorSearch", required = false) String authorSearch,
+                                          @RequestParam(name = "emailSearch", required = false) String emailSearch,
+                                          @RequestParam(name = "subjectSearch", required = false) String subjectSearch,
+                                          @RequestParam(name = "ipSearch", required = false) String ipSearch,
+                                          @RequestParam(name = "messageSearch", required = false) String messageSearch,
+                                          @RequestParam(name = "approvedSearch", required = false) String approvedSearch,
                                           @ModelAttribute MaintenanceThreadViewModel maintenanceThreadViewModel,
                                           Model model,
                                           HttpServletResponse response) {
@@ -566,6 +597,10 @@ public class ThreadsMaintenanceController extends MaintenanceController {
 
             if (tab != null && !tab.isEmpty()) {
                 maintenanceThreadViewModel.setTab(tab);
+            }
+
+            if (isSearching != null) {
+                maintenanceThreadViewModel.setSearchSubmitted(isSearching);
             }
 
             maintenanceThreadViewModel.setOnEditMessage(true);
@@ -605,14 +640,14 @@ public class ThreadsMaintenanceController extends MaintenanceController {
      * @return Returns generated HTML
      */
     private String getEditThreadHtml(ThreadTreeNode currentNode, String currentHtml, boolean skipCurrent,
-                                     boolean includeCheckBox, int currentPage, String tab) {
+                                     boolean includeCheckBox, int currentPage, String tab, boolean isSearching) {
 
         if (!skipCurrent) {
             currentHtml +=
                     "<li>" +
                             "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
                             "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
-                            + "&amp;tab=" + tab + "\">" +
+                            + "&amp;tab=" + tab + "&amp;isSearching=" + isSearching + "\">" +
                             currentNode.getCurrent().getSubject() +
                             "</a> " +
 
@@ -637,7 +672,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
         //recursively generate reply tree structure
         for (ThreadTreeNode node : currentNode.getSubThreads()) {
             currentHtml += "<ul>";
-            currentHtml = getEditThreadHtml(node, currentHtml, false, includeCheckBox, currentPage, tab);
+            currentHtml = getEditThreadHtml(node, currentHtml, false, includeCheckBox, currentPage, tab, isSearching);
             currentHtml += "</ul>";
         }
 
@@ -650,7 +685,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
      * @param threadTreeNodeList ThreadTreeNode list to use to populate HTML string
      * @return Generated HTML for node list
      */
-    private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList, int currentPage, String tab) {
+    private String getEditThreadListHtml(List<ThreadTreeNode> threadTreeNodeList, int currentPage, String tab, boolean isSearching) {
 
         StringBuilder currentHtml = new StringBuilder("<ul>");
 
@@ -673,7 +708,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     "<li>" +
                             "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + currentNode.getCurrent().getApplicationId() +
                             "&amp;article=" + currentNode.getCurrent().getId() + "&amp;page=" + currentPage
-                            + "&amp;tab=" + tab + "\">" +
+                            + "&amp;tab=" + tab + "&amp;isSearching=" + isSearching + "\">" +
                             currentNode.getCurrent().getSubject() +
                             "</a> " +
 
@@ -711,15 +746,19 @@ public class ThreadsMaintenanceController extends MaintenanceController {
     }
 
 
-    private String getListThreadHtml(List<Thread> threads, String tab) {
+    private String getListThreadHtml(List<Thread> threads, String tab, boolean isSearching,
+                                     String authorSearch, String emailSearch, String subjectSearch, String ipSearch,
+                                     String messageSearch, String approvedSearch) {
         String currentHtml = "<ul>";
 
-        for (Thread thread : threads) {
+         for (Thread thread : threads) {
 
             currentHtml += "<li>" +
                     "<a href=\"" + CONTROLLER_URL_DIRECTORY + "edit-thread.cgi?id=" + thread.getApplicationId() +
                     "&amp;article=" + thread.getId() +
-                    "&amp;tab=" + tab + "\">" +
+                    "&amp;tab=" + tab + "&amp;isSearching=" + isSearching + "&amp;authorSearch=" + authorSearch
+                    + "&amp;emailSearch=" + emailSearch + "&amp;subjectSearch=" + subjectSearch + "&amp;ipSearch="
+                    + ipSearch + "&amp;messageSearch=" + messageSearch + "&amp;approvedSearch=" + approvedSearch + "\">" +
                     thread.getSubject() +
                     "</a> " +
 

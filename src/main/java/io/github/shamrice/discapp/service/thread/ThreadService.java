@@ -407,6 +407,7 @@ public class ThreadService {
         searchThread.setIpAddress(ipAddress);
         searchThread.setBody(messageBody);
         searchThread.setApproved(isApproved);
+        searchThread.setDeleted(false);
 
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()

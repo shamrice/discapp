@@ -13,6 +13,15 @@
             <input type="hidden" name="onEditModifyMessage"
                    th:value="${maintenanceThreadViewModel.isOnEditModifyMessage()}"/>
             <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
+
+            <input type="hidden" name="searchSubmitted" th:value="${maintenanceThreadViewModel.isSearchSubmitted()}"/>
+            <input type="hidden" name="authorSearch" th:value="${maintenanceThreadViewModel.getAuthorSearch()}"/>
+            <input type="hidden" name="emailSearch" th:value="${maintenanceThreadViewModel.getEmailSearch()}"/>
+            <input type="hidden" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}"/>
+            <input type="hidden" name="ipSearch" th:value="${maintenanceThreadViewModel.getIpSearch()}"/>
+            <input type="hidden" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}"/>
+            <input type="hidden" name="approvedSearch" th:value="${maintenanceThreadViewModel.getApprovedSearch()}"/>
+
             <div class="buttons" style="margin-bottom:1em;">
                 <input type="submit" name="editArticle" value="Edit Message" class="button"/>
                 <input type="submit" name="deleteArticles" value="Delete Message" class="button"/>
@@ -105,6 +114,15 @@
             <input type="hidden" name="editArticleReplyThreadsHtml"
                    th:value="${maintenanceThreadViewModel.getEditArticleReplyThreadsHtml()}"/>
             <input type="hidden" name="pagemark" th:value="${maintenanceThreadViewModel.getPagemark()}"/>
+
+            <input type="hidden" name="searchSubmitted" th:value="${maintenanceThreadViewModel.isSearchSubmitted()}"/>
+            <input type="hidden" name="authorSearch" th:value="${maintenanceThreadViewModel.getAuthorSearch()}"/>
+            <input type="hidden" name="emailSearch" th:value="${maintenanceThreadViewModel.getEmailSearch()}"/>
+            <input type="hidden" name="subjectSearch" th:value="${maintenanceThreadViewModel.getSubjectSearch()}"/>
+            <input type="hidden" name="ipSearch" th:value="${maintenanceThreadViewModel.getIpSearch()}"/>
+            <input type="hidden" name="messageSearch" th:value="${maintenanceThreadViewModel.getMessageSearch()}"/>
+            <input type="hidden" name="approvedSearch" th:value="${maintenanceThreadViewModel.getApprovedSearch()}"/>
+
 
             <table style="margin:1em;">
                 <tr>

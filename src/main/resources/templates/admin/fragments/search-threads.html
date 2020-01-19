@@ -41,9 +41,9 @@
                 <th>Status</th>
                 <td>
                     <label>
-                        <input type="radio" name="approvedSearch" value="approved" checked="checked"/>approved</label>
+                        <input type="radio" name="approvedSearch" value="approved" th:checked="${maintenanceThreadViewModel.isApprovedSearchChecked('approved')}"/>approved</label>
                     <label>
-                        <input type="radio" name="approvedSearch" value="unapproved"/>unapproved</label>
+                        <input type="radio" name="approvedSearch" value="unapproved" th:checked="${maintenanceThreadViewModel.isApprovedSearchChecked('unapproved')}"/>unapproved</label>
                 </td>
             </tr>
             <tr>
