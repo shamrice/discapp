@@ -41,6 +41,9 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                                          Model model,
                                          HttpServletResponse response) {
 
+        //allow caching on create thread POST action to avoid expired web page message.
+        response.setHeader("Cache-Control", "max-age=240, private"); // HTTP 1.1
+
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
