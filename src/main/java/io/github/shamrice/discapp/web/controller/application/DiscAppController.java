@@ -549,10 +549,19 @@ public class DiscAppController {
 
                 } else {
                     newThread.setSubmitter(submitter);
-                    newThread.setEmail(email);
 
-                    //only use input from checkbox if there's an email address entered
-                    newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
+                    //only set email if it's valid.
+                    if (EmailValidator.getInstance().isValid(email)) {
+                        newThread.setEmail(email);
+
+                        //only use input from checkbox if there's an email address entered
+                        newThread.setShowEmail(!email.isEmpty() && newThreadViewModel.isShowEmail());
+                    } else {
+                        log.warn("Attempted to create thread with invalid email address: " + email
+                                + " : not setting value. appId: " + appId);
+                        newThread.setEmail("");
+                        newThread.setShowEmail(false);
+                    }
                 }
 
                 //add links to urls and add new lines.
