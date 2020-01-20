@@ -39,7 +39,10 @@
                            th:href="@{|/discussion.cgi?disc=${appId}&amp;article=${thread.getId()}&amp;page=${currentPage}|}"
                            th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
                     </td>
-                    <td class="author_cell" th:text="${thread.getSubmitter()}"></td>
+                    <td class="author_cell">
+                        [[${thread.getSubmitter()}]]
+                        <span th:if="${thread.isAdminPost()}" class="admin_post">Admin</span>
+                    </td>
                     <td class="date_cell" th:text="${thread.getCreateDt()}"></td>
                 </tr>
 

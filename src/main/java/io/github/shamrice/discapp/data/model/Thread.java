@@ -53,5 +53,6 @@ public class Thread {
     @JoinColumn(name = "discapp_user_id")
     private DiscAppUser discAppUser;
 
+    private Boolean isAdminPost;
 
 }

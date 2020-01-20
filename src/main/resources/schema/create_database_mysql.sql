@@ -93,6 +93,7 @@ CREATE TABLE thread (
     is_approved bool NOT NULL default true,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
+    is_admin_post bool NOT NULL default false,
     PRIMARY KEY (id),
     FOREIGN KEY (application_id) REFERENCES application(id)
 );

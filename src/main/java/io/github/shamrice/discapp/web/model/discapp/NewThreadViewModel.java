@@ -30,4 +30,7 @@ public class NewThreadViewModel {
     private String subscribe;
     private String postCode;
 
+    private boolean isAdmin;
+    private boolean markAdminPost;
+
 }

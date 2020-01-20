@@ -1,9 +1,9 @@
 body {
   color: #FFFFFF;
   background-color: #000000;
+  font: small terminal;
+  color:#9C9C9C;
 }
-
-a:visited {color:#00FF80;}
 
 /* Tooltip container */
 .tooltip {
@@ -36,4 +36,35 @@ a:visited {color:#00FF80;}
     color: red;
     font-weight: bold;
     text-align: center;
+}
+
+a:link {
+	color:#2eff00;
+}
+
+a:visited {
+	color:#1b9600;
+};
+
+.read {
+    color: #1b9600;
+}
+
+a:hover {
+    background-color: #2eff00;
+    color: #000000;
+    cursor: crosshair;
+}
+
+SPAN.new_message {
+	background-color:gray;
+}
+
+.admin_post {
+    color: #fff;
+    background: #f00;
+    padding: 2px;
+    margin: 5px;
+    font-weight: bold;
+    border-radius: 5px;
 }

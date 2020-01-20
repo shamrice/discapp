@@ -162,3 +162,12 @@ a.tab:hover { background-color:#88f; color:#eee; }
 .alert-success {
     color: green;
 }
+
+.admin_post {
+    color: #fff;
+    background: #f00;
+    padding: 2px;
+    margin: 5px;
+    font-weight: bold;
+    border-radius: 5px;
+}

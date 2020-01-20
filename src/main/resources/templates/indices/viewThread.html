@@ -44,6 +44,7 @@
                     <div th:unless="${threadViewModel.getCurrentUsername()}">
                         <span class="author_header">
                             <a th:href="'mailto:' + ${threadViewModel.getEmail()}" th:utext="${threadViewModel.getSubmitter()}"></a>
+                            <span th:if="${threadViewModel.isAdminPost()}" class="admin_post">Admin</span>
                         </span>
                     </div>
                 </div>
@@ -52,6 +53,7 @@
                         <span class="tooltip author_header">
                             [[${threadViewModel.getSubmitter()}]]
                             <span class="tooltiptext" th:utext="@{|Current username:<br />${threadViewModel.getCurrentUsername()}|}"></span>
+                            <span th:if="${threadViewModel.isAdminPost()}" class="admin_post">Admin</span>
                         </span>
 
                     </div>
@@ -59,6 +61,7 @@
                     <div th:unless="${threadViewModel.getCurrentUsername()}">
                         <span class="author_header" th:utext="${threadViewModel.getSubmitter()}">
                         </span>
+                        <span th:if="${threadViewModel.isAdminPost()}" class="admin_post">Admin</span>
                     </div>
                 </div>
                 <div class="header"><span class="subject_header" th:utext="${threadViewModel.getSubject()}"></span></div>

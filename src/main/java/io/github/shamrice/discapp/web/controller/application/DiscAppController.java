@@ -207,6 +207,7 @@ public class DiscAppController {
                         threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
                         threadViewModel.setShowMoreOnPreviewText(false);
                         threadViewModel.setHighlighted(isNewMessageHighlighted(threadTreeNode));
+                        threadViewModel.setAdminPost(threadTreeNode.getCurrent().getIsAdminPost());
 
                         //mark thread as read or not.
                         threadViewModel.setRead(userReadThreadService.csvContainsThreadId(readThreadsCsv, threadTreeNode.getCurrent().getId()));
@@ -352,6 +353,10 @@ public class DiscAppController {
                 model.addAttribute(SUBMITTER, user.getUsername());
                 model.addAttribute(EMAIL, user.getEmail());
                 model.addAttribute(SHOW_EMAIL, user.getShowEmail());
+
+                if (applicationService.isOwnerOfApp(appId, user.getEmail()) || accountHelper.isRootAdminAccount()) {
+                    model.addAttribute("isAdmin", true);
+                }
             } else if (user != null && !user.getIsUserAccount()) {
                 model.addAttribute(IS_LOGGED_IN_SYSTEM_ACCOUNT, true);
                 log.info("User is system admin account. Posting will be treated as not logged in user.");
@@ -546,9 +551,11 @@ public class DiscAppController {
                     newThread.setSubmitter(discAppUser.getUsername());
                     newThread.setEmail(discAppUser.getEmail());
                     newThread.setShowEmail(discAppUser.getShowEmail());
+                    newThread.setIsAdminPost(newThreadViewModel.isMarkAdminPost());
 
                 } else {
                     newThread.setSubmitter(submitter);
+                    newThread.setIsAdminPost(false);
 
                     //only set email if it's valid.
                     if (!email.isEmpty() && EmailValidator.getInstance().isValid(email)) {
@@ -686,6 +693,7 @@ public class DiscAppController {
             threadViewModel.setParentId(currentThread.getParentId().toString());
             threadViewModel.setSubject(currentThread.getSubject());
             threadViewModel.setSubmitter(currentThread.getSubmitter());
+            threadViewModel.setAdminPost(currentThread.getIsAdminPost());
 
             //use source user info if exists first.
             if (sourceUser != null && sourceUser.getEmail() != null) {
@@ -901,8 +909,17 @@ public class DiscAppController {
                 "&amp;page=" + currentPage + "\"" +
                 " name=\"" + currentNode.getCurrent().getId() + "\">" +
                 currentNode.getCurrent().getSubject() +
-                "                   </a> " + entryBreakString +
-                "                   <span class=\"author_cell\">" + currentNode.getCurrent().getSubmitter() + ",</span> " +
+                "                   </a> ";
+
+        topThreadHtml += entryBreakString +
+                "                   <span class=\"author_cell\">" + currentNode.getCurrent().getSubmitter();
+
+        //mark thread as admin post if it's set as one.
+        if (currentNode.getCurrent().getIsAdminPost() != null && currentNode.getCurrent().getIsAdminPost()) {
+            topThreadHtml += "<span class=\"admin_post\">Admin</span>";
+        }
+
+        topThreadHtml += ",</span> " +
                 "                   <span class=\"date_cell\">" +
                 getAdjustedDateStringForConfiguredTimeZone(
                         currentNode.getCurrent().getApplicationId(),
@@ -999,8 +1016,16 @@ public class DiscAppController {
             }
 
             currentHtml += entryBreakString +
-                    "      <span class=\"author_cell\">" + currentNode.getCurrent().getSubmitter() + ",</span> " +
-                    "      <span class=\"date_cell\">" +
+                    "      <span class=\"author_cell\">" + currentNode.getCurrent().getSubmitter();
+
+            //mark thread as admin post if it's set as one.
+            if (currentNode.getCurrent().getIsAdminPost() != null && currentNode.getCurrent().getIsAdminPost()) {
+                currentHtml += "<span class=\"admin_post\">Admin</span>";
+            }
+
+            currentHtml += ",</span> ";
+
+            currentHtml +=  "     <span class=\"date_cell\">" +
                     getAdjustedDateStringForConfiguredTimeZone(
                             currentNode.getCurrent().getApplicationId(),
                             currentNode.getCurrent().getCreateDt(),

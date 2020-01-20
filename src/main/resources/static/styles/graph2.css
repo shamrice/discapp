@@ -189,3 +189,12 @@ a:visited {
 .read {
     color: #551A8B;
 }
+
+.admin_post {
+    color: #fff;
+    background: #f00;
+    padding: 2px;
+    margin: 5px;
+    font-weight: bold;
+    border-radius: 5px;
+}
