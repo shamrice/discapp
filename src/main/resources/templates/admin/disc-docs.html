@@ -36,6 +36,9 @@
             <li>
                 <a href="#administration_link">Administration Link</a>
             </li>
+            <li>
+                <a href="#admin_post_distinction">Admin Post Distinction on Messages</a>
+            </li>
         </ul>
     </div>
     <hr />
@@ -143,6 +146,29 @@
         </p>
         <pre class="code" th:text="${adminLinkHtml}">
         </pre>
+        <a href="#navigation">Back to top</a>
+    </div>
+    <hr />
+    <div id="admin_post_distinction">
+        <h4>Admin Post Distinction on Messages</h4>
+        <p>
+            Admin owners of a DiscApp can select to mark their post as an "Admin post". This will cause a
+            special SPAN tag to be added to the author field with the css class of "admin_post". The built in
+            CSS offerings have the correct CSS required to correctly view this feature. If you are using a
+            custom CSS, please include the following in your CSS code. (Feel free to change the colors as needed).
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+        <pre class="code">
+    .admin_post {
+        color: #fff;
+        background: #f00;
+        padding: 2px;
+        margin: 5px;
+        font-weight: bold;
+        border-radius: 5px;
+    }</pre>
         <a href="#navigation">Back to top</a>
     </div>
 </div>
