@@ -71,6 +71,10 @@
                 <td th:text="${maintenanceThreadViewModel.getEditArticleSubject()}"></td>
             </tr>
             <tr>
+                <th>Marked as Admin Post</th>
+                <td th:text="${maintenanceThreadViewModel.isEditArticleAdminPost()}"></td>
+            </tr>
+            <tr>
                 <th>Create Date</th>
                 <td th:text="${maintenanceThreadViewModel.getEditArticleCreateDt()}"></td>
             </tr>
@@ -146,6 +150,15 @@
                                th:value="${maintenanceThreadViewModel.getEditArticleSubject()}" size="30"/>
                     </td>
                 </tr>
+                <tr>
+                    <th>Mark As Admin Post</th>
+                    <td>
+                        <input type="checkbox" name="editArticleAdminPost"
+                               th:checked="${maintenanceThreadViewModel.isEditArticleAdminPost()}"/>
+                    </td>
+                </tr>
+
+
             </table>
             <div><b>Message</b></div>
             <div>

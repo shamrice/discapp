@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.IS_USER_ACCOUNT;
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.POSTING_USERNAME;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.THREADS_EDIT_PAGE;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.THREAD_EDIT_PAGE;
@@ -306,60 +307,70 @@ public class ThreadsMaintenanceController extends MaintenanceController {
             //post new message
             if (maintenanceThreadViewModel.getPostArticle() != null && !maintenanceThreadViewModel.getPostArticle().isEmpty()) {
 
-                DiscAppUser user = discAppUserDetailsService.getByEmail(username);
 
-                if (user != null && user.getIsUserAccount()) {
+                if (maintenanceThreadViewModel.getNewThreadSubject() != null
+                        && !maintenanceThreadViewModel.getNewThreadSubject().trim().isEmpty()) {
 
-                    if (maintenanceThreadViewModel.getNewThreadSubject() != null
-                            && !maintenanceThreadViewModel.getNewThreadSubject().trim().isEmpty()) {
+                    String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getNewThreadSubject());
 
-                        String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getNewThreadSubject());
+                    //default to what is filled out on the form (only available to system accounts)
+                    String submitter = maintenanceThreadViewModel.getNewThreadSubmitter();
+                    String email = maintenanceThreadViewModel.getNewThreadEmail();
+                    boolean showEmail = maintenanceThreadViewModel.isNewThreadShowEmail();
+                    boolean setUserAccount = false;
 
-
-                        //set ip address and user agent
-                        String ipAddress = null;
-                        String userAgent = null;
-                        if (request != null) {
-                            //check forwarded header for proxy users, if not found, use ip provided.
-                            ipAddress = request.getHeader("X-FORWARDED-FOR");
-                            if (ipAddress == null || ipAddress.isEmpty()) {
-                                ipAddress = request.getRemoteAddr();
-                            }
-                            userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-                        }
-
-                        Thread newThread = new Thread();
-                        newThread.setSubmitter(user.getUsername());
-                        newThread.setDiscAppUser(user);
-                        newThread.setParentId(0L);
-                        newThread.setShowEmail(user.getShowEmail());
-                        newThread.setEmail(user.getEmail());
-                        newThread.setDeleted(false);
-                        newThread.setApplicationId(app.getId());
-                        newThread.setSubject(subject);
-                        newThread.setModDt(new Date());
-                        newThread.setCreateDt(new Date());
-                        //newThread.setApproved(isApproved);
-                        newThread.setApproved(true);
-                        newThread.setIpAddress(ipAddress);
-                        newThread.setUserAgent(userAgent);
-
-                        String body = maintenanceThreadViewModel.getNewThreadMessage();
-                        if (body != null && !body.isEmpty()) {
-                            body = body.replaceAll("\r", "<br />");
-
-                            body = inputHelper.addUrlHtmlLinksToString(body);
-                        }
-
-                        threadService.saveThread(newThread, body);
-                    } else {
-                        maintenanceThreadViewModel.setInfoMessage("A subject is required to post a new message.");
+                    //if user is not a system account, use those values
+                    DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+                    if (user.getIsUserAccount() != null && user.getIsUserAccount()) {
+                        submitter = user.getUsername();
+                        email = user.getEmail();
+                        showEmail = user.getShowEmail();
+                        setUserAccount = true;
                     }
+
+                    //set ip address and user agent
+                    String ipAddress = null;
+                    String userAgent = null;
+                    if (request != null) {
+                        //check forwarded header for proxy users, if not found, use ip provided.
+                        ipAddress = request.getHeader("X-FORWARDED-FOR");
+                        if (ipAddress == null || ipAddress.isEmpty()) {
+                            ipAddress = request.getRemoteAddr();
+                        }
+                        userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                    }
+
+                    Thread newThread = new Thread();
+                    newThread.setSubmitter(submitter);
+
+                    if (setUserAccount) {
+                        newThread.setDiscAppUser(user);
+                    }
+                    newThread.setParentId(0L);
+                    newThread.setShowEmail(showEmail);
+                    newThread.setEmail(email);
+                    newThread.setDeleted(false);
+                    newThread.setApplicationId(app.getId());
+                    newThread.setSubject(subject);
+                    newThread.setModDt(new Date());
+                    newThread.setCreateDt(new Date());
+                    newThread.setApproved(true);
+                    newThread.setIsAdminPost(maintenanceThreadViewModel.isNewThreadAdminPost());
+                    newThread.setIpAddress(ipAddress);
+                    newThread.setUserAgent(userAgent);
+
+                    String body = maintenanceThreadViewModel.getNewThreadMessage();
+                    if (body != null && !body.isEmpty()) {
+                        body = body.replaceAll("\r", "<br />");
+
+                        body = inputHelper.addUrlHtmlLinksToString(body);
+                    }
+
+                    threadService.saveThread(newThread, body);
                 } else {
-                    //TODO : maintenance accounts should post as logged out users. Page should ask for name/email
-                    //TODO : etc just like regular disc app does.
-                    maintenanceThreadViewModel.setInfoMessage("Maintenance system accounts cannot post new messages here. Please log in with a registered user account.");
+                    maintenanceThreadViewModel.setInfoMessage("A subject is required to post a new message.");
                 }
+
                 //return to thread tab.
                 maintenanceThreadViewModel.setTab(THREAD_TAB);
                 currentTab = THREAD_TAB;
@@ -374,6 +385,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     maintenanceThreadViewModel.setEditArticleSubmitter(threadToEdit.getSubmitter());
                     maintenanceThreadViewModel.setEditArticleEmail(threadToEdit.getEmail());
                     maintenanceThreadViewModel.setEditArticleSubject(threadToEdit.getSubject());
+                    maintenanceThreadViewModel.setEditArticleAdminPost(threadToEdit.getIsAdminPost());
                     maintenanceThreadViewModel.setEditArticleMessage(threadToEdit.getBody());
                     maintenanceThreadViewModel.setApplicationId(app.getId());
 
@@ -408,6 +420,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     String email = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleEmail());
                     String subject = inputHelper.sanitizeInput(maintenanceThreadViewModel.getEditArticleSubject());
 
+                    editThread.setIsAdminPost(maintenanceThreadViewModel.isEditArticleAdminPost());
                     editThread.setSubmitter(submitter);
                     editThread.setEmail(email);
                     editThread.setSubject(subject);
@@ -490,7 +503,12 @@ public class ThreadsMaintenanceController extends MaintenanceController {
             maintenanceThreadViewModel.setApplicationId(app.getId());
 
             DiscAppUser user = discAppUserDetailsService.getByEmail(username);
-            model.addAttribute(POSTING_USERNAME, user.getUsername());
+            if (user.getIsUserAccount() != null && user.getIsUserAccount()) {
+                model.addAttribute(POSTING_USERNAME, user.getUsername());
+                model.addAttribute(IS_USER_ACCOUNT, true);
+            } else {
+                model.addAttribute(IS_USER_ACCOUNT, false);
+            }
 
             //enable the unapproved messages tab if they exist.
             List<Thread> unapprovedThreads = threadService.getUnapprovedThreads(app.getId());
@@ -617,6 +635,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                 maintenanceThreadViewModel.setEditArticleIpAddress(editingThread.getIpAddress());
                 maintenanceThreadViewModel.setEditArticleMessage(editingThread.getBody());
                 maintenanceThreadViewModel.setEditArticleUserAgent(editingThread.getUserAgent());
+                maintenanceThreadViewModel.setEditArticleAdminPost(editingThread.getIsAdminPost());
 
                 if (editingThread.getDiscAppUser() != null) {
                     maintenanceThreadViewModel.setEditArticleUserEmail(editingThread.getDiscAppUser().getEmail());
@@ -654,8 +673,14 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                             "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
                             "    <span style=\"font-size:smaller;\">" +
                             "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
-                            currentNode.getCurrent().getSubmitter() + " " +
-                            currentNode.getCurrent().getCreateDt() +
+                            currentNode.getCurrent().getSubmitter() + " ";
+
+            //add admin flare to posts marked as admin
+            if (currentNode.getCurrent().getIsAdminPost() != null && currentNode.getCurrent().getIsAdminPost()) {
+                currentHtml += "<span class=\"admin_post\">Admin</span> ";
+            }
+
+            currentHtml += currentNode.getCurrent().getCreateDt() +
                             "        </span>" +
                             "    </span>" +
                             "</label>";
@@ -715,8 +740,14 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                             "<label for=\"checkbox_" + currentNode.getCurrent().getId() + "\">" +
                             "    <span style=\"font-size:smaller;\">" +
                             "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
-                            currentNode.getCurrent().getSubmitter() + " " +
-                            currentNode.getCurrent().getCreateDt() +
+                            currentNode.getCurrent().getSubmitter() + " ");
+
+            //add admin flare to posts marked as admin
+            if (currentNode.getCurrent().getIsAdminPost() != null && currentNode.getCurrent().getIsAdminPost()) {
+                currentHtml.append("<span class=\"admin_post\">Admin</span> ");
+            }
+
+            currentHtml.append(currentNode.getCurrent().getCreateDt() +
                             "        </span>" +
                             "    </span>" +
                             "</label>" +
@@ -765,8 +796,14 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     "<label for=\"checkbox_" + thread.getId() + "\">" +
                     "    <span style=\"font-size:smaller;\">" +
                     "        <span style=\"font-style:italic; margin-left:1ex; margin-right:1ex;\">" +
-                    thread.getSubmitter() + " " +
-                    thread.getCreateDt() +
+                    thread.getSubmitter() + " ";
+
+            //add admin flare to posts marked as admin
+            if (thread.getIsAdminPost() != null && thread.getIsAdminPost()) {
+                currentHtml += "<span class=\"admin_post\">Admin</span> ";
+            }
+
+            currentHtml += thread.getCreateDt() +
                     "        </span>" +
                     "    </span>" +
                     "</label>" +

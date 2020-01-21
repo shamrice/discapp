@@ -47,7 +47,11 @@ public class MaintenanceThreadViewModel {
     private boolean searchSubmitted;
     private String searchAgain;
 
+    private String newThreadEmail;
+    private String newThreadSubmitter;
+    private boolean newThreadShowEmail;
     private String newThreadSubject;
+    private boolean newThreadAdminPost;
     private String newThreadMessage;
     private String postArticle;
 
@@ -63,6 +67,7 @@ public class MaintenanceThreadViewModel {
     private String editArticleSubmitter;
     private String editArticleEmail;
     private String editArticleSubject;
+    private boolean editArticleAdminPost;
     private String editArticleCreateDt;
     private String editArticleModDt;
     private String editArticleIpAddress;
@@ -72,6 +77,8 @@ public class MaintenanceThreadViewModel {
     private String editArticleCurrentUsername;
     private String editArticleUserEmail;
     private Long editArticleUserId;
+
+    private boolean isSystemAccount;
 
     public Integer getNextPage() {
         return currentPage == null ? 1 : currentPage + 1;

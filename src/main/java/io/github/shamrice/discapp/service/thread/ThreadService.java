@@ -335,6 +335,11 @@ public class ThreadService {
                 thread.setSubject(noBodySubject);
             }
 
+            //if admin post is not set, default it to false.
+            if (thread.getIsAdminPost() == null) {
+                thread.setIsAdminPost(false);
+            }
+
             Thread createThread = threadRepository.save(thread);
             ThreadBody threadBody = threadBodyRepository.findByThreadId(createThread.getId());
 

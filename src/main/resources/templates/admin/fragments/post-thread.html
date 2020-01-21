@@ -8,15 +8,25 @@
     <form method="post" action="/disc-edit.cgi?id=46108;tab=post" enctype="multipart/form-data">
 
         <div style="padding-left:1em;">
-            <div style="width:35em; margin:auto;">
-                <div class="personal_account">
+            <div style="width:42em; margin:auto;">
+                <div th:if="${isUserAccount}" class="personal_account">
                     <label id="personal_account" th:text="${postingUsername}"></label>
                     <a href="/account/modify" style="font-size:smaller;padding-left:.5em;" target="_blank">Change Settings</a>
+                </div>
+                <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:3px;">
+                    <label id="submitter">Author:</label>
+                    <input class="button" type="text" name="newThreadSubmitter" size="30" />
+                </div>
+                <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:9px;">
+                    <label id="email">Email:</label>
+                    <input class="button" type="email" name="newThreadEmail" size="30" />
+                    <input class="button" type="checkbox" name="newThreadShowEmail" value="true">Show Email
                 </div>
 
                 <div style="margin-top:3px;margin-bottom:3px;">
                     Subject
-                    <input type="text" name="newThreadSubject" size="30" maxlength="60" />
+                    <input class="button" type="text" name="newThreadSubject" size="30" maxlength="60" />
+                    <input class="button" type="checkbox" name="newThreadAdminPost" value="true">Mark As Admin Post
                 </div>
 
                 <div>Message (32 KB max)</div>
@@ -25,7 +35,7 @@
                     <textarea name="newThreadMessage" rows="20" wrap="soft"></textarea>
                 </div>
 
-                <div class="buttons">
+                <div class="buttons" style="margin-top:5px;">
                     <input type="submit" name="postArticle" value="Post Message" class="button" />
                 </div>
 
