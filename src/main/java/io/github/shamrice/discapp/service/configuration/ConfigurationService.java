@@ -54,6 +54,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply");
         configsToSet.put(ConfigurationProperty.SHARE_BUTTON_TEXT, "Share");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_URL, "/styles/graph2.css");
+        configsToSet.put(ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
+        configsToSet.put(ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, "");
         configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, "activity");
         configsToSet.put(ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, "true");

@@ -151,6 +151,37 @@ VALUES (0, 'email.notification.reply.body.template', '<html><body>
 </body></html>');
 
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.graph', '/styles/graph2.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.ocean', '/styles/ocean.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.cute', '/styles/cute.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.cyan', '/styles/cyan2.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.forest', '/styles/forest.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.midnight', '/styles/midnight.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.steely', '/styles/steely.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.traditional', '/styles/traditional.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.default', '/styles/default.css');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'stylesheet.url.maintenance', '/styles/maint.css');
+
+
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
 ON thread(application_id, parent_id, deleted, is_approved)

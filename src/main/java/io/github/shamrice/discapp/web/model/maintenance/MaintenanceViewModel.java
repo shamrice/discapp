@@ -26,7 +26,9 @@ public class MaintenanceViewModel {
     private Date epilogueModDt;
 
     //style sheet config
+    private String styleSheetSelected;
     private String styleSheetUrl;
+    private String styleSheetCustomText;
 
     // thread config
     private String threadSortOrder;
@@ -90,6 +92,10 @@ public class MaintenanceViewModel {
 
     public boolean isThreadSortOrderActivity() {
         return threadSortOrder.equalsIgnoreCase("activity");
+    }
+
+    public boolean isSelectedCssStyle(String dropDownValue) {
+        return styleSheetSelected.equalsIgnoreCase(dropDownValue);
     }
 
 }

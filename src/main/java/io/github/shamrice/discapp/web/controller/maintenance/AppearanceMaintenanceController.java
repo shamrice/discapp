@@ -5,7 +5,9 @@ import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Epilogue;
 import io.github.shamrice.discapp.data.model.Prologue;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
+import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -58,6 +60,18 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             //stylesheet config
             String styleSheetUrl = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "");
             maintenanceViewModel.setStyleSheetUrl(styleSheetUrl);
+
+            maintenanceViewModel.setStyleSheetCustomText(configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, ""));
+
+            //todo : these strings should be an enum or constant
+            String styleSheetStyle = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
+            if ("default".equalsIgnoreCase(styleSheetStyle)) {
+                maintenanceViewModel.setStyleSheetSelected(getDefaultStyleSheetTypeByUrl(styleSheetUrl));
+            } else if ("custom-url".equalsIgnoreCase(styleSheetStyle)) {
+                maintenanceViewModel.setStyleSheetSelected("custom-url");
+            } else if ("custom-inline".equalsIgnoreCase(styleSheetStyle)) {
+                maintenanceViewModel.setStyleSheetSelected("custom-inline");
+            }
 
             //threads config
             String sortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
@@ -197,20 +211,29 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                              Model model,
                                              HttpServletResponse response) {
 
-        if (maintenanceViewModel.getStyleSheetUrl() == null || maintenanceViewModel.getStyleSheetUrl().isEmpty()) {
-            maintenanceViewModel.setInfoMessage("Style sheet URL cannot be empty. Settings not saved.");
-            return getAppearanceView(appId, maintenanceViewModel, model, response);
-        }
-
         Application app = applicationService.get(appId);
 
-        String styleSheetUrl = inputHelper.sanitizeInput(maintenanceViewModel.getStyleSheetUrl());
+        String styleSheetType = maintenanceViewModel.getStyleSheetSelected();
 
-        if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl)) {
-            maintenanceViewModel.setInfoMessage("Failed to update Style Sheet URL.");
+        if ("custom-inline".equalsIgnoreCase(styleSheetType)) {
+            String customStyleSheetText = maintenanceViewModel.getStyleSheetCustomText();
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, customStyleSheetText);
+
+            String styleSheetUrl = AppCustomCssUrl.CUSTOM_CSS_URL_PREFIX + appId + AppCustomCssUrl.CUSTOM_CSS_URL_SUFFIX;
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+
+        } else if ("custom-url".equalsIgnoreCase(styleSheetType)) {
+            String styleSheetUrl = inputHelper.sanitizeInput(maintenanceViewModel.getStyleSheetUrl());
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         } else {
-            maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
+            String styleSheetUrl = getDefaultStyleSheetUrlByType(styleSheetType);
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
+            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         }
+
+        maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
 
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
@@ -483,6 +506,59 @@ public class AppearanceMaintenanceController extends MaintenanceController {
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId) {
         return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+    }
+
+
+    private String getDefaultStyleSheetTypeByUrl(String styleSheetUrl) {
+
+        //todo: this is nasty...
+
+        if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_GRAPH, "/styles/graph2.css"))) {
+            return "graph";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_OCEAN, "/styles/ocean.css"))) {
+            return "ocean";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_CUTE, "/styles/cute.css"))) {
+            return "cute";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_CYAN, "/styles/cyan2.css"))) {
+            return "cyan";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_FOREST, "/styles/forest.css"))) {
+            return "forest";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_MIDNIGHT, "/styles/midnight.css"))) {
+            return "midnight";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_STEELY, "/styles/steely.css"))) {
+            return "steely";
+        } else if (styleSheetUrl.equals(configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_TRADITIONAL, "/styles/traditional.css"))) {
+            return "traditional";
+        } else {
+            log.warn("No default style sheet url found that matches: " + styleSheetUrl);
+            return "";
+        }
+    }
+
+    private String getDefaultStyleSheetUrlByType(String styleSheetType) {
+
+        //todo : types should be an enum somewhere.
+        switch (styleSheetType) {
+            case "graph":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_GRAPH, "/styles/graph2.css");
+            case "ocean":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_OCEAN, "/styles/ocean.css");
+            case "cute":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_CUTE, "/styles/cute.css");
+            case "cyan":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_CYAN, "/styles/cyan2.css");
+            case "forest":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_FOREST, "/styles/forest.css");
+            case "midnight":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_MIDNIGHT, "/styles/midnight.css");
+            case "steely":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_STEELY, "/styles/steely.css");
+            case "traditional":
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.STYLE_SHEET_URL_TRADITIONAL, "/styles/traditional.css");
+            default:
+                log.warn("No default style sheet type found that matches: " + styleSheetType);
+                return "";
+        }
     }
 
 }

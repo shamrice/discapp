@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
-    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link href="/styles/maint.css" rel="stylesheet" type="text/css"/>
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
 
     <style type="text/css">
     div.style_buttons input { padding:3px; background-color:#fff; border:1px solid #000;}
@@ -59,11 +59,12 @@
     }
 
     .dataTable td { border: 1px solid; }
+
     </style>
 </head>
 <body>
 
-<div th:if="${maintenanceViewModel.getApplicationId()}" class="preview_div">
+<div class="preview_div" th:if="${maintenanceViewModel.getApplicationId()}">
     <iframe id="preview_iframe" th:src="@{|/admin/appearance-preview.cgi?id=${appId}|}"></iframe>
 </div>
 
@@ -73,39 +74,39 @@
         static thread prototyping placeholder
     </div>
 
-    <div th:if="${maintenanceViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+    <div class="alert alert-error grey_box" th:if="${maintenanceViewModel.getInfoMessage()}"
          th:text="${maintenanceViewModel.getInfoMessage()}">
     </div>
 
-    <div class="grey_box closed" id="app_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="app_configuration_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
     <span class="toggle" onclick="switchElements('app_configuration_closed', 'app_configuration_open');"
           title="Show application controls">Application +</span>
     </div>
 
-    <div class="grey_box" id="app_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:none;">
+    <div class="grey_box" id="app_configuration_open" style="display:none;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="app_close_toggle">
         <span class="toggle close" onclick="switchElements('app_configuration_open', 'app_configuration_closed');"
               title="Hide application controls">close</span>
         </div>
 
-        <form name="f"
+        <form method="post"
+              name="f"
               th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}|}"
-              method="post"
               th:object="${maintenanceViewModel}">
 
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="app_configuration_open"/>
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="app_configuration_open"/>
             <table>
 
                 <tr>
                     <td><label>Disc App Id:</label></td>
                     <td class="value-label">
-                        <a th:href="@{|/indices/${maintenanceViewModel.getApplicationId()}|}"
-                           th:text="${maintenanceViewModel.getApplicationId()}"
-                           target="_top"></a>
+                        <a target="_top"
+                           th:href="@{|/indices/${maintenanceViewModel.getApplicationId()}|}"
+                           th:text="${maintenanceViewModel.getApplicationId()}"></a>
                     </td>
                 </tr>
                 <tr>
@@ -118,8 +119,9 @@
                 </tr>
                 <tr>
                     <td><label>Disc App Name:</label></td>
-                    <td><input type="text" id="applicationName" name="applicationName"
-                               th:value="${maintenanceViewModel.getApplicationName()}"/></td>
+                    <td><input id="applicationName" name="applicationName"
+                               th:value="${maintenanceViewModel.getApplicationName()}"
+                               type="text"/></td>
                 </tr>
 
                 <tr>
@@ -135,15 +137,15 @@
         </form>
     </div>
 
-    <div class="grey_box closed" id="css_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="css_configuration_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
     <span class="toggle" onclick="switchElements('css_configuration_closed', 'css_configuration_open');"
           title="Show css controls">Style Sheet +</span>
     </div>
 
 
-    <div class="grey_box" id="css_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:none;">
+    <div class="grey_box" id="css_configuration_open" style="display:none;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="css_close_toggle">
         <span class="toggle close" onclick="switchElements('css_configuration_open', 'css_configuration_closed');"
@@ -154,16 +156,70 @@
             function setStyleSheetUrl(url) {
                 document.getElementById("styleSheetUrl").value = url;
             }
+
+            function hideStyleSheetInput() {
+                document.getElementById("styleSheetUrlInput").style.display = 'none';
+                document.getElementById("styleSheetCustomInput").style.display = 'none';
+            }
+
+            function displayStyleSheetUrlInput() {
+                document.getElementById("styleSheetCustomInput").style.display = 'none';
+                document.getElementById("styleSheetUrlInput").style.display = 'block';
+            }
+
+            function displayStyleSheetCustomInput() {
+                document.getElementById("styleSheetUrlInput").style.display = 'none';
+                document.getElementById("styleSheetCustomInput").style.display = 'block';
+
+            }
+
         </script>
 
-        <form name="f"
+        <form method="post"
+              name="f"
               th:action="@{|/admin/modify/stylesheet?id=${maintenanceViewModel.getApplicationId()}|}"
-              method="post"
               th:object="${maintenanceViewModel}">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="css_configuration_open"/>
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="css_configuration_open"/>
             <table>
+
                 <tr>
+                    <td>
+                        Style Sheet:
+                    </td>
+                    <td>
+                        <select class="button" name="styleSheetSelected">
+                            <option onclick="hideStyleSheetInput()" value="cute" th:selected="${maintenanceViewModel.isSelectedCssStyle('cute')}">Cute</option>
+                            <option onclick="hideStyleSheetInput()" value="cyan" th:selected="${maintenanceViewModel.isSelectedCssStyle('cyan')}">Cyan</option>
+                            <option onclick="hideStyleSheetInput()" value="forest" th:selected="${maintenanceViewModel.isSelectedCssStyle('forest')}">Forest</option>
+                            <option onclick="hideStyleSheetInput()" value="graph" th:selected="${maintenanceViewModel.isSelectedCssStyle('graph')}">Graph</option>
+                            <option onclick="hideStyleSheetInput()" value="midnight" th:selected="${maintenanceViewModel.isSelectedCssStyle('midnight')}">Midnight</option>
+                            <option onclick="hideStyleSheetInput()" value="ocean" th:selected="${maintenanceViewModel.isSelectedCssStyle('ocean')}">Ocean</option>
+                            <option onclick="hideStyleSheetInput()" value="steely" th:selected="${maintenanceViewModel.isSelectedCssStyle('steely')}">Steely</option>
+                            <option onclick="hideStyleSheetInput()" value="traditional" th:selected="${maintenanceViewModel.isSelectedCssStyle('traditional')}">Traditional</option>
+                            <option onclick="displayStyleSheetUrlInput()" value="custom-url" th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-url')}">Custom - From Url</option>
+                            <option onclick="displayStyleSheetCustomInput()" value="custom-inline" th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-inline')}">Custom - User
+                                Entered
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div id="styleSheetUrlInput" style="display:none;">
+                Style Sheet URL:
+                <input id="styleSheetUrl" name="styleSheetUrl" th:value="${maintenanceViewModel.getStyleSheetUrl()}"
+                       type="text"
+                       width="80"/>
+            </div>
+
+            <div id="styleSheetCustomInput" style="display:none;">
+                Custom CSS:<br/>
+                <textarea cols="120" maxlength="16384" name="styleSheetCustomText" rows="16"
+                          th:utext="${maintenanceViewModel.getStyleSheetCustomText()}" wrap="soft">
+                    </textarea>
+            </div>
+            <table>
+                <!--tr>
                     <td>Style Sheet URL:</td>
                     <td><input type="text" name="styleSheetUrl" id="styleSheetUrl"
                                th:value="${maintenanceViewModel.getStyleSheetUrl()}"/>
@@ -201,7 +257,7 @@
                             </li>
                         </ul>
                     </td>
-                </tr>
+                </tr-->
 
                 <tr>
                     <td colspan="2">&nbsp;</td>
@@ -217,45 +273,47 @@
     </div>
 
 
-    <div class="grey_box closed" id="thread_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="thread_configuration_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
     <span class="toggle" onclick="switchElements('thread_configuration_closed', 'thread_configuration_open');"
           title="Show thread controls">Threads +</span>
     </div>
 
-    <div class="grey_box" id="thread_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:none;">
+    <div class="grey_box" id="thread_configuration_open" style="display:none;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="threadbox_close_toggle">
         <span class="toggle close" onclick="switchElements('thread_configuration_open', 'thread_configuration_closed');"
               title="Hide thread controls">close</span>
         </div>
 
-        <form name="f"
+        <form method="post"
+              name="f"
               th:action="@{|/admin/modify/threads?id=${maintenanceViewModel.getApplicationId()}|}"
-              method="post"
               th:object="${maintenanceViewModel}">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="thread_configuration_open"/>
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="thread_configuration_open"/>
             <table id="app_prefs" style="">
                 <tr>
                     <th>Sort threads in order of</th>
                     <td>
                         <label>
-                            <input type="radio" name="threadSortOrder" value="CREATION"
-                                   th:checked="${maintenanceViewModel.isThreadSortOrderCreation()}"/>creation</label>
+                            <input name="threadSortOrder"
+                                   th:checked="${maintenanceViewModel.isThreadSortOrderCreation()}" type="radio"
+                                   value="CREATION"/>creation</label>
                         <label>
-                            <input type="radio" name="threadSortOrder" value="ACTIVITY"
-                                   th:checked="${maintenanceViewModel.isThreadSortOrderActivity()}"/>activity</label>
+                            <input name="threadSortOrder"
+                                   th:checked="${maintenanceViewModel.isThreadSortOrderActivity()}" type="radio"
+                                   value="ACTIVITY"/>activity</label>
                     </td>
                 </tr>
                 <tr>
                     <th>Expand threads on index pages?</th>
                     <td>
                         <label>
-                            <input type="checkbox" name="expandThreadsOnIndex"
+                            <input id="expandThreadsOnIndex" name="expandThreadsOnIndex"
                                    th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}"
-                                   id="expandThreadsOnIndex"/>
+                                   type="checkbox"/>
                         </label>
                     </td>
                 </tr>
@@ -263,51 +321,59 @@
                     <th>Preview the first message in a thread on the index page?</th>
                     <td>
                         <label>
-                            <input type="checkbox" name="previewFirstMessageOnIndex"
+                            <input id="previewFirstMessageOnIndex" name="previewFirstMessageOnIndex"
                                    th:checked="${maintenanceViewModel.isPreviewFirstMessageOnIndex()}"
-                                   id="previewFirstMessageOnIndex"/>
+                                   type="checkbox"/>
                         </label>
                     </td>
                 </tr>
                 <tr>
                     <th>Highlight new messages? <a class="hidden_text"
-                                                   th:href="@{|/admin/disc-docs.cgi?id=${maintenanceViewModel.getApplicationId()}#highlight_new_messages|}"
-                                                   target="_blank">(more)<span>If you enable this option, then replies posted in the past 24 hours will be highlighted (that is, replies to threads that are over a day old).<br><br>If you use your own style sheet, then you'll have to add a rule for LI.new_message or SPAN.new_message.</span></a>
+                                                   target="_blank"
+                                                   th:href="@{|/admin/disc-docs.cgi?id=${maintenanceViewModel.getApplicationId()}#highlight_new_messages|}">(more)<span>If you enable this option, then replies posted in the past 24 hours will be highlighted (that is, replies to threads that are over a day old).<br><br>If you use your own style sheet, then you'll have to add a rule for LI.new_message or SPAN.new_message.</span></a>
                     </th>
                     <td>
                         <label>
-                            <input type="checkbox" name="highlightNewMessages"
+                            <input id="highlightNewMessages" name="highlightNewMessages"
                                    th:checked="${maintenanceViewModel.isHighlightNewMessages()}"
-                                   id="highlightNewMessages"/>
+                                   type="checkbox"/>
                         </label>
                     </td>
                 </tr>
             </table>
             <p><b>Thread Break</b> (Text that appears between expanded threads)
-                <input type="text" name="threadBreak"
-                       th:value="${maintenanceViewModel.getThreadBreak()}"
-                       size="35" maxlength="128"/>
+                <input maxlength="128" name="threadBreak"
+                       size="35"
+                       th:value="${maintenanceViewModel.getThreadBreak()}" type="text"/>
             </p>
             <p><b>Entry Break</b> (Text that appears between subject and author in the list of messages)
-                <input type="text" name="entryBreak" th:value="${maintenanceViewModel.getEntryBreak()}" size="35"
-                       maxlength="128"/>
+                <input maxlength="128" name="entryBreak" size="35" th:value="${maintenanceViewModel.getEntryBreak()}"
+                       type="text"/>
             </p>
 
             <p><b>Threads Per Page</b> (Number of threads on each page)
-                <select name="maxThreadCountPerPage" class="button" style="border:1px solid black;">
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(5)}" value="5">5</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(10)}" value="10">10</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(15)}" value="15">15</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(20)}" value="20">20</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(25)}" value="25">25</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(30)}" value="30">30</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(40)}" value="40">40</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(50)}" value="50">50</option>
+                <select class="button" name="maxThreadCountPerPage" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(5)}" value="5">5
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(10)}" value="10">10
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(15)}" value="15">15
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(20)}" value="20">20
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(25)}" value="25">25
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(30)}" value="30">30
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(40)}" value="40">40
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedMaxThreadCountPerPage(50)}" value="50">50
+                    </option>
                 </select>
             </p>
 
             <p><b>Thread Depth</b> (Number of indented replies before presenting a "# more comments" link)
-                <select name="threadDepth" class="button" style="border:1px solid black;">
+                <select class="button" name="threadDepth" style="border:1px solid black;">
                     <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(3)}" value="3">3</option>
                     <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(4)}" value="4">4</option>
                     <option th:selected="${maintenanceViewModel.isSelectedThreadDepth(5)}" value="5">5</option>
@@ -339,23 +405,37 @@
                 </select>
             </p>
 
-            <p><b>Preview Length on Top Level Threads</b> (Number characters in first message preview before presenting a "more" link)
-                <select name="previewTopLevelLength" class="button" style="border:1px solid black;">
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(200)}" value="200">200 - Small</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(320)}" value="320">320 - Medium</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(500)}" value="500">500 - Large</option>
+            <p><b>Preview Length on Top Level Threads</b> (Number characters in first message preview before presenting
+                a "more" link)
+                <select class="button" name="previewTopLevelLength" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(200)}" value="200">200 -
+                        Small
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(320)}" value="320">320 -
+                        Medium
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewTopLevelLength(500)}" value="500">500 -
+                        Large
+                    </option>
                 </select>
             </p>
 
-            <p><b>Preview Length on Replies</b> (Number characters in reply previews before presenting a "more" link on view thread page)
-                <select name="previewReplyLength" class="button" style="border:1px solid black;">
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(100)}" value="100">100 - Small</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(200)}" value="200">200 - Medium</option>
-                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(300)}" value="300">300 - Large</option>
+            <p><b>Preview Length on Replies</b> (Number characters in reply previews before presenting a "more" link on
+                view thread page)
+                <select class="button" name="previewReplyLength" style="border:1px solid black;">
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(100)}" value="100">100 -
+                        Small
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(200)}" value="200">200 -
+                        Medium
+                    </option>
+                    <option th:selected="${maintenanceViewModel.isSelectedPreviewReplyLength(300)}" value="300">300 -
+                        Large
+                    </option>
                 </select>
             </p>
 
-            <input type="submit" name="ChangeThreads" value="Change Threads" class="button"/>
+            <input class="button" name="ChangeThreads" type="submit" value="Change Threads"/>
         </form>
     </div>
 
@@ -371,32 +451,33 @@
         <span class="toggle close" onclick="switchElements('headerbox_open', 'headerbox_closed');"
               title="Hide header controls">close</span>
         </div>
-        <form th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}|}"
+        <form enctype="multipart/form-data"
               method="post"
-              th:object="${maintenanceViewModel}" enctype="multipart/form-data">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="headerbox_open"/>
+              th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}|}"
+              th:object="${maintenanceViewModel}">
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="headerbox_open"/>
             <p><b>Header</b> (Text that appears at the top of every page):
-                <input type="text" name="header" th:value="${maintenanceViewModel.getHeader()}" size="35"
-                       maxlength="128"/>
+                <input maxlength="128" name="header" size="35" th:value="${maintenanceViewModel.getHeader()}"
+                       type="text"/>
             </p>
             <p><b>Footer</b> (Text that appears at the bottom of every page):
-                <input type="text" name="footer" th:value="${maintenanceViewModel.getFooter()}" size="35"
-                       maxlength="128"/>
+                <input maxlength="128" name="footer" size="35" th:value="${maintenanceViewModel.getFooter()}"
+                       type="text"/>
             </p>
-            <input type="submit" name="ChangePageHeader" value="Submit Changes" class="button"/></form>
+            <input class="button" name="ChangePageHeader" type="submit" value="Submit Changes"/></form>
     </div>
 
 
-    <div class="grey_box closed" id="prologue_configuration_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="prologue_configuration_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
     <span class="toggle" onclick="switchElements('prologue_configuration_closed', 'prologue_configuration_open');"
           title="Show prologue/epilogue controls">Prologue/Epilogue +</span>
     </div>
 
 
-    <div class="grey_box" id="prologue_configuration_open" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:none;">
+    <div class="grey_box" id="prologue_configuration_open" style="display:none;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="prologue_close_toggle">
         <span class="toggle close"
@@ -404,12 +485,12 @@
               title="Hide prologue/epilogue controls">close</span>
         </div>
 
-        <form name="f"
+        <form method="post"
+              name="f"
               th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}|}"
-              method="post"
               th:object="${maintenanceViewModel}">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="prologue_configuration_open"/>
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="prologue_configuration_open"/>
             <table>
                 <tr>
                     <td>
@@ -418,8 +499,8 @@
                 </tr>
                 <tr>
                     <td>
-                        <textarea name="prologueText" rows="24" cols="120" wrap="soft"
-                                  th:utext="${maintenanceViewModel.getPrologueText()}" maxlength="16384"></textarea>
+                        <textarea cols="120" maxlength="16384" name="prologueText" rows="24"
+                                  th:utext="${maintenanceViewModel.getPrologueText()}" wrap="soft"></textarea>
                     </td>
                 </tr>
                 <tr>
@@ -439,8 +520,8 @@
                 </tr>
                 <tr>
                     <td>
-                        <textarea name="epilogueText" rows="24" cols="120" wrap="soft"
-                                  th:utext="${maintenanceViewModel.getEpilogueText()}" maxlength="16384"></textarea>
+                        <textarea cols="120" maxlength="16384" name="epilogueText" rows="24"
+                                  th:utext="${maintenanceViewModel.getEpilogueText()}" wrap="soft"></textarea>
                     </td>
                 </tr>
                 <tr>
@@ -463,86 +544,86 @@
         </form>
     </div>
 
-    <div class="grey_box closed" id="labelbox_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="labelbox_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
         <span class="toggle" onclick="switchElements('labelbox_closed', 'labelbox_open');" title="Show label controls">Labels +</span>
     </div>
-    <div class="grey_box" id="labelbox_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
+    <div class="grey_box" id="labelbox_open" style="display:none;" th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="labelbox_close_toggle">
             <span class="toggle close" onclick="switchElements('labelbox_open', 'labelbox_closed');"
                   title="Hide label controls">close</span>
         </div>
 
-        <form method="post"
+        <form enctype="multipart/form-data"
+              method="post"
               th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}|}"
-              th:object="${maintenanceViewModel}"
-              enctype="multipart/form-data">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="labelbox_open"/>
+              th:object="${maintenanceViewModel}">
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="labelbox_open"/>
             <p>The following labels appear when posting a message to your DiscussionApp and also as column headers when
                 using collapsed threads.</p>
             <table>
                 <tr>
                     <th>Author</th>
                     <td>
-                        <input type="text" name="authorHeader" th:value="${maintenanceViewModel.getAuthorHeader()}"
-                               size="32" maxlength="32"/>
+                        <input maxlength="32" name="authorHeader" size="32"
+                               th:value="${maintenanceViewModel.getAuthorHeader()}" type="text"/>
                     </td>
                 </tr>
                 <tr>
                     <th>Date</th>
                     <td>
-                        <input type="text" name="dateHeader" th:value="${maintenanceViewModel.getDateHeader()}"
-                               size="32" maxlength="32"/>
+                        <input maxlength="32" name="dateHeader" size="32"
+                               th:value="${maintenanceViewModel.getDateHeader()}" type="text"/>
                     </td>
                 </tr>
                 <tr>
                     <th>Email</th>
                     <td>
-                        <input type="text" name="emailHeader" th:value="${maintenanceViewModel.getEmailHeader()}"
-                               size="32" maxlength="32"/>
+                        <input maxlength="32" name="emailHeader" size="32"
+                               th:value="${maintenanceViewModel.getEmailHeader()}" type="text"/>
                     </td>
                 </tr>
                 <tr>
                     <th>Subject</th>
                     <td>
-                        <input type="text" name="subjectHeader" th:value="${maintenanceViewModel.getSubjectHeader()}"
-                               size="32" maxlength="32"/>
+                        <input maxlength="32" name="subjectHeader" size="32"
+                               th:value="${maintenanceViewModel.getSubjectHeader()}" type="text"/>
                     </td>
                 </tr>
                 <tr>
                     <th>Message</th>
                     <td>
-                        <input type="text" name="messageHeader" th:value="${maintenanceViewModel.getMessageHeader()}"
-                               size="32" maxlength="32"/>
+                        <input maxlength="32" name="messageHeader" size="32"
+                               th:value="${maintenanceViewModel.getMessageHeader()}" type="text"/>
                     </td>
                 </tr>
             </table>
-            <input type="submit" name="ChangeFieldHeaders" value="Change Labels" class="button"/>
+            <input class="button" name="ChangeFieldHeaders" type="submit" value="Change Labels"/>
         </form>
     </div>
 
-    <div class="grey_box closed" id="buttonbox_closed" th:if="${maintenanceViewModel.getApplicationId()}"
-         style="display:block;">
+    <div class="grey_box closed" id="buttonbox_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
         <span class="toggle" onclick="switchElements('buttonbox_closed', 'buttonbox_open');"
               title="Show button controls">Buttons +</span>
     </div>
 
-    <div class="grey_box" id="buttonbox_open" th:if="${maintenanceViewModel.getApplicationId()}" style="display:none;">
+    <div class="grey_box" id="buttonbox_open" style="display:none;" th:if="${maintenanceViewModel.getApplicationId()}">
 
         <div class="toggle" id="buttonbox_close_toggle">
             <span class="toggle close" onclick="switchElements('buttonbox_open', 'buttonbox_closed');"
                   title="Hide button controls">close</span>
         </div>
 
-        <form method="post"
+        <form enctype="multipart/form-data"
+              method="post"
               th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}|}"
-              th:object="${maintenanceViewModel}"
-              enctype="multipart/form-data">
-            <input type="hidden" name="windowState" value=""/>
-            <input type="hidden" name="submittedFromDiv" value="buttonbox_open"/>
-            <input type="hidden" name="id" th:value="${maintenanceViewModel.getApplicationId()}"/>
+              th:object="${maintenanceViewModel}">
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="buttonbox_open"/>
+            <input name="id" th:value="${maintenanceViewModel.getApplicationId()}" type="hidden"/>
             <p>Here, you can change the appearance of the various buttons in your DiscussionApp. In each textbox, you
                 can specify the text for the corresponding button or you can enter the URL of a graphic image
                 instead.</p>
@@ -552,8 +633,8 @@
                         <label for="shareButton">Share</label>
                     </th>
                     <td>
-                        <input type="text" id="shareButton" name="shareButton"
-                               th:value="${maintenanceViewModel.getShareButton()}"/>
+                        <input id="shareButton" name="shareButton" th:value="${maintenanceViewModel.getShareButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -561,8 +642,8 @@
                         <label for="editButton">Edit</label>
                     </th>
                     <td>
-                        <input type="text" id="editButton" name="editButton"
-                               th:value="${maintenanceViewModel.getEditButton()}"/>
+                        <input id="editButton" name="editButton" th:value="${maintenanceViewModel.getEditButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -570,8 +651,9 @@
                         <label for="returnButton">Return</label>
                     </th>
                     <td>
-                        <input type="text" id="returnButton" name="returnButton"
-                               th:value="${maintenanceViewModel.getReturnButton()}"/>
+                        <input id="returnButton" name="returnButton"
+                               th:value="${maintenanceViewModel.getReturnButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -579,8 +661,9 @@
                         <label for="previewButton">Preview</label>
                     </th>
                     <td>
-                        <input type="text" id="previewButton" name="previewButton"
-                               th:value="${maintenanceViewModel.getPreviewButton()}"/>
+                        <input id="previewButton" name="previewButton"
+                               th:value="${maintenanceViewModel.getPreviewButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -588,8 +671,8 @@
                         <label for="postButton">Post</label>
                     </th>
                     <td>
-                        <input type="text" id="postButton" name="postButton"
-                               th:value="${maintenanceViewModel.getPostButton()}"/>
+                        <input id="postButton" name="postButton" th:value="${maintenanceViewModel.getPostButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -597,8 +680,9 @@
                         <label for="previousButton">Previous Page</label>
                     </th>
                     <td>
-                        <input type="text" id="previousButton" name="previousPageButton"
-                               th:value="${maintenanceViewModel.getPreviousPageButton()}"/>
+                        <input id="previousButton" name="previousPageButton"
+                               th:value="${maintenanceViewModel.getPreviousPageButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -606,8 +690,9 @@
                         <label for="nextButton">Next Page</label>
                     </th>
                     <td>
-                        <input type="text" id="nextButton" name="nextPageButton"
-                               th:value="${maintenanceViewModel.getNextPageButton()}"/>
+                        <input id="nextButton" name="nextPageButton"
+                               th:value="${maintenanceViewModel.getNextPageButton()}"
+                               type="text"/>
                     </td>
                 </tr>
                 <tr>
@@ -615,30 +700,31 @@
                         <label for="replyButton">Reply</label>
                     </th>
                     <td>
-                        <input type="text" id="replyButton" name="replyButton"
-                               th:value="${maintenanceViewModel.getReplyButton()}"/>
+                        <input id="replyButton" name="replyButton" th:value="${maintenanceViewModel.getReplyButton()}"
+                               type="text"/>
                     </td>
                 </tr>
             </table>
-            <input type="submit" name="ChangeButtons" value="Change Buttons" class="button"/>
+            <input class="button" name="ChangeButtons" type="submit" value="Change Buttons"/>
         </form>
     </div>
 
     <div class="grey_box" th:if="${maintenanceViewModel.getApplicationId()}">
-        <form method="post"
+        <form enctype="multipart/form-data"
+              method="post"
               th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
-              th:object="${maintenanceViewModel}"
-              enctype="multipart/form-data">
-            <input type="hidden" name="windowState" value=""/>
+              th:object="${maintenanceViewModel}">
+            <input name="windowState" type="hidden" value=""/>
             <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon URL</a>
-            <input type="text" name="favicon" th:value="${maintenanceViewModel.getFavicon()}" size="40"
-                   maxlength="128"/>
-            <input type="submit" name="ChangeFavicon" value="Change Favicon" class="button"/>
+            <input maxlength="128" name="favicon" size="40" th:value="${maintenanceViewModel.getFavicon()}"
+                   type="text"/>
+            <input class="button" name="ChangeFavicon" type="submit" value="Change Favicon"/>
         </form>
     </div>
 
-    <input type="hidden" id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}"/>
-    <input type="hidden" id="previousSubmittedFromDiv" th:value="${maintenanceViewModel.getSubmittedFromDiv()}"/>
+    <input id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}" type="hidden"/>
+    <input id="previousSubmittedFromDiv" th:value="${maintenanceViewModel.getSubmittedFromDiv()}" type="hidden"/>
+    <input id="previousCssChoice" th:value="${maintenanceViewModel.getStyleSheetSelected()}" type="hidden" />
 </div>
 
 <script type="text/javascript">
@@ -678,11 +764,23 @@ function restoreWindowStates() {
         var windowOffset = document.getElementById(previousSubmittedFromDiv).offsetTop;
         window.scrollTo(0, windowOffset);
     }
+
+    var cssSelected = document.getElementById('previousCssChoice').value;
+    if (cssSelected != "") {
+        if (cssSelected == "custom-url") {
+            displayStyleSheetUrlInput();
+        } else if (cssSelected == "custom-inline") {
+            displayStyleSheetCustomInput();
+        } else {
+            hideStyleSheetInput();
+        }
+    }
 }
 
 window.onload = restoreWindowStates();
 
  //parent.frames.preview.document.location.reload();
+
 </script>
 
 </body>

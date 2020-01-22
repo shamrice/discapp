@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.filter;
 
 import io.github.shamrice.discapp.data.model.ApplicationIpBlock;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             String url = req.getRequestURL().toString();
 
             //todo : fix so filter works correctly on /indices/search?disc=appid urls.
-            if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains(AUTH_INDICES_URL)) {
+            if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains(AUTH_INDICES_URL) && !url.toLowerCase().contains(AppCustomCssUrl.CUSTOM_CSS_URL_PREFIX)) {
 
                 String ipAddress = req.getHeader("X-FORWARDED-FOR");
                 if (ipAddress == null || ipAddress.isEmpty()) {
