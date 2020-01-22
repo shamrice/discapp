@@ -316,6 +316,7 @@ public class DiscAppController {
             model.addAttribute(PARENT_THREAD_SUBJECT, newThreadViewModel.getParentThreadSubject());
             model.addAttribute(PARENT_THREAD_BODY, newThreadViewModel.getParentThreadBody());
             model.addAttribute(CURRENT_PAGE, newThreadViewModel.getCurrentPage());
+            model.addAttribute(MARK_ADMIN_POST, newThreadViewModel.isMarkAdminPost());
 
             //preview always returns empty string if checkbox was not previously selected. update accordingly.
             if (newThreadViewModel.getSubscribe() != null && !newThreadViewModel.getSubscribe().trim().isEmpty()) {
@@ -460,7 +461,7 @@ public class DiscAppController {
 
                 if (threadService.isNewThreadPostTooSoon(appId, ipAddress)) {
                     log.error("Cannot create thread so soon after creating previous thread. Returning user to page with error.");
-                    //TODO : centralise error messages.
+                    //TODO : centralize error messages.
                     newThreadViewModel.setErrorMessage("New message too soon after previous post. Please try again.");
                     return createNewThread(appId, null, newThreadViewModel, response, model);
                 }

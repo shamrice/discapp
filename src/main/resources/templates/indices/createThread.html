@@ -51,13 +51,6 @@
                             <input type="hidden" name="email" size="30" maxlength="60" th:value="${email}"/>
                             <input type="hidden" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
                         </td>
-                        <td th:if="${isAdmin}" colspan="2">
-                            <label id="admin_flare">
-                                Mark post as admin post?
-                                <input type="checkbox" name="markAdminPost" value="true"/>
-                            </label>
-                        </td>
-
                     </tr>
 
                 </div>
@@ -85,6 +78,12 @@
                 <tr>
                     <td class="entries_header" th:utext="${subjectLabel}"></td>
                     <td><input type="text" name="subject" size="30" maxlength="60" th:value="${subject}"/></td>
+                    <td th:if="${isAdmin}">
+                        <label id="admin_flare">
+                            <input type="checkbox" name="markAdminPost" value="true" th:checked="${markAdminPost}"/>
+                            Mark post as admin post?
+                        </label>
+                    </td>
                 </tr>
 
             </table>

@@ -12,6 +12,7 @@ public class CommonModelAttributeNames {
     public static final String IS_LOGGED_IN = "isLoggedIn";
     public static final String IS_LOGGED_IN_SYSTEM_ACCOUNT = "isLoggedInSystemAccount";
     public static final String IS_ADMIN = "isAdmin";
+    public static final String MARK_ADMIN_POST = "markAdminPost";
     public static final String APP_URL = "appUrl";
 
     public static final String ERROR = "error";
