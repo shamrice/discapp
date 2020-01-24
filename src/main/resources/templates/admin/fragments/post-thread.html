@@ -5,28 +5,41 @@
 <body>
 <div class="post-thread" th:fragment="post-thread">
 
-    <form method="post" action="/disc-edit.cgi?id=46108;tab=post" enctype="multipart/form-data">
+    <form method="post" th:action="@{|/disc-edit.cgi?id=${maintenanceThreadViewModel.getApplicationId()}&amp;tab=post|}"
+          enctype="multipart/form-data">
 
         <div style="padding-left:1em;">
             <div style="width:42em; margin:auto;">
                 <div th:if="${isUserAccount}" class="personal_account">
                     <label id="personal_account" th:text="${postingUsername}"></label>
-                    <a href="/account/modify" style="font-size:smaller;padding-left:.5em;" target="_blank">Change Settings</a>
+                    <a href="/account/modify" style="font-size:smaller;padding-left:.5em;" target="_blank">Change
+                        Settings</a>
                 </div>
                 <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:3px;">
                     <label id="submitter">Author:</label>
-                    <input class="button" type="text" name="newThreadSubmitter" size="30" />
+                    <input class="button" type="text" name="newThreadSubmitter" size="30"/>
                 </div>
                 <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:9px;">
                     <label id="email">Email:</label>
-                    <input class="button" type="email" name="newThreadEmail" size="30" />
+                    <input class="button" type="email" name="newThreadEmail" size="30"/>
                     <input class="button" type="checkbox" name="newThreadShowEmail" value="true">Show Email
                 </div>
 
                 <div style="margin-top:3px;margin-bottom:3px;">
                     Subject
-                    <input class="button" type="text" name="newThreadSubject" size="30" maxlength="60" />
-                    <input class="button" type="checkbox" name="newThreadAdminPost" value="true">Mark As Admin Post
+                    <input class="button" type="text" name="newThreadSubject" size="30" maxlength="60"/>
+                    <input class="button" type="checkbox" name="newThreadAdminPost" value="true"/>Mark As Admin Post
+                    <sup>
+                        <a class="hidden_text" target="_blank" style="text-size:smaller;"
+                           th:href="@{|/admin/disc-docs.cgi?id=${maintenanceThreadViewModel.getApplicationId()}#admin_post_distinction|}">?
+                            <span>
+                        Checking this option will add the following flare to a post after the author:
+                            <b class="admin_post">Admin</b>
+                            <br/>
+                            This style can be changed by CSS. Please refer the documentation off the admin page for more information.
+                        </span>
+                        </a>
+                    </sup>
                 </div>
 
                 <div>Message (32 KB max)</div>
@@ -36,7 +49,7 @@
                 </div>
 
                 <div class="buttons" style="margin-top:5px;">
-                    <input type="submit" name="postArticle" value="Post Message" class="button" />
+                    <input type="submit" name="postArticle" value="Post Message" class="button"/>
                 </div>
 
             </div>

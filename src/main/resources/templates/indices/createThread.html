@@ -18,6 +18,7 @@
         /* li { margin-top: 1ex } */
 
         div.message_preview { width:30em; }
+
     </style>
 
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -81,7 +82,12 @@
                     <td th:if="${isAdmin}">
                         <label id="admin_flare">
                             <input type="checkbox" name="markAdminPost" value="true" th:checked="${markAdminPost}"/>
-                            Mark post as admin post?
+                            Mark post as admin post
+                            <sup>
+                                <a target="_blank" style="text-size:smaller;"
+                                   th:href="@{|/admin/disc-docs.cgi?id=${appId}#admin_post_distinction|}">?
+                                </a>
+                            </sup>
                         </label>
                     </td>
                 </tr>
@@ -96,7 +102,8 @@
 
             <div>
                 <label>
-                    <input type="checkbox" name="subscribe" value="subscribe" th:checked="${subscribe}" th:text="@{|Check here to get daily updates for ${appName}|}" />
+                    <input type="checkbox" name="subscribe" value="subscribe" th:checked="${subscribe}"
+                           th:text="@{|Check here to get daily updates for ${appName}|}"/>
                 </label>
             </div>
 

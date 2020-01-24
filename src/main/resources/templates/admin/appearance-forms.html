@@ -60,6 +60,7 @@
 
     .dataTable td { border: 1px solid; }
 
+
     </style>
 </head>
 <body>
@@ -173,6 +174,7 @@
 
             }
 
+
         </script>
 
         <form method="post"
@@ -189,16 +191,37 @@
                     </td>
                     <td>
                         <select class="button" name="styleSheetSelected">
-                            <option onclick="hideStyleSheetInput()" value="cute" th:selected="${maintenanceViewModel.isSelectedCssStyle('cute')}">Cute</option>
-                            <option onclick="hideStyleSheetInput()" value="cyan" th:selected="${maintenanceViewModel.isSelectedCssStyle('cyan')}">Cyan</option>
-                            <option onclick="hideStyleSheetInput()" value="forest" th:selected="${maintenanceViewModel.isSelectedCssStyle('forest')}">Forest</option>
-                            <option onclick="hideStyleSheetInput()" value="graph" th:selected="${maintenanceViewModel.isSelectedCssStyle('graph')}">Graph</option>
-                            <option onclick="hideStyleSheetInput()" value="midnight" th:selected="${maintenanceViewModel.isSelectedCssStyle('midnight')}">Midnight</option>
-                            <option onclick="hideStyleSheetInput()" value="ocean" th:selected="${maintenanceViewModel.isSelectedCssStyle('ocean')}">Ocean</option>
-                            <option onclick="hideStyleSheetInput()" value="steely" th:selected="${maintenanceViewModel.isSelectedCssStyle('steely')}">Steely</option>
-                            <option onclick="hideStyleSheetInput()" value="traditional" th:selected="${maintenanceViewModel.isSelectedCssStyle('traditional')}">Traditional</option>
-                            <option onclick="displayStyleSheetUrlInput()" value="custom-url" th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-url')}">Custom - From Url</option>
-                            <option onclick="displayStyleSheetCustomInput()" value="custom-inline" th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-inline')}">Custom - User
+                            <option onclick="hideStyleSheetInput()" value="cute"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('cute')}">Cute
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="cyan"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('cyan')}">Cyan
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="forest"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('forest')}">Forest
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="graph"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('graph')}">Graph
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="midnight"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('midnight')}">Midnight
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="ocean"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('ocean')}">Ocean
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="steely"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('steely')}">Steely
+                            </option>
+                            <option onclick="hideStyleSheetInput()" value="traditional"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('traditional')}">Traditional
+                            </option>
+                            <option onclick="displayStyleSheetUrlInput()" value="custom-url"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-url')}">Custom - From
+                                Url
+                            </option>
+                            <option onclick="displayStyleSheetCustomInput()" value="custom-inline"
+                                    th:selected="${maintenanceViewModel.isSelectedCssStyle('custom-inline')}">Custom -
+                                User
                                 Entered
                             </option>
                         </select>
@@ -219,46 +242,6 @@
                     </textarea>
             </div>
             <table>
-                <!--tr>
-                    <td>Style Sheet URL:</td>
-                    <td><input type="text" name="styleSheetUrl" id="styleSheetUrl"
-                               th:value="${maintenanceViewModel.getStyleSheetUrl()}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">Or pick one of the following:</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <ul>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/graph2.css')">Graph</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/ocean.css')">Ocean</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/cute.css')">Cute</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/cyan2.css')">Cyan</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/forest.css')">Forest</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/midnight.css')">Midnight</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/steely.css')">Steely</a>
-                            </li>
-                            <li>
-                                <a href="#" onclick="setStyleSheetUrl('/styles/traditional.css')">Traditional</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr-->
-
                 <tr>
                     <td colspan="2">&nbsp;</td>
                 </tr>
@@ -724,7 +707,7 @@
 
     <input id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}" type="hidden"/>
     <input id="previousSubmittedFromDiv" th:value="${maintenanceViewModel.getSubmittedFromDiv()}" type="hidden"/>
-    <input id="previousCssChoice" th:value="${maintenanceViewModel.getStyleSheetSelected()}" type="hidden" />
+    <input id="previousCssChoice" th:value="${maintenanceViewModel.getStyleSheetSelected()}" type="hidden"/>
 </div>
 
 <script type="text/javascript">
@@ -780,6 +763,7 @@ function restoreWindowStates() {
 window.onload = restoreWindowStates();
 
  //parent.frames.preview.document.location.reload();
+
 
 </script>
 
