@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf()
                     .disable()
                 .authorizeRequests()
-                    .antMatchers("/error/permissionDenied").permitAll()
+                    .antMatchers("/error/**").permitAll()
                     .antMatchers("/indices/**").permitAll()
                     .antMatchers("/Indices/**").permitAll()
                     .antMatchers("/styles/**").permitAll()

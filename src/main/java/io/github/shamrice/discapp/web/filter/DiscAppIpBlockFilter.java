@@ -5,9 +5,11 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.NumberUtils;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -74,7 +76,7 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                         appIdStr = url.substring(url.lastIndexOf("/") + 1).replace(".html", "");
                     }
 
-                    if (appIdStr != null) {
+                    if (appIdStr != null && !appIdStr.isEmpty() && appIdStr.chars().allMatch(Character::isDigit)) {
                         long appId = Long.parseLong(appIdStr);
 
                         handleIpPrefixBlockedForApp(servletResponse, appId, ipAddress);
