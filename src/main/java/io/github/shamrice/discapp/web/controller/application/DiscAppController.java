@@ -286,6 +286,10 @@ public class DiscAppController {
             }
         }
 
+        if (accountHelper.checkUserHasPermission(appId, UserPermission.HOLD)) {
+            model.addAttribute("holdPermission", "New messages posted require admin approval. Your message will appear after it has been approved by an administrator.");
+        }
+
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
