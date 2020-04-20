@@ -42,6 +42,9 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     @Value("${discapp.root.email}")
     private String rootAccountEmail;
 
+    @Value("${discapp.security.bcrypt.strength}")
+    private int bcryptStrength;
+
     private final static String SITE_URL = "SITE_URL";
     private final static String USER_REGISTRATION_URL = "USER_REGISTRATION_URL";
 
@@ -125,7 +128,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             try {
                 if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                     String plainPassword = user.getPassword();
-                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(15);
+                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(bcryptStrength);
                     String encodedPassword = passwordEncoder.encode(plainPassword);
                     user.setPassword(encodedPassword);
                 }

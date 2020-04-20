@@ -60,6 +60,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/styles/**").permitAll()
                     .antMatchers("/images/**").permitAll()
                     .antMatchers("/*").permitAll()
+                    .antMatchers("/account/wizard").permitAll()
+                    .antMatchers("/account/wizard/add").permitAll()
                     .antMatchers("/account/create").permitAll()
                     .antMatchers("/account/registration").permitAll()
                     .antMatchers("/account/password/**").permitAll()

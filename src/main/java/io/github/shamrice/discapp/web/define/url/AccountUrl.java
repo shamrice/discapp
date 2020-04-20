@@ -17,6 +17,9 @@ public class AccountUrl {
     public static final String ACCOUNT_MODIFY_READ_STATUS = ACCOUNT_MODIFY + "/read/{status}";
     public static final String ACCOUNT_MODIFY_READ_RESET = ACCOUNT_MODIFY + "/read/reset";
 
+    public static final String ACCOUNT_CREATE_WIZARD = CONTROLLER_DIRECTORY_URL + "wizard";
+    public static final String ACCOUNT_CREATE_WIZARD_ADD = CONTROLLER_DIRECTORY_URL + "wizard/add";
+
     public static final String ACCOUNT_CREATE = CONTROLLER_DIRECTORY_URL + "create";
     public static final String ACCOUNT_CREATE_ACCOUNT_SUCCESS = CONTROLLER_DIRECTORY_URL + "createAccountSuccess";
     public static final String ACCOUNT_USER_REGISTRATION = CONTROLLER_DIRECTORY_URL + "registration";

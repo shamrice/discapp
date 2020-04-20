@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.web.controller.account;
 
+import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_DELETE;
@@ -58,6 +61,18 @@ public class AccountDeleteController extends AccountController {
                             log.info("Successfully marked owner " + appOwner.toString() + " as disabled.");
                         } else {
                             log.error("Failed to mark owner: " + appOwner.toString() + " as disabled.");
+                        }
+
+                        //mark apps as deleted as well.
+                        List<Application> apps = applicationService.getByOwnerId(appOwner.getId());
+                        for (Application app : apps) {
+                            app.setEnabled(false);
+                            app.setDeleted(true);
+                            app.setSearchable(false);
+                            app.setModDt(new Date());
+                            applicationService.save(app);
+                            log.info("Marked application id: " + app.getId()
+                                    + " as deleted due to account deletion of: " + user.getEmail());
                         }
                     }
                 }
