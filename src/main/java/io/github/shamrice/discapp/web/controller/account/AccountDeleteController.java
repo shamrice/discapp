@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.UUID;
+
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_DELETE;
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_DELETE_STATUS;
 
@@ -45,10 +47,11 @@ public class AccountDeleteController extends AccountController {
             DiscAppUser user = discAppUserDetailsService.getByEmail(username);
             if (user != null) {
 
-                //mark owner as disabled. (when owner is disabled, all associated apps will be as well)
+                //mark owner as disabled and deleted. (when owner is disabled, all associated apps will be as well)
                 if (user.getOwnerId() != null) {
                     Owner appOwner = accountService.getOwnerById(user.getOwnerId());
                     if (appOwner != null) {
+                        appOwner.setEmail(appOwner.getEmail() + "_DELETED_" + UUID.randomUUID().toString());
                         appOwner.setEnabled(false);
                         log.info("Delete Account : Disabling account owner id: " + appOwner.toString());
                         if (accountService.saveOwner(appOwner) != null) {
