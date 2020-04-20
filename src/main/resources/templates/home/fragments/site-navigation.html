@@ -7,9 +7,12 @@
     <div>
         <h4>Navigation</h4>
         <ul>
-            <li><a href="/login">Log In/Out</a></li>
+            <li>
+                <a th:if="${isLoggedIn}" href="/login">Log Out</a>
+                <a th:unless="${isLoggedIn}" href="/login">Log In</a>
+            </li>
+            <li th:if="${isLoggedIn}"><a href="/account/modify">Modify Account Settings</a></li>
             <li><a href="/account/create">Create a New Account</a></li>
-            <li><a href="/account/modify">Modify Account Settings</a></li>
             <li><a href="/account/password">Reset Password</a></li>
             <li><a href="/indices/1">Help Forum</a></li>
         </ul>

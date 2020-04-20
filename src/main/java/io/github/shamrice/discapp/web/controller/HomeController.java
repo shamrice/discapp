@@ -9,6 +9,7 @@ import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.web.define.url.AppUrl;
 import io.github.shamrice.discapp.web.model.home.HomeOlderUpdatesViewModel;
 import io.github.shamrice.discapp.web.model.home.SearchApplicationModel;
+import io.github.shamrice.discapp.web.util.AccountHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class HomeController {
     @Autowired
     private WebHelper webHelper;
 
+    @Autowired
+    private AccountHelper accountHelper;
+
     @GetMapping(CONTROLLER_URL_DIRECTORY)
     public ModelAndView getIndexView(Model model) {
 
@@ -55,11 +59,13 @@ public class HomeController {
             model.addAttribute("updateMessage", latestUpdate.getMessage());
         }
 
+        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
+
         return new ModelAndView("home/index", "model", model);
     }
 
     @GetMapping(OLDER_UPDATES)
-    public ModelAndView getOlderUpdatesView(HomeOlderUpdatesViewModel model) {
+    public ModelAndView getOlderUpdatesView(HomeOlderUpdatesViewModel homeOlderUpdatesViewModel, Model model) {
 
         List<SiteUpdateLog> updates = siteService.getSiteUpdateLogs();
         if (updates != null) {
@@ -82,10 +88,12 @@ public class HomeController {
                 }
             }
 
-            model.setUpdateList(updateList);
+            homeOlderUpdatesViewModel.setUpdateList(updateList);
         }
 
-        return new ModelAndView("home/olderUpdates", "model", model);
+        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
+
+        return new ModelAndView("home/olderUpdates", "model", homeOlderUpdatesViewModel);
     }
 
     @GetMapping(SEARCH_APPS)
@@ -130,6 +138,8 @@ public class HomeController {
         } else {
             searchApplicationModel.setInfoMessage("Please enter a search criteria of at least " + minSearchLength + " characters.");
         }
+
+        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
         return new ModelAndView("home/search-apps-results", "searchApplicationModel", searchApplicationModel);
     }
 
