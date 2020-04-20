@@ -171,3 +171,28 @@ a.tab:hover { background-color:#88f; color:#eee; }
     font-weight: bold;
     border-radius: 5px;
 }
+
+table.accounts_moderated {
+    border:1px solid black;
+    border-collapse:collapse;
+}
+
+tr.accounts_moderated_header {
+    color:white;
+    background:#99e;
+}
+
+tr.accounts_moderated {
+    text-align:left;
+}
+
+th.accounts_moderated {
+    text-align:center;
+    padding:10px;
+    border:1px solid black;
+}
+
+td.accounts_moderated {
+    border:1px solid black;
+    padding:10px;
+}

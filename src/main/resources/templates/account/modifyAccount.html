@@ -94,23 +94,21 @@
 <div th:if="${not #lists.isEmpty(accountViewModel.getModeratingApplications())}" class="grey_box" style="width:40em;">
     <h2 id="moderate_application_banner">Applications You Moderate</h2>
     <hr/>
-    <!-- todo : move inline style tags to css -->
+
     <div>
-        <table style="border:1px solid black;border-collapse:collapse;">
-            <tr style="color:white;background:#99e;">
-                <th style="text-align:center;padding:10px;border:1px solid black;">
+        <table class="accounts_moderated">
+            <tr class="accounts_moderated_header">
+                <th class="accounts_moderated">
                     Application Name
                 </th>
-                <th style="text-align:center;padding:10px;border:1px solid black;">
+                <th class="accounts_moderated">
                     Editor URL
                 </th>
             </tr>
-            <tr th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}"
-                style="text-align:left;">
-                <td th:text="${moderatingApplication.getApplicationName()}"
-                    style="border:1px solid black;padding:10px;">
+            <tr class="accounts_moderated" th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}">
+                <td class="accounts_moderated" th:text="${moderatingApplication.getApplicationName()}">
                 </td>
-                <td style="border:1px solid black;padding:10px;">
+                <td class="accounts_moderated">
                     <a th:href="${accountViewModel.getBaseEditorUrl() + moderatingApplication.getApplicationId()}"
                        th:text="${accountViewModel.getBaseEditorUrl() + moderatingApplication.getApplicationId()}"
                        target="_blank">
