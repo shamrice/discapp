@@ -2,6 +2,7 @@ package io.github.shamrice.discapp.web.filter;
 
 import io.github.shamrice.discapp.data.model.ApplicationIpBlock;
 import io.github.shamrice.discapp.service.application.ApplicationService;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +48,18 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             String url = req.getRequestURL().toString();
 
+            String ipAddress = req.getHeader("X-FORWARDED-FOR");
+            if (ipAddress == null || ipAddress.isEmpty()) {
+                ipAddress = req.getRemoteAddr();
+            }
+
+            //handle site wide IP blocks first.
+            if (!url.contains(PERMISSION_DENIED_URL)) {
+                handleIpPrefixBlockedForApp(servletResponse, ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ipAddress);
+            }
+
             //todo : fix so filter works correctly on /indices/search?disc=appid urls.
             if (url.toLowerCase().contains(APP_INDICES_URL) && !url.toLowerCase().contains(AUTH_INDICES_URL) && !url.toLowerCase().contains(AppCustomCssUrl.CUSTOM_CSS_URL_PREFIX)) {
-
-                String ipAddress = req.getHeader("X-FORWARDED-FOR");
-                if (ipAddress == null || ipAddress.isEmpty()) {
-                    ipAddress = req.getRemoteAddr();
-                }
 
                 try {
                     String appIdStr;
@@ -81,7 +87,9 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
                 }
             }
         }
-        filterChain.doFilter(servletRequest, servletResponse);
+        if (!servletResponse.isCommitted()) {
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
     }
 
     /**

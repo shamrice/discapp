@@ -4,6 +4,10 @@ public class SiteAdminUrl {
 
     public static final String CONTROLLER_URL_DIRECTORY = "/site_admin/";
 
+    public static final String IP_BLOCK_URL = CONTROLLER_URL_DIRECTORY + "ip_block";
+    public static final String IP_BLOCK_REMOVE = CONTROLLER_URL_DIRECTORY + "ip_block/remove";
+    public static final String IP_BLOCK_ADD = CONTROLLER_URL_DIRECTORY + "ip_block/add";
+
     public static final String SUBSCRIBERS_URL = CONTROLLER_URL_DIRECTORY + "subscribers";
     public static final String SUBSCRIBER_ENABLED = CONTROLLER_URL_DIRECTORY + "subscriber/enabled";
 

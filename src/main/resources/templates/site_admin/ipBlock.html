@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Disc App - Site Administration</title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        li {
+            float:left;
+            display:block;
+            padding:5px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${siteAdminIpBlockViewModel.getErrorMessage()}"
+     class="grey_box alert alert-error"
+     style="width:40em;"
+     th:text="${siteAdminIpBlockViewModel.getErrorMessage()}">
+</div>
+
+<div th:if="${siteAdminIpBlockViewModel.getInfoMessage()}"
+     class="grey_box alert alert-success"
+     style="width:40em;"
+     th:text="${siteAdminIpBlockViewModel.getInfoMessage()}">
+</div>
+
+<div class="grey_box">
+
+    <div>
+        <h4>Here you can manage IP prefixes that are blocked for the whole site (not just for
+            a single application). Warning: Blocking your own IP address will require the record
+            to be manually removed from the database before access can be reinstated.
+        </h4>
+    </div>
+
+    <div>
+        <form method="post" action="/site_admin/ip_block/add" enctype="application/x-www-form-urlencoded" >
+            <table style="text-align:left;">
+                <tr>
+                    <td style="text-align:right;">
+                        <label>New IP Prefix to Block:</label>
+                    </td>
+                    <td>
+                        <input class="button" type="text" name="newIpBlockPrefix" />
+                    </td>
+                    <td>
+                        <input class="button" type="submit" name="submit" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <TABLE border="1">
+        <tr>
+            <th>Id</th>
+            <th>Application Id</th>
+            <th>IP Address Prefix</th>
+            <th>Create Date</th>
+            <th>Mod Date</th>
+            <th>Remove Block</th>
+        </tr>
+        <tr th:if="${not #lists.isEmpty(siteAdminIpBlockViewModel.getIpBlockList())}"
+            th:each="ipBlock : ${siteAdminIpBlockViewModel.getIpBlockList()}">
+            <td th:text="${ipBlock.getId()}"></td>
+            <td th:text="${ipBlock.getApplicationId()}"></td>
+            <td th:text="${ipBlock.getIpAddressPrefix()}"></td>
+            <td th:text="${ipBlock.getCreateDt()}"></td>
+            <td th:text="${ipBlock.getModDt()}"></td>
+            <td>
+                <a th:href="@{|/site_admin/ip_block/remove?id=${ipBlock.getId()}|}">
+                    Remove
+                </a>
+            </td>
+        </tr>
+    </TABLE>
+</div>
+
+</body>
+</html>

@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.web.controller.siteadmin;
 import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.repository.*;
+import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.siteadmin.*;
@@ -48,11 +49,63 @@ public class SiteAdminController {
     private ApplicationSubscriptionRepository applicationSubscriptionRepository;
 
     @Autowired
+    private ApplicationIpBlockRepository applicationIpBlockRepository;
+
+    @Autowired
     private SiteService siteService;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY)
     public ModelAndView getSiteAdmin(ModelAndView model) {
         return new ModelAndView("site_admin/admin", "model", model);
+    }
+
+    @GetMapping(IP_BLOCK_URL)
+    public ModelAndView getSiteAdminIpBlock(SiteAdminIpBlockViewModel siteAdminIpBlockViewModel, Model model) {
+        List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
+        siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
+    }
+
+    @GetMapping(IP_BLOCK_REMOVE)
+    public ModelAndView getSiteAdminIpBlockRemove(@RequestParam long id,
+                                                  SiteAdminIpBlockViewModel siteAdminIpBlockViewModel,
+                                                  Model model) {
+        ApplicationIpBlock blockToRemove = applicationIpBlockRepository.getOne(id);
+        if (blockToRemove.getApplicationId().equals(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID)) {
+            log.info("Found IP Block record to remove. Id: " + id);
+            applicationIpBlockRepository.delete(blockToRemove);
+            siteAdminIpBlockViewModel.setInfoMessage("Removed IP Block for ID: " + id);
+        } else {
+            siteAdminIpBlockViewModel.setErrorMessage("Unable to find record for id or not owned by main site: " + id);
+        }
+
+        List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
+        siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
+    }
+
+    @PostMapping(IP_BLOCK_ADD)
+    public ModelAndView postSiteAdminIpBlockAdd(SiteAdminIpBlockViewModel siteAdminIpBlockViewModel, Model model) {
+
+        if (siteAdminIpBlockViewModel.getNewIpBlockPrefix() != null && !siteAdminIpBlockViewModel.getNewIpBlockPrefix().isEmpty()) {
+            //create new record
+            ApplicationIpBlock newApplicationIpBlock = new ApplicationIpBlock();
+            newApplicationIpBlock.setApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
+            newApplicationIpBlock.setIpAddressPrefix(siteAdminIpBlockViewModel.getNewIpBlockPrefix());
+            newApplicationIpBlock.setCreateDt(new Date());
+            newApplicationIpBlock.setModDt(new Date());
+            //save it
+            applicationIpBlockRepository.save(newApplicationIpBlock);
+
+            log.info("Created new site wide application block for IP Prefix: " + newApplicationIpBlock.getIpAddressPrefix());
+            siteAdminIpBlockViewModel.setInfoMessage("New block added for IP Prefix: " + newApplicationIpBlock.getIpAddressPrefix());
+        } else {
+            siteAdminIpBlockViewModel.setErrorMessage("Please enter an IP prefix to block.");
+        }
+
+        List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
+        siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
     }
 
     @GetMapping(SUBSCRIBERS_URL)
