@@ -49,6 +49,19 @@
 
 <div th:if="${maintenanceStatsViewModel.getApplicationId()}">
 
+    <div style="text-align:center;">
+        <a th:if="${maintenanceStatsViewModel.getCurrentPage() > 0}"
+           th:href="@{|?id=${maintenanceStatsViewModel.getApplicationId()}&amp;page=${maintenanceStatsViewModel.getCurrentPage() - 1}|}">
+            Newer Records
+        </a>
+        <a th:unless="${maintenanceStatsViewModel.getCurrentPage() > 0}">Newer Records</a>
+        |
+        <a th:if="${maintenanceStatsViewModel.isMoreRecords()}"
+           th:href="@{|?id=${maintenanceStatsViewModel.getApplicationId()}&amp;page=${maintenanceStatsViewModel.getCurrentPage() + 1}|}">
+            Older Records
+        </a>
+        <a th:unless="${maintenanceStatsViewModel.isMoreRecords()}">Older Records</a>
+    </div>
     <table class="colored">
         <tr>
             <th>Date</th>

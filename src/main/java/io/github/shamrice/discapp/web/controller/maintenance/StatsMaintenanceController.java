@@ -23,6 +23,7 @@ public class StatsMaintenanceController extends MaintenanceController {
     @GetMapping(CONTROLLER_URL_DIRECTORY + "disc-stats.cgi")
     public ModelAndView getDiscStatsView(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "selectedStatsId", required = false) Long statsId,
+                                         @RequestParam(name = "page", required = false) Integer page,
                                          MaintenanceStatsViewModel maintenanceStatsViewModel,
                                          Model model,
                                          HttpServletResponse response) {
@@ -34,16 +35,24 @@ public class StatsMaintenanceController extends MaintenanceController {
             long totalPageViews = 0L;
             long totalUniqueIps = 0L;
             float totalUniqueIpsPerDay = 0;
-            int numDays = 30;
+            int numRecords = 30;
+
+            if (page == null || page < 0) {
+                page = 0;
+            }
+            maintenanceStatsViewModel.setCurrentPage(page);
 
             String whoIsUrl = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.WHOIS_URL, "https://www.whois.com/whois/");
             maintenanceStatsViewModel.setWhoIsUrl(whoIsUrl);
 
-            List<Stats> pastMonthStats = statisticsService.getLatestStatsForApp(app.getId(), numDays);
+            List<Stats> stats = statisticsService.getLatestStatsForApp(app.getId(), page, numRecords);
 
             //if there's less than 30 days of data, do calculations on what we actually have.
-            if (pastMonthStats.size() < numDays) {
-                numDays = pastMonthStats.size();
+            if (stats.size() < numRecords) {
+                numRecords = stats.size();
+                maintenanceStatsViewModel.setMoreRecords(false);
+            } else {
+                maintenanceStatsViewModel.setMoreRecords(true);
             }
 
             Calendar calendar = GregorianCalendar.getInstance();
@@ -52,7 +61,7 @@ public class StatsMaintenanceController extends MaintenanceController {
 
             List<MaintenanceStatsViewModel.StatView> statViews = new ArrayList<>();
 
-            for (Stats dayStat : pastMonthStats) {
+            for (Stats dayStat : stats) {
 
                 boolean isUniqueIpAvailable = true;
                 if (dayStat.getCreateDt().before(maxStatAge)) {
@@ -77,9 +86,21 @@ public class StatsMaintenanceController extends MaintenanceController {
             maintenanceStatsViewModel.setApplicationId(app.getId());
             maintenanceStatsViewModel.setStatViews(statViews);
             maintenanceStatsViewModel.setTotalPageViews(totalPageViews);
-            maintenanceStatsViewModel.setAveragePageViews(totalPageViews / numDays);
-            maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numDays);
-            maintenanceStatsViewModel.setAveragePagesPerIp(totalUniqueIpsPerDay / numDays);
+            if (totalPageViews != 0) {
+                maintenanceStatsViewModel.setAveragePageViews(totalPageViews / numRecords);
+            } else {
+                maintenanceStatsViewModel.setAveragePageViews(0);
+            }
+            if (totalUniqueIps != 0) {
+                maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numRecords);
+            } else {
+                maintenanceStatsViewModel.setAverageUniqueIps(0);
+            }
+            if (totalUniqueIpsPerDay != 0) {
+                maintenanceStatsViewModel.setAveragePagesPerIp(totalUniqueIpsPerDay / numRecords);
+            } else {
+                maintenanceStatsViewModel.setAveragePagesPerIp(0);
+            }
 
             if (statsId != null && statsId > 0L) {
                 Stats selectedStats = statisticsService.getStats(statsId);

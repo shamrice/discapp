@@ -40,5 +40,7 @@ public class MaintenanceStatsViewModel {
     private String whoIsUrl;
     private List<StatsUniqueIps> uniqueIps;
     private boolean isUnavailableStatsPresent = false;
+    private int currentPage;
+    private boolean isMoreRecords;
 
 }

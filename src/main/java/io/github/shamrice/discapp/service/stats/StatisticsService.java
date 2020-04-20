@@ -81,10 +81,10 @@ public class StatisticsService {
                 + currentDayStat.getPageViews() + " :: uniqueIps = " + uniqueIpForToday);
     }
 
-    public List<Stats> getLatestStatsForApp(long applicationId, int numDays) {
+    public List<Stats> getLatestStatsForApp(long applicationId, int page, int numRecords) {
 
         //query to get latest stats for an application
-        Pageable limit = PageRequest.of(0, numDays);
+        Pageable limit = PageRequest.of(page, numRecords);
         return statsRepository.findByApplicationIdOrderByCreateDtDesc(
                 applicationId,
                 limit
