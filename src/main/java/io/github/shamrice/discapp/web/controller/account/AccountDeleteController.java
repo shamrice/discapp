@@ -50,10 +50,11 @@ public class AccountDeleteController extends AccountController {
             DiscAppUser user = discAppUserDetailsService.getByEmail(username);
             if (user != null) {
 
-                //mark owner as disabled and deleted. (when owner is disabled, all associated apps will be as well)
+                //check if user is an owner and deactivate related items as needed.
                 if (user.getOwnerId() != null) {
                     Owner appOwner = accountService.getOwnerById(user.getOwnerId());
                     if (appOwner != null) {
+                        //mark owner record as deleted.
                         appOwner.setEmail(appOwner.getEmail() + "_DELETED_" + UUID.randomUUID().toString());
                         appOwner.setEnabled(false);
                         log.info("Delete Account : Disabling account owner id: " + appOwner.toString());
@@ -73,6 +74,16 @@ public class AccountDeleteController extends AccountController {
                             applicationService.save(app);
                             log.info("Marked application id: " + app.getId()
                                     + " as deleted due to account deletion of: " + user.getEmail());
+                        }
+
+                        //deactivate any related system accounts that share the same owner.
+                        List<DiscAppUser> relatedUsers = discAppUserDetailsService.getByOwnerId(appOwner.getId());
+                        for (DiscAppUser relatedUser : relatedUsers) {
+                            if (relatedUser.getIsUserAccount() != null && !relatedUser.getIsUserAccount()) {
+                                log.info("Marking system account: " + relatedUser.getEmail() + " ("
+                                        + relatedUser.getUsername() + ") as deleted due to app association with : " + user.getEmail());
+                                discAppUserDetailsService.deactivateUser(relatedUser.getId());
+                            }
                         }
                     }
                 }
