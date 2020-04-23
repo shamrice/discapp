@@ -407,9 +407,9 @@ public class SiteAdminController {
             siteUpdateLog.setCreateDt(new Date());
             siteUpdateLog.setModDt(new Date());
             if (siteService.saveAndPostUpdateLog(siteUpdateLog)) {
-                model.setInfoMessage("New updated created and posted.");
+                model.setInfoMessage("New site update created and posted.");
             } else {
-                model.setErrorMessage("Failed to save new update.");
+                model.setErrorMessage("Failed to save and post new site update.");
             }
         }
 

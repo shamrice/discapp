@@ -19,6 +19,9 @@
 </head>
 <body>
 
+<div th:replace="site_admin/fragments/navigation :: navigation">
+    static thread prototyping placeholder
+</div>
 
 <div th:if="${siteAdminUpdateViewModel.getErrorMessage()}"
      class="grey_box alert alert-error"
@@ -30,10 +33,6 @@
      class="grey_box alert alert-success"
      style="width:40em;"
      th:text="${siteAdminUpdateViewModel.getInfoMessage()}">
-</div>
-
-<div th:replace="site_admin/fragments/navigation :: navigation">
-    static thread prototyping placeholder
 </div>
 
 <div class="grey_box">
