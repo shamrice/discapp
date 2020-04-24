@@ -70,13 +70,18 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminIpBlockRemove(@RequestParam long id,
                                                   SiteAdminIpBlockViewModel siteAdminIpBlockViewModel,
                                                   Model model) {
-        ApplicationIpBlock blockToRemove = applicationIpBlockRepository.getOne(id);
-        if (blockToRemove.getApplicationId().equals(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID)) {
-            log.info("Found IP Block record to remove. Id: " + id);
-            applicationIpBlockRepository.delete(blockToRemove);
-            siteAdminIpBlockViewModel.setInfoMessage("Removed IP Block for ID: " + id);
-        } else {
-            siteAdminIpBlockViewModel.setErrorMessage("Unable to find record for id or not owned by main site: " + id);
+        try {
+            ApplicationIpBlock blockToRemove = applicationIpBlockRepository.getOne(id);
+            if (blockToRemove.getApplicationId().equals(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID)) {
+                log.info("Found IP Block record to remove. Id: " + id);
+                applicationIpBlockRepository.delete(blockToRemove);
+                siteAdminIpBlockViewModel.setInfoMessage("Removed IP Block for ID: " + id);
+            } else {
+                siteAdminIpBlockViewModel.setErrorMessage("Unable to find record for id or not owned by main site: " + id);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to remove ip block id: " + id, ex);
+            siteAdminIpBlockViewModel.setErrorMessage("Failed to remove id: " + id + ". " + ex.getMessage());
         }
 
         List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
@@ -92,6 +97,7 @@ public class SiteAdminController {
             ApplicationIpBlock newApplicationIpBlock = new ApplicationIpBlock();
             newApplicationIpBlock.setApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
             newApplicationIpBlock.setIpAddressPrefix(siteAdminIpBlockViewModel.getNewIpBlockPrefix());
+            newApplicationIpBlock.setReason(siteAdminIpBlockViewModel.getNewIpBlockReason());
             newApplicationIpBlock.setCreateDt(new Date());
             newApplicationIpBlock.setModDt(new Date());
             //save it

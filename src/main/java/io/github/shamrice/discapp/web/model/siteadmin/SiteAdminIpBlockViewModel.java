@@ -15,5 +15,6 @@ public class SiteAdminIpBlockViewModel {
     private String infoMessage;
     private String errorMessage;
     private String newIpBlockPrefix;
+    private String newIpBlockReason;
     private List<ApplicationIpBlock> ipBlockList;
 }

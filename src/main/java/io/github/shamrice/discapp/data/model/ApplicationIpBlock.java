@@ -23,6 +23,7 @@ public class ApplicationIpBlock {
 
     private Long applicationId;
     private String ipAddressPrefix;
+    private String reason;
     private Date createDt;
     private Date modDt;
 

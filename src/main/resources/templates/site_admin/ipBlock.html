@@ -14,6 +14,7 @@
             display:block;
             padding:5px;
         }
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
@@ -45,17 +46,27 @@
     </div>
 
     <div>
-        <form method="post" action="/site_admin/ip_block/add" enctype="application/x-www-form-urlencoded" >
+        <form method="post" action="/site_admin/ip_block/add" enctype="application/x-www-form-urlencoded">
             <table style="text-align:left;">
                 <tr>
                     <td style="text-align:right;">
                         <label>New IP Prefix to Block:</label>
                     </td>
                     <td>
-                        <input class="button" type="text" name="newIpBlockPrefix" />
+                        <input class="button" type="text" name="newIpBlockPrefix"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:right;">
+                        <label>Reason:</label>
                     </td>
                     <td>
-                        <input class="button" type="submit" name="submit" value="Submit" />
+                        <input class="button" type="text" name="newIpBlockReason"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:5px;">
+                        <input style="width:50%;" class="button" type="submit" name="submit" value="Submit"/>
                     </td>
                 </tr>
             </table>
@@ -67,8 +78,8 @@
             <th>Id</th>
             <th>Application Id</th>
             <th>IP Address Prefix</th>
-            <th>Create Date</th>
-            <th>Mod Date</th>
+            <th>Reason</th>
+            <th>Block Date</th>
             <th>Remove Block</th>
         </tr>
         <tr th:if="${not #lists.isEmpty(siteAdminIpBlockViewModel.getIpBlockList())}"
@@ -76,7 +87,7 @@
             <td th:text="${ipBlock.getId()}"></td>
             <td th:text="${ipBlock.getApplicationId()}"></td>
             <td th:text="${ipBlock.getIpAddressPrefix()}"></td>
-            <td th:text="${ipBlock.getCreateDt()}"></td>
+            <td th:text="${ipBlock.getReason()}"></td>
             <td th:text="${ipBlock.getModDt()}"></td>
             <td>
                 <a th:href="@{|/site_admin/ip_block/remove?id=${ipBlock.getId()}|}">

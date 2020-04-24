@@ -220,6 +220,7 @@ CREATE TABLE application_ip_block (
     id int(255) NOT NULL AUTO_INCREMENT,
     application_id int NOT NULL,
     ip_address_prefix varchar(64) NOT NULL,
+    reason varchar NULL,
     create_dt TIMESTAMP DEFAULT NOW(),
     mod_dt TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
