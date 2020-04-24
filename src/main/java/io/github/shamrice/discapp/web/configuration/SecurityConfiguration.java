@@ -69,6 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/password/reset/*").permitAll()
                     .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                     .antMatchers("/abuse/**").access("hasRole('ROLE_ADMIN')")
+                    .antMatchers("/account/application").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/delete").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/delete/status").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/modify").access("hasRole('ROLE_USER')")
