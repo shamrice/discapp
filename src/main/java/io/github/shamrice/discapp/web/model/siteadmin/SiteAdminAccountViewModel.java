@@ -12,7 +12,25 @@ import java.util.List;
 @NoArgsConstructor
 public class SiteAdminAccountViewModel {
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class User {
+        Long id;
+        String username;
+        String email;
+        Boolean showEmail;
+        Long ownerId;
+        Boolean enabled;
+        Boolean isAdmin;
+        Boolean isUserAccount;
+        String lastLoginDate;
+        String createDt;
+        String modDt;
+    }
+
     private String infoMessage;
     private String errorMessage;
-    private List<DiscAppUser> userList;
+    private String userType;
+    private List<User> userList;
 }

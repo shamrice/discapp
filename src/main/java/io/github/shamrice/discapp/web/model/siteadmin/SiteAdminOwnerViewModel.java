@@ -11,5 +11,6 @@ import lombok.Setter;
 public class SiteAdminOwnerViewModel {
 
     private String errorMessage;
+    private String userType;
     private Owner owner;
 }

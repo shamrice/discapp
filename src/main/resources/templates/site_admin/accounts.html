@@ -37,19 +37,34 @@
 
 <div class="grey_box">
 
-    <TABLE border="1">
+    <p>
+        Below is the list of current user accounts. User accounts that have been deleted
+        will not show up in this list. As of now, if those accounts need administration, values must
+        be modified in the database directly. Undeleting accounts requires more advanced
+        changes than this account administration page currently offers.
+    </p>
+
+    <div style="text-align:center; padding:10px;">
+        <a th:if="${siteAdminAccountViewModel.getUserType().equals('user')}">User Accounts</a>
+        <a th:unless="${siteAdminAccountViewModel.getUserType().equals('user')}" href="/site_admin/accounts?type=user">User Accounts</a>
+        |
+        <a th:if="${siteAdminAccountViewModel.getUserType().equals('system')}">System Accounts</a>
+        <a th:unless="${siteAdminAccountViewModel.getUserType().equals('system')}" href="/site_admin/accounts?type=system">System Accounts</a>
+    </div>
+
+    <TABLE border="1" style="width:100%; table-layout:fixed;">
         <tr>
-            <th>Id</th>
+            <th style="width:min-content;">Id</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Show Email</th>
-            <th>Owner Id</th>
-            <th>Enabled</th>
-            <th>Admin</th>
-            <th>User Account</th>
-            <th>Last Login Date</th>
-            <th>Create Date</th>
-            <th>Mod Date</th>
+            <th style="width:min-content;">Show Email</th>
+            <th style="width:min-content;">Owner Id</th>
+            <th style="width:min-content;">Enabled</th>
+            <th style="width:min-content;">Admin</th>
+            <th style="width:min-content;">User Account</th>
+            <th style="width:max-content;">Last Login Date</th>
+            <th style="width:max-content;">Create Date</th>
+            <th style="width:max-content;">Mod Date</th>
         </tr>
         <tr th:if="${not #lists.isEmpty(siteAdminAccountViewModel.getUserList())}"
             th:each="user : ${siteAdminAccountViewModel.getUserList()}">
@@ -58,28 +73,28 @@
             <td th:text="${user.getEmail()}"></td>
             <td>
                 <a
-                   th:href="@{|/site_admin/account/showEmail?id=${user.getId()}&enabled=${!user.getShowEmail()}|}"
+                   th:href="@{|/site_admin/account/showEmail?id=${user.getId()}&enabled=${!user.getShowEmail()}&type=${siteAdminAccountViewModel.getUserType()}|}"
                    th:text="@{|${user.getShowEmail()}|}">
                 </a>
             </td>
             <td>
                 <a th:if="${user.getOwnerId()}"
-                   th:href="@{|/site_admin/owner?ownerId=${user.getOwnerId()}|}"
+                   th:href="@{|/site_admin/owner?ownerId=${user.getOwnerId()}&type=${siteAdminAccountViewModel.getUserType()}|}"
                    th:text="@{|${user.getOwnerId()}|}">
                 </a>
             </td>
             <td>
-                <a th:href="@{|/site_admin/account/enabled?id=${user.getId()}&enabled=${!user.getEnabled()}|}"
+                <a th:href="@{|/site_admin/account/enabled?id=${user.getId()}&enabled=${!user.getEnabled()}&type=${siteAdminAccountViewModel.getUserType()}|}"
                    th:text="@{|${user.getEnabled()}|}">
                 </a>
             </td>
             <td>
-                <a th:href="@{|/site_admin/account/isAdmin?id=${user.getId()}&enabled=${!user.getIsAdmin()}|}"
+                <a th:href="@{|/site_admin/account/isAdmin?id=${user.getId()}&enabled=${!user.getIsAdmin()}&type=${siteAdminAccountViewModel.getUserType()}|}"
                    th:text="@{|${user.getIsAdmin()}|}">
                 </a>
             </td>
             <td>
-                <a th:href="@{|/site_admin/account/isUserAccount?id=${user.getId()}&enabled=${!user.getIsUserAccount()}|}"
+                <a th:href="@{|/site_admin/account/isUserAccount?id=${user.getId()}&enabled=${!user.getIsUserAccount()}&type=${siteAdminAccountViewModel.getUserType()}|}"
                    th:text="@{|${user.getIsUserAccount()}|}">
                 </a>
             </td>

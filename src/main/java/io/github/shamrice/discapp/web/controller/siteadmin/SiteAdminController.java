@@ -19,6 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -144,16 +146,54 @@ public class SiteAdminController {
     }
 
     @GetMapping(ACCOUNTS_URL)
-    public ModelAndView getSiteAdminAccounts(SiteAdminAccountViewModel siteAdminAccountViewModel,
+    public ModelAndView getSiteAdminAccounts(@RequestParam(name = "type", required = false, defaultValue = "user") String userType,
+                                             SiteAdminAccountViewModel siteAdminAccountViewModel,
                                              Model model) {
         List<DiscAppUser> fullUserList = discAppUserRepository.findAll(Sort.by("id").ascending());
-        siteAdminAccountViewModel.setUserList(fullUserList);
+
+        //filter accounts based on query param as well as remove deleted accounts
+        //probably could be done in one pass instead of 2...
+        fullUserList.removeIf(user -> user.getUsername() != null && user.getUsername().contains("_DELETED_") && !user.getEnabled());
+
+        boolean onlyUserAccounts = "user".equalsIgnoreCase(userType);
+        if (onlyUserAccounts) {
+            fullUserList.removeIf(user -> user.getIsUserAccount() != null && !user.getIsUserAccount());
+        } else {
+            fullUserList.removeIf(user -> user.getIsUserAccount() != null && user.getIsUserAccount());
+        }
+
+        List<SiteAdminAccountViewModel.User> modelUserList = new ArrayList<>();
+
+        //this is a stupid way to just format the date columns...
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+        for (DiscAppUser user : fullUserList) {
+            SiteAdminAccountViewModel.User u = new SiteAdminAccountViewModel.User();
+            u.setId(user.getId());
+            u.setUsername(user.getUsername());
+            u.setEmail(user.getEmail());
+            u.setShowEmail(user.getShowEmail());
+            u.setOwnerId(user.getOwnerId());
+            u.setEnabled(user.getEnabled());
+            u.setIsAdmin(user.getIsAdmin());
+            u.setIsUserAccount(user.getIsUserAccount());
+            if (user.getLastLoginDate() != null) u.setLastLoginDate(dateFormat.format(user.getLastLoginDate()));
+            if (user.getCreateDt() != null) u.setCreateDt(dateFormat.format(user.getCreateDt()));
+            if (user.getModDt() != null) u.setModDt(dateFormat.format(user.getModDt()));
+
+            modelUserList.add(u);
+        }
+
+        siteAdminAccountViewModel.setUserType(userType);
+        siteAdminAccountViewModel.setUserList(modelUserList);
+
         return new ModelAndView("site_admin/accounts", "siteAdminAccountViewModel", siteAdminAccountViewModel);
     }
+
 
     @GetMapping(ACCOUNT_SHOW_EMAIL)
     public ModelAndView getSiteAdminAccountShowEmail(@RequestParam(name = "id") Long userId,
                                                      @RequestParam(name = "enabled") Boolean enabled,
+                                                     @RequestParam(name = "type", required = false, defaultValue = "user") String userType,
                                                      SiteAdminAccountViewModel siteAdminAccountViewModel,
                                                      Model model) {
         try {
@@ -167,14 +207,15 @@ public class SiteAdminController {
             log.error("Failed to set show email settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " email enabled to: " + enabled);
         }
-        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
+        return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_ENABLED)
     public ModelAndView getSiteAdminAccountEnabled(@RequestParam(name = "id") Long userId,
-                                                     @RequestParam(name = "enabled") Boolean enabled,
-                                                     SiteAdminAccountViewModel siteAdminAccountViewModel,
-                                                     Model model) {
+                                                   @RequestParam(name = "enabled") Boolean enabled,
+                                                   @RequestParam(name = "type", required = false, defaultValue = "user") String userType,
+                                                   SiteAdminAccountViewModel siteAdminAccountViewModel,
+                                                   Model model) {
         try {
             log.info("Setting user id: " + userId + " enabled to: " + enabled);
             DiscAppUser discAppUser = discAppUserRepository.getOne(userId);
@@ -186,14 +227,15 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " enabled to: " + enabled);
         }
-        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
+        return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_IS_ADMIN)
     public ModelAndView getSiteAdminIsAdmin(@RequestParam(name = "id") Long userId,
-                                                   @RequestParam(name = "enabled") Boolean enabled,
-                                                   SiteAdminAccountViewModel siteAdminAccountViewModel,
-                                                   Model model) {
+                                            @RequestParam(name = "enabled") Boolean enabled,
+                                            @RequestParam(name = "type", required = false, defaultValue = "user") String userType,
+                                            SiteAdminAccountViewModel siteAdminAccountViewModel,
+                                            Model model) {
         try {
             log.info("Setting user id: " + userId + " is admin to: " + enabled);
             DiscAppUser discAppUser = discAppUserRepository.getOne(userId);
@@ -205,14 +247,15 @@ public class SiteAdminController {
             log.error("Failed to set is admin settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is admin to: " + enabled);
         }
-        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
+        return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
     @GetMapping(ACCOUNT_IS_USER_ACCOUNT)
     public ModelAndView getSiteAdminIsUserAccount(@RequestParam(name = "id") Long userId,
-                                                   @RequestParam(name = "enabled") Boolean enabled,
-                                                   SiteAdminAccountViewModel siteAdminAccountViewModel,
-                                                   Model model) {
+                                                  @RequestParam(name = "enabled") Boolean enabled,
+                                                  @RequestParam(name = "type", required = false, defaultValue = "user") String userType,
+                                                  SiteAdminAccountViewModel siteAdminAccountViewModel,
+                                                  Model model) {
         try {
             log.info("Setting user id: " + userId + " is user account to: " + enabled);
             DiscAppUser discAppUser = discAppUserRepository.getOne(userId);
@@ -224,11 +267,12 @@ public class SiteAdminController {
             log.error("Failed to set is user account settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is user account to: " + enabled);
         }
-        return getSiteAdminAccounts(siteAdminAccountViewModel, model);
+        return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
     @GetMapping(OWNER_URL)
     public ModelAndView getSiteAdminOwnerInfo(@RequestParam(name = "ownerId") Long ownerId,
+                                              @RequestParam(name = "type", defaultValue = "user", required = false) String userType,
                                               SiteAdminOwnerViewModel siteAdminOwnerViewModel,
                                               Model model) {
         try {
@@ -238,6 +282,7 @@ public class SiteAdminController {
             log.error("Failed to get owner with id: " + ownerId + " :: " + ex.getMessage(), ex);
             siteAdminOwnerViewModel.setErrorMessage("Unable to find owner with id: " + ownerId);
         }
+        siteAdminOwnerViewModel.setUserType(userType);
         return new ModelAndView("site_admin/owner", "siteAdminOwnerViewModel", siteAdminOwnerViewModel);
 
     }
@@ -368,6 +413,11 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminThreads(SiteAdminThreadViewModel siteAdminThreadViewModel,
                                             Model model) {
         List<Thread> fullThreadList = threadService.getAllDeletedThreads();
+        for (Thread thread : fullThreadList) {
+            if (thread.getSubmitter() != null && thread.getSubmitter().length() > 10) {
+                thread.setSubmitter(thread.getSubmitter().substring(0, 10) + "...");
+            }
+        }
         siteAdminThreadViewModel.setThreadList(fullThreadList);
         return new ModelAndView("site_admin/threads", "siteAdminThreadViewModel", siteAdminThreadViewModel);
     }
