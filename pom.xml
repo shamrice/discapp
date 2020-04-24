@@ -6,7 +6,7 @@
 
     <groupId>io.github.shamrice.discapp</groupId>
     <artifactId>discapp-web</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.1</version>
     <!--packaging>war</packaging-->
 
     <parent>
