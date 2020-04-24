@@ -31,6 +31,7 @@ public class MaintenanceStatsViewModel {
     private long applicationId;
     private String infoMessage;
     private List<StatView> statViews;
+    private long totalUniqueIps;
     private long totalPageViews;
     private long averageUniqueIps;
     private long averagePageViews;

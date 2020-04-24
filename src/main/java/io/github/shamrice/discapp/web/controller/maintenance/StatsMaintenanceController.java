@@ -92,6 +92,7 @@ public class StatsMaintenanceController extends MaintenanceController {
                 maintenanceStatsViewModel.setAveragePageViews(0);
             }
             if (totalUniqueIps != 0) {
+                maintenanceStatsViewModel.setTotalUniqueIps(totalUniqueIps);
                 maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numRecords);
             } else {
                 maintenanceStatsViewModel.setAverageUniqueIps(0);

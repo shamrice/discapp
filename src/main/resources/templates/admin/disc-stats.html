@@ -87,7 +87,14 @@
 
         <tr>
             <th>Total</th>
-            <td></td>
+            <td>
+                <a class="hidden_text">
+                    [[${maintenanceStatsViewModel.getTotalUniqueIps()}]]
+                    <span>
+                        Total is for total page views for unique IP addresses. Not total unique IP addresses.
+                    </span>
+                </a>
+            </td>
             <td th:text="${maintenanceStatsViewModel.getTotalPageViews()}"></td>
         </tr>
         <tr>
