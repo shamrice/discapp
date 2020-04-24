@@ -14,7 +14,7 @@
         <hr th:unless="${isLoggedIn}">
         <ul>
             <li>
-                <a th:if="${isLoggedIn}" href="/login">Log Out</a>
+                <a th:if="${isLoggedIn}" href="/logout">Log Out</a>
                 <a th:unless="${isLoggedIn}" href="/login">Log In</a>
             </li>
             <li th:if="${isLoggedIn}"><a href="/account/modify">Modify Account Settings</a></li>
