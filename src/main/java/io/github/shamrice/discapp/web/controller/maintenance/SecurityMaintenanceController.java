@@ -163,27 +163,40 @@ public class SecurityMaintenanceController extends MaintenanceController {
 
         setCommonModelAttributes(model, app, username);
         try {
+
+            boolean isUserAccount = false;
+
+            DiscAppUser user = discAppUserDetailsService.getByEmail(username);
+            if (user != null && user.getIsUserAccount() != null) {
+                isUserAccount = user.getIsUserAccount();
+            }
+
             //update owner email
             if (maintenanceSecurityViewModel.getChangeOwnerEmail() != null) {
-                Owner ownerToUpdate = accountService.getOwnerById(app.getOwnerId());
-                String newEmail = inputHelper.sanitizeInput(maintenanceSecurityViewModel.getOwnerEmail());
-                if (!newEmail.trim().isEmpty()) {
-                    ownerToUpdate.setEmail(newEmail);
-                    ownerToUpdate.setModDt(new Date());
-                    try {
-                        if (accountService.saveOwner(ownerToUpdate) != null) {
-                            log.info("Updated owner: " + ownerToUpdate.toString());
-                            maintenanceSecurityViewModel.setOwnerEmailMessage("Email address updated");
-                        } else {
-                            log.error("Failed to update owners email: " + ownerToUpdate.toString());
-                            maintenanceSecurityViewModel.setErrorMessage("Failed to update owner email.");
-                        }
-                    } catch (Exception ex) {
-                        log.error("Error updating owner email address: " + ex.getMessage(), ex);
-                        maintenanceSecurityViewModel.setErrorMessage("Owner email address already in use. Please specify a different email.");
-                    }
+                if (!isUserAccount) {
+                    log.warn("System account: " + username + " attempted to update owner email address but was blocked from doing so.");
+                    maintenanceSecurityViewModel.setErrorMessage("Only the account logged in as the owner of this application may update the owner email address.");
                 } else {
-                    maintenanceSecurityViewModel.setErrorMessage("Owner email is either invalid or empty.");
+                    Owner ownerToUpdate = accountService.getOwnerById(app.getOwnerId());
+                    String newEmail = inputHelper.sanitizeInput(maintenanceSecurityViewModel.getOwnerEmail());
+                    if (!newEmail.trim().isEmpty()) {
+                        ownerToUpdate.setEmail(newEmail);
+                        ownerToUpdate.setModDt(new Date());
+                        try {
+                            if (accountService.saveOwner(ownerToUpdate) != null) {
+                                log.info("Updated owner: " + ownerToUpdate.toString());
+                                maintenanceSecurityViewModel.setOwnerEmailMessage("Email address updated");
+                            } else {
+                                log.error("Failed to update owners email: " + ownerToUpdate.toString());
+                                maintenanceSecurityViewModel.setErrorMessage("Failed to update owner email.");
+                            }
+                        } catch (Exception ex) {
+                            log.error("Error updating owner email address: " + ex.getMessage(), ex);
+                            maintenanceSecurityViewModel.setErrorMessage("Owner email address already in use. Please specify a different email.");
+                        }
+                    } else {
+                        maintenanceSecurityViewModel.setErrorMessage("Owner email is either invalid or empty.");
+                    }
                 }
             }
 
