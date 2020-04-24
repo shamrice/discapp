@@ -50,7 +50,7 @@ public class DiscAppUserPrincipal implements UserDetails {
 
         //give root access to configured account. Don't store email address in db in case db gets compromised.
         if (this.isRoot) {
-            log.warn("Granting user: " + user.toString() + " :: ROOT ACCESS.");
+            log.warn("Granting userId: " + user.getId() + " :: ROOT ACCESS.");
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ROOT));
         }
 
