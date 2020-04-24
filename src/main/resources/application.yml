@@ -52,12 +52,12 @@ logging:
   level:
     org:
       springframework:
-        web: WARN
-      hibernate: ERROR
+        web: ${LOG_LEVEL_SPRING_WEB}
+      hibernate: ${LOG_LEVEL_HIBERNATE}
     io:
       github:
         shamrice:
-          discapp: WARN
+          discapp: ${LOG_LEVEL_DISCAPP}
 
 server:
   port: 8081
