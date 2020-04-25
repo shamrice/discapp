@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://nediscapp.herokuapp.com/</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/account/wizard</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/old-updates</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/login</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/account/create</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/account/password</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/indices/1</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/discussion.cgi?disc=1&amp;article=34758&amp;page=0</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/disc-list-subscribe.cgi?id=1</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://nediscapp.herokuapp.com/Indices/1.html</loc>
+  <lastmod>2020-04-25T07:00:02+00:00</lastmod>
+  <priority>0.41</priority>
+</url>
+
+
+</urlset>
