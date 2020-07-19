@@ -133,21 +133,21 @@
                     <th>Author</th>
                     <td>
                         <input type="text" name="editArticleSubmitter"
-                               th:value="${maintenanceThreadViewModel.getEditArticleSubmitter()}" size="30"/>
+                               th:value="${maintenanceThreadViewModel.getEditArticleSubmitter()}" size="30"  maxlength="50" />
                     </td>
                 </tr>
                 <tr>
                     <th>Email</th>
                     <td>
                         <input type="text" name="editArticleEmail"
-                               th:value="${maintenanceThreadViewModel.getEditArticleEmail()}" size="30"/>
+                               th:value="${maintenanceThreadViewModel.getEditArticleEmail()}" size="30"  maxlength="60" />
                     </td>
                 </tr>
                 <tr>
                     <th>Subject</th>
                     <td>
                         <input type="text" name="editArticleSubject"
-                               th:value="${maintenanceThreadViewModel.getEditArticleSubject()}" size="30"/>
+                               th:value="${maintenanceThreadViewModel.getEditArticleSubject()}" size="30"  maxlength="60" />
                     </td>
                 </tr>
                 <tr>
@@ -163,7 +163,7 @@
             <div><b>Message</b></div>
             <div>
                 <textarea name="editArticleMessage" rows="12" wrap="soft"
-                          th:utext="${maintenanceThreadViewModel.getEditArticleMessage()}"></textarea>
+                          th:utext="${maintenanceThreadViewModel.getEditArticleMessage()}" maxlength="30000"></textarea>
             </div>
 
             <div class="buttons">

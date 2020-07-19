@@ -346,6 +346,14 @@ public class ThreadService {
             //new thread body that's not blank
             if (threadBody == null && threadBodyText != null && !threadBodyText.trim().isEmpty()) {
 
+                //truncate thread body if attempted is over 32KB
+                if (threadBodyText.length() > 32000) {
+                    threadBodyText = threadBodyText.substring(0, 32000);
+                    log.warn("Thread body for new thread truncated to fit database field. AppId: "
+                            + createThread.getApplicationId() + " :: Subject: " + createThread.getSubject()
+                            + " :: Submitter: " + createThread.getSubmitter());
+                }
+
                 threadBody = new ThreadBody();
                 threadBody.setApplicationId(createThread.getApplicationId());
                 threadBody.setBody(threadBodyText);

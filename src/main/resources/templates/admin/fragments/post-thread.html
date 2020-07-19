@@ -17,11 +17,11 @@
                 </div>
                 <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:3px;">
                     <label id="submitter">Author:</label>
-                    <input class="button" type="text" name="newThreadSubmitter" size="30"/>
+                    <input class="button" type="text" name="newThreadSubmitter" size="30" maxlength="50" />
                 </div>
                 <div th:unless="${isUserAccount}" style="margin-top:3px;margin-bottom:3px;margin-left:9px;">
                     <label id="email">Email:</label>
-                    <input class="button" type="email" name="newThreadEmail" size="30"/>
+                    <input class="button" type="email" name="newThreadEmail" size="30" maxlength="60" />
                     <input class="button" type="checkbox" name="newThreadShowEmail" value="true">Show Email
                 </div>
 
@@ -45,7 +45,7 @@
                 <div>Message (32 KB max)</div>
 
                 <div>
-                    <textarea name="newThreadMessage" rows="20" wrap="soft"></textarea>
+                    <textarea name="newThreadMessage" rows="20" wrap="soft" maxlength="30000"></textarea>
                 </div>
 
                 <div class="buttons" style="margin-top:5px;">
