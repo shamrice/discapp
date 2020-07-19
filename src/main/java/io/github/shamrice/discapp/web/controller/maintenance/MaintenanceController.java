@@ -116,6 +116,11 @@ public abstract class MaintenanceController {
 
     protected void setCommonModelAttributes(Model model, Application app, String username) {
 
+        if (model == null || app == null) {
+            log.warn("Cannot set common model attributes if model or application are null.");
+            return;
+        }
+
         model.addAttribute(APP_NAME, app.getName());
         model.addAttribute(APP_ID, app.getId());
         model.addAttribute(USERNAME, username);
