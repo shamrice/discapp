@@ -22,9 +22,13 @@ public class MaintenanceStatsViewModel {
 
         public float getPagesPerIp() {
             if (uniqueIps != 0) {
-                return pageViews / uniqueIps;
+                return  (float)pageViews / (float)uniqueIps;
             }
             return pageViews;
+        }
+
+        public String getFormattedPagesPerIp() {
+            return String.format("%.2f", getPagesPerIp());
         }
     }
 
@@ -33,8 +37,8 @@ public class MaintenanceStatsViewModel {
     private List<StatView> statViews;
     private long totalUniqueIps;
     private long totalPageViews;
-    private long averageUniqueIps;
-    private long averagePageViews;
+    private float averageUniqueIps;
+    private float averagePageViews;
     private float averagePagesPerIp;
     private long selectedStatId;
     private String selectedDate;
@@ -43,5 +47,17 @@ public class MaintenanceStatsViewModel {
     private boolean isUnavailableStatsPresent = false;
     private int currentPage;
     private boolean isMoreRecords;
+
+    public String getFormattedAverageUniqueIps() {
+        return String.format("%.2f", averageUniqueIps);
+    }
+
+    public String getFormattedAveragePageViews() {
+        return String.format("%.2f", averagePageViews);
+    }
+
+    public String getFormattedAveragePagesPerIp() {
+        return String.format("%.2f", averagePagesPerIp);
+    }
 
 }

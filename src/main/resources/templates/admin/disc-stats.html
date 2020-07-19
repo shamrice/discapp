@@ -82,7 +82,7 @@
             <td th:unless="${statView.isUniqueIpsAvailable()}" th:text="${statView.getUniqueIps()}"></td>
 
             <td th:text="${statView.getPageViews()}"></td>
-            <td th:text="${statView.getPagesPerIp()}"></td>
+            <td th:text="${statView.getFormattedPagesPerIp()}"></td>
         </tr>
 
         <tr>
@@ -99,9 +99,9 @@
         </tr>
         <tr>
             <th>Average</th>
-            <td th:text="${maintenanceStatsViewModel.getAverageUniqueIps()}"></td>
-            <td th:text="${maintenanceStatsViewModel.getAveragePageViews()}"></td>
-            <td th:text="${maintenanceStatsViewModel.getAveragePagesPerIp()}"></td>
+            <td th:text="${maintenanceStatsViewModel.getFormattedAverageUniqueIps()}"></td>
+            <td th:text="${maintenanceStatsViewModel.getFormattedAveragePageViews()}"></td>
+            <td th:text="${maintenanceStatsViewModel.getFormattedAveragePagesPerIp()}"></td>
         </tr>
     </table>
 
