@@ -51,7 +51,7 @@
             th:each="update : ${siteAdminUpdateViewModel.getSiteUpdateLogList()}">
             <td th:text="${update.getId()}"></td>
             <td th:text="${update.getSubject()}"></td>
-            <td th:text="${update.getMessage()}"></td>
+            <td style="text-align:left;padding:10px;" th:utext="${update.getMessage()}"></td>
             <td th:text="${update.getCreateDt()}"></td>
             <td th:text="${update.getModDt()}"></td>
             <td>
