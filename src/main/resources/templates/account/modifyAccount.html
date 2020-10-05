@@ -105,7 +105,8 @@
                     Editor URL
                 </th>
             </tr>
-            <tr class="accounts_moderated" th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}">
+            <tr class="accounts_moderated"
+                th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}">
                 <td class="accounts_moderated" th:text="${moderatingApplication.getApplicationName()}">
                 </td>
                 <td class="accounts_moderated">
@@ -156,6 +157,65 @@
     </form>
 </div>
 
+<div class="grey_box" style="width:40em;">
+
+    <!--div style="text-align:left;"-->
+
+    <h2 id="timezone_banner">Modify Local Time Zone Information</h2>
+    <hr/>
+    <form name="app_form" action="/account/modify/locale"
+          method="post" th:object="${accountViewModel}">
+        <table>
+            <tr>
+                <td style="text-align:right;">
+                    <label for="selectedTimezone">Local Time Zone:</label>
+                </td>
+                <td style="text-align:left;">
+                    <select id="selectedTimeZone" name="selectedTimeZone" class="button"
+                            style="border:1px solid black;">
+                        <option th:each="timeZone : ${accountViewModel.getTimeZones()}"
+                                th:value="${timeZone}"
+                                th:text="${timeZone}"
+                                th:selected="${accountViewModel.isCurrentTimeZone(timeZone)}">
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">
+                    <label for="userTimeZoneEnabled">Use Local Time Zone:</label>
+                </td>
+                <td style="text-align:left;">
+                    <select id="userTimeZoneEnabled" name="userTimeZoneEnabled" class="button"
+                            style="border:1px solid black;">
+                        <option th:selected="${accountViewModel.isUserTimeZoneEnabled()}"
+                                value="true">Enabled
+                        </option>
+                        <option th:selected="${!accountViewModel.isUserTimeZoneEnabled()}"
+                                value="false">Disabled
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="padding:5px;">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <input class="button" name="submit" type="submit" value="Save Changes">
+                    <input class="button" name="reset" type="reset">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br/>
+    <br/>
+    By default, your account will use the time zone configuration specified by the Disc App
+    that you are visiting. You can use the above settings to enable the use of your local
+    time zone instead. When this setting is enabled, all message dates and times will be in the
+    time zone selected above regardless of which Disc App you are currently using.
+</div>
+
 
 <div class="grey_box" style="width:40em;">
     <h2 id="password_change_banner">Change Account Password</h2>
@@ -197,9 +257,10 @@
     <hr/>
     <!-- todo : move inline style tags to css -->
 
-    <div th:if="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}" >
+    <div th:if="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}">
         <p>
-            Clicking the reset links below will reset any viewed threads you've accessed on that DiscApp back to unread. Doing so
+            Clicking the reset links below will reset any viewed threads you've accessed on that DiscApp back to unread.
+            Doing so
             will reset any account side visited thread history. Note that browser based visited link styling will
             not be affected and you will need to clear your browser history separately.
         </p>
@@ -225,23 +286,23 @@
             </tr>
         </table>
     </div>
-    <div th:unless="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}" >
+    <div th:unless="${not #lists.isEmpty(accountViewModel.getUserReadThreadApplications())}">
         <p>
             You currently do not have any read thread history to reset.
         </p>
     </div>
-    <hr />
+    <hr/>
     <p th:if="${accountViewModel.isReadTrackingEnabled()}" style="text-align:center;">
         <a href="/account/modify/read/disable">
             Click here to disable read thread history</a>
-        <br />
-        <br />
+        <br/>
+        <br/>
         By disabling this feature, no new threads will be added to your read thread history.
     </p>
     <p th:unless="${accountViewModel.isReadTrackingEnabled()}" style="text-align:center;">
         <a href="/account/modify/read/enable">Click here to enable read thread history</a>
-        <br />
-        <br />
+        <br/>
+        <br/>
         By enabling this feature, the threads you read on each DiscApp will be marked as read when you read
         them.
     </p>

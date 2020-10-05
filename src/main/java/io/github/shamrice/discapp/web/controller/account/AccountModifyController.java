@@ -13,15 +13,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.*;
 
 @Controller
 @Slf4j
 public class AccountModifyController extends AccountController {
+
+    @GetMapping(value = {CONTROLLER_DIRECTORY_URL, "/account"})
+    public ModelAndView getAccount(@ModelAttribute AccountViewModel accountViewModel,
+                                   HttpServletRequest request,
+                                   ModelMap model) {
+        return getAccountModifyAccount(accountViewModel, request, model);
+    }
 
     @GetMapping(ACCOUNT_MODIFY)
     public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
@@ -95,6 +100,13 @@ public class AccountModifyController extends AccountController {
 
             //get config value for read tracking
             accountViewModel.setReadTrackingEnabled(configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, false));
+
+            //time zone configuration
+            accountViewModel.setUserTimeZoneEnabled(configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.USER_TIMEZONE_ENABLED, false));
+            accountViewModel.setSelectedTimeZone(configurationService.getUserConfigStringValue(user.getId(), UserConfigurationProperty.USER_TIMEZONE_LOCATION, "UTC"));
+            String[] timezoneIds = TimeZone.getAvailableIDs();
+            List<String> timezones = Arrays.asList(timezoneIds);
+            accountViewModel.setTimeZones(timezones);
         }
 
         //NPE safety net.
@@ -302,6 +314,46 @@ public class AccountModifyController extends AccountController {
         }
 
         return new ModelAndView("redirect:/account/modify#user_read_threads_banner");
+    }
+
+    @PostMapping(ACCOUNT_MODIFY_LOCALE)
+    public ModelAndView postLocaleModify(@ModelAttribute AccountViewModel accountViewModel,
+                                        HttpServletRequest request,
+                                        ModelMap modelMap) {
+
+        if (accountViewModel != null) {
+            String email = accountHelper.getLoggedInEmail();
+            if (email != null && !email.trim().isEmpty()) {
+
+                DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+                if (user != null) {
+
+                    UserConfiguration userTimeZone = configurationService.getUserConfiguration(user.getId(), UserConfigurationProperty.USER_TIMEZONE_LOCATION.getPropName());
+                    if (userTimeZone == null) {
+                        userTimeZone = new UserConfiguration();
+                        userTimeZone.setDiscappUserId(user.getId());
+                        userTimeZone.setName(UserConfigurationProperty.USER_TIMEZONE_LOCATION.getPropName());
+                    }
+                    userTimeZone.setValue(accountViewModel.getSelectedTimeZone());
+                    configurationService.saveUserConfiguration(UserConfigurationProperty.USER_TIMEZONE_LOCATION, userTimeZone);
+
+                    UserConfiguration userTimeZoneEnabled = configurationService.getUserConfiguration(user.getId(), UserConfigurationProperty.USER_TIMEZONE_ENABLED.getPropName());
+                    if (userTimeZoneEnabled == null) {
+                        userTimeZoneEnabled = new UserConfiguration();
+                        userTimeZoneEnabled.setDiscappUserId(user.getId());
+                        userTimeZoneEnabled.setName(UserConfigurationProperty.USER_TIMEZONE_ENABLED.getPropName());
+                    }
+                    userTimeZoneEnabled.setValue(String.valueOf(accountViewModel.isUserTimeZoneEnabled()));
+                    configurationService.saveUserConfiguration(UserConfigurationProperty.USER_TIMEZONE_ENABLED, userTimeZoneEnabled);
+
+                    accountViewModel.setInfoMessage("User time zone settings updated.");
+                    log.info("Updated time zone configuration for user id: " + user.getId() + " :: time zone enabled: "
+                            + userTimeZoneEnabled.getValue() + " :: time zone location: " + userTimeZone.getValue());
+                }
+            }
+        }
+
+        return getAccountModify(accountViewModel, request, modelMap);
     }
 
 }

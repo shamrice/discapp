@@ -84,4 +84,13 @@ public class AccountViewModel {
         return this.ownerId != null;
     }
 
+    //date and time config
+    private boolean userTimeZoneEnabled;
+    private List<String> timeZones;
+    private String selectedTimeZone;
+
+    public boolean isCurrentTimeZone(String timeZone) {
+        return this.selectedTimeZone.equalsIgnoreCase(timeZone);
+    }
+
 }

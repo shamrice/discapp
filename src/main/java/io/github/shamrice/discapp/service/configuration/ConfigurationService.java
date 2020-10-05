@@ -291,6 +291,8 @@ public class ConfigurationService {
         //try to get from cache first:
         UserConfiguration configFromCache = UserConfigurationCache.getInstance().getFromCache(discappUserId, configurationProperty);
         if (configFromCache != null) {
+            log.debug("Pulling user configuration from cache for userid: " + discappUserId + " :: "
+                    + configurationProperty.getPropName() + " : value: " + configFromCache.getValue());
             return configFromCache.getValue();
         }
 

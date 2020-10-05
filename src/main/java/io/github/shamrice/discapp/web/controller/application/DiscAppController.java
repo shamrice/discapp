@@ -11,6 +11,7 @@ import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
@@ -1156,8 +1157,18 @@ public class DiscAppController {
 
     private String getAdjustedDateStringForConfiguredTimeZone(long appId, Date date, boolean includeComma) {
 
-        String dateFormatPattern = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
         String timeZoneLocation = configurationService.getStringValue(appId, ConfigurationProperty.TIMEZONE_LOCATION, "UTC");
+
+        //if user is logged in and they have their time zone set to override. Use that instead.
+        Long userId = accountHelper.getLoggedInDiscAppUserId();
+        if (userId != null) {
+            if (configurationService.getUserConfigBooleanValue(userId, UserConfigurationProperty.USER_TIMEZONE_ENABLED, false)) {
+                timeZoneLocation = configurationService.getUserConfigStringValue(userId, UserConfigurationProperty.USER_TIMEZONE_LOCATION, timeZoneLocation);
+                log.debug("User id: " + userId + " has time zone override enabled. Setting time zone to: " + timeZoneLocation);
+            }
+        }
+
+        String dateFormatPattern = configurationService.getStringValue(appId, ConfigurationProperty.DATE_FORMAT_PATTERN, "EEE MMM dd, yyyy h:mma");
 
         DateFormat dateFormat = new SimpleDateFormat(dateFormatPattern);
         dateFormat.setTimeZone(TimeZone.getTimeZone(timeZoneLocation));

@@ -14,6 +14,8 @@ public class AccountUrl {
 
     public static final String ACCOUNT_MODIFY = CONTROLLER_DIRECTORY_URL + "modify";
 
+    public static final String ACCOUNT_MODIFY_LOCALE = ACCOUNT_MODIFY + "/locale";
+
     public static final String ACCOUNT_MODIFY_READ_STATUS = ACCOUNT_MODIFY + "/read/{status}";
     public static final String ACCOUNT_MODIFY_READ_RESET = ACCOUNT_MODIFY + "/read/reset";
 
