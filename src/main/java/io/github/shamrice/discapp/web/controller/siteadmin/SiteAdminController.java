@@ -460,18 +460,27 @@ public class SiteAdminController {
         if (model.getNewUpdateText() != null && !model.getNewUpdateText().trim().isEmpty()
                 && model.getNewUpdateSubject() != null && !model.getNewUpdateSubject().trim().isEmpty()) {
 
-            String body = addHtmlToUpdateBody(model.getNewUpdateText());
-
-            SiteUpdateLog siteUpdateLog = new SiteUpdateLog();
-            siteUpdateLog.setSubject(model.getNewUpdateSubject());
-            siteUpdateLog.setMessage(body);
-            siteUpdateLog.setEnabled(true);
-            siteUpdateLog.setCreateDt(new Date());
-            siteUpdateLog.setModDt(new Date());
-            if (siteService.saveAndPostUpdateLog(siteUpdateLog)) {
-                model.setInfoMessage("New site update created and posted.");
+            if (model.getPreviewButton() != null && !model.getPreviewButton().isEmpty()) {
+                model.setShowPreview(true);
+                model.setUpdatePreviewText(addHtmlToUpdateBody(model.getNewUpdateText()));
+                return new ModelAndView("site_admin/update", "siteAdminUpdateViewModel", model);
             } else {
-                model.setErrorMessage("Failed to save and post new site update.");
+                String body = addHtmlToUpdateBody(model.getNewUpdateText());
+
+                SiteUpdateLog siteUpdateLog = new SiteUpdateLog();
+                siteUpdateLog.setSubject(model.getNewUpdateSubject());
+                siteUpdateLog.setMessage(body);
+                siteUpdateLog.setEnabled(true);
+                siteUpdateLog.setCreateDt(new Date());
+                siteUpdateLog.setModDt(new Date());
+                if (siteService.saveAndPostUpdateLog(siteUpdateLog)) {
+                    model.setInfoMessage("New site update created and posted.");
+                    //set values back to blank.
+                    model.setNewUpdateSubject("");
+                    model.setNewUpdateText("");
+                } else {
+                    model.setErrorMessage("Failed to save and post new site update.");
+                }
             }
         }
 
@@ -514,14 +523,21 @@ public class SiteAdminController {
         if (model.getEditUpdateSubject() != null && !model.getEditUpdateSubject().trim().isEmpty()
                 && model.getEditUpdateText() != null && !model.getEditUpdateText().trim().isEmpty()) {
             SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(model.getEditUpdateId());
+
             if (siteUpdateLog != null) {
+                if (model.getPreviewButton() != null && !model.getPreviewButton().isEmpty()) {
+                    model.setShowPreview(true);
+                    model.setUpdatePreviewText(addHtmlToUpdateBody(model.getEditUpdateText()));
+                    return new ModelAndView("site_admin/updateEdit", "siteAdminUpdateViewModel", model);
+                } else {
 
-                String body = addHtmlToUpdateBody(model.getEditUpdateText());
+                    String body = addHtmlToUpdateBody(model.getEditUpdateText());
 
-                siteUpdateLog.setSubject(model.getEditUpdateSubject());
-                siteUpdateLog.setMessage(body);
-                siteUpdateLog.setModDt(new Date());
-                siteService.saveUpdateLog(siteUpdateLog);
+                    siteUpdateLog.setSubject(model.getEditUpdateSubject());
+                    siteUpdateLog.setMessage(body);
+                    siteUpdateLog.setModDt(new Date());
+                    siteService.saveUpdateLog(siteUpdateLog);
+                }
             }
         }
         return new ModelAndView("redirect:" + UPDATE_MANAGE);

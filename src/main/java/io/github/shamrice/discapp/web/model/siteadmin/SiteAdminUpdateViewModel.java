@@ -19,6 +19,10 @@ public class SiteAdminUpdateViewModel {
     private String newUpdateText;
     private String submit;
 
+    private boolean showPreview = false;
+    private String updatePreviewText;
+    private String previewButton;
+
     private List<SiteUpdateLog> siteUpdateLogList = new ArrayList<>();
 
     private String editUpdateSubject;

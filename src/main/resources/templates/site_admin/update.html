@@ -14,6 +14,7 @@
             display:block;
             padding:5px;
         }
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
@@ -36,20 +37,32 @@
 </div>
 
 <div class="grey_box">
-
     <div>
-        <form method="post" action="/site_admin/update" enctype="application/x-www-form-urlencoded" >
-            <label>Post New Update:</label>
-            <br />
-            <hr />
-            <br />
+        <label>Post New Update:</label>
+        <br/>
+        <hr/>
+        <br/>
+        <div th:if="${siteAdminUpdateViewModel.isShowPreview()}">
+            <u>Update Preview:</u>
+            <br/>
+            <p style="font-size:large;font-weight:bold;"
+               th:text="@{|Latest Update: 01-01-2099 - ${siteAdminUpdateViewModel.getNewUpdateSubject()}|}">
+            </p>
+            <p th:if="${siteAdminUpdateViewModel.getUpdatePreviewText()}"
+               th:utext="${siteAdminUpdateViewModel.getUpdatePreviewText()}"></p>
+            <br/>
+            <hr/>
+            <br/>
+        </div>
+        <form method="post" action="/site_admin/update" enctype="application/x-www-form-urlencoded">
             <table style="width:100%;text-align:left;">
                 <tr>
                     <td style="text-align:right;">
                         <label>Subject:</label>
                     </td>
                     <td>
-                        <input style="width:90%;" class="button" type="text" name="newUpdateSubject" />
+                        <input style="width:90%;" class="button" type="text" name="newUpdateSubject"
+                               th:value="${siteAdminUpdateViewModel.getNewUpdateSubject()}"/>
                     </td>
                 </tr>
                 <tr>
@@ -57,12 +70,15 @@
                         <label>Body:</label>
                     </td>
                     <td>
-                        <textarea style="height:100px;" class="button" name="newUpdateText"></textarea>
+                        <textarea style="height:100px;" class="button" name="newUpdateText"
+                                  th:text="${siteAdminUpdateViewModel.getNewUpdateText()}"></textarea>
                     </td>
                 </tr>
             </table>
-            <input class="button" type="submit" name="submit" value="Submit" />
-            <br />
+            <input class="button" type="submit" name="previewButton" value="Preview"/>
+            <input class="button" type="submit" name="submit" value="Submit"/>
+            <input class="button" type="reset" name="reset" value="Reset"/>
+            <br/>
         </form>
     </div>
 
