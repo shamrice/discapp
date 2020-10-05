@@ -39,3 +39,7 @@
     font-weight: bold;
     border-radius: 5px;
 }
+
+a.read {
+    color: #551A8B;
+}

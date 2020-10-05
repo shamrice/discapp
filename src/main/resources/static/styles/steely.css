@@ -33,7 +33,7 @@ A { color:#008;
 
 A:VISITED { color:#a0a; }
 
-.read {
+a.read {
     color: #a0a;
 }
 

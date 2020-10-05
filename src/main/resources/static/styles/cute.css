@@ -134,3 +134,7 @@ table#widget_table {margin:auto;}
     font-weight: bold;
     border-radius: 5px;
 }
+
+a.read {
+    color: #888;
+}
