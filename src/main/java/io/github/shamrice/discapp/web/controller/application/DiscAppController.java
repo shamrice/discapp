@@ -152,8 +152,14 @@ public class DiscAppController {
 
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), page, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
 
+                /*
                 //if there are less than max threads returned, we must be on the last page.
-                if (threadTreeNodeList.size() < maxThreads) {
+                if (threadTreeNodeList.size() < maxThreads && threadSortOrder.equalsIgnoreCase(ThreadSortOrder.CREATION.name())) {
+                    model.addAttribute(HAS_NEXT_PAGE, false);
+                }
+                 */
+                //if there's no messages... there's no next page. :)
+                if (threadTreeNodeList.isEmpty()) {
                     model.addAttribute(HAS_NEXT_PAGE, false);
                 }
 

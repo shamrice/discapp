@@ -38,6 +38,9 @@ public class ThreadService {
     private ThreadPostCodeRepository threadPostCodeRepository;
 
     @Autowired
+    private ThreadActivityService threadActivityService;
+
+    @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
@@ -371,6 +374,14 @@ public class ThreadService {
 
             if (createThread != null) {
                 log.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
+
+                //create/update thread activity table.
+                Thread activityToUpdate = createThread;
+                if (createThread.getParentId() != 0) {
+                    activityToUpdate = getRootThread(createThread);
+                }
+                threadActivityService.updateThreadActivity(activityToUpdate);
+
                 return createThread.getId();
             }
 
@@ -435,15 +446,28 @@ public class ThreadService {
     public List<ThreadTreeNode> getLatestThreads(Long applicationId, int page, int numThreads,
                                                  ThreadSortOrder threadSortOrder, boolean isExpandOnIndex) {
 
-        //query to get latest parent threads (parentId = 0L) for an application
+        List<Thread> parentThreads;
         Pageable limit = PageRequest.of(page, numThreads);
-        List<Thread> parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
-                applicationId,
-                TOP_LEVEL_THREAD_PARENT_ID,
-                false,
-                true,
-                limit
-        );
+        if (threadSortOrder.equals(ThreadSortOrder.CREATION)) {
+            //query to get latest parent threads (parentId = 0L) for an application
+            parentThreads = threadRepository.findByApplicationIdAndParentIdAndDeletedAndIsApprovedOrderByCreateDtDesc(
+                    applicationId,
+                    TOP_LEVEL_THREAD_PARENT_ID,
+                    false,
+                    true,
+                    limit
+            );
+        } else {
+            //sort by activity. get list of threads based on thread activity table instead.
+            parentThreads = new ArrayList<>();
+            List<ThreadActivity> latestThreads = threadActivityService.getLatestThreadActivity(applicationId, limit);
+            for (ThreadActivity threadActivity : latestThreads) {
+                Thread threadToAdd = threadActivity.getThread();
+                if (threadToAdd != null && !threadToAdd.getDeleted() && threadToAdd.isApproved()) {
+                    parentThreads.add(threadActivity.getThread());
+                }
+            }
+        }
 
         List<ThreadTreeNode> threadList = new ArrayList<>();
 
@@ -469,6 +493,19 @@ public class ThreadService {
         }
 
         return threadList;
+    }
+
+    /**
+     * Recursive function that will follow up the thread list until it finds the top thread in the list.
+     * @param startThread
+     * @return
+     */
+    private Thread getRootThread(Thread startThread) {
+        if (startThread.getParentId() != 0) {
+            Thread nextThread = threadRepository.getOneByApplicationIdAndId(startThread.getApplicationId(), startThread.getParentId());
+            startThread = getRootThread(nextThread);
+        }
+        return startThread;
     }
 
     /**

@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS prologue;
 DROP TABLE IF EXISTS epilogue;
 DROP TABLE IF EXISTS thread_body;
 DROP TABLE IF EXISTS thread;
+DROP TABLE IF EXISTS thread_activity;
+DROP TABLE IF EXISTS thread_post_code
 DROP TABLE IF EXISTS configuration;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS owner;
@@ -110,6 +112,18 @@ CREATE TABLE thread_body (
     FOREIGN KEY (application_id) REFERENCES application(id),
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
+
+CREATE TABLE thread_activity (
+    id serial NOT NULL,
+    application_id int NOT NULL,
+    thread_id int NOT NULL,
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (thread_id) REFERENCES thread(id)
+);
+
 
 CREATE TABLE prologue (
     id serial NOT NULL,

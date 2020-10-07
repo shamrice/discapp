@@ -110,6 +110,18 @@ CREATE TABLE thread_body (
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
 
+
+CREATE TABLE thread_activity (
+    id int(255) NOT NULL AUTO_INCREMENT,
+    application_id int NOT NULL,
+    thread_id int(255) NOT NULL,
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (thread_id) REFERENCES thread(id)
+);
+
 CREATE TABLE prologue (
     id int(255) NOT NULL AUTO_INCREMENT,
     application_id int(20) UNIQUE NOT NULL,
