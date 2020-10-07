@@ -152,12 +152,6 @@ public class DiscAppController {
 
                 List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), page, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
 
-                /*
-                //if there are less than max threads returned, we must be on the last page.
-                if (threadTreeNodeList.size() < maxThreads && threadSortOrder.equalsIgnoreCase(ThreadSortOrder.CREATION.name())) {
-                    model.addAttribute(HAS_NEXT_PAGE, false);
-                }
-                 */
                 //if there's no messages... there's no next page. :)
                 if (threadTreeNodeList.isEmpty()) {
                     model.addAttribute(HAS_NEXT_PAGE, false);
@@ -631,8 +625,15 @@ public class DiscAppController {
                                 + "?id=" + appId + "&email=" + email);
                     }
 
-                    //otherwise, give regular view thread posted page.
-                    return new ModelAndView("redirect:/discussion.cgi?disc=" + appId + "&article=" + newThreadId +"&page=" + page);
+                    //otherwise, give view thread posted page.
+                    String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
+                    if (ThreadSortOrder.CREATION.name().equalsIgnoreCase(threadSortOrder)) {
+                        //if disc app sorted by creation, include page num
+                        return new ModelAndView("redirect:/discussion.cgi?disc=" + appId + "&article=" + newThreadId + "&page=" + page);
+                    } else {
+                        //if sorted by activity, don't include page num as thread will be on first page now.
+                        return new ModelAndView("redirect:/discussion.cgi?disc=" + appId + "&article=" + newThreadId);
+                    }
                 }
             }
         }

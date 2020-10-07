@@ -482,16 +482,6 @@ public class ThreadService {
             }
         }
 
-        //sort by activity if needed.
-        if (threadSortOrder.equals(ThreadSortOrder.ACTIVITY)) {
-            threadList.sort((t1, t2) -> {
-                if (t1.getNewestCreateDateInNodes().equals(t2.getNewestCreateDateInNodes())) {
-                    return 0;
-                }
-                return t1.getNewestCreateDateInNodes().after(t2.getNewestCreateDateInNodes()) ? -1 : 1;
-            });
-        }
-
         return threadList;
     }
 
