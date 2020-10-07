@@ -28,16 +28,19 @@ import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.attoparser.trace.MarkupTraceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriUtils;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -621,8 +624,12 @@ public class DiscAppController {
 
                     //redirect them to subscribe url if they clicked subscribe.
                     if (email != null && !email.isEmpty() && newThreadViewModel.getSubscribe() != null && !newThreadViewModel.getSubscribe().isEmpty()) {
+
+                        //url encode email address
+                        String urlEmail = UriUtils.encode(email, StandardCharsets.UTF_8);
+
                         return new ModelAndView("redirect:" + ApplicationSubscriptionUrl.SUBSCRIBE_URL
-                                + "?id=" + appId + "&email=" + email);
+                                + "?id=" + appId + "&email=" + urlEmail + "&encoded=true");
                     }
 
                     //otherwise, give view thread posted page.

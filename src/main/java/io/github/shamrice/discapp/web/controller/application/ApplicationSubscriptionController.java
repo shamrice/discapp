@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @Slf4j
@@ -95,6 +97,7 @@ public class ApplicationSubscriptionController {
     @GetMapping(ApplicationSubscriptionUrl.SUBSCRIBE_URL)
     public ModelAndView getSubscribeView(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "email", required = false) String email,
+                                         @RequestParam(name = "encoded", required = false) Boolean emailEncoded,
                                          HttpServletRequest request) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
@@ -105,6 +108,11 @@ public class ApplicationSubscriptionController {
         if (app != null) {
 
             if (email != null && !email.trim().isEmpty()) {
+
+                //decode email if it was encoded when passed so it looks correct to the user.
+                if (emailEncoded != null && emailEncoded) {
+                    email = UriUtils.decode(email, StandardCharsets.UTF_8);
+                }
                 model.setEmail(email);
             }
 
@@ -168,9 +176,11 @@ public class ApplicationSubscriptionController {
                 //make sure email address attempted was not blank before continuing.
                 if (applicationSubscriptionModel.getEmail() != null && !applicationSubscriptionModel.getEmail().isEmpty()) {
 
+                    //uri encode email for confirm url
+                    String urlEmail = UriUtils.encode(applicationSubscriptionModel.getEmail(), StandardCharsets.UTF_8);
                     //code query param value will be added by service.
                     String confirmUrl = baseUrl + ApplicationSubscriptionUrl.CONFIRM_URL + "?id=" + app.getId()
-                            + "&email=" + applicationSubscriptionModel.getEmail() + "&code=";
+                            + "&email=" + urlEmail + "&code=";
 
                     String confirmationMessage = configurationService.getStringValue(
                             app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE,
