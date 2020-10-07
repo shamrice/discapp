@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.data.repository.UserConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import io.github.shamrice.discapp.service.configuration.cache.UserConfigurationCache;
+import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_URL, "/styles/graph2.css");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, "");
-        configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, "activity");
+        configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.ACTIVITY.name());
         configsToSet.put(ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, "320");

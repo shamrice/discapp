@@ -322,6 +322,10 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if (maintenanceViewModel.getThreadSortOrder() == null || maintenanceViewModel.getThreadSortOrder().isEmpty()) {
             maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.CREATION.name());
+        } else if (ThreadSortOrder.CREATION.name().equalsIgnoreCase(maintenanceViewModel.getThreadSortOrder())) {
+            maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.CREATION.name());
+        } else {
+            maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.ACTIVITY.name());
         }
 
         boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
