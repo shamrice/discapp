@@ -84,7 +84,15 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {
-        return discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        List<DiscAppUser> results = discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        results.removeIf(user -> this.rootAccountEmail.equalsIgnoreCase(user.getEmail()) || !user.getEnabled());
+        return results;
+    }
+
+    public List<DiscAppUser> searchByEmail(String searchTerm, boolean searchUserAccounts) {
+        List<DiscAppUser> results = discappUserRepository.findByEmailContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        results.removeIf(user -> this.rootAccountEmail.equalsIgnoreCase(user.getEmail()) || !user.getEnabled());
+        return results;
     }
 
     public DiscAppUser getByUsername(String username) {

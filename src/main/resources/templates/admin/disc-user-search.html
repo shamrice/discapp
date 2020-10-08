@@ -36,7 +36,7 @@
 
     <input type="hidden" name="id" value="${appId}" />
     <div th:if="${maintenanceUserSearchViewModel.getSearchTerm()}" class="grey_box" style="width:32em;">
-        <p th:text="@{|Searching for names that start with ${maintenanceUserSearchViewModel.getSearchTerm()} ...|}"></p>
+        <p th:text="@{|Searching for names that contain ${maintenanceUserSearchViewModel.getSearchTerm()} ...|}"></p>
 
         <p th:if="${not #lists.isEmpty(maintenanceUserSearchViewModel.getSearchResults())}">Showing the first 10 matches...</p>
         <p th:unless="${not #lists.isEmpty(maintenanceUserSearchViewModel.getSearchResults())}">No matching names found.</p>
