@@ -314,6 +314,17 @@ CREATE TABLE user_registration (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE application_report_code (
+    id serial NOT NULL,
+    application_id INT NOT NULL,
+    email varchar(255) NOT NULL,
+    code varchar NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
 
 commit;
 

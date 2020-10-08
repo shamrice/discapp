@@ -81,7 +81,10 @@ public enum ConfigurationProperty {
     MAILING_LIST_EMAIL_UPDATE_SETTINGS("mailing.list.email.update.settings"),
     EMAIL_REPLY_NOTIFICATION_ENABLED("email.notification.reply.enabled"),
     EMAIL_REPLY_NOTIFICATION_SUBJECT_TEMPLATE("email.notification.reply.subject.template"),
-    EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE("email.notification.reply.body.template");
+    EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE("email.notification.reply.body.template"),
+    MAILING_LIST_ADMIN_REPORT_SUBJECT_TEMPLATE("mailing.list.email.admin.subject.template"),
+    MAILING_LIST_ADMIN_REPORT_BODY_TEMPLATE("mailing.list.email.admin.body.template"),
+    MAILING_LIST_ADMIN_REPORT_FREQUENCY("mailing.list.email.admin.frequency");
 
     private final String propName;
 

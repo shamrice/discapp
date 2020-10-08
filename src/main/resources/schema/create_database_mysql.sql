@@ -301,7 +301,7 @@ CREATE TABLE thread_post_code (
 );
 
 CREATE TABLE user_registration (
-  id serial NOT NULL,
+  id int(255) NOT NULL,
   email varchar(255) UNIQUE NOT NULL,
   key varchar(64) NOT NULL,
   is_redeemed boolean NOT NULL DEFAULT false,
@@ -310,6 +310,17 @@ CREATE TABLE user_registration (
   PRIMARY KEY (id)
 );
 
+
+CREATE TABLE application_report_code (
+    id int(255) NOT NULL,
+    application_id INT NOT NULL,
+    email varchar(255) NOT NULL,
+    code varchar NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
 
 
 commit;

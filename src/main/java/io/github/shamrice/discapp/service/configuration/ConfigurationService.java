@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.data.repository.UserConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import io.github.shamrice.discapp.service.configuration.cache.UserConfigurationCache;
+import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, "all");
 
         configsToSet.put(ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, "true");
+
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
 
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
