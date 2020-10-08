@@ -326,4 +326,39 @@ public class ConfigurationService {
     public UserConfiguration getUserConfiguration(long discappUserId, String configurationName) {
         return userConfigurationRepository.findOneByDiscappUserIdAndName(discappUserId, configurationName);
     }
+
+    /**
+     * Saves updated or new configuration for an application
+     *
+     * @param appId    application id
+     * @param property configuration property to save
+     * @param value    values to save for the configuration
+     * @return returns true on success and false on failure.
+     */
+    public boolean saveApplicationConfiguration(long appId, ConfigurationProperty property, String value) {
+        if (value == null) {
+            log.warn("Attempted to save null app configuration value for appId: " + appId + " : config property: " + property.getPropName());
+            return false;
+        }
+
+        Configuration configToUpdate = getConfiguration(appId, property.getPropName());
+
+        if (configToUpdate == null) {
+            log.info("Creating new app configuration prop: " + property.getPropName() + " for appId: " + appId);
+            configToUpdate = new Configuration();
+            configToUpdate.setName(property.getPropName());
+            configToUpdate.setApplicationId(appId);
+        }
+
+        configToUpdate.setValue(value);
+
+        if (!saveConfiguration(property, configToUpdate)) {
+            log.warn("Failed to update app configuration " + property.getPropName() + " of appId: " + appId);
+            return false;
+        } else {
+            log.info("Updated " + property.getPropName() + " for appId: " + appId + " to " + value);
+        }
+
+        return true;
+    }
 }

@@ -66,8 +66,8 @@ public class LocaleMaintenanceController extends MaintenanceController {
 
         String dateFormat = inputHelper.sanitizeInput(maintenanceLocaleViewModel.getDateFormat());
 
-        boolean timezoneSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceLocaleViewModel.getSelectedTimezone());
-        boolean dateFormatSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, dateFormat);
+        boolean timezoneSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.TIMEZONE_LOCATION, maintenanceLocaleViewModel.getSelectedTimezone());
+        boolean dateFormatSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.DATE_FORMAT_PATTERN, dateFormat);
 
         if (timezoneSaved && dateFormatSaved) {
             log.info("Saved date and time settings for appId: " + appId);

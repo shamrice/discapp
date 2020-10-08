@@ -4,6 +4,7 @@ import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
+import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -72,8 +73,9 @@ public class AccountModifyController extends AccountController {
                             AccountViewModel.AccountApplication accountApplication = new AccountViewModel.AccountApplication(
                                     application.getName(),
                                     application.getId(),
-                                    ENABLED,
-                                    ENABLED
+                                    ENABLED,    //not used in view
+                                    ENABLED,    //not used in view
+                                    AdminReportFrequency.NEVER.name() // not used in view
                             );
                             moderatingApplications.add(accountApplication);
                         }

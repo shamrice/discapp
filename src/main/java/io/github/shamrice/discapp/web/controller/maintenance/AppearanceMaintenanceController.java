@@ -217,20 +217,20 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if ("custom-inline".equalsIgnoreCase(styleSheetType)) {
             String customStyleSheetText = maintenanceViewModel.getStyleSheetCustomText();
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, customStyleSheetText);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, customStyleSheetText);
 
             String styleSheetUrl = AppCustomCssUrl.CUSTOM_CSS_URL_PREFIX + appId + AppCustomCssUrl.CUSTOM_CSS_URL_SUFFIX;
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
 
         } else if ("custom-url".equalsIgnoreCase(styleSheetType)) {
             String styleSheetUrl = inputHelper.sanitizeInput(maintenanceViewModel.getStyleSheetUrl());
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         } else {
             String styleSheetUrl = getDefaultStyleSheetUrlByType(styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         }
 
         maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
@@ -328,16 +328,16 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.ACTIVITY.name());
         }
 
-        boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
-        boolean expandSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
-        boolean previewSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isPreviewFirstMessageOnIndex()));
-        boolean highlightSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, String.valueOf(maintenanceViewModel.isHighlightNewMessages()));
-        boolean threadBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
-        boolean entryBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
-        boolean maxThreadCountSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getMaxThreadCountPerPage()));
-        boolean threadDepthSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
-        boolean previewTopLevelSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewTopLevelLength()));
-        boolean previewReplySaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewReplyLength()));
+        boolean sortOrderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
+        boolean expandSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
+        boolean previewSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isPreviewFirstMessageOnIndex()));
+        boolean highlightSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, String.valueOf(maintenanceViewModel.isHighlightNewMessages()));
+        boolean threadBreakSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
+        boolean entryBreakSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
+        boolean maxThreadCountSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getMaxThreadCountPerPage()));
+        boolean threadDepthSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
+        boolean previewTopLevelSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewTopLevelLength()));
+        boolean previewReplySaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewReplyLength()));
 
         if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved
                 && maxThreadCountSaved && threadDepthSaved && previewTopLevelSaved && previewReplySaved) {
@@ -356,8 +356,8 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                                HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean headerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HEADER_TEXT, maintenanceViewModel.getHeader());
-        boolean footerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
+        boolean headerSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.HEADER_TEXT, maintenanceViewModel.getHeader());
+        boolean footerSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
 
         if (headerSaved && footerSaved) {
             maintenanceViewModel.setInfoMessage("Successfully saved changes to header and footer.");
@@ -376,11 +376,11 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                          HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean authorHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBMITTER_LABEL_TEXT, maintenanceViewModel.getAuthorHeader());
-        boolean dateHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_LABEL_TEXT, String.valueOf(maintenanceViewModel.getDateHeader()));
-        boolean emailSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EMAIL_LABEL_TEXT, String.valueOf(maintenanceViewModel.getEmailHeader()));
-        boolean subjectSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBJECT_LABEL_TEXT, String.valueOf(maintenanceViewModel.getSubjectHeader()));
-        boolean messageSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
+        boolean authorHeaderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SUBMITTER_LABEL_TEXT, maintenanceViewModel.getAuthorHeader());
+        boolean dateHeaderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.DATE_LABEL_TEXT, String.valueOf(maintenanceViewModel.getDateHeader()));
+        boolean emailSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EMAIL_LABEL_TEXT, String.valueOf(maintenanceViewModel.getEmailHeader()));
+        boolean subjectSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SUBJECT_LABEL_TEXT, String.valueOf(maintenanceViewModel.getSubjectHeader()));
+        boolean messageSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
 
         if (authorHeaderSaved && dateHeaderSaved && emailSaved && subjectSaved && messageSaved) {
             maintenanceViewModel.setInfoMessage("Successfully saved changes to labels.");
@@ -399,14 +399,14 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                           HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean shareButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
-        boolean editButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EDIT_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getEditButton()));
-        boolean returnButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
-        boolean previewButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
-        boolean postButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
-        boolean previousPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviousPageButton()));
-        boolean nextPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
-        boolean replyButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
+        boolean shareButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
+        boolean editButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EDIT_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getEditButton()));
+        boolean returnButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
+        boolean previewButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
+        boolean postButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
+        boolean previousPageButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviousPageButton()));
+        boolean nextPageButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
+        boolean replyButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
 
         if (shareButtonSaved && editButtonSaved && returnButtonSaved && previewButtonSaved && postButtonSaved
                 && previousPageButtonSaved && nextPageButtonSaved && replyButtonSaved) {
@@ -448,7 +448,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         Application app = applicationService.get(appId);
 
-        if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
+        if (!configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
             maintenanceViewModel.setInfoMessage("Failed to update Favicon.");
         } else {
             maintenanceViewModel.setFavicon(favicon);
