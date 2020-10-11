@@ -14,8 +14,7 @@ public class AdminReportFrequencyModel {
     private String updateReportFrequency;
     private String emailAddress;
     private String authCode;
-    private Long appId;
-    private String appName;
+    private String appIds;
 
     private String infoMessage;
     private String errorMessage;

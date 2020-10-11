@@ -182,7 +182,7 @@ INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'stylesheet.url.maintenance', '/styles/maint.css');
 
 INSERT INTO configuration (application_id, name, value)
-VALUES (0, 'mailing.list.email.admin.subject.template', 'Your NeDiscApp Report - APPLICATION_NAME');
+VALUES (0, 'mailing.list.email.admin.subject.template', 'Your NeDiscApp Report');
 
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'mailing.list.email.admin.body.template', '<html>
@@ -216,6 +216,7 @@ VALUES (0, 'mailing.list.email.admin.body.template', '<html>
                 messages
             </th>
         </tr>
+        APPLICATION_REPORT_DATA_START
         <tr style="margin-bottom: 3px;">
             <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
             <a href="MAINTENANCE_URL">APPLICATION_NAME </a></td>
@@ -238,6 +239,7 @@ VALUES (0, 'mailing.list.email.admin.body.template', '<html>
                 <a href="MAINTENANCE_THREADS_UNAPPROVED_URL">TOTAL_UNAPPROVED_MESSAGES</a>
             </td>
         </tr>
+        APPLICATION_REPORT_DATA_END
     </table>
     <div style="height: 2em;"></div>
     <div
@@ -254,7 +256,7 @@ VALUES (0, 'mailing.list.email.admin.body.template', '<html>
             <input type="submit" name="updateReportFrequency" value="Update Report Frequency" />
             <input type="hidden" name="emailAddress" value="OWNER_EMAIL_ADDRESS" />
             <input type="hidden" name="authCode" value="GENERATED_AUTH_CODE" />
-            <input type="hidden" name="appId" value="APPLICATION_ID" />
+            <input type="hidden" name="appIds" value="APPLICATION_ID" />
         </form>
     </div>
 </html>

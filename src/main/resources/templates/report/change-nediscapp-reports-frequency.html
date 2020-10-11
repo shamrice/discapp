@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="@{|Disc App - Update Admin Report Frequency - ${appName}|}"></title>
+    <title>Disc App - Update Admin Report Frequency</title>
     <link href="/styles/maint.css" rel="stylesheet" type="text/css"/>
     <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <link href="/favicon.ico" rel="icon" type="image/x-icon">
@@ -20,7 +20,8 @@
     </h2>
     <hr/>
     <p style="margin:2em;">
-        Admin email report frequency can also be set in the "Manage Disc Apps" section of the
+        Admin email report frequency can also be set in the
+        <a href="/account/application">Manage Disc Apps</a> section of the
         <a href="/account/modify">Modify Account page.</a>
     </p>
 </div>
@@ -31,14 +32,15 @@
     </h2>
     <hr/>
     <p style="margin:2em;">
-        Admin email report frequency can also be set in the "Manage Disc Apps" section of the
+        Admin email report frequency can also be set in the
+        <a href="/account/application">Manage Disc Apps</a> section of the
         <a href="/account/modify">Modify Account page.</a>
     </p>
 </div>
 
 <p style="margin:2em;text-align:center;">
-    <a th:href="@{|/Indices/${adminReportFrequencyModel.getAppId()}.html|}"
-       th:text="@{|Return to ${adminReportFrequencyModel.getAppName()}|}">
+    <a th:href="${adminReportFrequencyModel.getBaseUrl()}">
+       Return to Home Page
     </a>
 </p>
 
