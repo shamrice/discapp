@@ -11,6 +11,7 @@ public class AppUrl {
     public static final String APPLICATION_VIEW_URL = CONTROLLER_DIRECTORY_URL + "{applicationId}";
 
     public static final String CREATE_THREAD = "/createThread";
+    public static final String CREATE_THREAD_HOLD = "/createThreadHold";
     public static final String POST_THREAD = "/postThread";
     public static final String PREVIEW_THREAD = "/previewThread";
 

@@ -91,6 +91,46 @@ public class DiscAppController {
     @Autowired
     private ApplicationSubscriptionService applicationSubscriptionService;
 
+    @GetMapping(CREATE_THREAD_HOLD)
+    public ModelAndView getCreateThreadHoldView(@RequestParam(name="disc") Long appId,
+                                                @RequestParam(name="page", required = false) Integer page,
+                                                @RequestParam(name="parentId", required = false) Integer parentId,
+                                                Model model) {
+        if (page == null || page < 0) {
+            page = 0;
+        }
+
+        try {
+            Application app = applicationService.get(appId);
+
+            if (app != null) {
+
+                //if none permissions are set, redirect user to access denied.
+                if (accountHelper.checkUserHasPermission(app.getId(), UserPermission.NONE)) {
+                    return errorController.getPermissionDeniedView("", model);
+                }
+
+                model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+                model.addAttribute(CURRENT_PAGE, page);
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
+                model.addAttribute(PARENT_THREAD_ID, parentId);
+                model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+
+                return new ModelAndView("indices/createThreadHold");
+            }
+        } catch (Exception ex) {
+            model.addAttribute(ERROR, "No disc app with id " + appId + " found. " + ex.getMessage());
+            log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
+        }
+
+        return errorController.getNotFoundView("Disc App with ID of " + appId + " does not exist.", model);
+
+    }
+
     @GetMapping(ALTERNATE_APPLICATION_VIEW_URL)
     public ModelAndView getAppViewOriginalUrl(@PathVariable(name = "applicationId") Long appId,
                                               @RequestParam(name = "page", required = false) Integer page,
@@ -583,7 +623,7 @@ public class DiscAppController {
                     body = inputHelper.addUrlHtmlLinksToString(body);
                 }
 
-                Long newThreadId = threadService.saveThread(newThread, body);
+                Long newThreadId = threadService.saveThread(newThread, body, newThread.isApproved());
                 if (newThreadId != null) {
 
                     //send reply notification email if enabled to parent thread being replied to.
@@ -629,6 +669,11 @@ public class DiscAppController {
 
                         return new ModelAndView("redirect:" + ApplicationSubscriptionUrl.SUBSCRIBE_URL
                                 + "?id=" + appId + "&email=" + urlEmail + "&encoded=true");
+                    }
+
+                    //if app is being held until approval, redirect to message letting the user know.
+                    if (!isApproved) {
+                        return new ModelAndView("redirect:/createThreadHold?disc=" + appId + "&page=" + page + "&parentId=" + parentId);
                     }
 
                     //otherwise, give view thread posted page.

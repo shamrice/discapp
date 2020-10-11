@@ -1,0 +1,49 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title th:text="${appName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" th:href="${styleSheetUrl}"/>
+    <link rel="shortcut icon" th:href="${faviconUrl}" type="image/x-icon">
+    <link rel="icon" th:href="${faviconUrl}" type="image/x-icon">
+
+    <style type="text/css">
+        ul {margin-top:0; padding-top:1px; margin-bottom:0;}
+        li.nested_list { list-style-type:none; display:inline; }
+        div.message_and_thread li.message_entry { margin-top:1em; }
+
+        /* li { margin-top: 1ex } */
+
+        div.message_preview { width:30em; }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<body>
+<div id="body">
+
+    <div th:utext="${headerText}"></div>
+
+    <div class="message_and_thread">
+
+        <div class="message" style="text-align:center;">
+            <p>
+                Your message will be posted once it has been approved by an administrator.
+            </p>
+            <div class="buttons">
+                <form method="GET" th:action="@{|/indices/${appId}#${parentThreadId}|}" enctype="multipart/form-data" action="submit">
+                    <input type="hidden" name="page" th:value="${currentPage}"/>
+                    <input type="submit" th:value="${returnButtonText}" class="button" id="returnToApp"/>
+                </form>
+            </div>
+            <div style="clear:left;"></div>
+        </div>
+    </div>
+
+    <div th:utext="${footerText}"></div>
+</div>
+
+</body>
+</html>

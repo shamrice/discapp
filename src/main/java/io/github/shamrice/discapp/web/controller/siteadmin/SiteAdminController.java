@@ -435,7 +435,7 @@ public class SiteAdminController {
             Thread thread = threadService.getThreadById(threadId);
             thread.setDeleted(false);
             thread.setModDt(new Date());
-            if (threadService.saveThread(thread, thread.getBody()) > 0) {
+            if (threadService.saveThread(thread, thread.getBody(), false) > 0) {
                 log.info("Thread id: " + threadId + " restored successfully.");
                 siteAdminThreadViewModel.setInfoMessage("Thread id: " + threadId + " restored successfully.");
             } else {

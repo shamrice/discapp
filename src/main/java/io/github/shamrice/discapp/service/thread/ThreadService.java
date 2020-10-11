@@ -311,7 +311,7 @@ public class ThreadService {
         return false;
     }
 
-    public Long saveThread(Thread thread, String threadBodyText) {
+    public Long saveThread(Thread thread, String threadBodyText, boolean updateThreadActivity) {
 
         if (thread != null) {
 
@@ -375,12 +375,15 @@ public class ThreadService {
             if (createThread != null) {
                 log.info("Saved thread: " + createThread.getId() + " :: for appId: " + createThread.getApplicationId());
 
-                //create/update thread activity table.
-                Thread activityToUpdate = createThread;
-                if (createThread.getParentId() != 0) {
-                    activityToUpdate = getRootThread(createThread);
+                //only update activity table if thread is approved.
+                if (createThread.isApproved() && updateThreadActivity) {
+                    //create/update thread activity table.
+                    Thread activityToUpdate = createThread;
+                    if (createThread.getParentId() != 0) {
+                        activityToUpdate = getRootThread(createThread);
+                    }
+                    threadActivityService.updateThreadActivity(activityToUpdate);
                 }
-                threadActivityService.updateThreadActivity(activityToUpdate);
 
                 return createThread.getId();
             }
