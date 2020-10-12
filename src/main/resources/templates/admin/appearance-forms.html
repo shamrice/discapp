@@ -61,6 +61,7 @@
     .dataTable td { border: 1px solid; }
 
 
+
     </style>
 </head>
 <body>
@@ -173,6 +174,7 @@
                 document.getElementById("styleSheetCustomInput").style.display = 'block';
 
             }
+
 
 
         </script>
@@ -692,6 +694,102 @@
         </form>
     </div>
 
+
+    <div class="grey_box closed" id="hold_configuration_closed" style="display:block;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
+    <span class="toggle" onclick="switchElements('hold_configuration_closed', 'hold_configuration_open');"
+          title="Show hold permissions controls">Hold Permissions +</span>
+    </div>
+
+    <div class="grey_box" id="hold_configuration_open" style="display:none;"
+         th:if="${maintenanceViewModel.getApplicationId()}">
+
+        <div class="toggle" id="hold_close_toggle">
+        <span class="toggle close" onclick="switchElements('hold_configuration_open', 'hold_configuration_closed');"
+              title="Hide hold permissions controls">close</span>
+        </div>
+        <p>These settings control how a user is notified when hold permissions are set for either their user
+            account or their account type on the
+            <a th:href="@{|/admin/disc-security.cgi?id=${maintenanceViewModel.getApplicationId()}|}">
+                Security Settings
+            </a> page.
+        </p>
+        <p>
+            When hold permissions are enabled for a user, new posts and replies need to be
+            approved by a moderator in the unapproved messages tab of the
+            <a th:href="@{|/admin/disc-edit.cgi?id=${maintenanceViewModel.getApplicationId()}&amp;tab=unapproved|}">
+                Manage Threads
+            </a> page before they are added to the discussion.
+        </p>
+        <form method="post"
+              name="f"
+              th:action="@{|/admin/modify/holdPermissions?id=${maintenanceViewModel.getApplicationId()}|}"
+              th:object="${maintenanceViewModel}">
+
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="hold_configuration_open"/>
+            <table>
+
+                <tr>
+                    <td style="text-align:right;"><label>Display Notification During Message Creation:</label>
+                    </td>
+                    <td class="value-label">
+                        <input id="displayPostHoldMessage" name="displayPostHoldMessage"
+                               th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}"
+                               type="checkbox"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:right;"><label>Display Notification Page After New Post Submitted:</label></td>
+                    <td class="value-label">
+                        <input id="displayAfterPostHoldMessage" name="displayAfterPostHoldMessage"
+                               th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}"
+                               type="checkbox"/>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label>Message During Message Creation With Hold Permissions:</label></td>
+                </tr>
+                <tr>
+                    <td>
+                              <textarea cols="120" maxlength="8384" name="displayPostHoldMessageText" rows="6"
+                                        th:utext="${maintenanceViewModel.getPrologueText()}" wrap="soft"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><label>Message On Follow Up Page After New Post With Hold
+                        Permissions:</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                         <textarea cols="120" maxlength="8384" name="displayAfterPostHoldMessageText" rows="6"
+                                   th:utext="${maintenanceViewModel.getPrologueText()}" wrap="soft"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input class="button" name="submit" type="submit" value="Change Settings">&nbsp;
+                        <input class="button" name="reset" type="reset">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
     <div class="grey_box" th:if="${maintenanceViewModel.getApplicationId()}">
         <form enctype="multipart/form-data"
               method="post"
@@ -763,6 +861,7 @@ function restoreWindowStates() {
 window.onload = restoreWindowStates();
 
  //parent.frames.preview.document.location.reload();
+
 
 
 </script>
