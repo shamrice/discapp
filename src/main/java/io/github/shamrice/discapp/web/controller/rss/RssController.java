@@ -1,10 +1,8 @@
 package io.github.shamrice.discapp.web.controller.rss;
 
 import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.ApplicationSubscription;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.application.ApplicationService;
-import io.github.shamrice.discapp.service.application.ApplicationSubscriptionService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.enums.RssBehavior;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
