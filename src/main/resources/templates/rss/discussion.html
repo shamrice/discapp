@@ -1,0 +1,16 @@
+<rss version="2.0" xmlns:th="http://www.thymeleaf.org" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <atom:link th:href="${rssViewModel.getFeedUrl()}" rel="self" type="application/rss+xml" />
+        <title>[[${rssViewModel.getAppName()}]]</title>
+        <link>[[${rssViewModel.getAppUrl()}]]</link>
+        <description></description>
+        <item th:if="${not #lists.isEmpty(rssViewModel.getRssItems())}" th:each="item : ${rssViewModel.getRssItems()}">
+            <title th:text="${item.getTitle()}"></title>
+            <link th:text="${item.getLink()}" />
+            <guid th:text="${item.getLink()}"></guid>
+            <pubDate th:text="${item.getPubDate()}"></pubDate>
+            <description th:text="${item.getDescription()}"></description>
+        </item>
+
+    </channel>
+</rss>

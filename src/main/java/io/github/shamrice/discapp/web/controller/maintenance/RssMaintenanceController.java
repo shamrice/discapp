@@ -62,8 +62,10 @@ public class RssMaintenanceController extends MaintenanceController {
             String rssBehavior;
             if (RssBehavior.FIRST.name().equalsIgnoreCase(maintenanceRssViewModel.getRssBehavior())) {
                 rssBehavior = RssBehavior.FIRST.name();
-            } else if (RssBehavior.PREVIEW.name().equalsIgnoreCase(maintenanceRssViewModel.getRssBehavior())) {
-                rssBehavior = RssBehavior.PREVIEW.name();
+            } else if (RssBehavior.FIRST_PREVIEW.name().equalsIgnoreCase(maintenanceRssViewModel.getRssBehavior())) {
+                rssBehavior = RssBehavior.FIRST_PREVIEW.name();
+            } else if (RssBehavior.ALL_PREVIEW.name().equalsIgnoreCase(maintenanceRssViewModel.getRssBehavior())) {
+                rssBehavior = RssBehavior.ALL_PREVIEW.name();
             } else {
                 rssBehavior = RssBehavior.ALL.name();
             }

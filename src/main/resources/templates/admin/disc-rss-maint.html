@@ -32,7 +32,7 @@
 
         <p>Visitors may subscribe to an RSS feed of your DiscussionApp by using the URL <b>[[${maintenanceRssViewModel.getRssFeedUrl()}]]</b> .</p>
 
-        <fieldset style="width:24em; margin:auto;">
+        <fieldset style="width:28em; margin:auto;">
             <legend>Distribute headlines for...</legend>
             <h3>[[${maintenanceRssViewModel.getInfoMessage()}]]</h3>
             <label>
@@ -40,11 +40,15 @@
                 all messages</label>
             <br />
             <label>
+                <input type="radio" name="rssBehavior" value="ALL_PREVIEW" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('ALL_PREVIEW')}" />
+                all messages with previews of message bodies</label>
+            <br />
+            <label>
                 <input type="radio" name="rssBehavior" value="FIRST" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('FIRST')}" />
                 first messages in threads</label>
             <br />
             <label>
-                <input type="radio" name="rssBehavior" value="PREVIEW" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('PREVIEW')}"/>
+                <input type="radio" name="rssBehavior" value="FIRST_PREVIEW" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('FIRST_PREVIEW')}"/>
                 first messages with previews of message bodies</label>
             <br />
             <div style="text-align:center; margin-top:1em;">
