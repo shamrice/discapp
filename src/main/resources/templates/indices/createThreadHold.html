@@ -28,10 +28,9 @@
 
     <div class="message_and_thread">
 
-        <div class="message" style="text-align:center;">
-            <p>
-                Your message will be posted once it has been approved by a moderator.
-            </p>
+        <div class="message" style="text-align:center;padding:20px;">
+            <div style="padding:20px;" th:utext="${holdMessageText}">
+            </div>
             <div class="buttons">
                 <form method="GET" th:action="@{|/indices/${appId}#${parentThreadId}|}" enctype="multipart/form-data" action="submit">
                     <input type="hidden" name="page" th:value="${currentPage}"/>

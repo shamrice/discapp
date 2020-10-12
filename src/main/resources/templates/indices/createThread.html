@@ -32,8 +32,8 @@
         <span class="message_error" th:text="${errorMessage}"></span>
     </div>
 
-    <div th:if="${holdPermission}" style="text-align:center;">
-        <h4 th:text="${holdPermission}"></h4>
+    <div th:if="${holdPermission}" style="text-align:center;padding:20px;">
+        <div style="font-size:larger;" th:utext="${holdPermission}"></div>
     </div>
 
     <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"

@@ -119,6 +119,7 @@ public class DiscAppController {
                 model.addAttribute(APP_ID, app.getId());
                 model.addAttribute(PARENT_THREAD_ID, parentId);
                 model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+                model.addAttribute("holdMessageText", configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator."));
 
                 return new ModelAndView("indices/createThreadHold");
             }
@@ -329,8 +330,16 @@ public class DiscAppController {
             }
         }
 
-        if (accountHelper.checkUserHasPermission(appId, UserPermission.HOLD)) {
-            model.addAttribute("holdPermission", "New messages posted require admin approval. Your message will appear after it has been approved by an administrator.");
+        //if user has hold permissions and app is configured to display hold message, show it.
+        if (accountHelper.checkUserHasPermission(appId, UserPermission.HOLD) &&
+                configurationService.getBooleanValue(appId,
+                        ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, true)) {
+
+            String holdMessage = configurationService.getStringValue(appId,
+                    ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT,
+                    "New messages posted require admin approval. Your message will appear after it has been approved by a moderator.");
+
+            model.addAttribute("holdPermission", holdMessage);
         }
 
         Application app = applicationService.get(appId);
@@ -671,8 +680,10 @@ public class DiscAppController {
                                 + "?id=" + appId + "&email=" + urlEmail + "&encoded=true");
                     }
 
-                    //if app is being held until approval, redirect to message letting the user know.
-                    if (!isApproved) {
+                    //if app is being held until approval, redirect to message letting the user know if configured to do so.
+                    if (!isApproved
+                            && configurationService.getBooleanValue(appId,
+                            ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE, true)) {
                         return new ModelAndView("redirect:/createThreadHold?disc=" + appId + "&page=" + page + "&parentId=" + parentId);
                     }
 
