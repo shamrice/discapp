@@ -93,6 +93,11 @@ public class ConfigurationService {
 
         configsToSet.put(ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
 
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, "true");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE, "true");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT, "New messages posted require admin approval. Your message will appear after it has been approved by an moderator.");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator.");
+
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
 

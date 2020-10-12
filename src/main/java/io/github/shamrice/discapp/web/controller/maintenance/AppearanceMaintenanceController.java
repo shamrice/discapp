@@ -156,6 +156,19 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
             maintenanceViewModel.setFavicon(favicon);
 
+            //hold permissions config
+            boolean displayPostHoldMessage = configurationService.getBooleanValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, true);
+            maintenanceViewModel.setDisplayPostHoldMessage(displayPostHoldMessage);
+
+            boolean displayAfterPostHoldMessage = configurationService.getBooleanValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE, true);
+            maintenanceViewModel.setDisplayAfterPostHoldMessage(displayAfterPostHoldMessage);
+
+            String displayPostHoldMessageText = configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT, "New messages posted require admin approval. Your message will appear after it has been approved by an moderator.");
+            maintenanceViewModel.setDisplayPostHoldMessageText(displayPostHoldMessageText);
+
+            String displayAfterPostHoldMessageText = configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator.");
+            maintenanceViewModel.setDisplayAfterPostHoldMessageText(displayAfterPostHoldMessageText);
+
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
         }
@@ -457,6 +470,46 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         return getAppearanceView(appId, maintenanceViewModel, model, response);
     }
+
+
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/holdPermissions")
+    public ModelAndView postModifyHoldPermissions(@RequestParam(name = "id") long appId,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model,
+                                          HttpServletResponse response) {
+
+        Application app = applicationService.get(appId);
+
+        try {
+            boolean isPostDisplaySuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE,
+                    String.valueOf(maintenanceViewModel.isDisplayPostHoldMessage()).toLowerCase());
+            boolean isAfterPostDisplaySuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE,
+                    String.valueOf(maintenanceViewModel.isDisplayAfterPostHoldMessage()).toLowerCase());
+
+            boolean isPostMessageSuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT,
+                    maintenanceViewModel.getDisplayPostHoldMessageText());
+
+            boolean isAfterPostMessageSuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT,
+                    maintenanceViewModel.getDisplayAfterPostHoldMessageText());
+
+            if (isPostDisplaySuccess && isAfterPostDisplaySuccess && isPostMessageSuccess && isAfterPostMessageSuccess) {
+                maintenanceViewModel.setInfoMessage("Hold permission display settings updated.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save hold permission display settings.");
+            }
+
+        } catch (Exception ex) {
+            log.error("Failed to update hold appearance config.", ex);
+            maintenanceViewModel.setInfoMessage("Failed to update hold permission display settings.");
+        }
+
+        return getAppearanceView(appId, maintenanceViewModel, model, response);
+    }
+
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-preview.cgi")
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,

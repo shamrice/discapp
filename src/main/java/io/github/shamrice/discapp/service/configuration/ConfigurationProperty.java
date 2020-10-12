@@ -84,7 +84,11 @@ public enum ConfigurationProperty {
     EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE("email.notification.reply.body.template"),
     MAILING_LIST_ADMIN_REPORT_SUBJECT_TEMPLATE("mailing.list.email.admin.subject.template"),
     MAILING_LIST_ADMIN_REPORT_BODY_TEMPLATE("mailing.list.email.admin.body.template"),
-    MAILING_LIST_ADMIN_REPORT_FREQUENCY("mailing.list.email.admin.frequency");
+    MAILING_LIST_ADMIN_REPORT_FREQUENCY("mailing.list.email.admin.frequency"),
+    HOLD_PERMISSIONS_DISPLAY_MESSAGE("permissions.hold.message.display"),
+    HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE("permissions.hold.message.post.display"),
+    HOLD_PERMISSIONS_MESSAGE_TEXT("permissions.hold.message.text"),
+    HOLD_PERMISSIONS_POST_MESSAGE_TEXT("permissions.hold.message.post.text");
 
     private final String propName;
 

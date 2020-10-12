@@ -711,15 +711,14 @@
         <p>These settings control how a user is notified when hold permissions are set for either their user
             account or their account type on the
             <a th:href="@{|/admin/disc-security.cgi?id=${maintenanceViewModel.getApplicationId()}|}">
-                Security Settings
-            </a> page.
+                Security Settings</a> page.
         </p>
         <p>
             When hold permissions are enabled for a user, new posts and replies need to be
             approved by a moderator in the unapproved messages tab of the
             <a th:href="@{|/admin/disc-edit.cgi?id=${maintenanceViewModel.getApplicationId()}&amp;tab=unapproved|}">
-                Manage Threads
-            </a> page before they are added to the discussion.
+                Manage Threads</a>
+            page before they are added to the discussion thread.
         </p>
         <form method="post"
               name="f"
@@ -731,19 +730,19 @@
             <table>
 
                 <tr>
-                    <td style="text-align:right;"><label>Display Notification During Message Creation:</label>
+                    <td style="text-align:right;"><label>Display Hold Notification During Message Creation:</label>
                     </td>
                     <td class="value-label">
                         <input id="displayPostHoldMessage" name="displayPostHoldMessage"
-                               th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}"
+                               th:checked="${maintenanceViewModel.isDisplayPostHoldMessage()}"
                                type="checkbox"/>
                     </td>
                 </tr>
                 <tr>
-                    <td style="text-align:right;"><label>Display Notification Page After New Post Submitted:</label></td>
+                    <td style="text-align:right;"><label>Display Hold Notification Page After New Post Submitted:</label></td>
                     <td class="value-label">
                         <input id="displayAfterPostHoldMessage" name="displayAfterPostHoldMessage"
-                               th:checked="${maintenanceViewModel.isExpandThreadsOnIndex()}"
+                               th:checked="${maintenanceViewModel.isDisplayAfterPostHoldMessage()}"
                                type="checkbox"/>
                     </td>
                 </tr>
@@ -758,7 +757,7 @@
                 <tr>
                     <td>
                               <textarea cols="120" maxlength="8384" name="displayPostHoldMessageText" rows="6"
-                                        th:utext="${maintenanceViewModel.getPrologueText()}" wrap="soft"></textarea>
+                                        th:utext="${maintenanceViewModel.getDisplayPostHoldMessageText()}" wrap="soft"></textarea>
                     </td>
                 </tr>
                 <tr>
@@ -772,7 +771,7 @@
                 <tr>
                     <td>
                          <textarea cols="120" maxlength="8384" name="displayAfterPostHoldMessageText" rows="6"
-                                   th:utext="${maintenanceViewModel.getPrologueText()}" wrap="soft"></textarea>
+                                   th:utext="${maintenanceViewModel.getDisplayAfterPostHoldMessageText()}" wrap="soft"></textarea>
                     </td>
                 </tr>
 
