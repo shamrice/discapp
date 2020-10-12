@@ -15,10 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,10 +46,10 @@ public class RssController {
     private WebHelper webHelper;
 
     @GetMapping(DISCUSSION_RSS_URL)
+    @RequestMapping(value = DISCUSSION_RSS_URL, method = RequestMethod.GET, produces = "application/rss+xml")
     public ModelAndView getRssDiscussionFeed(@RequestParam(name="id")long appId,
                                              RssViewModel rssViewModel,
                                              HttpServletRequest request) {
-
         rssViewModel = new RssViewModel();
         Application app = applicationService.get(appId);
         if (app != null) {
