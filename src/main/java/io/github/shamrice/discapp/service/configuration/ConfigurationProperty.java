@@ -88,7 +88,8 @@ public enum ConfigurationProperty {
     HOLD_PERMISSIONS_DISPLAY_MESSAGE("permissions.hold.message.display"),
     HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE("permissions.hold.message.post.display"),
     HOLD_PERMISSIONS_MESSAGE_TEXT("permissions.hold.message.text"),
-    HOLD_PERMISSIONS_POST_MESSAGE_TEXT("permissions.hold.message.post.text");
+    HOLD_PERMISSIONS_POST_MESSAGE_TEXT("permissions.hold.message.post.text"),
+    RSS_BEHAVIOR("rss.behavior");
 
     private final String propName;
 

@@ -1,0 +1,61 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-US" xml:lang="en-US">
+
+<head>
+    <title th:text="@{|${appName} RSS MAINTENANCE|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+
+<body>
+
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${maintenanceRssViewModel.getErrorMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceRssViewModel.getErrorMessage()}">
+</div>
+
+<form method="post" th:action="@{|/admin/disc-rss-maint.cgi?id=${maintenanceRssViewModel.getApplicationId()}|}"
+      enctype="multipart/form-data" th:object="${maintenanceRssViewModel}">
+
+    <input type="hidden" name="id" value="${maintenanceRssViewModel.getApplicationId()}" />
+    <div class="grey_box" style="width:35em; ">
+        <h3>RSS Settings</h3>
+
+        <P>RSS is a popular XML format for syndicating headlines to <a href="https://www.rssboard.org/" target="_blank">news aggregators.</a></p>
+
+        <p>Visitors may subscribe to an RSS feed of your DiscussionApp by using the URL <b>[[${maintenanceRssViewModel.getRssFeedUrl()}]]</b> .</p>
+
+        <fieldset style="width:24em; margin:auto;">
+            <legend>Distribute headlines for...</legend>
+            <h3>[[${maintenanceRssViewModel.getInfoMessage()}]]</h3>
+            <label>
+                <input type="radio" name="rssBehavior" value="ALL" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('ALL')}" />
+                all messages</label>
+            <br />
+            <label>
+                <input type="radio" name="rssBehavior" value="FIRST" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('FIRST')}" />
+                first messages in threads</label>
+            <br />
+            <label>
+                <input type="radio" name="rssBehavior" value="PREVIEW" th:checked="${maintenanceRssViewModel.isRssBehaviorChecked('PREVIEW')}"/>
+                first messages with previews of message bodies</label>
+            <br />
+            <div style="text-align:center; margin-top:1em;">
+                <input type="submit" name="changeRss" value="Update" class="button" />
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <input type="hidden" name=".cgifields" value="rss_behavior" />
+    </div>
+</form>
+</body>
+
+</html>

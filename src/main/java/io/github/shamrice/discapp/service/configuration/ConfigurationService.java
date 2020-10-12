@@ -98,6 +98,8 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT, "New messages posted require admin approval. Your message will appear after it has been approved by an moderator.");
         configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator.");
 
+        configsToSet.put(ConfigurationProperty.RSS_BEHAVIOR, "ALL");
+
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
 
