@@ -4,12 +4,17 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Epilogue;
 import io.github.shamrice.discapp.data.model.Prologue;
+import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
+import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
+import io.github.shamrice.discapp.web.model.discapp.ThreadViewModel;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
+import io.github.shamrice.discapp.web.util.DiscAppHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +25,21 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.ERROR;
 
 @Controller
 @Slf4j
 public class AppearanceMaintenanceController extends MaintenanceController {
 
+    @Autowired
+    private DiscAppHelper discAppHelper;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
@@ -515,7 +529,128 @@ public class AppearanceMaintenanceController extends MaintenanceController {
     public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
                                                  Model model,
                                                  HttpServletRequest request) {
-        return discAppController.getAppView(appId, 0, model, request);
+        try {
+            Application app = applicationService.get(appId);
+
+            if (app != null) {
+
+                model.addAttribute(APP_NAME, app.getName());
+                model.addAttribute(APP_ID, app.getId());
+
+                model.addAttribute(PROLOGUE_TEXT, replaceUrlsWithPlaceholder(applicationService.getPrologueText(app.getId())));
+                model.addAttribute(EPILOGUE_TEXT, replaceUrlsWithPlaceholder(applicationService.getEpilogueText(app.getId())));
+
+                model.addAttribute(POST_MESSAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
+                model.addAttribute(NEXT_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
+                model.addAttribute(PREVIOUS_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
+
+                model.addAttribute(HAS_PREVIOUS_PAGE, true);
+                model.addAttribute(PREVIOUS_PAGE, 2);
+
+                model.addAttribute(CURRENT_PAGE, 3);
+                model.addAttribute(NEXT_PAGE, 4);
+                model.addAttribute(HAS_NEXT_PAGE, true); // default.
+
+                //get threads
+                int maxThreads = configurationService.getIntegerValue(appId, ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, 25);
+                boolean showTopLevelPreview = configurationService.getBooleanValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, true);
+                boolean isExpandOnIndex = configurationService.getBooleanValue(appId, ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, false);
+                String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
+
+                //List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 0, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
+                List<ThreadTreeNode> threadTreeNodeList = generateFakeThreadTreeNodes(ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
+
+
+                if (isExpandOnIndex) {
+
+                    List<String> threadTreeHtml = new ArrayList<>();
+                    String entryBreakString = configurationService.getStringValue(appId, ConfigurationProperty.ENTRY_BREAK_TEXT, "-");
+                    int maxPreviewLengthTopLevelThread = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, 320);
+                    int maxPreviewLengthReplies = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
+                    int maxThreadDepth = configurationService.getIntegerValue(appId, ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, 30);
+
+                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+
+                        String currentHtml = discAppHelper.getAppViewTopThreadHtml(threadTreeNode, entryBreakString, showTopLevelPreview,
+                                0, maxPreviewLengthTopLevelThread, new String[0]);
+
+                        //get replies if they exist and add on HTML.
+                        if (threadTreeNode.getSubThreads() != null && threadTreeNode.getSubThreads().size() > 0) {
+                            currentHtml += "<div class=\"responses\">";
+                            currentHtml += discAppHelper.getAppViewThreadHtml(threadTreeNode, "",
+                                    entryBreakString, true, -1,
+                                    false, 0, maxPreviewLengthReplies,
+                                    0, maxThreadDepth, new String[0]);
+                            currentHtml = currentHtml.substring(0, currentHtml.lastIndexOf("</ul>")); //remove trailing ul tag
+                            currentHtml += "</div>";
+                        }
+
+                        threadTreeHtml.add(currentHtml);
+                    }
+
+                    model.addAttribute(THREAD_NODE_LIST, threadTreeHtml);
+                } else {
+                    model.addAttribute(DATE_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.DATE_LABEL_TEXT, "Date:"));
+                    model.addAttribute(SUBMITTER_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBMITTER_LABEL_TEXT, "Submitter:"));
+                    model.addAttribute(SUBJECT_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
+
+                    List<ThreadViewModel> threads = new ArrayList<>();
+                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+
+                        ThreadViewModel threadViewModel = new ThreadViewModel();
+
+                        threadViewModel.setSubmitter(threadTreeNode.getCurrent().getSubmitter());
+                        threadViewModel.setSubject(threadTreeNode.getCurrent().getSubject());
+                        threadViewModel.setCreateDt(discAppHelper.getAdjustedDateStringForConfiguredTimeZone(appId, threadTreeNode.getCurrent().getCreateDt(), false));
+                        threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
+                        threadViewModel.setShowMoreOnPreviewText(false);
+                        threadViewModel.setHighlighted(discAppHelper.isNewMessageHighlighted(threadTreeNode));
+                        threadViewModel.setAdminPost(threadTreeNode.getCurrent().getIsAdminPost());
+
+                        //mark thread as read or not.
+                        //threadViewModel.setRead(userReadThreadService.csvContainsThreadId(readThreadsCsv, threadTreeNode.getCurrent().getId()));
+
+                        String body = threadTreeNode.getCurrent().getBody();
+                        String previewText = null;
+                        if (body != null && !body.isEmpty()) {
+                            if (body.length() > 320) { //todo : system configuration for length.
+                                previewText = inputHelper.sanitizeInput(body.substring(0, 320));
+                                previewText += "...";
+                                threadViewModel.setShowMoreOnPreviewText(true);
+                            } else {
+                                previewText = inputHelper.sanitizeInput(body);
+                            }
+                        }
+                        threadViewModel.setPreviewText(previewText);
+
+                        threads.add(threadViewModel);
+
+                    }
+                    model.addAttribute(THREADS, threads);
+
+                }
+
+                model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
+                model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+                model.addAttribute(THREAD_SEPARATOR, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BREAK_TEXT, "<hr />"));
+                model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+                model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+                model.addAttribute(IS_EXPAND_ON_INDEX, isExpandOnIndex);
+                model.addAttribute(IS_SHOW_TOP_LEVEL_PREVIEW, showTopLevelPreview);
+
+                return new ModelAndView("admin/appearance-preview");
+
+            } else {
+                model.addAttribute(ERROR, "Disc app with id " + appId + " returned null.");
+                log.info("Disc app with application id of " + appId + " does not exist. Returning null.");
+            }
+        } catch (Exception ex) {
+            model.addAttribute(ERROR, "No disc app with id " + appId + " found. " + ex.getMessage());
+            log.error("Error getting disc app with id of " + appId + ". Returning null. ", ex);
+        }
+
+        return new ModelAndView("admin/appearance-preview");
+
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
@@ -618,4 +753,36 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         }
     }
 
+    private List<ThreadTreeNode> generateFakeThreadTreeNodes(ThreadSortOrder threadSortOrder, boolean isExpandOnIndex) {
+        //todo : finish this.
+        return new ArrayList<>();
+    }
+
+    private String replaceUrlsWithPlaceholder(String text) {
+        //replace anchor tags with "#" instead of actual urls.
+        String urlRegex = "href=([\"'])(?:(?=(\\\\?))\\2.)*?\\1";
+        Pattern pattern = Pattern.compile(urlRegex);
+        Matcher matcher = pattern.matcher(text);
+
+        StringBuffer stringBuffer = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(stringBuffer, "href=\"#\"");
+        }
+
+        matcher.appendTail(stringBuffer);
+
+        //remove form tags.
+        String formRegex = "(?i)<(.*)form(.*?)>";
+        pattern = Pattern.compile(formRegex);
+        matcher = pattern.matcher(stringBuffer.toString());
+
+        stringBuffer = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(stringBuffer, "<br />");
+        }
+
+        matcher.appendTail(stringBuffer);
+
+        return stringBuffer.toString();
+    }
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${appName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" th:href="${styleSheetUrl}"/>
+    <link rel="shortcut icon" th:href="${faviconUrl}" type="image/x-icon">
+    <link rel="icon" th:href="${faviconUrl}" type="image/x-icon">
+
+    <style type="text/css">
+        ul {margin-top:0; padding-top:1px; margin-bottom:0;}
+        li.nested_list { list-style-type:none; display:inline; }
+        div.message_and_thread li.message_entry { margin-top:1em; }
+
+        /* li { margin-top: 1ex } */
+
+        div.message_preview { width:30em; }
+    </style>
+</head>
+<body>
+
+<div id="body">
+
+    <p th:if="${error}" th:text="${error}"/>
+
+    <div th:if="${headerText}" th:utext="${headerText}"></div>
+
+    <div th:replace="indices/fragments/prologue :: prologue">
+        static prototyping placeholder
+    </div>
+
+    <!--form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}"
+          enctype="multipart/form-data">
+        <input type="hidden" name="disc" th:value="${appId}"/-->
+        <div id="post_button" style="text-align:center; margin-top:1em;">
+            <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>
+        </div>
+    <!--/form-->
+
+    <div th:replace="indices/fragments/threads :: threads">
+        static thread prototyping placeholder
+    </div>
+
+    <div id="navigation_buttons" style="text-align:center; margin-top:1em;">
+
+        <!--form th:if="${hasPreviousPage}" method="get" th:action="@{|/indices/${appId}|}"
+              enctype="multipart/form-data" style="display:inline-block;">
+            <input type="hidden" name="page" th:value="${previousPage}"/-->
+            <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
+        <!--/form-->
+
+
+        <!--form th:if="${hasNextPage}" method="get" th:action="@{|/indices/${appId}|}"
+              enctype="multipart/form-data" style="display:inline-block;">
+            <input type="hidden" name="page" th:value="${nextPage}"/-->
+            <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
+        <!--/form-->
+
+    </div>
+
+    <div th:replace="indices/fragments/epilogue :: epilogue">
+        static prototyping placeholder
+    </div>
+
+    <div th:if="${footerText}" th:utext="${footerText}"></div>
+</div>
+</body>
+</html>
