@@ -15,6 +15,7 @@
         /* li { margin-top: 1ex } */
 
         div.message_preview { width:30em; }
+
     </style>
 </head>
 <body>
@@ -29,32 +30,74 @@
         static prototyping placeholder
     </div>
 
-    <!--form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}"
-          enctype="multipart/form-data">
-        <input type="hidden" name="disc" th:value="${appId}"/-->
-        <div id="post_button" style="text-align:center; margin-top:1em;">
-            <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>
-        </div>
-    <!--/form-->
+    <div id="post_button" style="text-align:center; margin-top:1em;">
+        <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>
+    </div>
 
-    <div th:replace="indices/fragments/threads :: threads">
-        static thread prototyping placeholder
+    <div th:if="${isExpandOnIndex}">
+
+        <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
+            <div class="thread" th:utext="${threadHtml}"></div>
+            <div th:utext="${threadSeparator}"></div>
+        </div>
+
+    </div>
+
+    <div th:unless="${isExpandOnIndex}">
+
+        <table id="entries_table" border="0">
+            <tr id="entries_headers">
+                <th class="entries_header" th:text="${subjectLabel}"></th>
+                <th class="entries_header" th:text="${submitterLabel}"></th>
+                <th class="entries_header" th:text="${dateLabel}"></th>
+            </tr>
+
+            <div th:if="${not #lists.isEmpty(threads)}" th:each="thread : ${threads}">
+
+                <tr class="entry_row">
+                    <td class="link_cell">
+                        <a th:if="${thread.isRead()}" class="article_link read"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+
+                        <a th:if="${!thread.isRead() && !thread.isHighlighted()}" class="article_link"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+
+                        <a th:if="${!thread.isRead() && thread.isHighlighted()}" class="article_link new_message"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+                    </td>
+                    <td class="author_cell">
+                        [[${thread.getSubmitter()}]]
+                        <span th:if="${thread.isAdminPost()}" class="admin_post">Admin</span>
+                    </td>
+                    <td class="date_cell" th:text="${thread.getCreateDt()}"></td>
+                </tr>
+
+                <tr th:if="${isShowTopLevelPreview && thread.getPreviewText() != null}">
+                    <td colspan="3">
+                        <div class="first_message">
+                            <span th:text="${thread.getPreviewText()}"></span>
+
+                            <span th:if="${thread.isShowMoreOnPreviewText()}">
+                            <a class="article_link"
+                               href="#">more</a>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+
+            </div>
+
+        </table>
     </div>
 
     <div id="navigation_buttons" style="text-align:center; margin-top:1em;">
 
-        <!--form th:if="${hasPreviousPage}" method="get" th:action="@{|/indices/${appId}|}"
-              enctype="multipart/form-data" style="display:inline-block;">
-            <input type="hidden" name="page" th:value="${previousPage}"/-->
-            <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
-        <!--/form-->
+        <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
 
-
-        <!--form th:if="${hasNextPage}" method="get" th:action="@{|/indices/${appId}|}"
-              enctype="multipart/form-data" style="display:inline-block;">
-            <input type="hidden" name="page" th:value="${nextPage}"/-->
-            <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
-        <!--/form-->
+        <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
 
     </div>
 

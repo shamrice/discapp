@@ -4,11 +4,11 @@ import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Epilogue;
 import io.github.shamrice.discapp.data.model.Prologue;
-import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
+import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import io.github.shamrice.discapp.web.model.discapp.ThreadViewModel;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -558,7 +559,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 String threadSortOrder = configurationService.getStringValue(appId, ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.CREATION.name());
 
                 //List<ThreadTreeNode> threadTreeNodeList = threadService.getLatestThreads(app.getId(), 0, maxThreads, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
-                List<ThreadTreeNode> threadTreeNodeList = generateFakeThreadTreeNodes(ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
+                List<ThreadTreeNode> threadTreeNodeList = generateFakeThreadTreeNodes(appId, ThreadSortOrder.valueOf(threadSortOrder.toUpperCase()), isExpandOnIndex);
 
 
                 if (isExpandOnIndex) {
@@ -585,6 +586,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                             currentHtml += "</div>";
                         }
 
+                        currentHtml = replaceUrlsWithPlaceholder(currentHtml);
                         threadTreeHtml.add(currentHtml);
                     }
 
@@ -595,22 +597,24 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                     model.addAttribute(SUBJECT_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
 
                     List<ThreadViewModel> threads = new ArrayList<>();
-                    for (ThreadTreeNode threadTreeNode : threadTreeNodeList) {
+
+                    //generate fake threads.
+                    for (int i = 0; i < 10; i++) {
 
                         ThreadViewModel threadViewModel = new ThreadViewModel();
 
-                        threadViewModel.setSubmitter(threadTreeNode.getCurrent().getSubmitter());
-                        threadViewModel.setSubject(threadTreeNode.getCurrent().getSubject());
-                        threadViewModel.setCreateDt(discAppHelper.getAdjustedDateStringForConfiguredTimeZone(appId, threadTreeNode.getCurrent().getCreateDt(), false));
-                        threadViewModel.setId(threadTreeNode.getCurrent().getId().toString());
+                        threadViewModel.setSubmitter("Test Submitter");
+                        threadViewModel.setSubject("Test Subject");
+                        threadViewModel.setCreateDt(discAppHelper.getAdjustedDateStringForConfiguredTimeZone(appId, new Date(), false));
+                        threadViewModel.setId(String.valueOf(i));
                         threadViewModel.setShowMoreOnPreviewText(false);
-                        threadViewModel.setHighlighted(discAppHelper.isNewMessageHighlighted(threadTreeNode));
-                        threadViewModel.setAdminPost(threadTreeNode.getCurrent().getIsAdminPost());
+                        threadViewModel.setHighlighted(false);
+                        threadViewModel.setAdminPost(false);
 
                         //mark thread as read or not.
                         //threadViewModel.setRead(userReadThreadService.csvContainsThreadId(readThreadsCsv, threadTreeNode.getCurrent().getId()));
 
-                        String body = threadTreeNode.getCurrent().getBody();
+                        String body = "This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. ";
                         String previewText = null;
                         if (body != null && !body.isEmpty()) {
                             if (body.length() > 320) { //todo : system configuration for length.
@@ -753,10 +757,47 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         }
     }
 
-    private List<ThreadTreeNode> generateFakeThreadTreeNodes(ThreadSortOrder threadSortOrder, boolean isExpandOnIndex) {
-        //todo : finish this.
-        return new ArrayList<>();
+    private List<ThreadTreeNode> generateFakeThreadTreeNodes(long appId, ThreadSortOrder threadSortOrder, boolean isExpandOnIndex) {
+
+        List<ThreadTreeNode> threadTreeNodeList = new ArrayList<>();
+        List<ThreadTreeNode> subThread1 = new ArrayList<>();
+        List<ThreadTreeNode> subThread2 = new ArrayList<>();
+
+        ThreadTreeNode node = new ThreadTreeNode(getFakeThread(appId));
+        subThread2.add(node);
+
+        ThreadTreeNode node1 = new ThreadTreeNode(getFakeThread(appId));
+        node1.setSubThreads(subThread2);
+        subThread1.add(node1);
+
+        for (int i = 0; i < 2; i++) {
+            ThreadTreeNode node2 = new ThreadTreeNode(getFakeThread(appId));
+            node2.setSubThreads(subThread1);
+            threadTreeNodeList.add(node2);
+        }
+
+        return threadTreeNodeList;
     }
+
+    Thread getFakeThread(long appId) {
+
+        //todo : set date
+        String testBodyText = "This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. This text is a placeholder for the message's body text. ";
+
+        Thread testThread = new Thread();
+        testThread.setSubject("Test message");
+        testThread.setBody(testBodyText);
+        testThread.setParentId(0L);
+        testThread.setSubmitter("Test Submitter");
+        testThread.setId(9999L);
+        testThread.setApplicationId(appId);
+        testThread.setIsAdminPost(false);
+        testThread.setApproved(true);
+        testThread.setDeleted(false);
+        testThread.setCreateDt(new Date(9999999L));
+        return testThread;
+    }
+
 
     private String replaceUrlsWithPlaceholder(String text) {
         //replace anchor tags with "#" instead of actual urls.

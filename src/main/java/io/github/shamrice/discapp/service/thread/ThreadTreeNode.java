@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class ThreadTreeNode {
 
     @NonNull
