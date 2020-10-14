@@ -111,7 +111,7 @@ public class AppearancePreviewController extends MaintenanceController {
                     List<ThreadViewModel> threads = new ArrayList<>();
 
                     //generate fake threads.
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 5; i++) {
 
                         ThreadViewModel threadViewModel = new ThreadViewModel();
 

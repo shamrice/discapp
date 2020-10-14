@@ -9,9 +9,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
-import io.github.shamrice.discapp.web.util.DiscAppHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +25,11 @@ import java.util.Date;
 @Slf4j
 public class AppearanceMaintenanceController extends MaintenanceController {
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
-    public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-forms.cgi")
+    public ModelAndView getAppearanceFormsView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -174,6 +171,25 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         }
 
         return new ModelAndView("admin/appearance-forms", "maintenanceViewModel", maintenanceViewModel);
+
+    }
+
+        @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
+    public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model,
+                                          HttpServletResponse response) {
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+            setCommonModelAttributes(model, app, username);
+            maintenanceViewModel.setApplicationId(app.getId());
+
+        } catch (Exception ex) {
+            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+        }
+
+        return new ModelAndView("admin/appearance-frameset", "maintenanceViewModel", maintenanceViewModel);
     }
 
 
@@ -215,7 +231,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
@@ -248,7 +264,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
@@ -322,7 +338,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -359,7 +375,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to threads.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
@@ -378,7 +394,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to header and footer.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -401,7 +417,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to labels.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -429,7 +445,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to buttons.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -468,7 +484,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -507,56 +523,55 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to update hold permission display settings.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
     public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
     public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/threads")
     public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
     public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/favicon")
     public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
-
 
     private String getDefaultStyleSheetTypeByUrl(String styleSheetUrl) {
 
