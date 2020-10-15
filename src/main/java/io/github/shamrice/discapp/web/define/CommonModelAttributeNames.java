@@ -15,6 +15,9 @@ public class CommonModelAttributeNames {
     public static final String MARK_ADMIN_POST = "markAdminPost";
     public static final String APP_URL = "appUrl";
 
+    public static final String NEW_POST_DISABLED = "NEW_POST_DISABLED";
+    public static final String REPLY_DISABLED = "REPLY_DISABLED";
+
     public static final String ERROR = "error";
     public static final String ERROR_STATUS_CODE = "errorStatusCode";
     public static final String ERROR_TEXT = "errorText";
