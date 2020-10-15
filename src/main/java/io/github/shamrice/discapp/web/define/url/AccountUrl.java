@@ -28,7 +28,9 @@ public class AccountUrl {
     public static final String ACCOUNT_DELETE = CONTROLLER_DIRECTORY_URL + "delete";
     public static final String ACCOUNT_DELETE_STATUS = ACCOUNT_DELETE + "/status";
     public static final String ACCOUNT_PASSWORD = CONTROLLER_DIRECTORY_URL + "password";
+    public static final String SYSTEM_ACCOUNT_PASSWORD = CONTROLLER_DIRECTORY_URL + "discpassword";
     public static final String ACCOUNT_PASSWORD_RESET = CONTROLLER_DIRECTORY_URL + "password/{resetKey}";
+    public static final String SYSTEM_ACCOUNT_PASSWORD_RESET = CONTROLLER_DIRECTORY_URL + "discpassword/{resetKey}";
 
     public static final String ACCOUNT_APPLICATION = CONTROLLER_DIRECTORY_URL + "application";
 }

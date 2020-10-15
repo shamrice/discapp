@@ -1,11 +1,13 @@
 package io.github.shamrice.discapp.service.account;
 
+import io.github.shamrice.discapp.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.model.PasswordReset;
 import io.github.shamrice.discapp.data.repository.OwnerRepository;
 import io.github.shamrice.discapp.data.repository.PasswordResetRepository;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
 import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,9 @@ public class AccountService {
 
     @Autowired
     private DiscAppUserDetailsService discAppUserDetailsService;
+
+    @Autowired
+    private ApplicationService applicationService;
 
     @Autowired
     private PasswordResetRepository passwordResetRepository;
@@ -107,6 +112,38 @@ public class AccountService {
 
         log.info("Successfully reset password for user: " + email);
         return true;
+    }
+
+    public boolean createSystemAccountPasswordResetRequest(String ownerEmail, Long appId, String passwordResetUrl) {
+
+        if (discAppUserDetailsService.getByEmail(appId.toString()) == null) {
+            log.warn("Attempted to reset password for disc app admin for appId: " + appId + " but no such disc app exists.");
+            return false;
+        }
+
+        if (!applicationService.isOwnerOfApp(appId, ownerEmail)) {
+            log.warn("Attempted to reset admin system account for appId: " + appId + " with owner email: "
+                    + ownerEmail + ". But that is not the owner email for that application.");
+            return false;
+        }
+
+        PasswordReset passwordReset = createNewPasswordResetRequest(appId.toString());
+
+        if (passwordReset != null) {
+            Map<String, Object> emailParams = new HashMap<>();
+            emailParams.put(PASSWORD_RESET_URL, passwordResetUrl + "/" + passwordReset.getKey());
+            emailParams.put(PASSWORD_RESET_CODE, passwordReset.getCode());
+
+            TemplateEmail passwordResetEmail = new TemplateEmail(ownerEmail, NotificationType.PASSWORD_RESET, emailParams, false);
+            EmailNotificationQueueService.addTemplateEmailToSend(passwordResetEmail);
+            return true;
+
+        } else {
+            log.error("Failed to create new admin system account password reset request for appId: "
+                    + appId + " with owner email: " + ownerEmail);
+        }
+
+        return false;
     }
 
     public boolean createPasswordResetRequest(String email, String passwordResetUrl) {
