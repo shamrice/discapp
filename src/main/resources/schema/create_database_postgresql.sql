@@ -185,6 +185,7 @@ CREATE TABLE stats_unique_ips (
 CREATE TABLE password_reset (
   id serial NOT NULL,
   email varchar(255) UNIQUE NOT NULL,
+  application_id int NULL,
   key varchar(64) NOT NULL,
   code INT NOT NULL,
   is_redeemed boolean NOT NULL DEFAULT false,

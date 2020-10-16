@@ -148,8 +148,9 @@ public class AccountPasswordResetController extends AccountController {
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
 
-        if (accountService.performPasswordReset(resetKey, resetCodeInt, appIdStr, newPassword)) {
+        if (accountService.performSystemAccountPasswordReset(resetKey, resetCodeInt, email, appId, newPassword)) {
             modelMap.addAttribute(STATUS, "Password successfully reset.");
+            modelMap.addAttribute("adminLogInUrl", "/admin/disc-maint.cgi?id=" + appId);
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
 
@@ -189,7 +190,7 @@ public class AccountPasswordResetController extends AccountController {
             appId = Long.parseLong(appIdStr);
         } catch (Exception ex) {
             log.error("Failed to process appId for system account password reset. Attempted: " + appIdStr, ex);
-            modelMap.addAttribute(STATUS, "Please enter a valid indices number.");
+            modelMap.addAttribute(STATUS, "Please enter a valid Disc App indices number.");
             return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
         }
 

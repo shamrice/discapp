@@ -88,8 +88,8 @@ public class AccountService {
         }
 
         if (!passwordReset.getCode().equals(resetCode)) {
-            log.warn("Password reset code entered for email: " + email + " does not match the one on file. Actual: "
-                    + passwordReset.getCode() + " :: attempted: " + resetCode);
+            log.warn("Password reset code entered for email: " + email
+                    + " does not match the one on file. Attempted:" + resetCode);
             return false;
         }
 
@@ -114,6 +114,53 @@ public class AccountService {
         return true;
     }
 
+    public boolean performSystemAccountPasswordReset(String resetKey, int resetCode, String email, long appId, String newPassword) {
+        PasswordReset passwordReset = passwordResetRepository.findOneByEmailAndKeyAndApplicationId(email, resetKey, appId);
+        if (passwordReset == null || passwordReset.getIsRedeemed()) {
+            log.warn("Failed to find non-redeemed system account password reset for owner email: " + email + " with key: "
+                    + resetKey + " and appId: " + appId);
+            return false;
+        }
+
+        if (passwordReset.getExpDt().before(new Date())) {
+            log.warn("System account Password reset window has closed for owner email: " + email + " on " + passwordReset.getExpDt().toString());
+            return false;
+        }
+
+        if (!passwordReset.getCode().equals(resetCode)) {
+            log.warn("Password reset code entered for owner email: " + email
+                    + " does not match the one on file. :: attempted: " + resetCode);
+            return false;
+        }
+
+        if (!applicationService.isOwnerOfApp(appId, email)) {
+            log.warn("System account for appId: " + appId + " cannot be reset even though fields are correct because "
+                    + email + " does not own the application.");
+            return false;
+        }
+
+        //system account email address column is app id... I know.. it's gross
+        DiscAppUser user = discAppUserDetailsService.getByEmail(String.valueOf(appId));
+        if (user == null) {
+            log.warn("Failed to find System user for appId: " + appId);
+            return false;
+        }
+
+        user.setPassword(newPassword);
+        user.setPasswordFailCount(0);
+        user.setLockedUntilDate(null);
+        if (!discAppUserDetailsService.saveDiscAppUser(user)) {
+            log.error("Failed to update system account password for appId: " + appId);
+            return false;
+        }
+
+        passwordReset.setIsRedeemed(true);
+        passwordResetRepository.save(passwordReset);
+
+        log.info("Successfully reset system account password for appId: " + appId + " owned by: " + email);
+        return true;
+    }
+
     public boolean createSystemAccountPasswordResetRequest(String ownerEmail, Long appId, String passwordResetUrl) {
 
         if (discAppUserDetailsService.getByEmail(appId.toString()) == null) {
@@ -127,7 +174,7 @@ public class AccountService {
             return false;
         }
 
-        PasswordReset passwordReset = createNewPasswordResetRequest(appId.toString());
+        PasswordReset passwordReset = createNewPasswordResetRequest(ownerEmail, appId);
 
         if (passwordReset != null) {
             Map<String, Object> emailParams = new HashMap<>();
@@ -153,7 +200,7 @@ public class AccountService {
             return false;
         }
 
-        PasswordReset passwordReset = createNewPasswordResetRequest(email);
+        PasswordReset passwordReset = createNewPasswordResetRequest(email, null);
 
         if (passwordReset != null) {
             Map<String, Object> emailParams = new HashMap<>();
@@ -171,7 +218,7 @@ public class AccountService {
         return false;
     }
 
-    private PasswordReset createNewPasswordResetRequest(String email) {
+    private PasswordReset createNewPasswordResetRequest(String email, Long appId) {
         //delete existing if exists.
         passwordResetRepository.deleteByEmail(email);
 
@@ -184,6 +231,7 @@ public class AccountService {
 
         PasswordReset passwordReset = new PasswordReset();
         passwordReset.setEmail(email);
+        passwordReset.setApplicationId(appId);
         passwordReset.setCreateDt(new Date());
         passwordReset.setExpDt(expDt);
         passwordReset.setKey(generatedKey);
