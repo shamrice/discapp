@@ -1,6 +1,5 @@
 package io.github.shamrice.discapp.service.account;
 
-import io.github.shamrice.discapp.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.model.PasswordReset;
