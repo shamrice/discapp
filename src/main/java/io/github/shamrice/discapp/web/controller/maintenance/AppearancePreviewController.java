@@ -50,8 +50,8 @@ public class AppearancePreviewController extends MaintenanceController {
                 model.addAttribute(APP_NAME, app.getName());
                 model.addAttribute(APP_ID, app.getId());
 
-                model.addAttribute(PROLOGUE_TEXT, replaceUrlsWithPlaceholder(applicationService.getPrologueText(app.getId())));
-                model.addAttribute(EPILOGUE_TEXT, replaceUrlsWithPlaceholder(applicationService.getEpilogueText(app.getId())));
+                model.addAttribute(PROLOGUE_TEXT, applicationService.getPrologueText(app.getId()));
+                model.addAttribute(EPILOGUE_TEXT, applicationService.getEpilogueText(app.getId()));
 
                 model.addAttribute(POST_MESSAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
                 model.addAttribute(NEXT_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
