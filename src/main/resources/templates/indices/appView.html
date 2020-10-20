@@ -29,7 +29,7 @@
         static prototyping placeholder
     </div>
 
-    <form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}"
+    <form th:unless="${NEW_POST_DISABLED}" method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newthread}"
           enctype="multipart/form-data">
         <input type="hidden" name="disc" th:value="${appId}"/>
         <div id="post_button" style="text-align:center; margin-top:1em;">

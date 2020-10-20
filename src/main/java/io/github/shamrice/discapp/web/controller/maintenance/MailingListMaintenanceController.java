@@ -134,7 +134,7 @@ public class MailingListMaintenanceController extends MaintenanceController {
         String status = "Saved.";
 
         if (listViewModel.getChangeBehaviorButton() != null && !listViewModel.getChangeBehaviorButton().isEmpty()) {
-            if (saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
+            if (configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
                 log.info("Updated email update settings for appId: " + appId + " to: " + listViewModel.getEmailUpdateSetting());
             } else {
                 log.warn("Failed to update mailing list email settings for appId: " + appId);
@@ -143,11 +143,11 @@ public class MailingListMaintenanceController extends MaintenanceController {
         }
 
         if (listViewModel.getUpdateFormsButton() != null && !listViewModel.getUpdateFormsButton().isEmpty()) {
-            boolean descriptionSaved = saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML, listViewModel.getDescriptionText());
-            boolean followUpPageSaved = saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML, listViewModel.getFollowUpPageText());
-            boolean confirmationMessageSaved = saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, listViewModel.getConfirmationMessageText());
-            boolean confirmationPageSaved = saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, listViewModel.getConfirmationPageText());
-            boolean unsubscribePageSaved = saveUpdatedConfiguration(appId, ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, listViewModel.getUnsubscribePageText());
+            boolean descriptionSaved = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML, listViewModel.getDescriptionText());
+            boolean followUpPageSaved = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML, listViewModel.getFollowUpPageText());
+            boolean confirmationMessageSaved = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, listViewModel.getConfirmationMessageText());
+            boolean confirmationPageSaved = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, listViewModel.getConfirmationPageText());
+            boolean unsubscribePageSaved = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, listViewModel.getUnsubscribePageText());
 
             if (!(descriptionSaved && followUpPageSaved && confirmationMessageSaved && confirmationPageSaved && unsubscribePageSaved)) {
                 status = "Failed to save one more of mailing list appearance forms.";
@@ -156,7 +156,7 @@ public class MailingListMaintenanceController extends MaintenanceController {
 
         if (listViewModel.getChangeReplyBehaviorButton() != null && !listViewModel.getChangeReplyBehaviorButton().isEmpty()) {
             boolean replyNotificationEnabled = "on".equalsIgnoreCase(listViewModel.getEmailReplySetting());
-            if (saveUpdatedConfiguration(appId, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, String.valueOf(replyNotificationEnabled))) {
+            if (configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, String.valueOf(replyNotificationEnabled))) {
                 log.info("Updated reply notification settings for appId: " + appId + " to: " + replyNotificationEnabled);
             } else {
                 log.warn("Failed to update email reply notification settings for appId: " + appId);

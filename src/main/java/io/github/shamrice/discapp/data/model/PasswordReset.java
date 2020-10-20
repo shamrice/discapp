@@ -21,6 +21,7 @@ public class PasswordReset {
     private Long id;
 
     private String email;
+    private Long applicationId;
     private String key;
     private Integer code;
     private Boolean isRedeemed;

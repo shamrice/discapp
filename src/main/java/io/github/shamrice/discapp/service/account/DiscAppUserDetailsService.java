@@ -20,7 +20,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.ACCOUNT_USER_REGISTRATION;
@@ -82,7 +84,15 @@ public class DiscAppUserDetailsService implements UserDetailsService {
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {
-        return discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        List<DiscAppUser> results = discappUserRepository.findByUsernameContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        results.removeIf(user -> this.rootAccountEmail.equalsIgnoreCase(user.getEmail()) || !user.getEnabled());
+        return results;
+    }
+
+    public List<DiscAppUser> searchByEmail(String searchTerm, boolean searchUserAccounts) {
+        List<DiscAppUser> results = discappUserRepository.findByEmailContainingIgnoreCaseAndIsUserAccount(searchTerm, searchUserAccounts);
+        results.removeIf(user -> this.rootAccountEmail.equalsIgnoreCase(user.getEmail()) || !user.getEnabled());
+        return results;
     }
 
     public DiscAppUser getByUsername(String username) {
@@ -282,9 +292,11 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         userRegistrationRepository.save(newUserRegistration);
         log.info("Created new user registration record: " + newUserRegistration.toString());
 
+        String encodedEmail = UriUtils.encode(newUserEmail, StandardCharsets.UTF_8);
+
         Map<String, Object> templateParams = new HashMap<>();
         templateParams.put(SITE_URL, baseSiteUrl);
-        templateParams.put(USER_REGISTRATION_URL, baseSiteUrl + ACCOUNT_USER_REGISTRATION + "?email=" + newUserEmail + "&key=" + registrationKey);
+        templateParams.put(USER_REGISTRATION_URL, baseSiteUrl + ACCOUNT_USER_REGISTRATION + "?email=" + encodedEmail + "&key=" + registrationKey);
 
         TemplateEmail newUserCreatedEmail = new TemplateEmail(newUserEmail, NotificationType.NEW_ACCOUNT_CREATED, templateParams, false);
         EmailNotificationQueueService.addTemplateEmailToSend(newUserCreatedEmail);

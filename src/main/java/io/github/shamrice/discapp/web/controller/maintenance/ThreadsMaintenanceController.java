@@ -194,7 +194,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                     if (thread != null && thread.getApplicationId().equals(app.getId())) {
                         thread.setApproved(true);
                         thread.setModDt(new Date());
-                        if (threadService.saveThread(thread, thread.getBody()) == null) {
+                        if (threadService.saveThread(thread, thread.getBody(), true) == null) {
                             log.error("Failed to approve thread: " + thread.toString());
                             threadApproved = false;
                         } else {
@@ -210,7 +210,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                             if (thread != null && thread.getApplicationId().equals(app.getId())) {
                                 thread.setApproved(true);
                                 thread.setModDt(new Date());
-                                if (threadService.saveThread(thread, thread.getBody()) == null) {
+                                if (threadService.saveThread(thread, thread.getBody(), true) == null) {
                                     log.error("Failed to approve thread: " + thread.toString());
                                     threadApproved = false;
                                 } else {
@@ -366,7 +366,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
                         body = inputHelper.addUrlHtmlLinksToString(body);
                     }
 
-                    threadService.saveThread(newThread, body);
+                    threadService.saveThread(newThread, body, true);
                 } else {
                     maintenanceThreadViewModel.setInfoMessage("A subject is required to post a new message.");
                 }
@@ -428,7 +428,7 @@ public class ThreadsMaintenanceController extends MaintenanceController {
 
                     String body = maintenanceThreadViewModel.getEditArticleMessage();
 
-                    if (threadService.saveThread(editThread, body) != null) {
+                    if (threadService.saveThread(editThread, body, false) != null) {
                         maintenanceThreadViewModel.setInfoMessage("Successfully edited thread.");
                     } else {
                         log.error("Failed to edit thread: " + maintenanceThreadViewModel.getEditArticleId() + " : appId: " + app.getId());

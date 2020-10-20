@@ -40,7 +40,7 @@ A { color: #66f; }
 
 A:VISITED { color: #C0C; }
 
-.read {
+a.read {
     color: #C0C;
 }
 

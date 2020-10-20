@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${appName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" th:href="${styleSheetUrl}"/>
+    <link rel="shortcut icon" th:href="${faviconUrl}" type="image/x-icon">
+    <link rel="icon" th:href="${faviconUrl}" type="image/x-icon">
+
+    <style type="text/css">
+        ul {margin-top:0; padding-top:1px; margin-bottom:0;}
+        li.nested_list { list-style-type:none; display:inline; }
+        div.message_and_thread li.message_entry { margin-top:1em; }
+
+        /* li { margin-top: 1ex } */
+
+        div.message_preview { width:30em; }
+
+    </style>
+</head>
+<body>
+
+<div id="body">
+
+    <p th:if="${error}" th:text="${error}"/>
+
+    <div th:if="${headerText}" th:utext="${headerText}"></div>
+
+    <div th:replace="indices/fragments/prologue :: prologue">
+        static prototyping placeholder
+    </div>
+
+    <div id="post_button" style="text-align:center; margin-top:1em;">
+        <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>
+    </div>
+
+    <div th:if="${isExpandOnIndex}">
+
+        <div th:if="${not #lists.isEmpty(threadNodeList)}" th:each="threadHtml : ${threadNodeList}">
+            <div class="thread" th:utext="${threadHtml}"></div>
+            <div th:utext="${threadSeparator}"></div>
+        </div>
+
+    </div>
+
+    <div th:unless="${isExpandOnIndex}">
+
+        <table id="entries_table" border="0">
+            <tr id="entries_headers">
+                <th class="entries_header" th:text="${subjectLabel}"></th>
+                <th class="entries_header" th:text="${submitterLabel}"></th>
+                <th class="entries_header" th:text="${dateLabel}"></th>
+            </tr>
+
+            <div th:if="${not #lists.isEmpty(threads)}" th:each="thread : ${threads}">
+
+                <tr class="entry_row">
+                    <td class="link_cell">
+                        <a th:if="${thread.isRead()}" class="article_link read"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+
+                        <a th:if="${!thread.isRead() && !thread.isHighlighted()}" class="article_link"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+
+                        <a th:if="${!thread.isRead() && thread.isHighlighted()}" class="article_link new_message"
+                           href="#"
+                           th:name="${thread.getId()}" th:text="${thread.getSubject()}"></a>
+                    </td>
+                    <td class="author_cell">
+                        [[${thread.getSubmitter()}]]
+                        <span th:if="${thread.isAdminPost()}" class="admin_post">Admin</span>
+                    </td>
+                    <td class="date_cell" th:text="${thread.getCreateDt()}"></td>
+                </tr>
+
+                <tr th:if="${isShowTopLevelPreview && thread.getPreviewText() != null}">
+                    <td colspan="3">
+                        <div class="first_message">
+                            <span th:text="${thread.getPreviewText()}"></span>
+
+                            <span th:if="${thread.isShowMoreOnPreviewText()}">
+                            <a class="article_link"
+                               href="#">more</a>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+
+            </div>
+
+        </table>
+    </div>
+
+    <div id="navigation_buttons" style="text-align:center; margin-top:1em;">
+
+        <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
+
+        <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
+
+    </div>
+
+    <div th:replace="indices/fragments/epilogue :: epilogue">
+        static prototyping placeholder
+    </div>
+
+    <div th:if="${footerText}" th:utext="${footerText}"></div>
+</div>
+</body>
+</html>

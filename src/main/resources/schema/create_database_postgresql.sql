@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS prologue;
 DROP TABLE IF EXISTS epilogue;
 DROP TABLE IF EXISTS thread_body;
 DROP TABLE IF EXISTS thread;
+DROP TABLE IF EXISTS thread_activity;
+DROP TABLE IF EXISTS thread_post_code
 DROP TABLE IF EXISTS configuration;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS owner;
@@ -111,6 +113,18 @@ CREATE TABLE thread_body (
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
 
+CREATE TABLE thread_activity (
+    id serial NOT NULL,
+    application_id int NOT NULL,
+    thread_id int NOT NULL,
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (thread_id) REFERENCES thread(id)
+);
+
+
 CREATE TABLE prologue (
     id serial NOT NULL,
     application_id int UNIQUE NOT NULL,
@@ -171,6 +185,7 @@ CREATE TABLE stats_unique_ips (
 CREATE TABLE password_reset (
   id serial NOT NULL,
   email varchar(255) UNIQUE NOT NULL,
+  application_id int NULL,
   key varchar(64) NOT NULL,
   code INT NOT NULL,
   is_redeemed boolean NOT NULL DEFAULT false,
@@ -298,6 +313,17 @@ CREATE TABLE user_registration (
   create_dt TIMESTAMP DEFAULT NOW(),
   redeem_dt TIMESTAMP NULL,
   PRIMARY KEY (id)
+);
+
+CREATE TABLE application_report_code (
+    id serial NOT NULL,
+    application_id INT NOT NULL,
+    email varchar(255) NOT NULL,
+    code varchar NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
 

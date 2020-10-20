@@ -87,13 +87,13 @@ public class StatsMaintenanceController extends MaintenanceController {
             maintenanceStatsViewModel.setStatViews(statViews);
             maintenanceStatsViewModel.setTotalPageViews(totalPageViews);
             if (totalPageViews != 0) {
-                maintenanceStatsViewModel.setAveragePageViews(totalPageViews / numRecords);
+                maintenanceStatsViewModel.setAveragePageViews((float)totalPageViews / numRecords);
             } else {
                 maintenanceStatsViewModel.setAveragePageViews(0);
             }
             if (totalUniqueIps != 0) {
                 maintenanceStatsViewModel.setTotalUniqueIps(totalUniqueIps);
-                maintenanceStatsViewModel.setAverageUniqueIps(totalUniqueIps / numRecords);
+                maintenanceStatsViewModel.setAverageUniqueIps((float)totalUniqueIps / numRecords);
             } else {
                 maintenanceStatsViewModel.setAverageUniqueIps(0);
             }

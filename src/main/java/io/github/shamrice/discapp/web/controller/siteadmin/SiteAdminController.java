@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.web.model.siteadmin.*;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -55,6 +56,9 @@ public class SiteAdminController {
 
     @Autowired
     private SiteService siteService;
+
+    @Autowired
+    private InputHelper inputHelper;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY)
     public ModelAndView getSiteAdmin(ModelAndView model) {
@@ -431,7 +435,7 @@ public class SiteAdminController {
             Thread thread = threadService.getThreadById(threadId);
             thread.setDeleted(false);
             thread.setModDt(new Date());
-            if (threadService.saveThread(thread, thread.getBody()) > 0) {
+            if (threadService.saveThread(thread, thread.getBody(), false) > 0) {
                 log.info("Thread id: " + threadId + " restored successfully.");
                 siteAdminThreadViewModel.setInfoMessage("Thread id: " + threadId + " restored successfully.");
             } else {
@@ -456,16 +460,27 @@ public class SiteAdminController {
         if (model.getNewUpdateText() != null && !model.getNewUpdateText().trim().isEmpty()
                 && model.getNewUpdateSubject() != null && !model.getNewUpdateSubject().trim().isEmpty()) {
 
-            SiteUpdateLog siteUpdateLog = new SiteUpdateLog();
-            siteUpdateLog.setSubject(model.getNewUpdateSubject());
-            siteUpdateLog.setMessage(model.getNewUpdateText());
-            siteUpdateLog.setEnabled(true);
-            siteUpdateLog.setCreateDt(new Date());
-            siteUpdateLog.setModDt(new Date());
-            if (siteService.saveAndPostUpdateLog(siteUpdateLog)) {
-                model.setInfoMessage("New site update created and posted.");
+            if (model.getPreviewButton() != null && !model.getPreviewButton().isEmpty()) {
+                model.setShowPreview(true);
+                model.setUpdatePreviewText(addHtmlToUpdateBody(model.getNewUpdateText()));
+                return new ModelAndView("site_admin/update", "siteAdminUpdateViewModel", model);
             } else {
-                model.setErrorMessage("Failed to save and post new site update.");
+                String body = addHtmlToUpdateBody(model.getNewUpdateText());
+
+                SiteUpdateLog siteUpdateLog = new SiteUpdateLog();
+                siteUpdateLog.setSubject(model.getNewUpdateSubject());
+                siteUpdateLog.setMessage(body);
+                siteUpdateLog.setEnabled(true);
+                siteUpdateLog.setCreateDt(new Date());
+                siteUpdateLog.setModDt(new Date());
+                if (siteService.saveAndPostUpdateLog(siteUpdateLog)) {
+                    model.setInfoMessage("New site update created and posted.");
+                    //set values back to blank.
+                    model.setNewUpdateSubject("");
+                    model.setNewUpdateText("");
+                } else {
+                    model.setErrorMessage("Failed to save and post new site update.");
+                }
             }
         }
 
@@ -495,9 +510,11 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminUpdateEdit(@RequestParam(name = "id") long updateId, SiteAdminUpdateViewModel model) {
         SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(updateId);
 
+        String updatePlainText = removeHtmlFromUpdateBody(siteUpdateLog.getMessage());
+
         model.setEditUpdateId(siteUpdateLog.getId());
         model.setEditUpdateSubject(siteUpdateLog.getSubject());
-        model.setEditUpdateText(siteUpdateLog.getMessage());
+        model.setEditUpdateText(updatePlainText);
         return new ModelAndView("site_admin/updateEdit", "siteAdminUpdateViewModel", model);
     }
 
@@ -506,13 +523,50 @@ public class SiteAdminController {
         if (model.getEditUpdateSubject() != null && !model.getEditUpdateSubject().trim().isEmpty()
                 && model.getEditUpdateText() != null && !model.getEditUpdateText().trim().isEmpty()) {
             SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(model.getEditUpdateId());
+
             if (siteUpdateLog != null) {
-                siteUpdateLog.setSubject(model.getEditUpdateSubject());
-                siteUpdateLog.setMessage(model.getEditUpdateText());
-                siteUpdateLog.setModDt(new Date());
-                siteService.saveUpdateLog(siteUpdateLog);
+                if (model.getPreviewButton() != null && !model.getPreviewButton().isEmpty()) {
+                    model.setShowPreview(true);
+                    model.setUpdatePreviewText(addHtmlToUpdateBody(model.getEditUpdateText()));
+                    return new ModelAndView("site_admin/updateEdit", "siteAdminUpdateViewModel", model);
+                } else {
+
+                    String body = addHtmlToUpdateBody(model.getEditUpdateText());
+
+                    siteUpdateLog.setSubject(model.getEditUpdateSubject());
+                    siteUpdateLog.setMessage(body);
+                    siteUpdateLog.setModDt(new Date());
+                    siteService.saveUpdateLog(siteUpdateLog);
+                }
             }
         }
         return new ModelAndView("redirect:" + UPDATE_MANAGE);
+    }
+
+    /**
+     * add links to urls and add new lines.
+     * @param body update body text to add new lines and links to
+     * @return body with html added.
+     */
+    private String addHtmlToUpdateBody(String body) {
+        if (body != null && !body.trim().isEmpty()) {
+            body = body.replaceAll("\r", "<br />");
+            body = inputHelper.addUrlHtmlLinksToString(body);
+        }
+        return body;
+    }
+
+    /**
+     * Removes html added for new lines and links from update body.
+     * @param body update body to remove new lines and links from
+     * @return body with html tags replaced.
+     */
+    private String removeHtmlFromUpdateBody(String body) {
+        if (body != null && !body.trim().isEmpty()) {
+            body = body.replaceAll("<br />", "\r");
+            body = body.replaceAll("<a target=\"_blank\" href=\".+?\">", "");
+            body = body.replaceAll("</a>", "");
+        }
+        return body;
     }
 }

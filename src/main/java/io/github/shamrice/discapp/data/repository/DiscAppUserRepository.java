@@ -61,5 +61,7 @@ public interface DiscAppUserRepository extends JpaRepository<DiscAppUser, Long> 
 
     List<DiscAppUser> findByUsernameContainingIgnoreCaseAndIsUserAccount(String username, boolean isUserAccount);
 
+    List<DiscAppUser> findByEmailContainingIgnoreCaseAndIsUserAccount(String email, boolean isUserAccount);
+
     List<DiscAppUser> findByOwnerId(Long ownerId);
 }

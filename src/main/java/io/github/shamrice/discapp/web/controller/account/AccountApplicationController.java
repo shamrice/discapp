@@ -1,11 +1,9 @@
 package io.github.shamrice.discapp.web.controller.account;
 
-import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.ApplicationPermission;
-import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.Owner;
+import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -29,7 +27,6 @@ import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENAN
 @Controller
 @Slf4j
 public class AccountApplicationController extends AccountController {
-
 
     @GetMapping(ACCOUNT_APPLICATION)
     public ModelAndView getAccountApplication(@ModelAttribute AccountViewModel accountViewModel,
@@ -73,8 +70,10 @@ public class AccountApplicationController extends AccountController {
                             appSearchStatus = ENABLED;
                         }
 
+                        String adminReportFrequency = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
+
                         AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
-                                app.getName(), app.getId(), appStatus, appSearchStatus
+                                app.getName(), app.getId(), appStatus, appSearchStatus, adminReportFrequency
                         );
                         accountApplications.add(application);
                     }
@@ -84,7 +83,7 @@ public class AccountApplicationController extends AccountController {
                         if (a1.getApplicationId().equals(a2.getApplicationId())) {
                             return 0;
                         }
-                        return a1.getApplicationId() > a2.getApplicationId() ? -1 : 1;
+                        return a1.getApplicationId() < a2.getApplicationId() ? -1 : 1;
                     });
 
                     accountViewModel.setAccountApplications(accountApplications);
@@ -143,6 +142,20 @@ public class AccountApplicationController extends AccountController {
                                     app.setSearchable(false);
                                 }
 
+                                //update admin report frequency configuration value.
+                                String adminReportFrequency = accountViewModel.getApplicationAdminReportFrequency();
+                                if (AdminReportFrequency.NEVER.name().equalsIgnoreCase(adminReportFrequency)) {
+                                    configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
+                                } else if (AdminReportFrequency.DAILY.name().equalsIgnoreCase(adminReportFrequency)) {
+                                    configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.DAILY.name());
+                                } else if (AdminReportFrequency.WEEKLY.name().equalsIgnoreCase(adminReportFrequency)) {
+                                    configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.WEEKLY.name());
+                                } else if (AdminReportFrequency.MONTHLY.name().equalsIgnoreCase(adminReportFrequency)) {
+                                    configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.MONTHLY.name());
+                                } else {
+                                    log.warn("Invalid admin report frequency set for appId: " + app.getId() + " Value: " + adminReportFrequency + " ignored.");
+                                }
+
                                 if (applicationService.save(app) != null) {
                                     log.info("Application id: " + app.getId() + " has been updated.");
                                     accountViewModel.setInfoMessage("Application has been updated.");
@@ -161,7 +174,6 @@ public class AccountApplicationController extends AccountController {
         } else {
             log.error("Account view model is null. Nothing to update.");
         }
-
 
         return getAccountApplication(accountViewModel, modelMap);
     }
@@ -355,5 +367,4 @@ public class AccountApplicationController extends AccountController {
         }
         return getAccountApplication(accountViewModel, modelMap);
     }
-
 }

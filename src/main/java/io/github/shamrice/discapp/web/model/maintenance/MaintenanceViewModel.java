@@ -70,6 +70,12 @@ public class MaintenanceViewModel {
     private String windowState;
     private String submittedFromDiv;
 
+    //hold permissions config
+    private boolean displayPostHoldMessage;
+    private boolean displayAfterPostHoldMessage;
+    private String displayPostHoldMessageText;
+    private String displayAfterPostHoldMessageText;
+
     public boolean isSelectedMaxThreadCountPerPage(int dropDownValue) {
         return maxThreadCountPerPage == dropDownValue;
     }

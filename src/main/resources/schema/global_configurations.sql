@@ -181,6 +181,87 @@ VALUES (0, 'stylesheet.url.default', '/styles/default.css');
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'stylesheet.url.maintenance', '/styles/maint.css');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'mailing.list.email.admin.subject.template', 'Your NeDiscApp Report');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'mailing.list.email.admin.body.template', '<html>
+    <h3 style="margin: 2em; margin-left: 0;">
+        <a href="BASE_SITE_URL" style="text-decoration: none; font-weight: bold;">Ne<span style="color: #d44; margin-left: 2px;">Disc</span>App</a>
+        report for OWNER_EMAIL_ADDRESS
+        <a style="font-size: smaller; margin-left: 1em;" href="MODIFY_ACCOUNT_URL">Settings</a>
+        <a style="font-size: smaller; margin-left: 1em;" href="HELP_FORUM_URL">Support</a>
+        <!--/span-->
+    </h3>
+
+    <table style="border: 1px solid black; background-color: #cce; padding: 1em; border-collapse: collapse; margin-left: 2px;">
+        <tr>
+            <td colspan="8" style="font-size: larger; font-weight: bold; text-align: center; padding: 1ex;"><a href="BASE_SITE_URL">DiscussionApps</a></td>
+        </tr>
+        <tr>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">Name</th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">Entries</th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">Last entry</th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">Subscribers</th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">
+                Last<br />
+                subscription
+            </th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">
+                Average Daily Visitors<br />
+                (last month)
+            </th>
+            <th style="text-align: center; vertical-align: bottom; border-bottom: 1px solid black;">
+                Unapproved<br />
+                messages
+            </th>
+        </tr>
+        APPLICATION_REPORT_DATA_START
+        <tr style="margin-bottom: 3px;">
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+            <a href="MAINTENANCE_URL">APPLICATION_NAME </a></td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_THREADS_URL">TOTAL_THREADS</a>
+            </td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_THREADS_URL">LAST_THREAD_CREATION</a>
+            </td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_SUBSCRIBERS_URL">TOTAL_SUBSCRIBERS</a>
+            </td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_SUBSCRIBERS_URL">LAST_SUBSCRIPTION_DATE</a>
+            </td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_STATS_URL">TOTAL_LAST_MONTH_VISITORS</a>
+            </td>
+            <td style="background-color: #f4f4ff; text-align: right; padding: 1ex; border: 1px solid #444;">
+                <a href="MAINTENANCE_THREADS_UNAPPROVED_URL">TOTAL_UNAPPROVED_MESSAGES</a>
+            </td>
+        </tr>
+        APPLICATION_REPORT_DATA_END
+    </table>
+    <div style="height: 2em;"></div>
+    <div
+        style="border:1px solid #666; background-color:#cce;=20
+                                width:30em; padding:1ex; margin:2em; margin-left:2px; ">
+        <form method="post" action="REPORT_FREQUENCY_URL" enctype="multipart/form-data">
+            Send email reports
+            <select name="changeReportFrequency">
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option selected="selected" value="Monthly">Monthly</option>
+                <option value="Never">Never</option>
+            </select>
+            <input type="submit" name="updateReportFrequency" value="Update Report Frequency" />
+            <input type="hidden" name="emailAddress" value="OWNER_EMAIL_ADDRESS" />
+            <input type="hidden" name="authCode" value="GENERATED_AUTH_CODE" />
+            <input type="hidden" name="appIds" value="APPLICATION_ID" />
+        </form>
+    </div>
+</html>
+');
+
 
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
@@ -213,6 +294,12 @@ ON discapp_user(id);
 
 CREATE INDEX idx_discapp_user_email
 ON discapp_user(email);
+
+CREATE INDEX idx_thread_activity_thread_id
+ON thread_activity(thread_id);
+
+CREATE INDEX idx_thread_activity_mod_dt_application_id_thread_id
+ON thread_activity(mod_dt, application_id, thread_id);
 
 
 -- STORED PROC

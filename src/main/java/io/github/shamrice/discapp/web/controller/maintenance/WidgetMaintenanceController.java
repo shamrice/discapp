@@ -32,9 +32,9 @@ public class WidgetMaintenanceController extends MaintenanceController {
 
             //submit changes.
             if (maintenanceWidgetViewModel.getSubmitChanges() != null && !maintenanceWidgetViewModel.getSubmitChanges().isEmpty()) {
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, String.valueOf(maintenanceWidgetViewModel.isShowStyleSheet()).toLowerCase());
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, String.valueOf(maintenanceWidgetViewModel.isShowAuthor()).toLowerCase());
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, String.valueOf(maintenanceWidgetViewModel.isShowDate()).toLowerCase());
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, String.valueOf(maintenanceWidgetViewModel.isShowStyleSheet()).toLowerCase());
 
                 int width = 20;
                 try {
@@ -45,8 +45,8 @@ public class WidgetMaintenanceController extends MaintenanceController {
                             + width + " :: " + widthEx.getMessage());
                 }
                 maintenanceWidgetViewModel.setWidgetWidth(String.valueOf(width));
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, String.valueOf(width));
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, maintenanceWidgetViewModel.getWidgetWidthUnit());
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, String.valueOf(width));
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, maintenanceWidgetViewModel.getWidgetWidthUnit());
 
                 int height = 18;
                 try {
@@ -57,8 +57,8 @@ public class WidgetMaintenanceController extends MaintenanceController {
                             + height + " :: " + heightEx.getMessage());
                 }
                 maintenanceWidgetViewModel.setWidgetHeight(String.valueOf(height));
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, String.valueOf(height));
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, maintenanceWidgetViewModel.getWidgetHeightUnit());
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, String.valueOf(height));
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, maintenanceWidgetViewModel.getWidgetHeightUnit());
             } else {
                 //reset to default values.
                 //todo : probably should get these values from somewhere in the config service or something...
@@ -70,13 +70,13 @@ public class WidgetMaintenanceController extends MaintenanceController {
                 String showDate = "false";
                 String useStyleSheet = "true";
 
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, showAuthor);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, showDate);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, useStyleSheet);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, width);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, widthUnit);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, height);
-                saveUpdatedConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, heightUnit);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_AUTHOR, showAuthor);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_SHOW_DATE, showDate);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_USE_STYLE_SHEET, useStyleSheet);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH, width);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_WIDTH_UNIT, widthUnit);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT, height);
+                configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.WIDGET_HEIGHT_UNIT, heightUnit);
 
                 maintenanceWidgetViewModel.setWidgetWidth(width);
                 maintenanceWidgetViewModel.setWidgetWidthUnit(widthUnit);

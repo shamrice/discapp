@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PasswordResetRepository extends JpaRepository<PasswordReset, Long> {
 
     PasswordReset findOneByEmailAndKey(String email, String key);
+    PasswordReset findOneByEmailAndKeyAndApplicationId(String email, String key, Long applicationId);
 
     @Transactional
     void deleteByEmail(String email);

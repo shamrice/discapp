@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
@@ -26,13 +25,11 @@ import java.util.Date;
 @Slf4j
 public class AppearanceMaintenanceController extends MaintenanceController {
 
-
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
-    public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-forms.cgi")
+    public ModelAndView getAppearanceFormsView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
                                           HttpServletResponse response) {
-
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
@@ -156,11 +153,43 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
             maintenanceViewModel.setFavicon(favicon);
 
+            //hold permissions config
+            boolean displayPostHoldMessage = configurationService.getBooleanValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, true);
+            maintenanceViewModel.setDisplayPostHoldMessage(displayPostHoldMessage);
+
+            boolean displayAfterPostHoldMessage = configurationService.getBooleanValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE, true);
+            maintenanceViewModel.setDisplayAfterPostHoldMessage(displayAfterPostHoldMessage);
+
+            String displayPostHoldMessageText = configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT, "New messages posted require admin approval. Your message will appear after it has been approved by an moderator.");
+            maintenanceViewModel.setDisplayPostHoldMessageText(displayPostHoldMessageText);
+
+            String displayAfterPostHoldMessageText = configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator.");
+            maintenanceViewModel.setDisplayAfterPostHoldMessageText(displayAfterPostHoldMessageText);
+
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
         }
 
         return new ModelAndView("admin/appearance-forms", "maintenanceViewModel", maintenanceViewModel);
+
+    }
+
+        @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
+    public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model,
+                                          HttpServletResponse response) {
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+            setCommonModelAttributes(model, app, username);
+            maintenanceViewModel.setApplicationId(app.getId());
+
+        } catch (Exception ex) {
+            model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
+        }
+
+        return new ModelAndView("admin/appearance-frameset", "maintenanceViewModel", maintenanceViewModel);
     }
 
 
@@ -202,7 +231,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
@@ -217,25 +246,25 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if ("custom-inline".equalsIgnoreCase(styleSheetType)) {
             String customStyleSheetText = maintenanceViewModel.getStyleSheetCustomText();
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, customStyleSheetText);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, customStyleSheetText);
 
             String styleSheetUrl = AppCustomCssUrl.CUSTOM_CSS_URL_PREFIX + appId + AppCustomCssUrl.CUSTOM_CSS_URL_SUFFIX;
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
 
         } else if ("custom-url".equalsIgnoreCase(styleSheetType)) {
             String styleSheetUrl = inputHelper.sanitizeInput(maintenanceViewModel.getStyleSheetUrl());
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, styleSheetType);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         } else {
             String styleSheetUrl = getDefaultStyleSheetUrlByType(styleSheetType);
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
-            saveUpdatedConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
+            configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         }
 
         maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
@@ -309,7 +338,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("You must be logged in to perform this action.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -322,18 +351,22 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if (maintenanceViewModel.getThreadSortOrder() == null || maintenanceViewModel.getThreadSortOrder().isEmpty()) {
             maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.CREATION.name());
+        } else if (ThreadSortOrder.CREATION.name().equalsIgnoreCase(maintenanceViewModel.getThreadSortOrder())) {
+            maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.CREATION.name());
+        } else {
+            maintenanceViewModel.setThreadSortOrder(ThreadSortOrder.ACTIVITY.name());
         }
 
-        boolean sortOrderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
-        boolean expandSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
-        boolean previewSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isPreviewFirstMessageOnIndex()));
-        boolean highlightSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, String.valueOf(maintenanceViewModel.isHighlightNewMessages()));
-        boolean threadBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
-        boolean entryBreakSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
-        boolean maxThreadCountSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getMaxThreadCountPerPage()));
-        boolean threadDepthSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
-        boolean previewTopLevelSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewTopLevelLength()));
-        boolean previewReplySaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewReplyLength()));
+        boolean sortOrderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_SORT_ORDER, maintenanceViewModel.getThreadSortOrder());
+        boolean expandSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isExpandThreadsOnIndex()));
+        boolean previewSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.isPreviewFirstMessageOnIndex()));
+        boolean highlightSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.HIGHLIGHT_NEW_MESSAGES, String.valueOf(maintenanceViewModel.isHighlightNewMessages()));
+        boolean threadBreakSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_BREAK_TEXT, maintenanceViewModel.getThreadBreak());
+        boolean entryBreakSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.ENTRY_BREAK_TEXT, maintenanceViewModel.getEntryBreak());
+        boolean maxThreadCountSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.MAX_THREADS_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getMaxThreadCountPerPage()));
+        boolean threadDepthSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_DEPTH_ON_INDEX_PAGE, String.valueOf(maintenanceViewModel.getThreadDepth()));
+        boolean previewTopLevelSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewTopLevelLength()));
+        boolean previewReplySaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, String.valueOf(maintenanceViewModel.getPreviewReplyLength()));
 
         if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved
                 && maxThreadCountSaved && threadDepthSaved && previewTopLevelSaved && previewReplySaved) {
@@ -342,7 +375,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to threads.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
@@ -352,8 +385,8 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                                HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean headerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.HEADER_TEXT, maintenanceViewModel.getHeader());
-        boolean footerSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
+        boolean headerSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.HEADER_TEXT, maintenanceViewModel.getHeader());
+        boolean footerSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
 
         if (headerSaved && footerSaved) {
             maintenanceViewModel.setInfoMessage("Successfully saved changes to header and footer.");
@@ -361,7 +394,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to header and footer.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -372,11 +405,11 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                          HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean authorHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBMITTER_LABEL_TEXT, maintenanceViewModel.getAuthorHeader());
-        boolean dateHeaderSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.DATE_LABEL_TEXT, String.valueOf(maintenanceViewModel.getDateHeader()));
-        boolean emailSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EMAIL_LABEL_TEXT, String.valueOf(maintenanceViewModel.getEmailHeader()));
-        boolean subjectSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SUBJECT_LABEL_TEXT, String.valueOf(maintenanceViewModel.getSubjectHeader()));
-        boolean messageSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
+        boolean authorHeaderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SUBMITTER_LABEL_TEXT, maintenanceViewModel.getAuthorHeader());
+        boolean dateHeaderSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.DATE_LABEL_TEXT, String.valueOf(maintenanceViewModel.getDateHeader()));
+        boolean emailSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EMAIL_LABEL_TEXT, String.valueOf(maintenanceViewModel.getEmailHeader()));
+        boolean subjectSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SUBJECT_LABEL_TEXT, String.valueOf(maintenanceViewModel.getSubjectHeader()));
+        boolean messageSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
 
         if (authorHeaderSaved && dateHeaderSaved && emailSaved && subjectSaved && messageSaved) {
             maintenanceViewModel.setInfoMessage("Successfully saved changes to labels.");
@@ -384,7 +417,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to labels.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -395,14 +428,14 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                                           HttpServletResponse response) {
         Application app = applicationService.get(appId);
 
-        boolean shareButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
-        boolean editButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.EDIT_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getEditButton()));
-        boolean returnButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
-        boolean previewButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
-        boolean postButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
-        boolean previousPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviousPageButton()));
-        boolean nextPageButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
-        boolean replyButtonSaved = saveUpdatedConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
+        boolean shareButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.SHARE_BUTTON_TEXT, maintenanceViewModel.getShareButton());
+        boolean editButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.EDIT_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getEditButton()));
+        boolean returnButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReturnButton()));
+        boolean previewButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIEW_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviewButton()));
+        boolean postButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPostButton()));
+        boolean previousPageButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getPreviousPageButton()));
+        boolean nextPageButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getNextPageButton()));
+        boolean replyButtonSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, String.valueOf(maintenanceViewModel.getReplyButton()));
 
         if (shareButtonSaved && editButtonSaved && returnButtonSaved && previewButtonSaved && postButtonSaved
                 && previousPageButtonSaved && nextPageButtonSaved && replyButtonSaved) {
@@ -412,7 +445,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setInfoMessage("Failed to save changes to buttons.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
 
@@ -444,70 +477,101 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         Application app = applicationService.get(appId);
 
-        if (!saveUpdatedConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
+        if (!configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
             maintenanceViewModel.setInfoMessage("Failed to update Favicon.");
         } else {
             maintenanceViewModel.setFavicon(favicon);
             maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
         }
 
-        return getAppearanceView(appId, maintenanceViewModel, model, response);
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
-    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-preview.cgi")
-    public ModelAndView getAppearancePreviewView(@RequestParam(name = "id") long appId,
-                                                 Model model,
-                                                 HttpServletRequest request) {
-        return discAppController.getAppView(appId, 0, model, request);
+
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/holdPermissions")
+    public ModelAndView postModifyHoldPermissions(@RequestParam(name = "id") long appId,
+                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                          Model model,
+                                          HttpServletResponse response) {
+
+        Application app = applicationService.get(appId);
+
+        try {
+            boolean isPostDisplaySuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE,
+                    String.valueOf(maintenanceViewModel.isDisplayPostHoldMessage()).toLowerCase());
+            boolean isAfterPostDisplaySuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE,
+                    String.valueOf(maintenanceViewModel.isDisplayAfterPostHoldMessage()).toLowerCase());
+
+            boolean isPostMessageSuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT,
+                    maintenanceViewModel.getDisplayPostHoldMessageText());
+
+            boolean isAfterPostMessageSuccess = configurationService.saveApplicationConfiguration(app.getId(),
+                    ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT,
+                    maintenanceViewModel.getDisplayAfterPostHoldMessageText());
+
+            if (isPostDisplaySuccess && isAfterPostDisplaySuccess && isPostMessageSuccess && isAfterPostMessageSuccess) {
+                maintenanceViewModel.setInfoMessage("Hold permission display settings updated.");
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to save hold permission display settings.");
+            }
+
+        } catch (Exception ex) {
+            log.error("Failed to update hold appearance config.", ex);
+            maintenanceViewModel.setInfoMessage("Failed to update hold permission display settings.");
+        }
+
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
     public ModelAndView getModifyApplication(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/prologue-epilogue")
     public ModelAndView getModifyPrologueEpilogue(@RequestParam(name = "id") long appId) {
 
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/stylesheet")
     public ModelAndView getModifyStyleSheet(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/threads")
     public ModelAndView getModifyThreads(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/header-footer")
     public ModelAndView getModifyHeaderFooter(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/labels")
     public ModelAndView getModifyLabels(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/buttons")
     public ModelAndView getModifyButtons(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/favicon")
     public ModelAndView getModifyFavicon(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "modify/time")
     public ModelAndView getModifyTime(@RequestParam(name = "id") long appId) {
-        return new ModelAndView("redirect:/admin/appearance-forms.cgi?id=" + appId);
+        return new ModelAndView("redirect:/admin/appearance-frameset.cgi?id=" + appId);
     }
-
 
     private String getDefaultStyleSheetTypeByUrl(String styleSheetUrl) {
 
@@ -560,5 +624,4 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 return "";
         }
     }
-
 }

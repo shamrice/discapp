@@ -8,7 +8,7 @@
 </head>
 
 <frameset rows="*,40", border=0>
-    <frame name="dbmain" th:src="@{|/admin/disc-info.cgi?id=${appId}|}">
+    <frame name="dbmain" th:src="@{|/admin/${topFrame}.cgi?id=${appId}|}">
     <frame name="toolbar" th:src="@{|/admin/disc-toolbar.cgi?id=${appId}|}" marginheight="1" scrolling="no" noresize="noresize">
 </frameset>
 

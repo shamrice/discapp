@@ -113,6 +113,27 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <label>Admin Email Report:</label>
+                    </td>
+                    <td>
+                        <select name="applicationAdminReportFrequency" class="button" style="border:1px solid black;width:100%;">
+                            <option th:selected="${accountApplication.isSelectedApplicationAdminReport('DAILY')}"
+                                    value="DAILY">Daily
+                            </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationAdminReport('WEEKLY')}"
+                                    value="WEEKLY">Weekly
+                            </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationAdminReport('MONTHLY')}"
+                                    value="MONTHLY">Monthly
+                            </option>
+                            <option th:selected="${accountApplication.isSelectedApplicationAdminReport('NEVER')}"
+                                    value="NEVER">Never
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td colspan="2" style="padding:5px;">&nbsp;</td>
                 </tr>
                 <tr>

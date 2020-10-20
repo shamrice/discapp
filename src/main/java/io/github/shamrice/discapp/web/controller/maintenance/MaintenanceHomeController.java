@@ -33,12 +33,19 @@ public class MaintenanceHomeController extends MaintenanceController {
 
     @GetMapping(MAINTENANCE_PAGE)
     public ModelAndView getDiscMaintenanceView(@RequestParam(name = "id") long appId,
+                                               @RequestParam(name = "top_frame", required = false) String topFrame,
                                                Model model,
                                                HttpServletResponse response) {
         try {
             Application app = applicationService.get(appId);
             String username = accountHelper.getLoggedInEmail();
             setCommonModelAttributes(model, app, username);
+
+            if (topFrame != null && !topFrame.isEmpty()) {
+                model.addAttribute("topFrame", topFrame);
+            } else {
+                model.addAttribute("topFrame", "disc-info");
+            }
 
             return new ModelAndView("admin/disc-maint");
 

@@ -6,6 +6,8 @@ import io.github.shamrice.discapp.data.repository.ConfigurationRepository;
 import io.github.shamrice.discapp.data.repository.UserConfigurationRepository;
 import io.github.shamrice.discapp.service.configuration.cache.ConfigurationCache;
 import io.github.shamrice.discapp.service.configuration.cache.UserConfigurationCache;
+import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
+import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +58,7 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_URL, "/styles/graph2.css");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_STYLE_SETTING, "default");
         configsToSet.put(ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, "");
-        configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, "activity");
+        configsToSet.put(ConfigurationProperty.THREAD_SORT_ORDER, ThreadSortOrder.ACTIVITY.name());
         configsToSet.put(ConfigurationProperty.EXPAND_THREADS_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_OF_THREAD_ON_INDEX_PAGE, "true");
         configsToSet.put(ConfigurationProperty.PREVIEW_FIRST_MESSAGE_LENGTH_IN_NUM_CHARS, "320");
@@ -88,6 +90,15 @@ public class ConfigurationService {
         configsToSet.put(ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, "all");
 
         configsToSet.put(ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_ENABLED, "true");
+
+        configsToSet.put(ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
+
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, "true");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE, "true");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_MESSAGE_TEXT, "New messages posted require admin approval. Your message will appear after it has been approved by an moderator.");
+        configsToSet.put(ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator.");
+
+        configsToSet.put(ConfigurationProperty.RSS_BEHAVIOR, "ALL");
 
         for (ConfigurationProperty configurationProperty : configsToSet.keySet()) {
             String value = configsToSet.getOrDefault(configurationProperty, "");
@@ -291,6 +302,8 @@ public class ConfigurationService {
         //try to get from cache first:
         UserConfiguration configFromCache = UserConfigurationCache.getInstance().getFromCache(discappUserId, configurationProperty);
         if (configFromCache != null) {
+            log.debug("Pulling user configuration from cache for userid: " + discappUserId + " :: "
+                    + configurationProperty.getPropName() + " : value: " + configFromCache.getValue());
             return configFromCache.getValue();
         }
 
@@ -319,5 +332,40 @@ public class ConfigurationService {
 
     public UserConfiguration getUserConfiguration(long discappUserId, String configurationName) {
         return userConfigurationRepository.findOneByDiscappUserIdAndName(discappUserId, configurationName);
+    }
+
+    /**
+     * Saves updated or new configuration for an application
+     *
+     * @param appId    application id
+     * @param property configuration property to save
+     * @param value    values to save for the configuration
+     * @return returns true on success and false on failure.
+     */
+    public boolean saveApplicationConfiguration(long appId, ConfigurationProperty property, String value) {
+        if (value == null) {
+            log.warn("Attempted to save null app configuration value for appId: " + appId + " : config property: " + property.getPropName());
+            return false;
+        }
+
+        Configuration configToUpdate = getConfiguration(appId, property.getPropName());
+
+        if (configToUpdate == null) {
+            log.info("Creating new app configuration prop: " + property.getPropName() + " for appId: " + appId);
+            configToUpdate = new Configuration();
+            configToUpdate.setName(property.getPropName());
+            configToUpdate.setApplicationId(appId);
+        }
+
+        configToUpdate.setValue(value);
+
+        if (!saveConfiguration(property, configToUpdate)) {
+            log.warn("Failed to update app configuration " + property.getPropName() + " of appId: " + appId);
+            return false;
+        } else {
+            log.info("Updated " + property.getPropName() + " for appId: " + appId + " to " + value);
+        }
+
+        return true;
     }
 }

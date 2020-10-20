@@ -14,6 +14,8 @@ public class AccountUrl {
 
     public static final String ACCOUNT_MODIFY = CONTROLLER_DIRECTORY_URL + "modify";
 
+    public static final String ACCOUNT_MODIFY_LOCALE = ACCOUNT_MODIFY + "/locale";
+
     public static final String ACCOUNT_MODIFY_READ_STATUS = ACCOUNT_MODIFY + "/read/{status}";
     public static final String ACCOUNT_MODIFY_READ_RESET = ACCOUNT_MODIFY + "/read/reset";
 
@@ -26,7 +28,9 @@ public class AccountUrl {
     public static final String ACCOUNT_DELETE = CONTROLLER_DIRECTORY_URL + "delete";
     public static final String ACCOUNT_DELETE_STATUS = ACCOUNT_DELETE + "/status";
     public static final String ACCOUNT_PASSWORD = CONTROLLER_DIRECTORY_URL + "password";
+    public static final String SYSTEM_ACCOUNT_PASSWORD = CONTROLLER_DIRECTORY_URL + "discpassword";
     public static final String ACCOUNT_PASSWORD_RESET = CONTROLLER_DIRECTORY_URL + "password/{resetKey}";
+    public static final String SYSTEM_ACCOUNT_PASSWORD_RESET = CONTROLLER_DIRECTORY_URL + "discpassword/{resetKey}";
 
     public static final String ACCOUNT_APPLICATION = CONTROLLER_DIRECTORY_URL + "application";
 }

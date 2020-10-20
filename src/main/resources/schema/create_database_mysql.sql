@@ -110,6 +110,18 @@ CREATE TABLE thread_body (
     FOREIGN KEY (thread_id) REFERENCES thread(id)
 );
 
+
+CREATE TABLE thread_activity (
+    id int(255) NOT NULL AUTO_INCREMENT,
+    application_id int NOT NULL,
+    thread_id int(255) NOT NULL,
+    create_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    mod_dt TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id),
+    FOREIGN KEY (thread_id) REFERENCES thread(id)
+);
+
 CREATE TABLE prologue (
     id int(255) NOT NULL AUTO_INCREMENT,
     application_id int(20) UNIQUE NOT NULL,
@@ -170,6 +182,7 @@ CREATE TABLE stats_unique_ips (
 CREATE TABLE password_reset (
   id int(255) NOT NULL AUTO_INCREMENT,
   email varchar(255) UNIQUE NOT NULL,
+  application_id int(255) NULL,
   key varchar(64) NOT NULL,
   code INT(20) NOT NULL,
   is_redeemed boolean NOT NULL DEFAULT false,
@@ -289,7 +302,7 @@ CREATE TABLE thread_post_code (
 );
 
 CREATE TABLE user_registration (
-  id serial NOT NULL,
+  id int(255) NOT NULL,
   email varchar(255) UNIQUE NOT NULL,
   key varchar(64) NOT NULL,
   is_redeemed boolean NOT NULL DEFAULT false,
@@ -298,6 +311,17 @@ CREATE TABLE user_registration (
   PRIMARY KEY (id)
 );
 
+
+CREATE TABLE application_report_code (
+    id int(255) NOT NULL,
+    application_id INT NOT NULL,
+    email varchar(255) NOT NULL,
+    code varchar NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
 
 
 commit;

@@ -31,7 +31,7 @@
           th:object="${maintenanceLocaleViewModel}">
 
         <div style="text-align:left;">
-            <label for="selectedTimezone">Timezone</label>
+            <label for="selectedTimezone">Time Zone</label>
 
             <select id="selectedTimezone" name="selectedTimezone" class="button" style="border:1px solid black;">
                 <option th:each="timezone : ${maintenanceLocaleViewModel.getTimezones()}"
@@ -43,7 +43,7 @@
 
         </div>
         <div class="offset" th:text="@{|Disc App uses UTC by default.
-            In this field, you may specify your local time zone to reflect your local timezone. For example,
+            In this field, you may specify your local time zone or another time zone to be used instead. For example,
             if you wanted your DiscApp to reflect CST, you would enter 'US/Central' or a more local location
             in order to set the time for your location.|}">
         </div>

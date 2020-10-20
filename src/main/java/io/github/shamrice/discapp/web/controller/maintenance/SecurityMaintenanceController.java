@@ -46,29 +46,20 @@ public class SecurityMaintenanceController extends MaintenanceController {
 
                 //add result by email if email searched.
                 if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                    List<DiscAppUser> results;
                     if (searchTerm.contains("@")) {
-                        DiscAppUser result = discAppUserDetailsService.getByEmail(searchTerm);
-                        if (result != null) {
-                            if (app.getOwnerId().equals(result.getOwnerId())) {
-                                log.info("Cannot add email : " + username + " to appid " + appId + " editors. Is already owner.");
-                                maintenanceUserSearchViewModel.setErrorMessage(searchTerm
-                                        + " is the owner of this DiscussionApp and already has full administrative privileges.");
-                            } else {
-                                maintenanceUserSearchViewModel.getSearchResults().add(result);
-                            }
-                        }
+                        results = discAppUserDetailsService.searchByEmail(searchTerm, true);
                     } else {
-                        List<DiscAppUser> searchResults = discAppUserDetailsService.searchByUsername(searchTerm, true);
-
-                        //remove owners from results
-                        searchResults.removeAll(discAppUserDetailsService.getByOwnerId(app.getOwnerId()));
-
-                        //limit results to 10.
-                        if (searchResults.size() > 10) {
-                            searchResults = searchResults.subList(0, 9);
-                        }
-                        maintenanceUserSearchViewModel.setSearchResults(searchResults);
+                        results = discAppUserDetailsService.searchByUsername(searchTerm, true);
                     }
+                    //remove owners from results
+                    results.removeIf(user -> app.getOwnerId().equals(user.getOwnerId()));
+
+                    //limit results to 10.
+                    if (results.size() > 10) {
+                        results = results.subList(0, 10);
+                    }
+                    maintenanceUserSearchViewModel.setSearchResults(results);
                 }
             }
 

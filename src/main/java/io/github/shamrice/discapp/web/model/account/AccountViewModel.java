@@ -18,6 +18,7 @@ public class AccountViewModel {
         private @NonNull Long applicationId;
         private @NonNull String applicationStatus;
         private @NonNull String applicationSearchStatus;
+        private @NonNull String applicationAdminReportFrequency;
 
         public boolean isSelectedApplicationStatus(String dropDownValue) {
             return applicationStatus.equalsIgnoreCase(dropDownValue);
@@ -25,6 +26,10 @@ public class AccountViewModel {
 
         public boolean isSelectedApplicationSearchStatus(String dropDownValue) {
             return applicationSearchStatus.equalsIgnoreCase(dropDownValue);
+        }
+
+        public boolean isSelectedApplicationAdminReport(String dropDownValue) {
+            return applicationAdminReportFrequency.equalsIgnoreCase(dropDownValue);
         }
     }
 
@@ -53,6 +58,7 @@ public class AccountViewModel {
     private String applicationName;
     private String applicationStatus;
     private String applicationSearchStatus;
+    private String applicationAdminReportFrequency;
 
     private Integer maxDiscApps;
 
@@ -82,6 +88,15 @@ public class AccountViewModel {
 
     public boolean isOwner() {
         return this.ownerId != null;
+    }
+
+    //date and time config
+    private boolean userTimeZoneEnabled;
+    private List<String> timeZones;
+    private String selectedTimeZone;
+
+    public boolean isCurrentTimeZone(String timeZone) {
+        return this.selectedTimeZone.equalsIgnoreCase(timeZone);
     }
 
 }
