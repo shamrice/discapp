@@ -295,6 +295,12 @@ ON discapp_user(id);
 CREATE INDEX idx_discapp_user_email
 ON discapp_user(email);
 
+CREATE INDEX idx_thread_activity_thread_id
+ON thread_activity(thread_id);
+
+CREATE INDEX idx_thread_activity_mod_dt_application_id_thread_id
+ON thread_activity(mod_dt, application_id, thread_id);
+
 
 -- STORED PROC
 
