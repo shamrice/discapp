@@ -301,6 +301,9 @@ ON thread_activity(thread_id);
 CREATE INDEX idx_thread_activity_mod_dt_application_id_thread_id
 ON thread_activity(mod_dt, application_id, thread_id);
 
+CREATE INDEX idx_user_read_thread_application_id_discapp_user_id
+ON user_read_thread(application_id, discapp_user_id);
+
 
 -- STORED PROC
 
