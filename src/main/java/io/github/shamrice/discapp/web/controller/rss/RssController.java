@@ -11,11 +11,13 @@ import io.github.shamrice.discapp.web.model.rss.RssViewModel;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -86,8 +88,9 @@ public class RssController {
             }
 
             rssViewModel.setRssItems(rssItems);
+            return new ModelAndView("rss/discussion", "rssViewModel", rssViewModel);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Disc App Id " + appId + " was not found.");
         }
-
-        return new ModelAndView("rss/discussion", "rssViewModel", rssViewModel);
     }
 }
