@@ -31,7 +31,8 @@ public class ThreadActivityService {
             }
             threadActivity.setModDt(new Date());
             threadActivityRepository.save(threadActivity);
-            log.info("Updated thread activity: " + threadActivity.toString());
+            log.info("Updated thread activity id: " + threadActivity.getId()
+                    + " for application id: " + threadActivity.getApplicationId());
         }
     }
 
