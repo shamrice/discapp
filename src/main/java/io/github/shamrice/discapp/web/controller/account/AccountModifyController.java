@@ -92,6 +92,7 @@ public class AccountModifyController extends AccountController {
                 String baseUrl = webHelper.getBaseUrl(request);
                 accountViewModel.setBaseEditorUrl(baseUrl + "/admin/disc-edit.cgi?id=");
 
+                moderatingApplications.sort(Comparator.comparing(s -> s.getApplicationName().toLowerCase()));
                 accountViewModel.setModeratingApplications(moderatingApplications);
             }
 
@@ -105,6 +106,7 @@ public class AccountModifyController extends AccountController {
                         appsWithReadThreads.add(app);
                     }
                 }
+                appsWithReadThreads.sort(Comparator.comparing(s -> s.getName().toLowerCase()));
                 accountViewModel.setUserReadThreadApplications(appsWithReadThreads);
             }
 
