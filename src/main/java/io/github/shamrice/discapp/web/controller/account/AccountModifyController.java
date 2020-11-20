@@ -162,12 +162,15 @@ public class AccountModifyController extends AccountController {
                     user.setPassword(newPassword.trim());
                     if (discAppUserDetailsService.saveDiscAppUser(user)) {
                         accountViewModel.setInfoMessage("Password successfully updated.");
-                        return getAccountModify(accountViewModel, request, modelMap);
+                        //set password fields back to empty on success.
+                        accountViewModel.setPassword("");
+                        accountViewModel.setNewPassword("");
+                        accountViewModel.setConfirmPassword("");
                     } else {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
                         accountViewModel.setErrorMessage("Failed to update password.");
-                        return getAccountModify(accountViewModel, request, modelMap);
                     }
+                    return getAccountModify(accountViewModel, request, modelMap);
                 }
             }
         }
