@@ -29,6 +29,14 @@ public class AccountModifyController extends AccountController {
         return getAccountModifyAccount(accountViewModel, request, model);
     }
 
+    @GetMapping(ACCOUNT_MODIFY_PASSWORD)
+    public ModelAndView getAccountModifyPassword(@ModelAttribute AccountViewModel accountViewModel,
+                                   HttpServletRequest request,
+                                   ModelMap model) {
+        return getAccountModifyAccount(accountViewModel, request, model);
+    }
+
+
     @GetMapping(ACCOUNT_MODIFY)
     public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                          HttpServletRequest request,
@@ -134,6 +142,11 @@ public class AccountModifyController extends AccountController {
                 String newPassword = accountViewModel.getNewPassword();
                 String confirmNewPassword = accountViewModel.getConfirmPassword();
 
+                //set password fields back to empty in model.
+                accountViewModel.setPassword("");
+                accountViewModel.setNewPassword("");
+                accountViewModel.setConfirmPassword("");
+
                 if ((currentPassword == null || currentPassword.trim().isEmpty())
                         || (newPassword == null || newPassword.trim().isEmpty())
                         || (confirmNewPassword == null || confirmNewPassword.isEmpty())) {
@@ -153,7 +166,7 @@ public class AccountModifyController extends AccountController {
                 } else {
 
                     //verify passwords entered are correct.
-                    if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
+                    if (!BCrypt.checkpw(currentPassword, user.getPassword())) {
                         log.error("Cannot update account password. Original password does not match existing password for account.");
                         accountViewModel.setErrorMessage("Failed to update password");
                         return getAccountModify(accountViewModel, request, modelMap);
@@ -162,10 +175,6 @@ public class AccountModifyController extends AccountController {
                     user.setPassword(newPassword.trim());
                     if (discAppUserDetailsService.saveDiscAppUser(user)) {
                         accountViewModel.setInfoMessage("Password successfully updated.");
-                        //set password fields back to empty on success.
-                        accountViewModel.setPassword("");
-                        accountViewModel.setNewPassword("");
-                        accountViewModel.setConfirmPassword("");
                     } else {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
                         accountViewModel.setErrorMessage("Failed to update password.");
