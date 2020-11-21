@@ -7,6 +7,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.applicationsubscription.ApplicationSubscriptionModel;
+import io.github.shamrice.discapp.web.util.InputHelper;
 import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class ApplicationSubscriptionController {
 
     @Autowired
     private WebHelper webHelper;
+
+    @Autowired
+    private InputHelper inputHelper;
 
     @GetMapping(ApplicationSubscriptionUrl.UNSUBSCRIBE_URL)
     public ModelAndView getUnsubscribeView(@RequestParam(name = "id") long appId,
@@ -98,11 +102,14 @@ public class ApplicationSubscriptionController {
     public ModelAndView getSubscribeView(@RequestParam(name = "id") long appId,
                                          @RequestParam(name = "email", required = false) String email,
                                          @RequestParam(name = "encoded", required = false) Boolean emailEncoded,
+                                         @RequestParam(name = "errorMessage", required = false) String errorMessage,
                                          HttpServletRequest request) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
         model.setApplicationId(appId);
         model.setBaseUrl(webHelper.getBaseUrl(request));
+
+        model.setErrorMessage(errorMessage);
 
         Application app = applicationService.get(appId);
         if (app != null) {
@@ -153,6 +160,14 @@ public class ApplicationSubscriptionController {
 
         Application app = applicationService.get(appId);
         if (app != null) {
+
+            //verify recaptcha
+            if (!inputHelper.verifyReCaptchaResponse(applicationSubscriptionModel.getReCaptchaResponse())) {
+                log.warn("Failed to create subscription request for " + applicationSubscriptionModel.getEmail()
+                        + " due to ReCaptcha verification failure.");
+                String errorMessage = "Failed to create subscription request. Please try again.";
+                return getSubscribeView(appId, null, null, errorMessage, request);
+            }
 
             applicationSubscriptionModel.setReturnToApplicationText("Return to " + app.getName());
 

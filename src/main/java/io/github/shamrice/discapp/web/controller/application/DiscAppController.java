@@ -856,7 +856,7 @@ public class DiscAppController {
                     return errorController.getPermissionDeniedView("", model);
                 }
 
-                log.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
+                log.info("new reply started to appId: " + appId + " thread id : " + threadViewModel.getId()
                         + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
