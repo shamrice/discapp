@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.data.repository.UserRegistrationRepository;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
@@ -40,6 +41,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ApplicationService applicationService;
+
 
     @Value("${discapp.root.email}")
     private String rootAccountEmail;
@@ -80,7 +85,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         }
 
         //principal is returned back and verified by "spring magic"
-        return new DiscAppUserPrincipal(user, isRoot);
+        return new DiscAppUserPrincipal(user, isRoot, applicationService);
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {

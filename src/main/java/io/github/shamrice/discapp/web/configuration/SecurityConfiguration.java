@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Slf4j
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -69,7 +71,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/account/password").permitAll()
                     .antMatchers("/account/discpassword").permitAll()
                     .antMatchers("/password/reset/*").permitAll()
+                    .antMatchers("/admin/edit-thread.cgi").access("hasRole('ROLE_EDITOR')")
+                    .antMatchers("/admin/disc-edit.cgi").access("hasRole('ROLE_EDITOR')")
                     .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+                    .antMatchers("/edit/**").access("hasRole('ROLE_EDITOR')")
                     .antMatchers("/abuse/**").access("hasRole('ROLE_ADMIN')")
                     .antMatchers("/account/application").access("hasRole('ROLE_USER')")
                     .antMatchers("/account/delete").access("hasRole('ROLE_USER')")
