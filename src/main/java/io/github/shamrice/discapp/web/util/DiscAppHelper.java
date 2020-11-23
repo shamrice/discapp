@@ -196,9 +196,9 @@ public class DiscAppHelper {
                 String previewText = currentNode.getCurrent().getBody();
                 if (previewText != null && !previewText.isEmpty()) {
 
-                    //remove any css style tags or script tags from preview.
-                    previewText = previewText.replaceAll("<style.+?</style>", "");
-                    previewText = previewText.replaceAll("<script.+?</script>", "");
+                    //remove any css style tags or script tags from preview and the content inside the tags.
+                    previewText = previewText.replaceAll("(?i)<style.+?</style>", "");
+                    previewText = previewText.replaceAll("(?i)<script.+?</script>", "");
                     previewText = inputHelper.sanitizeInput(previewText); //clear HTML from preview thread body
 
                     if (previewText.length() > maxPreviewLength) {
