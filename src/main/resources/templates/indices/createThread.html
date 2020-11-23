@@ -117,13 +117,20 @@
             <input type="hidden" name="parentThreadBody" th:value="${parentThreadBody}"/>
 
             <div class="buttons">
-                <input type="submit" name="previewArticle" th:value="${previewButtonText}" class="button"
-                       id="previewArticle" style/>
-                <input type="submit" name="submitNewThread" th:value="${postButtonText}" class="button"
-                       id="submitNewThread" style/>
+                <input th:if="${PREVIEW_BUTTON_IS_IMAGE}" type="image" name="previewArticle" th:src="${previewButtonText}" value="preview" class="button"
+                       id="previewArticle" />
+                <input th:unless="${PREVIEW_BUTTON_IS_IMAGE}" type="submit" name="previewArticle" th:value="${previewButtonText}" class="button"
+                       id="previewArticle" />
+
+                <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThread" th:src="${postMessageButtonText}" value="post_message" class="button"
+                       id="submitNewThread" />
+                <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="submit" name="submitNewThread" th:value="${postMessageButtonText}" class="button"
+                       id="submitNewThread" />
+
                 <input type="hidden" name="postpostarticle" value="1"/>
-                <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
-                       style/>
+
+                <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp" th:src="${returnButtonText}" value="return" class="button" id="returnToApp" />
+                <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp" />
             </div>
         </div>
 
