@@ -1,18 +1,11 @@
 package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.UserPermission;
-import io.github.shamrice.discapp.service.account.AccountService;
-import io.github.shamrice.discapp.service.application.ApplicationService;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,15 +23,14 @@ public class DiscAppUserPrincipal implements UserDetails {
     private static final String ROLE_SYSTEM = ROLE_PREFIX + "SYSTEM";
     private static final String ROLE_ROOT = ROLE_PREFIX + "ROOT";
 
-    private DiscAppUser user;
-    private boolean isRoot;
+    private final DiscAppUser user;
+    private final boolean isRoot;
+    private boolean isEditor;
 
-    private ApplicationService applicationService;
-
-    public DiscAppUserPrincipal(DiscAppUser user, boolean isRoot, ApplicationService applicationService) {
+     public DiscAppUserPrincipal(DiscAppUser user, boolean isRoot, boolean isEditor) {
         this.user = user;
         this.isRoot = isRoot;
-        this.applicationService = applicationService;
+        this.isEditor = isEditor;
     }
 
     @Override
@@ -47,7 +39,7 @@ public class DiscAppUserPrincipal implements UserDetails {
         if (user.getIsAdmin()) {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ADMIN));
             //admins are editors... maintenance filter decides what page they can view.
-            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_EDITOR));
+            isEditor = true;
         }
 
         if (user.getIsUserAccount()) {
@@ -56,19 +48,9 @@ public class DiscAppUserPrincipal implements UserDetails {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_SYSTEM));
         }
 
-        //check if user has any editor permissions on any apps. If so, give them the editor role.
-        List<UserPermission> userPermissions = applicationService.getAllApplicationPermissionsForUser(user.getId());
-        if (userPermissions != null && userPermissions.size() > 0) {
-            for (UserPermission permission : userPermissions) {
-                if (permission != null && permission.getUserPermissions() != null && !permission.getUserPermissions().isEmpty()) {
-                    if (permission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT)) {
-                        grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_EDITOR));
-                        log.info("Logged in user id: " + user.getId() + " editor permissions found in appId: "
-                                + permission.getApplicationId() + ". Granting ROLE_EDITOR.");
-                        break;
-                    }
-                }
-            }
+        //set editor permissions if needed.
+        if (isEditor) {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_EDITOR));
         }
 
         //give root access to configured account. Don't store email address in db in case db gets compromised.
