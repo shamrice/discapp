@@ -1,7 +1,9 @@
 package io.github.shamrice.discapp.service.sitemap;
 
+import io.github.shamrice.discapp.data.model.ApplicationPermission;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.data.repository.ThreadRepository;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,9 @@ public class SiteMapService {
     @Autowired
     private ThreadRepository threadRepository;
 
+    @Autowired
+    private ApplicationService applicationService;
+
     private static GenericSiteMap genericSiteMapCache = new GenericSiteMap();
 
     long cacheDuration = 900000L;
@@ -40,7 +45,7 @@ public class SiteMapService {
 
             List<GenericSiteMapItem> latestThreadItems = new ArrayList<>();
             Page<Thread> latestThreads = threadRepository.findAll(
-                    PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "modDt"))
+                    PageRequest.of(0, 200, Sort.by(Sort.Direction.DESC, "modDt"))
             );
 
             //Date time must be formatted to spec:
@@ -50,11 +55,19 @@ public class SiteMapService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
             latestThreads.forEach((thread) -> {
-                latestThreadItems.add(new GenericSiteMapItem(
-                        "/Indices/" + thread.getApplicationId() + ".html",
-                        "/discussion.cgi?disc=" + thread.getApplicationId() + "&article=" + thread.getId(),
-                        dateFormat.format(thread.getModDt())
-                ));
+                //don't include sites that requested to block search engines.
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(thread.getApplicationId());
+                if (applicationPermission == null || applicationPermission.getBlockSearchEngines() != null && !applicationPermission.getBlockSearchEngines()) {
+
+                    latestThreadItems.add(new GenericSiteMapItem(
+                            "/Indices/" + thread.getApplicationId() + ".html",
+                            "/discussion.cgi?disc=" + thread.getApplicationId() + "&article=" + thread.getId(),
+                            dateFormat.format(thread.getModDt())
+                    ));
+                } else {
+                    log.info("Application id: " + thread.getApplicationId()
+                            + " has block search engines config set to true. Excluding from generic site map.");
+                }
             });
 
             genericSiteMapCache.setGenericSiteMapItems(latestThreadItems);
