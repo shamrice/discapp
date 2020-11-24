@@ -82,6 +82,7 @@ VALUES (0, 'filter.badwords.list', '');
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'robots.txt.contents', 'Sitemap: https://nediscapp.herokuapp.com/Sitemaps/forums.xml
 Sitemap: https://nediscapp.herokuapp.com/Sitemaps/articles.xml
+Sitemap: https://nediscapp.herokuapp.com/sitemap.xml
 
 User-agent: *
 Disallow: /test
