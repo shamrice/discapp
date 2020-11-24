@@ -8,6 +8,7 @@ import io.github.shamrice.discapp.service.thread.UserReadThreadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.REPLY_BUTTON_IS_IMAGE;
 
 @Component
 @Slf4j
@@ -31,6 +35,60 @@ public class DiscAppHelper {
 
     @Autowired
     private UserReadThreadService userReadThreadService;
+
+    public void setButtonModelAttributes(long appId, Model model) {
+
+        //post message button.
+        String postMessageButtonText = configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message");
+        model.addAttribute(POST_MESSAGE_BUTTON_TEXT, postMessageButtonText);
+
+        if (postMessageButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(POST_MESSAGE_BUTTON_IS_IMAGE, true);
+        }
+
+        String previousButtonText = configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page");
+        model.addAttribute(PREVIOUS_PAGE_BUTTON_TEXT, previousButtonText);
+
+        if (previousButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(PREVIOUS_PAGE_BUTTON_IS_IMAGE, true);
+        }
+
+        String nextButtonText = configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page");
+        model.addAttribute(NEXT_PAGE_BUTTON_TEXT, nextButtonText);
+
+        if (nextButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(NEXT_PAGE_BUTTON_IS_IMAGE, true);
+        }
+
+        String previewButtonText = configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview");
+        model.addAttribute(PREVIEW_BUTTON_TEXT, previewButtonText);
+
+        if (previewButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(PREVIEW_BUTTON_IS_IMAGE, true);
+        }
+
+        String returnButtonText = configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages");
+        model.addAttribute(RETURN_BUTTON_TEXT, returnButtonText);
+
+        if (returnButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(RETURN_BUTTON_IS_IMAGE, true);
+        }
+
+        String editButtonText = configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message");
+        model.addAttribute(EDIT_BUTTON_TEXT, editButtonText);
+
+        if (editButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(EDIT_BUTTON_IS_IMAGE, true);
+        }
+
+        String replyButtonText = configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply");
+        model.addAttribute(REPLY_BUTTON_TEXT, replyButtonText);
+
+        if (replyButtonText.toLowerCase().startsWith("http")) {
+            model.addAttribute(REPLY_BUTTON_IS_IMAGE, true);
+        }
+    }
+
 
     public String getAppViewTopThreadHtml(ThreadTreeNode currentNode, String entryBreakString,
                                            boolean showPreviewText, int currentPage, int maxPreviewLength, String[] readThreads) {
@@ -196,6 +254,9 @@ public class DiscAppHelper {
                 String previewText = currentNode.getCurrent().getBody();
                 if (previewText != null && !previewText.isEmpty()) {
 
+                    //remove any css style tags or script tags from preview and the content inside the tags.
+                    previewText = previewText.replaceAll("(?i)<style.+?</style>", "");
+                    previewText = previewText.replaceAll("(?i)<script.+?</script>", "");
                     previewText = inputHelper.sanitizeInput(previewText); //clear HTML from preview thread body
 
                     if (previewText.length() > maxPreviewLength) {

@@ -6,11 +6,10 @@
         <description></description>
         <item th:if="${not #lists.isEmpty(rssViewModel.getRssItems())}" th:each="item : ${rssViewModel.getRssItems()}">
             <title th:text="${item.getTitle()}"></title>
-            <link th:text="${item.getLink()}" />
+            <link th:text="${item.getLink()}"/>
             <guid th:text="${item.getLink()}"></guid>
             <pubDate th:text="${item.getPubDate()}"></pubDate>
             <description th:text="${item.getDescription()}"></description>
         </item>
-
     </channel>
 </rss>

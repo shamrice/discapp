@@ -1,16 +1,11 @@
 package io.github.shamrice.discapp.service.account.principal;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.service.application.ApplicationService;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,15 +19,18 @@ public class DiscAppUserPrincipal implements UserDetails {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final String ROLE_ADMIN = ROLE_PREFIX + "ADMIN";
     private static final String ROLE_USER = ROLE_PREFIX + "USER";
+    private static final String ROLE_EDITOR = ROLE_PREFIX + "EDITOR";
     private static final String ROLE_SYSTEM = ROLE_PREFIX + "SYSTEM";
     private static final String ROLE_ROOT = ROLE_PREFIX + "ROOT";
 
-    private DiscAppUser user;
-    private boolean isRoot;
+    private final DiscAppUser user;
+    private final boolean isRoot;
+    private boolean isEditor;
 
-    public DiscAppUserPrincipal(DiscAppUser user, boolean isRoot) {
+     public DiscAppUserPrincipal(DiscAppUser user, boolean isRoot, boolean isEditor) {
         this.user = user;
         this.isRoot = isRoot;
+        this.isEditor = isEditor;
     }
 
     @Override
@@ -40,12 +38,19 @@ public class DiscAppUserPrincipal implements UserDetails {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         if (user.getIsAdmin()) {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_ADMIN));
+            //admins are editors... maintenance filter decides what page they can view.
+            isEditor = true;
         }
 
         if (user.getIsUserAccount()) {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_USER));
         } else {
             grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_SYSTEM));
+        }
+
+        //set editor permissions if needed.
+        if (isEditor) {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_EDITOR));
         }
 
         //give root access to configured account. Don't store email address in db in case db gets compromised.

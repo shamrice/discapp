@@ -34,7 +34,8 @@
             <div class="buttons">
                 <form method="GET" th:action="@{|/indices/${appId}#${parentThreadId}|}" enctype="multipart/form-data" action="submit">
                     <input type="hidden" name="page" th:value="${currentPage}"/>
-                    <input type="submit" th:value="${returnButtonText}" class="button" id="returnToApp"/>
+                    <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" th:src="${returnButtonText}" th:value="${returnButtonText}" class="button" id="returnToApp"/>
+                    <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" th:value="${returnButtonText}" class="button" id="returnToApp"/>
                 </form>
             </div>
             <div style="clear:left;"></div>

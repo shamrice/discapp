@@ -1,11 +1,13 @@
 package io.github.shamrice.discapp.service.account;
 
 import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.data.model.UserPermission;
 import io.github.shamrice.discapp.data.model.UserRegistration;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.data.repository.UserRegistrationRepository;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
+import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
@@ -40,6 +42,10 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ApplicationService applicationService;
+
 
     @Value("${discapp.root.email}")
     private String rootAccountEmail;
@@ -79,8 +85,24 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             isRoot = rootAccountEmail.equalsIgnoreCase(user.getEmail());
         }
 
+        boolean isEditor = false;
+        //check if user has any editor permissions on any apps. If so, give them the editor role.
+        List<UserPermission> userPermissions = applicationService.getAllApplicationPermissionsForUser(user.getId());
+        if (userPermissions != null && userPermissions.size() > 0) {
+            for (UserPermission permission : userPermissions) {
+                if (permission != null && permission.getUserPermissions() != null && !permission.getUserPermissions().isEmpty()) {
+                    if (permission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT)) {
+                        isEditor = true;
+                        log.info("Logged in user id: " + user.getId() + " editor permissions found in appId: "
+                                + permission.getApplicationId() + ". Granting ROLE_EDITOR.");
+                        break;
+                    }
+                }
+            }
+        }
+
         //principal is returned back and verified by "spring magic"
-        return new DiscAppUserPrincipal(user, isRoot);
+        return new DiscAppUserPrincipal(user, isRoot, isEditor);
     }
 
     public List<DiscAppUser> searchByUsername(String searchTerm, boolean searchUserAccounts) {

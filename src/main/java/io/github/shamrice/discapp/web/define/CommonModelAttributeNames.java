@@ -57,6 +57,14 @@ public class CommonModelAttributeNames {
     public static final String NEXT_PAGE_BUTTON_TEXT = "nextPageButtonText";
     public static final String PREVIOUS_PAGE_BUTTON_TEXT = "previousPageButtonText";
 
+    public static final String POST_MESSAGE_BUTTON_IS_IMAGE = "POST_MESSAGE_BUTTON_IS_IMAGE";
+    public static final String PREVIOUS_PAGE_BUTTON_IS_IMAGE = "PREVIOUS_PAGE_BUTTON_IS_IMAGE";
+    public static final String NEXT_PAGE_BUTTON_IS_IMAGE = "NEXT_PAGE_BUTTON_IS_IMAGE";
+    public static final String PREVIEW_BUTTON_IS_IMAGE = "PREVIEW_BUTTON_IS_IMAGE";
+    public static final String REPLY_BUTTON_IS_IMAGE = "REPLY_BUTTON_IS_IMAGE";
+    public static final String RETURN_BUTTON_IS_IMAGE = "RETURN_BUTTON_IS_IMAGE";
+    public static final String EDIT_BUTTON_IS_IMAGE = "EDIT_BUTTON_IS_IMAGE";
+
     public static final String HEADER_TEXT = "headerText";
     public static final String FOOTER_TEXT = "footerText";
     public static final String THREAD_SEPARATOR = "threadSeparator";

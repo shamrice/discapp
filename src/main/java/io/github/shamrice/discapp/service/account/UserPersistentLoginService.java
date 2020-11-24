@@ -35,7 +35,7 @@ public class UserPersistentLoginService implements PersistentTokenRepository {
                 persistentLogin.setLastUsed(persistentRememberMeToken.getDate());
 
                 userPersistentLoginRepository.save(persistentLogin);
-                log.info("Created new persistent login for user: " + user.getEmail() + " :: " + persistentLogin.toString());
+                log.info("Created new persistent login for User Id: " + user.getId());
             }
         }
     }

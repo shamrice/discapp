@@ -53,9 +53,7 @@ public class AppearancePreviewController extends MaintenanceController {
                 model.addAttribute(PROLOGUE_TEXT, applicationService.getPrologueText(app.getId()));
                 model.addAttribute(EPILOGUE_TEXT, applicationService.getEpilogueText(app.getId()));
 
-                model.addAttribute(POST_MESSAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-                model.addAttribute(NEXT_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
-                model.addAttribute(PREVIOUS_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
+                discAppHelper.setButtonModelAttributes(app.getId(), model);
 
                 model.addAttribute(HAS_PREVIOUS_PAGE, true);
                 model.addAttribute(PREVIOUS_PAGE, 2);

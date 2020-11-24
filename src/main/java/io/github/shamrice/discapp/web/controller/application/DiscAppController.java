@@ -122,8 +122,9 @@ public class DiscAppController {
                 model.addAttribute(APP_NAME, app.getName());
                 model.addAttribute(APP_ID, app.getId());
                 model.addAttribute(PARENT_THREAD_ID, parentId);
-                model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
                 model.addAttribute("holdMessageText", configurationService.getStringValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_POST_MESSAGE_TEXT, "Your message will be posted once it has been approved by a moderator."));
+
+                discAppHelper.setButtonModelAttributes(appId, model);
 
                 return new ModelAndView("indices/createThreadHold");
             }
@@ -171,9 +172,7 @@ public class DiscAppController {
                 model.addAttribute(PROLOGUE_TEXT, applicationService.getPrologueText(app.getId()));
                 model.addAttribute(EPILOGUE_TEXT, applicationService.getEpilogueText(app.getId()));
 
-                model.addAttribute(POST_MESSAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-                model.addAttribute(NEXT_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.NEXT_PAGE_BUTTON_TEXT, "Next Page"));
-                model.addAttribute(PREVIOUS_PAGE_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIOUS_PAGE_BUTTON_TEXT, "Previous Page"));
+                discAppHelper.setButtonModelAttributes(appId, model);
 
                 if (page == null) {
                     page = 0;
@@ -438,14 +437,13 @@ public class DiscAppController {
         model.addAttribute(EMAIL_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.EMAIL_LABEL_TEXT, "Email:"));
         model.addAttribute(SUBJECT_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.SUBJECT_LABEL_TEXT, "Subject:"));
         model.addAttribute(BODY_LABEL, configurationService.getStringValue(appId, ConfigurationProperty.THREAD_BODY_LABEL_TEXT, "Message Text:"));
-        model.addAttribute(PREVIEW_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.PREVIEW_BUTTON_TEXT, "Preview"));
-        model.addAttribute(POST_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-        model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
         model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
         model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
         model.addAttribute(HEADER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.HEADER_TEXT, ""));
         model.addAttribute(FOOTER_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.FOOTER_TEXT, ""));
+
+        discAppHelper.setButtonModelAttributes(appId, model);
 
         return new ModelAndView("indices/createThread");
     }
@@ -466,10 +464,8 @@ public class DiscAppController {
         }
         newThreadViewModel.setHtmlBody(htmlBody);
 
+        discAppHelper.setButtonModelAttributes(appId, model);
 
-        model.addAttribute(EDIT_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.EDIT_BUTTON_TEXT, "Edit Message"));
-        model.addAttribute(POST_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_MESSAGE_BUTTON_TEXT, "Post Message"));
-        model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
         model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
         model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
@@ -488,7 +484,7 @@ public class DiscAppController {
                                       HttpServletResponse response) {
         if (newThreadViewModel != null) {
 
-            if (newThreadViewModel.getReturnToApp() != null && !newThreadViewModel.getReturnToApp().isEmpty()) {
+            if (newThreadViewModel.getReturnToApp() != null) {
                 log.info("Return to app button clicked for app id " + appId + ". Value=" + newThreadViewModel.getReturnToApp());
 
                 if (newThreadViewModel.getCurrentPage() != null && newThreadViewModel.getCurrentPage() > 0) {
@@ -497,10 +493,10 @@ public class DiscAppController {
                 }
                 return new ModelAndView("redirect:/indices/" + appId);
 
-            } else if (newThreadViewModel.getPreviewArticle() != null && !newThreadViewModel.getPreviewArticle().isEmpty()) {
+            } else if (newThreadViewModel.getPreviewArticle() != null) {
                 return postPreviewThread(appId, newThreadViewModel, model);
 
-            } else if (newThreadViewModel.getSubmitNewThread() != null && !newThreadViewModel.getSubmitNewThread().isEmpty()) {
+            } else if (newThreadViewModel.getSubmitNewThread() != null) {
 
                 int page = 0;
                 if (newThreadViewModel.getCurrentPage() != null && newThreadViewModel.getCurrentPage() > 0) {
@@ -810,8 +806,8 @@ public class DiscAppController {
             model.addAttribute("threadViewModel", threadViewModel);
             model.addAttribute(SUB_THREADS_HTML, subThreadsHtml);
 
-            model.addAttribute(REPLY_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.POST_REPLY_MESSAGE_BUTTON_TEXT, "Post Reply"));
-            model.addAttribute(RETURN_BUTTON_TEXT, configurationService.getStringValue(appId, ConfigurationProperty.RETURN_TO_MESSAGES_BUTTON_TEXT, "Return to Messages"));
+            discAppHelper.setButtonModelAttributes(appId, model);
+
             model.addAttribute(FAVICON_URL, configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
             model.addAttribute(STYLE_SHEET_URL, configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_URL, "/styles/disc_" + appId + ".css"));
 
@@ -840,7 +836,7 @@ public class DiscAppController {
                                            HttpServletResponse response,
                                            Model model) {
         if (threadViewModel != null) {
-            if (threadViewModel.getReturnToApp() != null && !threadViewModel.getReturnToApp().isEmpty()) {
+            if (threadViewModel.getReturnToApp() != null) {
                 int currentPage = 0;
                 if (threadViewModel.getCurrentPage() != null && threadViewModel.getCurrentPage() > 0) {
                     currentPage = threadViewModel.getCurrentPage();
@@ -849,14 +845,14 @@ public class DiscAppController {
                 log.info("Return to app button clicked for app id " + appId + ". Value=" + threadViewModel.getReturnToApp());
                 return new ModelAndView("redirect:/indices/" + appId + "?page=" + currentPage + "#" + threadViewModel.getId());
 
-            } else if (threadViewModel.getPostResponse() != null && !threadViewModel.getPostResponse().isEmpty()) {
+            } else if (threadViewModel.getPostResponse() != null) {
 
                 //make sure user has reply permissions before allowing reply to be created.
                 if (!accountHelper.checkUserHasPermission(appId, UserPermission.REPLY)) {
                     return errorController.getPermissionDeniedView("", model);
                 }
 
-                log.info("new reply appId: " + threadViewModel.getAppId() + " parent id : " + threadViewModel.getId()
+                log.info("new reply started to appId: " + appId + " thread id : " + threadViewModel.getId()
                         + " submitter: " + threadViewModel.getSubmitter() + " : subject: "
                         + threadViewModel.getSubject() + " : email: " + threadViewModel.getEmail()
                         + " : body: " + threadViewModel.getBody());
@@ -1035,7 +1031,5 @@ public class DiscAppController {
 
         return currentHtml;
     }
-
-
 
 }

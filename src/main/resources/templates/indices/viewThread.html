@@ -85,9 +85,14 @@
                     <input type="hidden" name="body" th:value="${threadViewModel.getBody()}"/>
                     <input type="hidden" name="currentPage" th:value="${threadViewModel.getCurrentPage()}"/>
 
-                    <input th:unless="${REPLY_DISABLED}" type="submit" name="postResponse" th:value="${replyButtonText}" class="button" id="postResponse"
+                    <input th:if="not ${REPLY_DISABLED} and ${REPLY_BUTTON_IS_IMAGE}" type="image" name="postResponse" th:src="${replyButtonText}" th:value="${replyButtonText}" class="button" id="postResponse"
                            style="float:left;"/>
-                    <input type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
+                    <input th:if="not ${REPLY_DISABLED} and not ${REPLY_BUTTON_IS_IMAGE}" type="submit" name="postResponse" th:value="${replyButtonText}" class="button" id="postResponse"
+                           style="float:left;"/>
+
+                    <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp" th:src="${returnButtonText}" th:value="${returnButtonText}" class="button" id="returnToApp"
+                           style="float:left;"/>
+                    <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
                            style="float:left;"/>
                 </form>
             </div>

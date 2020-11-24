@@ -31,7 +31,8 @@
     </div>
 
     <div id="post_button" style="text-align:center; margin-top:1em;">
-        <input type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle" style/>
+        <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}"  type="image" class="button" th:src="${postMessageButtonText}" th:value="${postMessageButtonText}" id="postarticle"/>
+        <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="submit" class="button" th:value="${postMessageButtonText}" id="postarticle"/>
     </div>
 
     <div th:if="${isExpandOnIndex}">
@@ -95,9 +96,11 @@
 
     <div id="navigation_buttons" style="text-align:center; margin-top:1em;">
 
-        <input type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
+        <input th:if="${PREVIOUS_PAGE_BUTTON_IS_IMAGE}" type="image" class="button" th:src="${previousPageButtonText}" th:value="${previousPageButtonText}" id="previousPage"/>
+        <input th:unless="${PREVIOUS_PAGE_BUTTON_IS_IMAGE}" type="submit" class="button" th:value="${previousPageButtonText}" id="previousPage"/>
 
-        <input type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
+        <input th:if="${NEXT_PAGE_BUTTON_IS_IMAGE}" type="image" class="button" th:src="${nextPageButtonText}"  th:value="${nextPageButtonText}" id="nextPage"/>
+        <input th:unless="${NEXT_PAGE_BUTTON_IS_IMAGE}" type="submit" class="button" th:value="${nextPageButtonText}" id="nextPage"/>
 
     </div>
 

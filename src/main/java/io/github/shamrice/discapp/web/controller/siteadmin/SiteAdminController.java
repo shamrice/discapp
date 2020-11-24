@@ -510,7 +510,9 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminUpdateEdit(@RequestParam(name = "id") long updateId, SiteAdminUpdateViewModel model) {
         SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(updateId);
 
-        String updatePlainText = removeHtmlFromUpdateBody(siteUpdateLog.getMessage());
+        String updatePlainText = siteUpdateLog.getMessage();
+        //convert new line HTML tags to actual new lines in the text box.
+        updatePlainText = updatePlainText.replaceAll("<br />", "\r");
 
         model.setEditUpdateId(siteUpdateLog.getId());
         model.setEditUpdateSubject(siteUpdateLog.getSubject());
@@ -531,7 +533,9 @@ public class SiteAdminController {
                     return new ModelAndView("site_admin/updateEdit", "siteAdminUpdateViewModel", model);
                 } else {
 
-                    String body = addHtmlToUpdateBody(model.getEditUpdateText());
+                    //convert new lines to html <br /> tags.
+                    String body = model.getEditUpdateText();
+                    body = body.replaceAll("\r", "<br />");
 
                     siteUpdateLog.setSubject(model.getEditUpdateSubject());
                     siteUpdateLog.setMessage(body);

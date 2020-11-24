@@ -9,6 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApplicationSubscriptionModel {
 
+    private String errorMessage;
+    private String reCaptchaResponse;
+
     private String subscriptionEmailTextBoxLabel;
     private String subscribeButtonText;
     private String returnToApplicationText;

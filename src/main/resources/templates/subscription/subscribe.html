@@ -6,16 +6,45 @@
     <link rel="stylesheet" type="text/css" th:href="${applicationSubscriptionModel.getApplicationStyleSheetUrl()}"/>
     <link rel="shortcut icon" th:href="${applicationSubscriptionModel.getApplicationFaviconUrl()}" type="image/x-icon">
     <link rel="icon" th:href="${applicationSubscriptionModel.getApplicationFaviconUrl()}"  type="image/x-icon">
+
+    <script type="text/javascript">
+      var onloadCallback = function() {
+        grecaptcha.render('html_element', {
+          'sitekey' : '6Lcy7LcUAAAAAEX5j1QoCUpgM3tViv6oHdUCBkTV'
+        });
+      };
+
+    function validateReCaptcha() {
+        var response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            alert('ReCaptcha is not valid.');
+            return false;
+        } else {
+            document.getElementById("reCaptchaResponse").value = response;
+            return true;
+        }
+    }
+    </script>
 </head>
 <body>
 
+    <div th:if="${applicationSubscriptionModel.getErrorMessage()}"
+         style="margin:auto;width:30em;color:red;font-weight:bolder;"
+         th:text="${applicationSubscriptionModel.getErrorMessage()}">
+    </div>
+
     <form method="post" th:action="@{|/disc-list-subscribe.cgi?id=${applicationSubscriptionModel.getApplicationId()}|}"
-          enctype="application/x-www-form-urlencoded" th:object="${applicationSubscriptionModel}">
+          enctype="application/x-www-form-urlencoded" th:object="${applicationSubscriptionModel}"
+          onsubmit="return validateReCaptcha();">
+        <input type="hidden" id="reCaptchaResponse" name="reCaptchaResponse">
         <div style="width:30em; margin:auto; margin-top:5%; margin-bottom:2%">
 
             [[${applicationSubscriptionModel.getSubscriptionEmailTextBoxLabel()}]]
 
             <input type="email" name="email" th:value="${applicationSubscriptionModel.getEmail()}" size="40" />
+            <br />
+            <div id="html_element" style="display:inline-block;padding:15px;"></div>
+            <br />
             <input type="submit" name="Subscribe" th:value="${applicationSubscriptionModel.getSubscribeButtonText()}" />
         </div>
         <p style="margin:2em;">
@@ -32,6 +61,9 @@
         <div></div>
     </form>
 
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+            async defer>
+    </script>
 
 </body>
 </html>
