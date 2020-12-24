@@ -23,12 +23,12 @@ public class CustomStyleSheetController {
 
 
     @RequestMapping(value = CUSTOM_CSS_URL_PREFIX + "{appId}" + CUSTOM_CSS_URL_SUFFIX,
-            method = RequestMethod.GET, produces = "text/plain")
+            method = RequestMethod.GET, produces = "text/css")
     public String getCustomCss(@PathVariable(name = "appId") Long appId,
                                Model model,
                                HttpServletResponse response) {
 
-        response.setContentType("text/plain");
+        response.setContentType("text/css");
         response.setCharacterEncoding("UTF-8");
         String cssContents = configurationService.getStringValue(appId, ConfigurationProperty.STYLE_SHEET_CUSTOM_CONFIGURATION, "");
         model.addAttribute("cssContents", cssContents);
