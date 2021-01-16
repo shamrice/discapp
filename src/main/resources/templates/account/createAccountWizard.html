@@ -67,7 +67,7 @@
                 </td>
                 <td>
                     <input type="text" id="ownerFirstName" name="ownerFirstName"
-                           th:value="${accountViewModel.getOwnerFirstName()}"/>
+                           th:value="${accountViewModel.getOwnerFirstName()}" maxlength="200"/>
                 </td>
             </tr>
             <tr>
@@ -76,7 +76,7 @@
                 </td>
                 <td>
                     <input type="text" id="ownerLastName" name="ownerLastName"
-                           th:value="${accountViewModel.getOwnerLastName()}"/>
+                           th:value="${accountViewModel.getOwnerLastName()}" maxlength="200" />
                 </td>
             </tr>
 
@@ -113,7 +113,7 @@
                 </td>
                 <td>
                     <input type="text" id="applicationName" name="applicationName"
-                           th:value="${accountViewModel.getApplicationName()}"/>
+                           th:value="${accountViewModel.getApplicationName()}" maxlength="200"/>
                 </td>
             </tr>
             <tr>

@@ -121,6 +121,12 @@ public class AccountApplicationController extends AccountController {
 
                                 String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
+                                if (appName.length() > 255) {
+                                    log.warn("Attempted updated application name for id: " + app.getId()
+                                            + " was greater than 255. Shorting string to fit: " + appName);
+                                    appName = appName.substring(0, 255);
+                                }
+
                                 app.setName(appName);
                                 app.setModDt(new Date());
 
@@ -252,7 +258,6 @@ public class AccountApplicationController extends AccountController {
                         String ownerLastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
                         String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
-
                         if ((ownerFirstName == null || ownerFirstName.trim().isEmpty())
                                 || (ownerLastName == null || ownerLastName.trim().isEmpty()) ) {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
@@ -266,6 +271,24 @@ public class AccountApplicationController extends AccountController {
                                     + " attempted to create a new application without a name");
                             accountViewModel.setErrorMessage("Application name is required to create an application.");
                             return getAccountApplication(accountViewModel, modelMap);
+                        }
+
+                        //check string lengths and shorten them as needed.
+                        if (appName.length() > 255) {
+                            appName = appName.substring(0, 255);
+                            log.warn("Attempted new application name "
+                                    + " was greater than 255. Shorting string to fit: " + appName);
+                        }
+
+                        if (ownerFirstName.length() > 255) {
+                            ownerFirstName = ownerFirstName.substring(0, 255);
+                            log.warn("Attempted new owner first name "
+                                    + " was greater than 255. Shorting string to fit: " + ownerFirstName);
+                        }
+                        if (ownerLastName.length() > 255) {
+                            ownerLastName = ownerLastName.substring(0, 255);
+                            log.warn("Attempted new owner last name "
+                                    + " was greater than 255. Shorting string to fit: " + ownerLastName);
                         }
 
                         //check if owner already exists...
@@ -293,7 +316,6 @@ public class AccountApplicationController extends AccountController {
                                         + ". Please delete one or more apps to create a new one.");
                                 return getAccountApplication(accountViewModel, modelMap);
                             }
-
 
                             Application newApp = new Application();
                             newApp.setName(appName);

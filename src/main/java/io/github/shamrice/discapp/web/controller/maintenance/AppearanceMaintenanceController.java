@@ -211,11 +211,16 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
             if (user != null) {
                 Application app = applicationService.get(appId);
+                String updatedAppName = inputHelper.sanitizeInput(maintenanceViewModel.getApplicationName());
 
                 log.info("Updating application name of id: " + app.getId() + " from: "
-                        + maintenanceViewModel.getApplicationName() + " to: " + app.getName());
+                        + app.getName() + " to: " + updatedAppName);
 
-                String updatedAppName = inputHelper.sanitizeInput(maintenanceViewModel.getApplicationName());
+                if (updatedAppName.length() > 255) {
+                    log.warn("Attempted updated application name for id: " + app.getId()
+                            + " was greater than 255. Shorting string to fit: " + updatedAppName);
+                    updatedAppName = updatedAppName.substring(0, 255);
+                }
 
                 app.setName(updatedAppName);
                 app.setModDt(new Date());
