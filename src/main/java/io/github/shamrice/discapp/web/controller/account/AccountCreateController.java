@@ -3,6 +3,7 @@ package io.github.shamrice.discapp.web.controller.account;
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
+import io.github.shamrice.discapp.service.account.exception.RegistrationCodeRedeemedException;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
@@ -122,36 +123,44 @@ public class AccountCreateController extends AccountController {
                                             @RequestParam(name = "key") String registrationKey,
                                             ModelMap modelMap) {
 
-        if (discAppUserDetailsService.redeemNewUserRegistrationKey(email, registrationKey)) {
+        modelMap.addAttribute("adminEmail", configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, ""));
 
-            DiscAppUser user = discAppUserDetailsService.getByEmail(email);
-            if (user != null) {
+        try {
+            if (discAppUserDetailsService.redeemNewUserRegistrationKey(email, registrationKey)) {
 
-                //if owner id is not null, account was created with wizard and has application
-                //and owner that needs to be enabled as well.
-                if (user.getOwnerId() != null) {
-                    Owner owner = accountService.getOwnerById(user.getOwnerId());
-                    if (owner != null) {
-                        log.info("Enabling new account owner record for email: " + owner.getEmail());
-                        owner.setEnabled(true);
-                        owner.setModDt(new Date());
-                        accountService.saveOwner(owner);
+                DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+                if (user != null) {
 
-                        log.info("Enabling new account applications for email: " + user.getEmail() + " :: Owner Id: " + user.getOwnerId());
-                        List<Application> applicationList = applicationService.getByOwnerId(user.getOwnerId());
-                        for (Application application : applicationList) {
-                            application.setEnabled(true);
-                            application.setModDt(new Date());
-                            applicationService.save(application);
+                    //if owner id is not null, account was created with wizard and has application
+                    //and owner that needs to be enabled as well.
+                    if (user.getOwnerId() != null) {
+                        Owner owner = accountService.getOwnerById(user.getOwnerId());
+                        if (owner != null) {
+                            log.info("Enabling new account owner record for email: " + owner.getEmail());
+                            owner.setEnabled(true);
+                            owner.setModDt(new Date());
+                            accountService.saveOwner(owner);
+
+                            log.info("Enabling new account applications for email: " + user.getEmail() + " :: Owner Id: " + user.getOwnerId());
+                            List<Application> applicationList = applicationService.getByOwnerId(user.getOwnerId());
+                            for (Application application : applicationList) {
+                                application.setEnabled(true);
+                                application.setModDt(new Date());
+                                applicationService.save(application);
+                            }
                         }
                     }
                 }
-            }
 
-            modelMap.addAttribute("success", true);
-        } else {
-            modelMap.addAttribute("adminEmail", configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, ""));
+                modelMap.addAttribute("success", true);
+            } else {
+                modelMap.addAttribute("success", false);
+            }
+        } catch (RegistrationCodeRedeemedException ex) {
+            log.error("Registration failed for email: " + email + " and key: " + registrationKey
+                    + " :: Error: ", ex.getMessage(), ex);
             modelMap.addAttribute("success", false);
+            modelMap.addAttribute("isRedeemed", true);
         }
 
         return new ModelAndView("account/registration/redeem", "model", modelMap);

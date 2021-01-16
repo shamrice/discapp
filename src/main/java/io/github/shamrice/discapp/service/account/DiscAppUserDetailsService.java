@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.data.model.UserPermission;
 import io.github.shamrice.discapp.data.model.UserRegistration;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.data.repository.UserRegistrationRepository;
+import io.github.shamrice.discapp.service.account.exception.RegistrationCodeRedeemedException;
 import io.github.shamrice.discapp.service.account.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
@@ -193,8 +194,9 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     public void setLastLoginDateToNow(long userId) {
         try {
-            log.info("Setting last login date to now for userId: " + userId);
-            discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, new Date(), 0);
+            Date newLastLoginDate = new Date();
+            log.info("Setting last login date to " + newLastLoginDate.toString() + " for userId: " + userId);
+            discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, newLastLoginDate, 0);
         } catch (Exception ex) {
             log.error("Failed to set last log in date for userId: " + userId + " :: " + ex.getMessage(), ex);
         }
@@ -324,12 +326,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         EmailNotificationQueueService.addTemplateEmailToSend(newUserCreatedEmail);
     }
 
-    public boolean redeemNewUserRegistrationKey(String email, String registrationKey) {
+    public boolean redeemNewUserRegistrationKey(String email, String registrationKey) throws RegistrationCodeRedeemedException {
         UserRegistration userRegistration = userRegistrationRepository.findOneByEmailAndKey(email, registrationKey);
         if (userRegistration != null) {
             if (userRegistration.isRedeemed()) {
-                log.warn("User registration is already redeemed. Not redeeming again. Returning true");
-                return true;
+                log.warn("User registration is already redeemed. Not redeeming again. Throwing exception.");
+                throw new RegistrationCodeRedeemedException("Registration code has already been redeemed.");
             }
             DiscAppUser user = discappUserRepository.findByEmail(email);
             if (user != null) {
