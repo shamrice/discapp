@@ -5,7 +5,7 @@ public enum ConfigurationProperty {
     SUBMITTER_LABEL_TEXT ("label.submitter.text"),
     SUBJECT_LABEL_TEXT ("label.subject.text"),
     EMAIL_LABEL_TEXT ("label.email.text"),
-    DATE_LABEL_TEXT ("label.data.text"),
+    DATE_LABEL_TEXT ("label.date.text"),
     THREAD_BODY_LABEL_TEXT ("label.thread.body.text"),
     PREVIEW_BUTTON_TEXT ("button.preview.text"),
     EDIT_BUTTON_TEXT ("button.edit.text"),
