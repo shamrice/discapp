@@ -22,9 +22,6 @@ import java.util.regex.Pattern;
 @Component
 public class InputHelper {
 
-    private final Pattern stylePattern = Pattern.compile("(?i)<\\s*style.+?<\\s*/\\s*style\\s*>");
-    private final Pattern scriptPattern = Pattern.compile("(?i)<\\s*script.+?<\\s*/\\s*script\\s*>");
-
     @Autowired
     private ConfigurationService configurationService;
 
@@ -33,19 +30,15 @@ public class InputHelper {
     }
 
     public String convertScriptAndStyleTags(String text) {
-        if (stylePattern.matcher(text).find() || scriptPattern.matcher(text).find()) {
-            log.warn("Text contained a style or script tag. Converting all script or style tags in text: " + text);
-
-            return text.replaceAll("(?i)<\\s*script", "&lt;script")
-                    .replaceAll("(?i)<\\s*style", "&lt;style")
-                    .replaceAll("(?i)<\\s*/\\s*script\\s*>", "&lt;/script&gt;")
-                    .replaceAll("(?i)<\\s*/\\s*style\\s*>", "&lt;/style&gt;");
-        }
-        return text;
+        return text.replaceAll("(?i)<\\s*script", "&lt;script")
+                .replaceAll("(?i)<\\s*style", "&lt;style")
+                .replaceAll("(?i)<\\s*/\\s*script\\s*>", "&lt;/script&gt;")
+                .replaceAll("(?i)<\\s*/\\s*style\\s*>", "&lt;/style&gt;");
     }
 
     /**
      * Remove HTML via regex and trailing white spaces from text.
+     *
      * @param text Text to clean
      * @return Cleaned up text
      */
@@ -56,6 +49,7 @@ public class InputHelper {
     /**
      * Adds anchor HTML tags to the text supplied. Does not add anchors for ones only starting with www.
      * Source modified from: https://stackoverflow.com/questions/49425990/replace-url-in-text-with-href-in-java
+     *
      * @param text text to add anchors to
      * @return returns text with html anchor tags added where found.
      */
