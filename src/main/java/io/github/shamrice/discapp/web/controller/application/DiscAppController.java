@@ -570,17 +570,26 @@ public class DiscAppController {
                         submitter = inputHelper.convertHtmlToPlainText(submitter);
                         email = inputHelper.convertHtmlToPlainText(email);
                         subject = inputHelper.convertHtmlToPlainText(subject);
+                    } else {
+                        //remove css and script tags regardless of permissions.
+                        submitter = inputHelper.convertScriptAndStyleTags(submitter);
+                        email = inputHelper.convertScriptAndStyleTags(email);
+                        subject = inputHelper.convertScriptAndStyleTags(subject);
                     }
                     if (HtmlPermission.FORBID.equalsIgnoreCase(htmlPermissions)) {
                         body = inputHelper.convertHtmlToPlainText(body);
+                    } else {
+                        //remove css and script tags regardless of permissions.
+                        body = inputHelper.convertScriptAndStyleTags(body);
                     }
                 } else {
-                    //if no permissions exist (for some reason...) default to blocking in subject and submitter fields.
+                    //if no permissions exist (for some reason...) default to blocking all HTML.
                     log.warn("No application permissions exist for appId: " + appId
-                            + " defaulting to HTML permission: " + HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
+                            + " defaulting to HTML permission: " + HtmlPermission.FORBID);
                     submitter = inputHelper.convertHtmlToPlainText(submitter);
                     email = inputHelper.convertHtmlToPlainText(email);
                     subject = inputHelper.convertHtmlToPlainText(subject);
+                    body = inputHelper.convertHtmlToPlainText(body);
                 }
 
                 log.info("new thread: " + newThreadViewModel.getAppId() + " : " + submitter + " : "

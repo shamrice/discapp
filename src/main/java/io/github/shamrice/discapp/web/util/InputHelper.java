@@ -22,11 +22,26 @@ import java.util.regex.Pattern;
 @Component
 public class InputHelper {
 
+    private final Pattern stylePattern = Pattern.compile("(?i)<\\s*style.+?<\\s*/\\s*style\\s*>");
+    private final Pattern scriptPattern = Pattern.compile("(?i)<\\s*script.+?<\\s*/\\s*script\\s*>");
+
     @Autowired
     private ConfigurationService configurationService;
 
     public String convertHtmlToPlainText(String text) {
         return text.replace("<", "&lt;").replace(">", "&gt;").trim();
+    }
+
+    public String convertScriptAndStyleTags(String text) {
+        if (stylePattern.matcher(text).find() || scriptPattern.matcher(text).find()) {
+            log.warn("Text contained a style or script tag. Converting all script or style tags in text: " + text);
+
+            return text.replaceAll("(?i)<\\s*script", "&lt;script")
+                    .replaceAll("(?i)<\\s*style", "&lt;style")
+                    .replaceAll("(?i)<\\s*/\\s*script\\s*>", "&lt;/script&gt;")
+                    .replaceAll("(?i)<\\s*/\\s*style\\s*>", "&lt;/style&gt;");
+        }
+        return text;
     }
 
     /**

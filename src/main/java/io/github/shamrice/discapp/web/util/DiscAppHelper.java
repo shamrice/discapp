@@ -255,6 +255,7 @@ public class DiscAppHelper {
                 if (previewText != null && !previewText.isEmpty()) {
 
                     //remove any css style tags or script tags from preview and the content inside the tags.
+                    //TODO : can probably be removed as script and style tags are HTML encoded regardless of perms on thread creation.
                     previewText = previewText.replaceAll("(?i)<style.+?</style>", "");
                     previewText = previewText.replaceAll("(?i)<script.+?</script>", "");
                     previewText = inputHelper.sanitizeInput(previewText); //clear HTML from preview thread body
