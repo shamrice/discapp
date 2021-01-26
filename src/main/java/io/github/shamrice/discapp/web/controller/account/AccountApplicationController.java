@@ -4,6 +4,9 @@ import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
+import io.github.shamrice.discapp.web.define.url.AccountUrl;
+import io.github.shamrice.discapp.web.define.url.AppUrl;
+import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -15,13 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.url.AccountUrl.*;
-import static io.github.shamrice.discapp.web.define.url.AppUrl.APP_SEARCH_URL;
+import static io.github.shamrice.discapp.web.define.url.AppUrl.*;
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENANCE_PAGE;
 
 @Controller
@@ -366,6 +366,11 @@ public class AccountApplicationController extends AccountController {
                                 //save default configuration values for new app.
                                 configurationService.setDefaultConfigurationValuesForApplication(savedApp.getId());
                                 log.info("Created new owner id: " + savedOwner.getId() + " and new appId: " + savedApp.getId());
+
+                                //send new application information notification email
+                                String baseUrl = webHelper.getBaseUrl(request);
+                                applicationService.sendNewApplicationInfoEmail(user.getEmail(), newApp, baseUrl);
+
                                 accountViewModel.setInfoMessage("Successfully created new application.");
                                 return new ModelAndView("redirect:/account/application", "accountViewModel", accountViewModel);
 

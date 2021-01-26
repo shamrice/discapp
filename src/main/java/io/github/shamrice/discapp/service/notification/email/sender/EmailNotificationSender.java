@@ -1,7 +1,8 @@
-package io.github.shamrice.discapp.service.account.notification;
+package io.github.shamrice.discapp.service.notification.email.sender;
 
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.notification.NotificationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,9 +16,7 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class EmailNotificationService {
-
-    //todo : this has become disjointed from EmailNotificationQueueService
+public class EmailNotificationSender {
 
     @Autowired
     private JavaMailSender emailSender;
@@ -105,6 +104,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_SUBJECT_TEMPLATE, null);
             case REPLY_NOTIFICATION:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_SUBJECT_TEMPLATE, null);
+            case NEW_APP_INFO:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_APP_INFO_SUBJECT_TEMPLATE, null);
         }
 
         return null;
@@ -122,6 +123,8 @@ public class EmailNotificationService {
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_BODY_TEMPLATE, null);
             case REPLY_NOTIFICATION:
                 return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_REPLY_NOTIFICATION_BODY_TEMPLATE, null);
+            case NEW_APP_INFO:
+                return configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_NEW_APP_INFO_BODY_TEMPLATE, null);
         }
         return  null;
     }

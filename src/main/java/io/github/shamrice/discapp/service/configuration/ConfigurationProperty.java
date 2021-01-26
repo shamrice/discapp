@@ -89,7 +89,9 @@ public enum ConfigurationProperty {
     HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE("permissions.hold.message.post.display"),
     HOLD_PERMISSIONS_MESSAGE_TEXT("permissions.hold.message.text"),
     HOLD_PERMISSIONS_POST_MESSAGE_TEXT("permissions.hold.message.post.text"),
-    RSS_BEHAVIOR("rss.behavior");
+    RSS_BEHAVIOR("rss.behavior"),
+    EMAIL_NEW_APP_INFO_SUBJECT_TEMPLATE("email.notification.newapp.subject.template"),
+    EMAIL_NEW_APP_INFO_BODY_TEMPLATE("email.notification.newapp.body.template");
 
     private final String propName;
 

@@ -121,7 +121,7 @@ public class AccountCreateController extends AccountController {
     @GetMapping(ACCOUNT_USER_REGISTRATION)
     public ModelAndView getUserRegistration(@RequestParam(name = "email") String email,
                                             @RequestParam(name = "key") String registrationKey,
-                                            ModelMap modelMap) {
+                                            ModelMap modelMap, HttpServletRequest request) {
 
         modelMap.addAttribute("adminEmail", configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.EMAIL_ADMIN_ADDRESS, ""));
 
@@ -141,12 +141,17 @@ public class AccountCreateController extends AccountController {
                             owner.setModDt(new Date());
                             accountService.saveOwner(owner);
 
+                            String baseUrl = webHelper.getBaseUrl(request);
+
                             log.info("Enabling new account applications for email: " + user.getEmail() + " :: Owner Id: " + user.getOwnerId());
                             List<Application> applicationList = applicationService.getByOwnerId(user.getOwnerId());
                             for (Application application : applicationList) {
                                 application.setEnabled(true);
                                 application.setModDt(new Date());
                                 applicationService.save(application);
+
+                                //send new application information notification email
+                                applicationService.sendNewApplicationInfoEmail(user.getEmail(), application, baseUrl);
                             }
                         }
                     }
