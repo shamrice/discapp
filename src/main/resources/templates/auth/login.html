@@ -13,7 +13,7 @@
     <h1 id="banner">Login to Disc App Service</h1>
     <form name="f" th:action="@{/login}" method="post">
 
-        <div th:if="${param.error}" class="alert alert-error">
+        <div th:if="${param.error} and not ${param.admin}" class="alert alert-error">
             Invalid Username and Password
         </div>
 
@@ -76,6 +76,11 @@
 </div>
 
 <div th:if="${appId}" class="grey_box" style="width:32em;">
+
+    <div th:if="${param.error} and ${param.admin}" class="alert alert-error">
+        Login failed. Please try again.
+    </div>
+
     <form method="post" action="/login" enctype="multipart/form-data">
         <p style="text-align:center;">Or enter the admin password for this DiscussionApp-</p>
         <div>

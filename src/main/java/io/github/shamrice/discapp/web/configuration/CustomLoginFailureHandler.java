@@ -32,10 +32,19 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-
+        boolean isAdmin = false;
         String username = httpServletRequest.getParameter(USERNAME_REQUEST_PARAMETER);
         if (username != null && username.trim().length() > 0) {
             discAppUserDetailsService.incrementPasswordLastFailCount(username, webHelper.getBaseUrl(httpServletRequest));
+            if (!username.contains("@")) {
+                isAdmin = true; //system accounts don't contain "@" symbols.
+            }
+        }
+
+        if (isAdmin) {
+            logger.error("System account login failure: " + username);
+            httpServletResponse.sendRedirect(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_ERROR_PARAMETER + AuthenticationUrl.LOGIN_ADMIN_PARAMETER);
+            return;
         }
 
         if (e.getCause() != null && e.getCause() instanceof LockedException) {
