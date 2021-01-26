@@ -227,17 +227,20 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                             ConfigurationProperty.LOGIN_LOCK_DURATION_FAILED_AUTH,
                             300000);
 
-                    //todo : send this to email queue
+
                     Date lockedUntilDate = new Date(new Date().getTime() + lockDurationMills);
                     log.warn("User: " + email + " has passed maximum login attempts before account lock. Locking account until: " + lockedUntilDate.toString());
 
-                    Map<String, Object> templateParams = new HashMap<>();
-                    templateParams.put("ACCOUNT_EMAIL", email);
-                    templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
-                    templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
+                    //only send locked email to user accounts, not system accounts.
+                    if (user.getIsUserAccount()) {
+                        Map<String, Object> templateParams = new HashMap<>();
+                        templateParams.put("ACCOUNT_EMAIL", email);
+                        templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
+                        templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
 
-                    TemplateEmail accountLockedEmail = new TemplateEmail(email, NotificationType.ACCOUNT_LOCKED, templateParams, false);
-                    EmailNotificationQueueService.addTemplateEmailToSend(accountLockedEmail);
+                        TemplateEmail accountLockedEmail = new TemplateEmail(email, NotificationType.ACCOUNT_LOCKED, templateParams, false);
+                        EmailNotificationQueueService.addTemplateEmailToSend(accountLockedEmail);
+                    }
 
                     discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(
                             user.getId(),

@@ -43,7 +43,12 @@ public class CustomLoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
         if (isAdmin) {
             logger.error("System account login failure: " + username);
-            httpServletResponse.sendRedirect(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_ERROR_PARAMETER + AuthenticationUrl.LOGIN_ADMIN_PARAMETER);
+            if (e.getCause() != null && e.getCause() instanceof LockedException) {
+                logger.error("Account locked: " + username + " :: setting login error message to locked.");
+                httpServletResponse.sendRedirect(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_LOCKED_PARAMETER + AuthenticationUrl.LOGIN_ADMIN_PARAMETER);
+            } else {
+                httpServletResponse.sendRedirect(AuthenticationUrl.LOGIN + AuthenticationUrl.LOGIN_ERROR_PARAMETER + AuthenticationUrl.LOGIN_ADMIN_PARAMETER);
+            }
             return;
         }
 

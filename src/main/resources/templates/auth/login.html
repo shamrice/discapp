@@ -17,7 +17,7 @@
             Invalid Username and Password
         </div>
 
-        <div th:if="${param.locked}" class="alert alert-error">
+        <div th:if="${param.locked} and not ${param.admin}" class="alert alert-error">
             Account is currently locked due to too many authentication failures. Please try again in a few minutes.
         </div>
 
@@ -79,6 +79,10 @@
 
     <div th:if="${param.error} and ${param.admin}" class="alert alert-error">
         Login failed. Please try again.
+    </div>
+
+    <div th:if="${param.locked} and ${param.admin}" class="alert alert-error">
+        Account is currently locked due to too many authentication failures. Please try again in a few minutes.
     </div>
 
     <form method="post" action="/login" enctype="multipart/form-data">
