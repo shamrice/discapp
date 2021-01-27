@@ -41,6 +41,8 @@ public enum ConfigurationProperty {
     HEADER_TEXT ("page.header.text"),
     FOOTER_TEXT ("page.footer.text"),
     FAVICON_URL ("favicon.url"),
+    FAVICON_STYLE_SETTING("favicon.url.style"),
+    FAVICON_CUSTOM_URL("favicon.url.custom"),
     TIMEZONE_LOCATION ("timezone.location"),
     DATE_FORMAT_PATTERN ("date.format.pattern"),
     WIDGET_WIDTH ("widget.width"),

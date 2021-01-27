@@ -30,11 +30,19 @@
 
     .dataTable td { border: 1px solid; }
 
+
+
+
+
     </style>
     <script>
         function resizeIframe(obj) {
             obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
         }
+
+
+
+
     </script>
 </head>
 <body>
@@ -137,6 +145,10 @@
                 document.getElementById("styleSheetCustomInput").style.display = 'block';
 
             }
+
+
+
+
 
 
 
@@ -756,22 +768,112 @@
 </div>
 
 
-<div class="grey_box" th:if="${maintenanceViewModel.getApplicationId()}">
-    <form enctype="multipart/form-data"
-          method="post"
-          th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
-          th:object="${maintenanceViewModel}">
-        <input name="windowState" type="hidden" value=""/>
-        <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon URL</a>
-        <input maxlength="128" name="favicon" size="40" th:value="${maintenanceViewModel.getFavicon()}"
-               type="text"/>
-        <input class="button" name="ChangeFavicon" type="submit" value="Change Favicon"/>
-    </form>
+<div class="grey_box closed" id="favicon_configuration_closed" style="display:block;"
+     th:if="${maintenanceViewModel.getApplicationId()}">
+    <span class="toggle" onclick="switchElements('favicon_configuration_closed', 'favicon_configuration_open');"
+          title="Show favicon controls">Favicon +</span>
+</div>
+
+<div class="grey_box" id="favicon_configuration_open" style="display:none;"
+     th:if="${maintenanceViewModel.getApplicationId()}">
+
+    <div class="toggle" id="favicon_close_toggle">
+        <span class="toggle close"
+              onclick="switchElements('favicon_configuration_open', 'favicon_configuration_closed');"
+              title="Hide favicon controls">close</span>
+    </div>
+
+    <script type="text/javascript">
+            function setFaviconStyle(style) {
+                document.getElementById("faviconStyleSelected").value = style;
+            }
+
+            function displayFaviconUrlInput() {
+                document.getElementById("faviconUrlInput").style.display = 'block';
+                document.getElementById("faviconCustomFile").style.display = 'none';
+                setFaviconStyle("favicon-custom-url");
+            }
+
+            function displayFaviconCustomFile() {
+                document.getElementById("faviconUrlInput").style.display = 'none';
+                document.getElementById("faviconCustomFile").style.display = 'block';
+                setFaviconStyle("favicon-custom-file");
+            }
+    </script>
+    <table>
+        <tr>
+            <td>
+                <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon</a> Type:
+            </td>
+            <td>
+                <select class="button" name="faviconTypeSelected">
+
+                    <option onclick="displayFaviconUrlInput()" value="favicon-custom-url"
+                            th:selected="${maintenanceViewModel.isSelectedFaviconStyle('favicon-custom-url')}">Use
+                        Url
+                    </option>
+                    <option onclick="displayFaviconCustomFile()" value="favicon-custom-file"
+                            th:selected="${maintenanceViewModel.isSelectedFaviconStyle('favicon-custom-file')}">Use
+                        Uploaded File
+                    </option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div id="faviconUrlInput" style="display:none;">
+        <form method="post"
+              name="f"
+              th:action="@{|/admin/modify/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
+              th:object="${maintenanceViewModel}">
+            <input name="windowState" type="hidden" value=""/>
+            <input name="submittedFromDiv" type="hidden" value="favicon_configuration_open"/>
+            <input name="faviconStyleSelected" type="hidden"/>
+
+            Favicon URL:
+            <input maxlength="256" name="favicon" size="40" th:value="${maintenanceViewModel.getFavicon()}"
+                   type="text"/>
+            <table>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                        <input class="button" name="submit" type="submit" value="Save Favicon Settings">&nbsp;
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div id="faviconCustomFile" style="display:none;">
+        <form name="f"
+              th:action="@{|/admin/data/favicon?id=${maintenanceViewModel.getApplicationId()}|}"
+              method="post"
+              th:object="${maintenanceViewModel}"
+              enctype="multipart/form-data">
+
+            <div style="padding:15px;">
+                Current Uploaded File: [[${maintenanceViewModel.getFaviconFileName()}]]
+            </div>
+            <div>
+                <input type="file" class="button" id="uploadSourceFile" name="uploadSourceFile"/>
+                <br/><br/>
+                <input type="submit" name="uploadFaviconFile" value="Upload New Favicon File"
+                       class="button"/>
+                <input type="submit" name="reuseFaviconFile" value="Use Existing Uploaded File"
+                       class="button"/>
+                <input type="hidden" name="faviconFileName" th:value="${maintenanceViewModel.getFaviconFileName()}"/>
+                <input name="submittedFromDiv" type="hidden" value="favicon_configuration_open"/>
+                <input name="windowState" type="hidden" value=""/>
+            </div>
+        </form>
+    </div>
 </div>
 
 <input id="previousWindowStates" th:value="${maintenanceViewModel.getWindowState()}" type="hidden"/>
 <input id="previousSubmittedFromDiv" th:value="${maintenanceViewModel.getSubmittedFromDiv()}" type="hidden"/>
 <input id="previousCssChoice" th:value="${maintenanceViewModel.getStyleSheetSelected()}" type="hidden"/>
+<input id="previousFaviconChoice" th:value="${maintenanceViewModel.getFaviconStyleSelected()}" type="hidden"/>
 
 <script type="text/javascript">
 
@@ -821,12 +923,25 @@ function restoreWindowStates() {
             hideStyleSheetInput();
         }
     }
+
+    var faviconSelected = document.getElementById('previousFaviconChoice').value;
+    if (faviconSelected != "") {
+        if (faviconSelected == "favicon-custom-file") {
+            displayFaviconCustomFile();
+        } else {
+            displayFaviconUrlInput();
+        }
+    }
 }
 
 window.onload = function() {
     restoreWindowStates();
     parent.preview_iframe.location.reload();
 }
+
+
+
+
 </script>
 </body>
 </html>

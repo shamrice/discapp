@@ -1,29 +1,34 @@
 package io.github.shamrice.discapp.web.controller.maintenance;
 
-import io.github.shamrice.discapp.data.model.Application;
-import io.github.shamrice.discapp.data.model.DiscAppUser;
-import io.github.shamrice.discapp.data.model.Epilogue;
-import io.github.shamrice.discapp.data.model.Prologue;
+import io.github.shamrice.discapp.data.model.*;
+import io.github.shamrice.discapp.service.application.data.ApplicationFaviconService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
+import io.github.shamrice.discapp.web.model.maintenance.MaintenanceImportExportViewModel;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.UUID;
 
 @Controller
 @Slf4j
 public class AppearanceMaintenanceController extends MaintenanceController {
+
+    @Autowired
+    private ApplicationFaviconService applicationFaviconService;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-forms.cgi")
     public ModelAndView getAppearanceFormsView(@RequestParam(name = "id") long appId,
@@ -150,8 +155,23 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             maintenanceViewModel.setReplyButton(replyButton);
 
             //favicon config
-            String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_URL, "/favicon.ico");
+            String favicon = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_CUSTOM_URL, "/favicon.ico");
             maintenanceViewModel.setFavicon(favicon);
+
+            String faviconStyle = configurationService.getStringValue(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-url");
+            if ("favicon-custom-url".equalsIgnoreCase(faviconStyle)) {
+                maintenanceViewModel.setFaviconStyleSelected("favicon-custom-url");
+            } else if ("favicon-custom-file".equalsIgnoreCase(faviconStyle)) {
+                maintenanceViewModel.setFaviconStyleSelected("favicon-custom-file");
+            }
+
+            //set favicon file name if exists.
+            ApplicationFavicon applicationFavicon = applicationFaviconService.getFaviconData(app.getId());
+            if (applicationFavicon != null) {
+                maintenanceViewModel.setFaviconFileName(applicationFavicon.getFileName());
+            } else {
+                maintenanceViewModel.setFaviconFileName("No file exists.");
+            }
 
             //hold permissions config
             boolean displayPostHoldMessage = configurationService.getBooleanValue(appId, ConfigurationProperty.HOLD_PERMISSIONS_DISPLAY_MESSAGE, true);
@@ -485,6 +505,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         if (!configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
             maintenanceViewModel.setInfoMessage("Failed to update Favicon.");
         } else {
+            configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-url");
+            configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_CUSTOM_URL, favicon);
+
             maintenanceViewModel.setFavicon(favicon);
             maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
         }
@@ -493,11 +516,73 @@ public class AppearanceMaintenanceController extends MaintenanceController {
     }
 
 
+
+    @PostMapping(CONTROLLER_URL_DIRECTORY + "data/favicon")
+    public ModelAndView postFaviconFile(@RequestParam(name = "id") long appId,
+                                        @RequestParam("uploadSourceFile") MultipartFile uploadSourceFile,
+                                        @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                        Model model,
+                                        HttpServletResponse response) {
+        try {
+            Application app = applicationService.get(appId);
+            String username = accountHelper.getLoggedInEmail();
+            setCommonModelAttributes(model, app, username);
+
+            if (maintenanceViewModel.getReuseFaviconFile() != null) {
+                log.info("Reusing existing uploaded favicon file. Just setting style and active config values for appId: " + appId);
+                boolean styleSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-file");
+                boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, "/favicon/" + appId + "/" + maintenanceViewModel.getFaviconFileName());
+
+                if (styleSave && activeSave) {
+                    maintenanceViewModel.setInfoMessage("Successfully set favicon for application to: " + maintenanceViewModel.getFaviconFileName());
+                } else {
+                    maintenanceViewModel.setInfoMessage("Failed to set favicon to uploaded file. Please try again.");
+                }
+                return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
+            }
+
+            if (uploadSourceFile == null || uploadSourceFile.isEmpty() || uploadSourceFile.getSize() > 655360) {
+                maintenanceViewModel.setInfoMessage("Favicon could not be uploaded. File is not valid. Please make sure file is less than 640KB");
+                return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
+            }
+
+            String fileName = uploadSourceFile.getOriginalFilename();
+            if (fileName == null || (
+                    !fileName.toLowerCase().contains(".ico")
+                    && !fileName.toLowerCase().contains(".png")
+                    && !fileName.toLowerCase().contains(".gif")
+                    && !fileName.toLowerCase().contains(".jpeg")
+                    && !fileName.toLowerCase().contains(".jpg")
+                    && !fileName.toLowerCase().contains(".apng")
+                    && !fileName.toLowerCase().contains(".svg")
+            )) {
+                maintenanceViewModel.setInfoMessage("Favicon file selected is not a valid favicon file type.");
+                return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
+            }
+
+            if (applicationFaviconService.saveFaviconData(app.getId(), fileName, uploadSourceFile.getBytes())) {
+                configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-file");
+                boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, "/favicon/" + appId + "/" + fileName);
+                log.info("Favicon for appId: " + app.getId() + " saved successfully.");
+                maintenanceViewModel.setInfoMessage(
+                        "Favicon file set successfully to " + fileName);
+
+            } else {
+                maintenanceViewModel.setInfoMessage("Failed to upload favicon file. Please try again.");
+            }
+
+
+        } catch (Exception ex) {
+            log.error("Error posting favicon for appId: " + appId + " :: " + ex.getMessage(), ex);
+        }
+        return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
+    }
+
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/holdPermissions")
     public ModelAndView postModifyHoldPermissions(@RequestParam(name = "id") long appId,
-                                          @ModelAttribute MaintenanceViewModel maintenanceViewModel,
-                                          Model model,
-                                          HttpServletResponse response) {
+                                                  @ModelAttribute MaintenanceViewModel maintenanceViewModel,
+                                                  Model model,
+                                                  HttpServletResponse response) {
 
         Application app = applicationService.get(appId);
 
