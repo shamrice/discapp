@@ -2,11 +2,9 @@ package io.github.shamrice.discapp.web.controller.application;
 
 import io.github.shamrice.discapp.data.model.ApplicationFavicon;
 import io.github.shamrice.discapp.service.application.data.ApplicationFaviconService;
-import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.web.define.url.AppCustomFaviconUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
