@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.web.define.url.AppCustomCssUrl;
+import io.github.shamrice.discapp.web.define.url.AppCustomFaviconUrl;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceImportExportViewModel;
 import io.github.shamrice.discapp.web.model.maintenance.MaintenanceViewModel;
 import lombok.extern.slf4j.Slf4j;
@@ -168,7 +169,12 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             //set favicon file name if exists.
             ApplicationFavicon applicationFavicon = applicationFaviconService.getFaviconData(app.getId());
             if (applicationFavicon != null) {
-                maintenanceViewModel.setFaviconFileName(applicationFavicon.getFileName());
+                //if favicon file name was mangled at save, show them the original favicon icon name.
+                if ((AppCustomFaviconUrl.MANGLE_PREFIX + appId + AppCustomFaviconUrl.MANGLE_POSTFIX).equalsIgnoreCase(applicationFavicon.getFileName())) {
+                    maintenanceViewModel.setFaviconFileName(AppCustomFaviconUrl.FAVICON_FILE_NAME);
+                } else {
+                    maintenanceViewModel.setFaviconFileName(applicationFavicon.getFileName());
+                }
             } else {
                 maintenanceViewModel.setFaviconFileName("No file exists.");
             }
@@ -493,7 +499,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 !favicon.startsWith("/")) {
 
             //if just want default favicon, add front slash, otherwise attempt to add http
-            if (favicon.equalsIgnoreCase("favicon.ico")) {
+            if ("favicon.ico".equalsIgnoreCase(favicon)) {
                 favicon = "/favicon.ico";
             } else {
                 favicon = "http://" + favicon;
@@ -509,7 +515,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_CUSTOM_URL, favicon);
 
             maintenanceViewModel.setFavicon(favicon);
-            maintenanceViewModel.setInfoMessage("Successfully updated Favicon.");
+            maintenanceViewModel.setInfoMessage("Successfully updated Favicon URL");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -529,9 +535,10 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             setCommonModelAttributes(model, app, username);
 
             if (maintenanceViewModel.getReuseFaviconFile() != null) {
-                log.info("Reusing existing uploaded favicon file. Just setting style and active config values for appId: " + appId);
+                log.info("Reusing existing uploaded favicon file. Setting style and url to existing uploaded file for appId: " + appId);
                 boolean styleSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-file");
-                boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, "/favicon/" + appId + "/" + maintenanceViewModel.getFaviconFileName());
+                ApplicationFavicon existingFavicon = applicationFaviconService.getFaviconData(appId);
+                boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, AppCustomFaviconUrl.CONTROLLER_DIRECTORY_URL + appId + "/" + existingFavicon.getFileName());
 
                 if (styleSave && activeSave) {
                     maintenanceViewModel.setInfoMessage("Successfully set favicon for application to: " + maintenanceViewModel.getFaviconFileName());
@@ -541,8 +548,8 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
-            if (uploadSourceFile == null || uploadSourceFile.isEmpty() || uploadSourceFile.getSize() > 655360) {
-                maintenanceViewModel.setInfoMessage("Favicon could not be uploaded. File is not valid. Please make sure file is less than 640KB");
+            if (uploadSourceFile == null || uploadSourceFile.isEmpty()) {
+                maintenanceViewModel.setInfoMessage("No file selected to be uploaded. Please select a file.");
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
@@ -560,12 +567,24 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
+            if (uploadSourceFile.getSize() > 655360) {
+                maintenanceViewModel.setInfoMessage("Favicon could not be uploaded. File is not valid. Please make sure file is less than 640KB");
+                return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
+            }
+
+            if (AppCustomFaviconUrl.FAVICON_FILE_NAME.equalsIgnoreCase(uploadSourceFile.getOriginalFilename())) {
+                log.info("Favicon upload for appId: " + appId
+                        + " is " + AppCustomFaviconUrl.FAVICON_FILE_NAME +
+                        ". Renaming to avoid issue where that specific file name is blocked in custom favicon controller.");
+                fileName = AppCustomFaviconUrl.MANGLE_PREFIX + appId + AppCustomFaviconUrl.MANGLE_POSTFIX;
+            }
+
             if (applicationFaviconService.saveFaviconData(app.getId(), fileName, uploadSourceFile.getBytes())) {
                 configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-file");
                 boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, "/favicon/" + appId + "/" + fileName);
-                log.info("Favicon for appId: " + app.getId() + " saved successfully.");
+                log.info("Favicon file upload for appId: " + app.getId() + " saved successfully.");
                 maintenanceViewModel.setInfoMessage(
-                        "Favicon file set successfully to " + fileName);
+                        "Favicon file set successfully to " + uploadSourceFile.getOriginalFilename());
 
             } else {
                 maintenanceViewModel.setInfoMessage("Failed to upload favicon file. Please try again.");

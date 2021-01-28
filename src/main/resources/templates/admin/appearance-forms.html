@@ -168,7 +168,7 @@
                     Style Sheet:
                 </td>
                 <td>
-                    <select class="button" name="styleSheetSelected">
+                    <select class="button" name="styleSheetSelected" style="border:1px solid black;margin-left:5px;">
                         <option onclick="hideStyleSheetInput()" value="cute"
                                 th:selected="${maintenanceViewModel.isSelectedCssStyle('cute')}">Cute
                         </option>
@@ -806,7 +806,7 @@
                 <a href="http://en.wikipedia.org/wiki/Favicon" target="_blank">Favicon</a> Type:
             </td>
             <td>
-                <select class="button" name="faviconTypeSelected">
+                <select class="button" name="faviconTypeSelected" style="border:1px solid black;margin-left:5px;">
 
                     <option onclick="displayFaviconUrlInput()" value="favicon-custom-url"
                             th:selected="${maintenanceViewModel.isSelectedFaviconStyle('favicon-custom-url')}">Use

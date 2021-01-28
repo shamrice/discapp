@@ -32,6 +32,8 @@ public class CustomFaviconController {
                                                  @PathVariable(name = "fileName") String fileName,
                                                  Model model,
                                                  HttpServletResponse response) {
+
+        log.info("Getting custom favicon for appId: " + appId + " filename: " + fileName);
         response.setContentType("image/x-icon");
         response.setCharacterEncoding("UTF-8");
 
@@ -39,8 +41,9 @@ public class CustomFaviconController {
 
             ApplicationFavicon applicationFavicon = applicationFaviconService.getFaviconData(appId);
             if (applicationFavicon != null && fileName.equals(applicationFavicon.getFileName())) {
-                HttpHeaders headers = new HttpHeaders();
+                log.info("Found custom favicon :: appId: " + appId + " : file name: " + applicationFavicon.getFileName());
 
+                HttpHeaders headers = new HttpHeaders();
                 headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
                 return new ResponseEntity<>(applicationFavicon.getFaviconData(), headers, HttpStatus.OK);
