@@ -95,7 +95,6 @@ public class AccountWizardController extends AccountController {
             String ownerLastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
             String appName = inputHelper.sanitizeInput(accountViewModel.getApplicationName());
 
-
             if ((ownerFirstName == null || ownerFirstName.trim().isEmpty())
                     || (ownerLastName == null || ownerLastName.trim().isEmpty())) {
                 log.warn("New account: " + accountViewModel.getEmail()
@@ -126,6 +125,23 @@ public class AccountWizardController extends AccountController {
                 return new ModelAndView("account/createAccountWizard", "accountViewModel", accountViewModel);
             }
 
+            //make sure strings aren't too long.
+            if (appName.length() > 255) {
+                appName = appName.substring(0, 255);
+                log.warn("Attempted new application name "
+                        + " was greater than 255. Shorting string to fit: " + appName);
+            }
+
+            if (ownerFirstName.length() > 255) {
+                ownerFirstName = ownerFirstName.substring(0, 255);
+                log.warn("Attempted new owner first name "
+                        + " was greater than 255. Shorting string to fit: " + ownerFirstName);
+            }
+            if (ownerLastName.length() > 255) {
+                ownerLastName = ownerLastName.substring(0, 255);
+                log.warn("Attempted new owner last name "
+                        + " was greater than 255. Shorting string to fit: " + ownerLastName);
+            }
 
             //passed checks. create user.
             DiscAppUser newUser = new DiscAppUser();
@@ -153,8 +169,8 @@ public class AccountWizardController extends AccountController {
                 Owner newOwner = new Owner();
                 newOwner.setEmail(newCreatedUser.getEmail());
                 newOwner.setEnabled(false);
-                newOwner.setFirstName(accountViewModel.getOwnerFirstName());
-                newOwner.setLastName(accountViewModel.getOwnerLastName());
+                newOwner.setFirstName(ownerFirstName);
+                newOwner.setLastName(ownerLastName);
                 newOwner.setCreateDt(new Date());
                 newOwner.setModDt(new Date());
 
@@ -165,7 +181,7 @@ public class AccountWizardController extends AccountController {
 
                 //create new application
                 Application newApplication = new Application();
-                newApplication.setName(accountViewModel.getApplicationName());
+                newApplication.setName(appName);
                 newApplication.setDeleted(false);
                 newApplication.setEnabled(false);
                 newApplication.setOwnerId(newOwner.getId());

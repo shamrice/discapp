@@ -11,14 +11,13 @@ import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
-import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
 import io.github.shamrice.discapp.service.thread.ThreadTreeNode;
 import io.github.shamrice.discapp.service.thread.UserReadThreadService;
-import io.github.shamrice.discapp.service.utility.email.ReplyNotification;
-import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.notification.email.type.ReplyNotification;
+import io.github.shamrice.discapp.service.notification.email.EmailNotificationQueueService;
 import io.github.shamrice.discapp.web.controller.ErrorController;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.discapp.NewThreadViewModel;
@@ -41,10 +40,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.*;
@@ -570,17 +565,26 @@ public class DiscAppController {
                         submitter = inputHelper.convertHtmlToPlainText(submitter);
                         email = inputHelper.convertHtmlToPlainText(email);
                         subject = inputHelper.convertHtmlToPlainText(subject);
+                    } else {
+                        //remove css and script tags regardless of permissions.
+                        submitter = inputHelper.convertScriptAndStyleTags(submitter);
+                        email = inputHelper.convertScriptAndStyleTags(email);
+                        subject = inputHelper.convertScriptAndStyleTags(subject);
                     }
                     if (HtmlPermission.FORBID.equalsIgnoreCase(htmlPermissions)) {
                         body = inputHelper.convertHtmlToPlainText(body);
+                    } else {
+                        //remove css and script tags regardless of permissions.
+                        body = inputHelper.convertScriptAndStyleTags(body);
                     }
                 } else {
-                    //if no permissions exist (for some reason...) default to blocking in subject and submitter fields.
+                    //if no permissions exist (for some reason...) default to blocking all HTML.
                     log.warn("No application permissions exist for appId: " + appId
-                            + " defaulting to HTML permission: " + HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
+                            + " defaulting to HTML permission: " + HtmlPermission.FORBID);
                     submitter = inputHelper.convertHtmlToPlainText(submitter);
                     email = inputHelper.convertHtmlToPlainText(email);
                     subject = inputHelper.convertHtmlToPlainText(subject);
+                    body = inputHelper.convertHtmlToPlainText(body);
                 }
 
                 log.info("new thread: " + newThreadViewModel.getAppId() + " : " + submitter + " : "

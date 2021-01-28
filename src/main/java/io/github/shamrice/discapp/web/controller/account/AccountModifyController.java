@@ -267,6 +267,17 @@ public class AccountModifyController extends AccountController {
                         String firstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
                         String lastName = inputHelper.sanitizeInput(accountViewModel.getOwnerLastName());
 
+                        if (firstName.length() > 255) {
+                            firstName = firstName.substring(0, 255);
+                            log.warn("Attempted updated owner first name "
+                                    + " was greater than 255. Shorting string to fit: " + firstName);
+                        }
+                        if (lastName.length() > 255) {
+                            lastName = lastName.substring(0, 255);
+                            log.warn("Attempted updated owner last name "
+                                    + " was greater than 255. Shorting string to fit: " + lastName);
+                        }
+
                         owner.setFirstName(firstName);
                         owner.setLastName(lastName);
                         owner.setModDt(new Date());

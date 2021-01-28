@@ -1,6 +1,6 @@
-package io.github.shamrice.discapp.service.utility.email;
+package io.github.shamrice.discapp.service.notification.email.type;
 
-import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.notification.NotificationType;
 import lombok.*;
 
 import java.util.Map;

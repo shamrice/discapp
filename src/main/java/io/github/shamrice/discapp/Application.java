@@ -1,7 +1,7 @@
 package io.github.shamrice.discapp;
 
-import io.github.shamrice.discapp.service.utility.NotifierKeepAliveUtilityService;
-import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.notification.ping.NotifierKeepAliveUtilityService;
+import io.github.shamrice.discapp.service.notification.email.EmailNotificationQueueService;
 import lombok.var;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,7 +1,9 @@
-package io.github.shamrice.discapp.service.utility.email;
+package io.github.shamrice.discapp.service.notification.email;
 
-import io.github.shamrice.discapp.service.account.notification.EmailNotificationService;
-import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.notification.email.sender.EmailNotificationSender;
+import io.github.shamrice.discapp.service.notification.NotificationType;
+import io.github.shamrice.discapp.service.notification.email.type.ReplyNotification;
+import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +16,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public class EmailNotificationQueueService {
 
-    private static LinkedBlockingQueue<ReplyNotification> replyNotificationQueue = new LinkedBlockingQueue<>();
+    private static final LinkedBlockingQueue<ReplyNotification> replyNotificationQueue = new LinkedBlockingQueue<>();
 
-    private static LinkedBlockingQueue<TemplateEmail> templateEmailQueue = new LinkedBlockingQueue<>();
+    private static final LinkedBlockingQueue<TemplateEmail> templateEmailQueue = new LinkedBlockingQueue<>();
 
     @Autowired
-    private EmailNotificationService emailNotificationService;
+    private EmailNotificationSender emailNotificationSender;
 
     public void start() {
         Thread replyNotificationThread = new Thread(this::runReplySender);
@@ -63,14 +65,14 @@ public class EmailNotificationQueueService {
                 TemplateEmail templateEmail = templateEmailQueue.take();
 
                 if (templateEmail.isMimeMessage()) {
-                    emailNotificationService.sendMimeMessage(
+                    emailNotificationSender.sendMimeMessage(
                             templateEmail.getTo(),
                             templateEmail.getNotificationType(),
                             templateEmail.getSubjectTemplateParams(),
                             templateEmail.getBodyTemplateParams()
                     );
                 } else {
-                    emailNotificationService.send(
+                    emailNotificationSender.send(
                             templateEmail.getTo(),
                             templateEmail.getNotificationType(),
                             templateEmail.getBodyTemplateParams()
@@ -103,7 +105,7 @@ public class EmailNotificationQueueService {
                 bodyParams.put("APP_DISCUSSION_URL", replyNotification.getDiscussionUrl());
                 bodyParams.put("THREAD_ID", replyNotification.getNewThreadId());
 
-                emailNotificationService.sendMimeMessage(replyNotification.getEmailAddress(),
+                emailNotificationSender.sendMimeMessage(replyNotification.getEmailAddress(),
                         NotificationType.REPLY_NOTIFICATION, subjectParams, bodyParams);
                 log.info("Sent reply notification for thread: " + replyNotification.getNewThreadId() + " to: "
                         + replyNotification.getEmailAddress());

@@ -54,7 +54,6 @@ VALUES (0, 'email.accountlocked.message',
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.admin.address', 'ADMIN_EMAIL@EXAMPLE.COM');
 
-
 INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'recaptcha.secret', 'RE_CAPTCHA_SECRET');
 
@@ -261,6 +260,240 @@ VALUES (0, 'mailing.list.email.admin.body.template', '<html>
         </form>
     </div>
 </html>
+');
+
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.newapp.subject.template', 'New DiscApp Message Board Created: APPLICATION_NAME');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.newapp.body.template', '<BODY>
+<HTML>
+<head>
+<style type="text/css">
+pre.code {      background-color:#fff;
+                border:1px dashed #000;
+                padding:1em; }
+</style>
+</head>
+<h2>New message board "APPLICATION_NAME" has been created and added to your account.</h2>
+<P>
+    Thank you for creating a new message board at <a href="BASE_SITE_URL">BASE_SITE_URL</a>. In this email, you will
+    find some useful information and links to get you started.
+</P>
+<DIV>
+	<h3>Useful Links:</h3>
+	<UL>
+		<LI>Your New Message Board: <a href="MESSAGE_BOARD_URL">MESSAGE_BOARD_URL</a></LI>
+    	<LI>Message Board Admin Page: <a href="MESSAGE_BOARD_ADMIN_URL">MESSAGE_BOARD_ADMIN_URL</a></LI>
+    	<LI>Modify Account Page: <a href="MODIFY_ACCOUNT_URL">MODIFY_ACCOUNT_URL</a></LI>
+    	<LI>Help Forum: <a href="HELP_FORUM_URL">HELP_FORUM_URL</a></LI>
+	</UL>
+</DIV>
+<hr />
+<div>
+	<h3>Information On Areas Of The Message Board Admin Page</h3>
+	<ul>
+		<li><b>Info/Landing Page:</b> Contains links to all areas of the admin section.</li>
+		<li><b>Appearance:</b> Here you can customize the look and feel of your message board. You can choose how threads are
+			displayed and sorted. You can also change the style sheet as well as customize buttons, labels and more!</li>
+		<li><b>Messages:</b> The messages section allows you to perform admin actions on messages posted to your message board.
+			Messages here can be modified, reported or deleted. You can also approve messages here if your application is
+			configured to require that messages are approved before they are publicly displayed. Users who are granted "Editor" permissions on the
+			Security section will have access to this page as well to help with administration.</li>
+		<li><b>Security:</b> This section allows you to set user and application permission settings. There are also settings for where
+			HTML can be allowed when posting messages, a section to block IP address prefixes and some additional miscellaneous
+			security settings.
+			<br />
+			<br />
+			<u>User Permission levels descriptions:</u>
+			<ul>
+				<li><b>None:</b> Users won''t have any access to your DiscussionApp.</li>
+				<li><b>Read:</b> Users can''t post any messages.</li>
+				<li><b>Reply:</b> Users can reply to messages but can''t create new threads.</li>
+				<li><b>Post:</b> Users can create new threads as well as response to messages. (This is the default user permission value.)</li>
+				<li><b>Edit:</b> Users with Edit privileges are moderators who can edit <em>any</em> message. Be very selective about whom
+					you assign this privilege to. (Only available on user specific permissions)</li>
+				<li><b>Hold:</b> Messages must be approved by a moderator with Edit privileges or the message board admin.</li>
+				<li><b>Delete:</b> On specific user permissions, set the permissions to "Delete" to remove any specific permission settings for
+					that user.</li>
+			</ul>
+			<br />
+		</li>
+		<li><b>Mailing List:</b> Here you can configure what the messages sent to users who are subscribed to your message board contain. You can also
+			configure the appearance of the mailing list related pages. Instant email reply notifications on messages can also be turned
+			on and off in this section.</li>
+		<li><b>RSS:</b> Allows you to configuration the behavior of how messages are presented in the RSS feed for the message board.</li>
+		<li><b>Widget:</b> The widget section helps you configure a small message board widget that you can place on your site. The code needed
+			to display the widge is also available on this page.</li>
+		<li><b>Locale Settings:</b> Sets the message board''s Time Zone as well as the date and time format to be displayed on messages.</li>
+		<li><b>Statistics:</b> Shows statistics for page views, unique IP counts and average page views per IP address broken down by day.</li>
+		<li><b>Import/Export:</b> If you would like a copy of the contents of your message board, you can create an export of it here. The export
+			is in the form of a SQL script. You can also upload a previous export here as well if you would like to restore a previous message
+			board to your current message board. Please note that importing data is subject to review and may take up to 14 business days before
+			data is imported. If you would like to "rollback" your messages to a previous date and are not importing data from a different message
+			board, please create a request on the <a href="HELP_FORUM_URL">Help Forum</a> for assistance instead.</li>
+		<li><b>Documentation:</b> Provides information on some of the more advanced features that are possible with configuring your message board.
+			A copy of this information can be found below under "Advanced DiscApp Feature Documentation" </li>
+		<li><b>Help:</b> A link to the <a href="HELP_FORUM_URL">Help Forum</a></li>
+
+	</ul>
+</div>
+<hr />
+<DIV>
+    <h3>Advanced DiscApp Feature Documentation</h3>
+	The following information can also be found on the documentation page off of the message board admin page: <a href="DOC_ADMIN_URL">DOC_ADMIN_URL</a>.
+	<BR />
+	<br />
+    <div id="navigation">
+		The topics discussed below give information on how to implement the following features on your message board:
+        <ul>
+            <li>
+                Highlight New Messages
+            </li>
+            <li>
+                Read Thread History
+            </li>
+            <li>
+                Search Feature
+            </li>
+            <li>
+                Administration Link
+            </li>
+            <li>
+				Admin Post Distinction on Messages
+            </li>
+        </ul>
+    </div>
+   <div id="highlight_new_messages">
+        <h4>Highlight New Messages</h4>
+        <p>
+            With this feature enabled on the Appearance settings page under the Threads configuration, any message or
+            reply that has been created in the past 24 hours will be marked with an additional CSS class "new_message".
+            Once a message is no longer less than 24 hours old, it will no longer be marked as a new message.
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+
+        <ul>
+            <li>
+                <b>Built-in CSS options:</b> If you are using one of the built in CSS options provided in the Appearance settings
+                page, no additional work will be needed as this feature has already been added to those choices.
+            </li>
+            <li>
+                <b>Custom CSS option:</b> If you are using your own CSS page on your DiscApp, you will need to add the
+                following additional rule to your file (using the color of  your choosing):
+                <br />
+                <br />
+                <u>Expand on index:</u>
+                <br />
+                <pre class="code">
+    span.new_message {
+         background-color:gray;
+    }
+                </pre>
+                <u>Non-expand on index:</u>
+                <br />
+                <pre class="code">
+    a.new_message {
+        background-color:gray;
+    }
+                </pre>
+            </li>
+        </ul>
+    </div>
+    <div id="read_thread_history">
+        <h4>Read Thread History</h4>
+        <p>
+            This feature allows users who have a registered account and are logged in to keep track of which threads
+            they have read. With this feature an additional CSS class attribute will be added called "read" to thread
+            anchor tags. By default, on the built-in CSS options, it is the same as the visited link color. This can be
+            changed on custom CSS implementations if desired.
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+        <ul>
+            <li>
+                <b>Built in CSS options:</b> If you are using one of the built in CSS options provided in the Appearance settings
+                page, no additional work will be needed as this feature has already been added to those choices.
+            </li>
+            <li>
+                <b>Custom CSS option:</b> If you are using your own CSS page on your DiscApp, you will need to add the
+                following additional rule to your file (using the color of  your choosing):
+                <br />
+                <pre class="code">
+    a.read {
+        color: #551A8B;
+    }
+                </pre>
+            </li>
+        </ul>
+    </div>
+    <div id="search_feature">
+        <h4>Adding a Search Feature</h4>
+        <p>
+            By default, when your DiscApp is created, the HTML required for the search feature is added to the epilogue of
+            your DiscApp. The search feature allows users to search subjects and message bodies of articles of your DiscApp.
+            Please use the below HTML code if you would like add the search feature elsewhere or need to reset or replace
+            the original entry.
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+        <pre class="code">    &lt;b&gt;Search the message board:&lt;/b&gt;
+    &lt;FORM METHOD=&quot;POST&quot; ACTION=&quot;BASE_SITE_URL/indices/search?disc=APPLICATION_ID&quot;&gt;
+        &lt;INPUT TYPE=&quot;hidden&quot; NAME=&quot;id&quot; VALUE=&quot;46108&quot;&gt;
+        &lt;INPUT TYPE=&quot;text&quot; NAME=&quot;searchTerm&quot;&gt;
+        &lt;INPUT TYPE=&quot;submit&quot; NAME=&quot;submit&quot; VALUE=&quot;Search&quot;&gt;
+    &lt;/FORM&gt;</pre>
+    </div>
+    <div id="administration_link">
+        <h4>Adding an Administration Link</h4>
+        <p>
+            By default, when your DiscApp is created, the administration link added to the epilogue of
+            your DiscApp.
+            Please use the below HTML code if you would like add the link elsewhere or need to reset or replace
+            the original entry.
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+        <pre class="code">    &lt;a href=&quot;MESSAGE_BOARD_ADMIN_URL&quot;&gt;Admin&lt;/a&gt;</pre>
+    </div>
+    <div id="admin_post_distinction">
+        <h4>Admin Post Distinction on Messages</h4>
+        <p>
+            Admin owners of a DiscApp can select to mark their post as an "Admin post". This will cause a
+            special SPAN tag to be added to the author field with the css class of "admin_post". The built in
+            CSS offerings have the correct CSS required to correctly view this feature. If you are using a
+            custom CSS, please include the following in your CSS code. (Feel free to change the colors as needed).
+        </p>
+        <p>
+            <b><u>Using this feature:</u></b>
+        </p>
+        <pre class="code">
+    .admin_post {
+        color: #fff;
+        background: #f00;
+        padding: 2px;
+        margin: 5px;
+        font-weight: bold;
+        border-radius: 5px;
+    }</pre>
+</DIV>
+<br />
+<PRE>
+-------------------------------------------------------------------
+
+Message from NE Disc App:
+
+This is an automated message. Please do not respond to this message.
+
+</PRE>
+</BODY>
+</HTML>
 ');
 
 

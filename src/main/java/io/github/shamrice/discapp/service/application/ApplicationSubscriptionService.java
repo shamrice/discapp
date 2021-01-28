@@ -2,10 +2,10 @@ package io.github.shamrice.discapp.service.application;
 
 import io.github.shamrice.discapp.data.model.ApplicationSubscription;
 import io.github.shamrice.discapp.data.repository.ApplicationSubscriptionRepository;
-import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.notification.NotificationType;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
-import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
-import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
+import io.github.shamrice.discapp.service.notification.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

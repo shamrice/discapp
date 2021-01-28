@@ -65,6 +65,9 @@ public class MaintenanceViewModel {
 
     //favicon config
     private String favicon;
+    private String faviconFileName;
+    private String faviconStyleSelected;
+    private String reuseFaviconFile;
 
     //window state config
     private String windowState;
@@ -102,6 +105,10 @@ public class MaintenanceViewModel {
 
     public boolean isSelectedCssStyle(String dropDownValue) {
         return styleSheetSelected.equalsIgnoreCase(dropDownValue);
+    }
+
+    public boolean isSelectedFaviconStyle(String dropDownValue) {
+        return faviconStyleSelected.equalsIgnoreCase(dropDownValue);
     }
 
 }

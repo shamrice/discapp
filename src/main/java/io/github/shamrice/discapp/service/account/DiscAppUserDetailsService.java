@@ -5,13 +5,14 @@ import io.github.shamrice.discapp.data.model.UserPermission;
 import io.github.shamrice.discapp.data.model.UserRegistration;
 import io.github.shamrice.discapp.data.repository.DiscAppUserRepository;
 import io.github.shamrice.discapp.data.repository.UserRegistrationRepository;
-import io.github.shamrice.discapp.service.account.notification.NotificationType;
+import io.github.shamrice.discapp.service.account.exception.RegistrationCodeRedeemedException;
+import io.github.shamrice.discapp.service.notification.NotificationType;
 import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
-import io.github.shamrice.discapp.service.utility.email.EmailNotificationQueueService;
-import io.github.shamrice.discapp.service.utility.email.TemplateEmail;
+import io.github.shamrice.discapp.service.notification.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,8 +194,9 @@ public class DiscAppUserDetailsService implements UserDetailsService {
 
     public void setLastLoginDateToNow(long userId) {
         try {
-            log.info("Setting last login date to now for userId: " + userId);
-            discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, new Date(), 0);
+            Date newLastLoginDate = new Date();
+            log.info("Setting last login date to " + newLastLoginDate.toString() + " for userId: " + userId);
+            discappUserRepository.updateDiscAppUserLastLoginDateAndPasswordFailCountById(userId, newLastLoginDate, 0);
         } catch (Exception ex) {
             log.error("Failed to set last log in date for userId: " + userId + " :: " + ex.getMessage(), ex);
         }
@@ -225,17 +227,20 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                             ConfigurationProperty.LOGIN_LOCK_DURATION_FAILED_AUTH,
                             300000);
 
-                    //todo : send this to email queue
+
                     Date lockedUntilDate = new Date(new Date().getTime() + lockDurationMills);
                     log.warn("User: " + email + " has passed maximum login attempts before account lock. Locking account until: " + lockedUntilDate.toString());
 
-                    Map<String, Object> templateParams = new HashMap<>();
-                    templateParams.put("ACCOUNT_EMAIL", email);
-                    templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
-                    templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
+                    //only send locked email to user accounts, not system accounts.
+                    if (user.getIsUserAccount()) {
+                        Map<String, Object> templateParams = new HashMap<>();
+                        templateParams.put("ACCOUNT_EMAIL", email);
+                        templateParams.put("ACCOUNT_LOCK_DURATION", (lockDurationMills / 1000 / 60) + " minutes");
+                        templateParams.put("PASSWORD_RESET_URL", baseUrl + AccountUrl.ACCOUNT_PASSWORD);
 
-                    TemplateEmail accountLockedEmail = new TemplateEmail(email, NotificationType.ACCOUNT_LOCKED, templateParams, false);
-                    EmailNotificationQueueService.addTemplateEmailToSend(accountLockedEmail);
+                        TemplateEmail accountLockedEmail = new TemplateEmail(email, NotificationType.ACCOUNT_LOCKED, templateParams, false);
+                        EmailNotificationQueueService.addTemplateEmailToSend(accountLockedEmail);
+                    }
 
                     discappUserRepository.updateDiscAppUserPasswordFailCountAndLastPasswordFailDateAndLockedUntilDateById(
                             user.getId(),
@@ -324,12 +329,12 @@ public class DiscAppUserDetailsService implements UserDetailsService {
         EmailNotificationQueueService.addTemplateEmailToSend(newUserCreatedEmail);
     }
 
-    public boolean redeemNewUserRegistrationKey(String email, String registrationKey) {
+    public boolean redeemNewUserRegistrationKey(String email, String registrationKey) throws RegistrationCodeRedeemedException {
         UserRegistration userRegistration = userRegistrationRepository.findOneByEmailAndKey(email, registrationKey);
         if (userRegistration != null) {
             if (userRegistration.isRedeemed()) {
-                log.warn("User registration is already redeemed. Not redeeming again. Returning true");
-                return true;
+                log.warn("User registration is already redeemed. Not redeeming again. Throwing exception.");
+                throw new RegistrationCodeRedeemedException("Registration code has already been redeemed.");
             }
             DiscAppUser user = discappUserRepository.findByEmail(email);
             if (user != null) {

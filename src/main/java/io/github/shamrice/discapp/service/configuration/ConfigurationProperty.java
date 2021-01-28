@@ -5,7 +5,7 @@ public enum ConfigurationProperty {
     SUBMITTER_LABEL_TEXT ("label.submitter.text"),
     SUBJECT_LABEL_TEXT ("label.subject.text"),
     EMAIL_LABEL_TEXT ("label.email.text"),
-    DATE_LABEL_TEXT ("label.data.text"),
+    DATE_LABEL_TEXT ("label.date.text"),
     THREAD_BODY_LABEL_TEXT ("label.thread.body.text"),
     PREVIEW_BUTTON_TEXT ("button.preview.text"),
     EDIT_BUTTON_TEXT ("button.edit.text"),
@@ -41,6 +41,8 @@ public enum ConfigurationProperty {
     HEADER_TEXT ("page.header.text"),
     FOOTER_TEXT ("page.footer.text"),
     FAVICON_URL ("favicon.url"),
+    FAVICON_STYLE_SETTING("favicon.url.style"),
+    FAVICON_CUSTOM_URL("favicon.url.custom"),
     TIMEZONE_LOCATION ("timezone.location"),
     DATE_FORMAT_PATTERN ("date.format.pattern"),
     WIDGET_WIDTH ("widget.width"),
@@ -89,7 +91,9 @@ public enum ConfigurationProperty {
     HOLD_PERMISSIONS_DISPLAY_POST_MESSAGE("permissions.hold.message.post.display"),
     HOLD_PERMISSIONS_MESSAGE_TEXT("permissions.hold.message.text"),
     HOLD_PERMISSIONS_POST_MESSAGE_TEXT("permissions.hold.message.post.text"),
-    RSS_BEHAVIOR("rss.behavior");
+    RSS_BEHAVIOR("rss.behavior"),
+    EMAIL_NEW_APP_INFO_SUBJECT_TEMPLATE("email.notification.newapp.subject.template"),
+    EMAIL_NEW_APP_INFO_BODY_TEMPLATE("email.notification.newapp.body.template");
 
     private final String propName;
 

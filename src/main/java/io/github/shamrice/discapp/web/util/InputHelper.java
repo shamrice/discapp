@@ -29,8 +29,16 @@ public class InputHelper {
         return text.replace("<", "&lt;").replace(">", "&gt;").trim();
     }
 
+    public String convertScriptAndStyleTags(String text) {
+        return text.replaceAll("(?i)<\\s*script", "&lt;script")
+                .replaceAll("(?i)<\\s*style", "&lt;style")
+                .replaceAll("(?i)<\\s*/\\s*script\\s*>", "&lt;/script&gt;")
+                .replaceAll("(?i)<\\s*/\\s*style\\s*>", "&lt;/style&gt;");
+    }
+
     /**
      * Remove HTML via regex and trailing white spaces from text.
+     *
      * @param text Text to clean
      * @return Cleaned up text
      */
@@ -41,6 +49,7 @@ public class InputHelper {
     /**
      * Adds anchor HTML tags to the text supplied. Does not add anchors for ones only starting with www.
      * Source modified from: https://stackoverflow.com/questions/49425990/replace-url-in-text-with-href-in-java
+     *
      * @param text text to add anchors to
      * @return returns text with html anchor tags added where found.
      */

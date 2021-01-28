@@ -8,7 +8,13 @@ import io.github.shamrice.discapp.service.application.cache.ApplicationCache;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.notification.NotificationType;
+import io.github.shamrice.discapp.service.notification.email.EmailNotificationQueueService;
+import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import io.github.shamrice.discapp.service.site.SiteService;
+import io.github.shamrice.discapp.web.define.url.AccountUrl;
+import io.github.shamrice.discapp.web.define.url.AppUrl;
+import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +73,28 @@ public class ApplicationService {
 
     public Application save(Application application) {
         return applicationRepository.save(application);
+    }
+
+    public void sendNewApplicationInfoEmail(String emailAddress, Application newApp, String baseUrl) {
+        log.info("Creating new application notification email to: " + emailAddress);
+
+        Map<String, Object> subjectParams = new HashMap<>();
+        subjectParams.put("APPLICATION_NAME", newApp.getName());
+
+        Map<String, Object> bodyParams = new HashMap<>();
+        bodyParams.put("APPLICATION_NAME", newApp.getName());
+        bodyParams.put("APPLICATION_ID", newApp.getId());
+        bodyParams.put("BASE_SITE_URL", baseUrl);
+        bodyParams.put("MESSAGE_BOARD_URL", baseUrl + AppUrl.CONTROLLER_DIRECTORY_URL_ALTERNATE + newApp.getId() + ".html");
+        bodyParams.put("MESSAGE_BOARD_ADMIN_URL", baseUrl + MaintenanceUrl.MAINTENANCE_PAGE + "?id=" + newApp.getId());
+        bodyParams.put("MODIFY_ACCOUNT_URL", baseUrl + AccountUrl.ACCOUNT_MODIFY);
+        bodyParams.put("HELP_FORUM_URL", baseUrl + AppUrl.CONTROLLER_DIRECTORY_URL_ALTERNATE + "1.html");
+        bodyParams.put("DOC_ADMIN_URL", baseUrl + MaintenanceUrl.DOCUMENTATION_URL + "?id=" + newApp.getId());
+
+        TemplateEmail subscriptionEmail = new TemplateEmail(emailAddress, NotificationType.NEW_APP_INFO, bodyParams, true);
+        subscriptionEmail.setSubjectTemplateParams(subjectParams);
+
+        EmailNotificationQueueService.addTemplateEmailToSend(subscriptionEmail);
     }
 
     public Application saveApplication(Application application, Prologue prologue, Epilogue epilogue) {

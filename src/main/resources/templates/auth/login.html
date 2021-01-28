@@ -13,11 +13,11 @@
     <h1 id="banner">Login to Disc App Service</h1>
     <form name="f" th:action="@{/login}" method="post">
 
-        <div th:if="${param.error}" class="alert alert-error">
+        <div th:if="${param.error} and not ${param.admin}" class="alert alert-error">
             Invalid Username and Password
         </div>
 
-        <div th:if="${param.locked}" class="alert alert-error">
+        <div th:if="${param.locked} and not ${param.admin}" class="alert alert-error">
             Account is currently locked due to too many authentication failures. Please try again in a few minutes.
         </div>
 
@@ -76,10 +76,19 @@
 </div>
 
 <div th:if="${appId}" class="grey_box" style="width:32em;">
+
+    <div th:if="${param.error} and ${param.admin}" class="alert alert-error">
+        Login failed. Please try again.
+    </div>
+
+    <div th:if="${param.locked} and ${param.admin}" class="alert alert-error">
+        Account is currently locked due to too many authentication failures. Please try again in a few minutes.
+    </div>
+
     <form method="post" action="/login" enctype="multipart/form-data">
         <p style="text-align:center;">Or enter the admin password for this DiscussionApp-</p>
         <div>
-            <input type="password" class="button" name="password" size="20" maxlength="20" />
+            <input type="password" class="button" name="password" />
             <input type="submit" name="submit_password" value="Enter Password" class="button" />
             <input type="hidden" name="username" th:value="${appId}" />
         </div>

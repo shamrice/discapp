@@ -327,6 +327,18 @@ CREATE TABLE application_report_code (
 );
 
 
+CREATE TABLE application_favicon (
+    id serial NOT NULL,
+    application_id INT unique NOT NULL,
+    file_name varchar not null,
+    favicon_data bytea NOT NULL,
+    create_dt TIMESTAMP DEFAULT NOW(),
+    mod_dt TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id),
+    FOREIGN KEY (application_id) REFERENCES application(id)
+);
+
+
 commit;
 
 
