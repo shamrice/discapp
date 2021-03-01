@@ -85,7 +85,7 @@ public class HomeController {
         if (updates != null) {
 
             List<HomeOlderUpdatesViewModel.Update> updateList = new ArrayList<>();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-YYYY");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy");
 
             for (SiteUpdateLog update : updates) {
 
