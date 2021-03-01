@@ -267,8 +267,7 @@ INSERT INTO configuration (application_id, name, value)
 VALUES (0, 'email.notification.newapp.subject.template', 'New DiscApp Message Board Created: APPLICATION_NAME');
 
 INSERT INTO configuration (application_id, name, value)
-VALUES (0, 'email.notification.newapp.body.template', '<BODY>
-<HTML>
+VALUES (0, 'email.notification.newapp.body.template', '<HTML>
 <head>
 <style type="text/css">
 pre.code {      background-color:#fff;
@@ -276,6 +275,7 @@ pre.code {      background-color:#fff;
                 padding:1em; }
 </style>
 </head>
+<BODY>
 <h2>New message board "APPLICATION_NAME" has been created and added to your account.</h2>
 <P>
     Thank you for creating a new message board at <a href="BASE_SITE_URL">BASE_SITE_URL</a>. In this email, you will

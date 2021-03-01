@@ -19,6 +19,7 @@ public class AccountViewModel {
         private @NonNull String applicationStatus;
         private @NonNull String applicationSearchStatus;
         private @NonNull String applicationAdminReportFrequency;
+        private @NonNull String appViewUrl;
 
         public boolean isSelectedApplicationStatus(String dropDownValue) {
             return applicationStatus.equalsIgnoreCase(dropDownValue);

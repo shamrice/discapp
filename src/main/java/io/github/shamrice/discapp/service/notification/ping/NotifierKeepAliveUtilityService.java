@@ -31,7 +31,7 @@ public class NotifierKeepAliveUtilityService {
         while (true) {
 
             Calendar calendar = Calendar.getInstance();
-            int currentHour = calendar.get(Calendar.HOUR);
+            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
 
             if (currentHour >= sendHour - 1 && currentHour <= sendHour + 1) {
                 log.info("Current hour: " + currentHour + " is close to send hour: " + sendHour

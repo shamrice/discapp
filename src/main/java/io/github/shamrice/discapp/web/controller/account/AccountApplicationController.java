@@ -4,9 +4,7 @@ import io.github.shamrice.discapp.data.model.*;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
-import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import io.github.shamrice.discapp.web.define.url.AppUrl;
-import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -30,9 +28,11 @@ public class AccountApplicationController extends AccountController {
 
     @GetMapping(ACCOUNT_APPLICATION)
     public ModelAndView getAccountApplication(@ModelAttribute AccountViewModel accountViewModel,
+                                              HttpServletRequest request,
                                               ModelMap modelMap) {
 
         String email = accountHelper.getLoggedInEmail();
+        String baseUrl = webHelper.getBaseUrl(request);
 
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
@@ -72,8 +72,10 @@ public class AccountApplicationController extends AccountController {
 
                         String adminReportFrequency = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_ADMIN_REPORT_FREQUENCY, AdminReportFrequency.NEVER.name());
 
+                        String appViewUrl = baseUrl + AppUrl.CONTROLLER_DIRECTORY_URL_ALTERNATE + app.getId() + AppUrl.APP_NUMBER_SUFFIX_ALTERNATE;
+
                         AccountViewModel.AccountApplication application = new AccountViewModel.AccountApplication(
-                                app.getName(), app.getId(), appStatus, appSearchStatus, adminReportFrequency
+                                app.getName(), app.getId(), appStatus, appSearchStatus, adminReportFrequency, appViewUrl
                         );
                         accountApplications.add(application);
                     }
@@ -103,6 +105,7 @@ public class AccountApplicationController extends AccountController {
 
     @PostMapping(ACCOUNT_MODIFY_APPLICATION)
     public ModelAndView postApplicationModify(@ModelAttribute AccountViewModel accountViewModel,
+                                              HttpServletRequest request,
                                               ModelMap modelMap) {
         if (accountViewModel != null) {
 
@@ -181,13 +184,14 @@ public class AccountApplicationController extends AccountController {
             log.error("Account view model is null. Nothing to update.");
         }
 
-        return getAccountApplication(accountViewModel, modelMap);
+        return getAccountApplication(accountViewModel, request, modelMap);
     }
 
 
 
     @GetMapping(ACCOUNT_ADD_APPLICATION)
     public ModelAndView getAddApplication(@ModelAttribute AccountViewModel accountViewModel,
+                                          HttpServletRequest request,
                                           ModelMap modelMap) {
 
         String email = accountHelper.getLoggedInEmail();
@@ -210,7 +214,7 @@ public class AccountApplicationController extends AccountController {
 
                     if (apps.size() >= appLimit) {
                         accountViewModel.setErrorMessage("Unable to add an additional application. You are already at your account limit.");
-                        return getAccountApplication(accountViewModel, modelMap);
+                        return getAccountApplication(accountViewModel, request, modelMap);
                     }
                 }
             }
@@ -227,7 +231,7 @@ public class AccountApplicationController extends AccountController {
 
             //cancel button, return to manage applications
             if (accountViewModel.getCancel() != null && !accountViewModel.getCancel().isEmpty()) {
-                return getAccountApplication(accountViewModel, modelMap);
+                return getAccountApplication(accountViewModel, request, modelMap);
             }
 
             String password = inputHelper.sanitizeInput(accountViewModel.getPassword());
@@ -251,7 +255,7 @@ public class AccountApplicationController extends AccountController {
                         if (!BCrypt.checkpw(accountViewModel.getPassword(), user.getPassword())) {
                             log.error("Cannot add Disc App to account. Passwords do not match existing password for account.");
                             accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                            return getAccountApplication(accountViewModel, modelMap);
+                            return getAccountApplication(accountViewModel, request, modelMap);
                         }
 
                         String ownerFirstName = inputHelper.sanitizeInput(accountViewModel.getOwnerFirstName());
@@ -263,14 +267,14 @@ public class AccountApplicationController extends AccountController {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new owner without a first or last name.");
                             accountViewModel.setErrorMessage("Owner first name and last name are required to create an application.");
-                            return getAccountApplication(accountViewModel, modelMap);
+                            return getAccountApplication(accountViewModel, request, modelMap);
                         }
 
                         if (appName == null || appName.trim().isEmpty()) {
                             log.warn("UserId : " + user.getId() + " : email: " + user.getEmail()
                                     + " attempted to create a new application without a name");
                             accountViewModel.setErrorMessage("Application name is required to create an application.");
-                            return getAccountApplication(accountViewModel, modelMap);
+                            return getAccountApplication(accountViewModel, request, modelMap);
                         }
 
                         //check string lengths and shorten them as needed.
@@ -314,7 +318,7 @@ public class AccountApplicationController extends AccountController {
                                 log.warn("Cannot add additional app, User is already at the application limit of: " + appLimit);
                                 accountViewModel.setErrorMessage("You are at the max application limit of " + appLimit
                                         + ". Please delete one or more apps to create a new one.");
-                                return getAccountApplication(accountViewModel, modelMap);
+                                return getAccountApplication(accountViewModel, request, modelMap);
                             }
 
                             Application newApp = new Application();
@@ -377,21 +381,21 @@ public class AccountApplicationController extends AccountController {
                             } else {
                                 log.error("Failed to create new app with name" + newApp.getName() + " : for ownerId: " + owner.getId());
                                 accountViewModel.setErrorMessage("Failed to create new app.");
-                                return getAccountApplication(accountViewModel, modelMap);
+                                return getAccountApplication(accountViewModel, request, modelMap);
                             }
                         } else {
                             log.error("Failed to create new owner for email: " + owner.getEmail());
                             accountViewModel.setErrorMessage("Failed to create new owner for new app.");
-                            return getAccountApplication(accountViewModel, modelMap);
+                            return getAccountApplication(accountViewModel, request, modelMap);
                         }
                     }
                 }
             } else {
                 log.error("Cannot add Disc App to account. Passwords do not match");
                 accountViewModel.setErrorMessage("Cannot create new application. Passwords do not match.");
-                return getAccountApplication(accountViewModel, modelMap);
+                return getAccountApplication(accountViewModel, request, modelMap);
             }
         }
-        return getAccountApplication(accountViewModel, modelMap);
+        return getAccountApplication(accountViewModel, request, modelMap);
     }
 }
