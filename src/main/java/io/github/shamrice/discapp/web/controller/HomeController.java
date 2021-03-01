@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
+import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.web.define.url.AppUrl;
 import io.github.shamrice.discapp.web.model.home.HomeOlderUpdatesViewModel;
 import io.github.shamrice.discapp.web.model.home.SearchApplicationModel;
@@ -37,6 +38,9 @@ public class HomeController {
     private ApplicationService applicationService;
 
     @Autowired
+    private StatisticsService statisticsService;
+
+    @Autowired
     private SiteService siteService;
 
     @Autowired
@@ -46,17 +50,27 @@ public class HomeController {
     private AccountHelper accountHelper;
 
     @GetMapping(CONTROLLER_URL_DIRECTORY)
-    public ModelAndView getIndexView(Model model) {
+    public ModelAndView getIndexView(HttpServletRequest request, Model model) {
 
         SiteUpdateLog latestUpdate = siteService.getLatestSiteUpdateLog();
         if (latestUpdate != null) {
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-YYYY");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd-yyyy");
             String updateDate = simpleDateFormat.format(latestUpdate.getCreateDt());
 
             model.addAttribute("updateDate", updateDate);
             model.addAttribute("updateSubject", latestUpdate.getSubject());
             model.addAttribute("updateMessage", latestUpdate.getMessage());
+        }
+
+        //get ip address of request
+        if (request != null) {
+            //check forwarded header for proxy users, if not found, use ip provided.
+            String ipAddress = request.getHeader("X-FORWARDED-FOR");
+            if (ipAddress == null || ipAddress.isEmpty()) {
+                ipAddress = request.getRemoteAddr();
+            }
+            statisticsService.increaseCurrentPageStats(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ipAddress);
         }
 
         model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());

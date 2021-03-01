@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.data.model.StatsUniqueIps;
 import io.github.shamrice.discapp.data.repository.StatsRepository;
 import io.github.shamrice.discapp.data.repository.StatsUniqueIpsRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,11 @@ public class StatisticsService {
     public void increaseCurrentPageStats(long applicationId, String sourceIpAddress) {
 
         String statDate = getCurrentStatDateString();
+
+        if (!InetAddressValidator.getInstance().isValid(sourceIpAddress)) {
+            log.warn("Statistics for IP address: " + sourceIpAddress + " is not a valid IP Address. Not updating statistics for appId: " + applicationId);
+            return;
+        }
 
         Stats currentDayStat = statsRepository.findOneByApplicationIdAndStatDate(applicationId, statDate);
 
