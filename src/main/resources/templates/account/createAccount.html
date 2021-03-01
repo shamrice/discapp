@@ -79,7 +79,8 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input class="button" name="submit" type="submit" value="Create Account">&nbsp;
+                    <input class="button" id="submitButton" name="submit" type="submit" value="Create Account" onclick="var e=this;setTimeout(function() {e.disabled=true;e.value='Please wait...';}, 0); return true;">
+                    &nbsp;
                     <input class="button" name="reset" type="reset">
                 </td>
             </tr>
@@ -104,7 +105,6 @@
     <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
             async defer>
     </script>
-
 
 </div>
 

@@ -86,7 +86,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input class="button" name="submit" type="submit" value="Save Changes"/>
+                    <input class="button" name="submit" type="submit" value="Save Changes" onclick="var e=this;setTimeout(function() {e.disabled=true;e.value='Please wait...';}, 0); return true;"/>
                     <input class="button" name="reset" type="reset"/>
                     <input class="button" name="cancel" type="submit" value="Cancel"/>
                 </td>
