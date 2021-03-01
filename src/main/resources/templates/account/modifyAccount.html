@@ -107,7 +107,9 @@
             </tr>
             <tr class="accounts_moderated"
                 th:each="moderatingApplication : ${accountViewModel.getModeratingApplications()}">
-                <td class="accounts_moderated" th:text="${moderatingApplication.getApplicationName()}">
+                <td class="accounts_moderated">
+                    <a target="_blank" th:href="${moderatingApplication.getAppViewUrl()}" th:text="${moderatingApplication.getApplicationName()}">
+                    </a>
                 </td>
                 <td class="accounts_moderated">
                     <a th:href="${accountViewModel.getBaseEditorUrl() + moderatingApplication.getApplicationId()}"

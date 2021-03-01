@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
+import io.github.shamrice.discapp.web.define.url.AppUrl;
 import io.github.shamrice.discapp.web.model.account.AccountViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -70,12 +71,13 @@ public class AccountModifyController extends AccountController {
 
             List<UserPermission> userPermissions = applicationService.getAllApplicationPermissionsForUser(user.getId());
             if (userPermissions != null) {
+
+                String baseUrl = webHelper.getBaseUrl(request);
+
                 List<AccountViewModel.AccountApplication> moderatingApplications = new ArrayList<>();
 
                 for (UserPermission userPermission : userPermissions) {
-
                     if (userPermission.getUserPermissions().contains(io.github.shamrice.discapp.service.application.permission.UserPermission.EDIT)) {
-
                         Application application = applicationService.get(userPermission.getApplicationId());
                         if (application != null) {
                             AccountViewModel.AccountApplication accountApplication = new AccountViewModel.AccountApplication(
@@ -83,13 +85,14 @@ public class AccountModifyController extends AccountController {
                                     application.getId(),
                                     ENABLED,    //not used in view
                                     ENABLED,    //not used in view
-                                    AdminReportFrequency.NEVER.name() // not used in view
+                                    AdminReportFrequency.NEVER.name(), // not used in view,
+                                    baseUrl + AppUrl.CONTROLLER_DIRECTORY_URL_ALTERNATE + application.getId() + AppUrl.APP_NUMBER_SUFFIX_ALTERNATE
                             );
                             moderatingApplications.add(accountApplication);
                         }
                     }
                 }
-                String baseUrl = webHelper.getBaseUrl(request);
+
                 accountViewModel.setBaseEditorUrl(baseUrl + "/admin/disc-edit.cgi?id=");
 
                 moderatingApplications.sort(Comparator.comparing(s -> s.getApplicationName().toLowerCase()));

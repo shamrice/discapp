@@ -66,7 +66,8 @@
                     <td>
                         <label>Application Index:</label>
                     </td>
-                    <td class="value-label" th:text="${accountApplication.getApplicationId()}">
+                    <td class="value-label">
+                        <a target="_blank" th:href="${accountApplication.getAppViewUrl()}" th:text="${accountApplication.getApplicationId()}"></a>
                     </td>
                 </tr>
                 <tr>
