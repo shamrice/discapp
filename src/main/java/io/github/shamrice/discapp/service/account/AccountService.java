@@ -12,7 +12,6 @@ import io.github.shamrice.discapp.service.notification.email.EmailNotificationQu
 import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
