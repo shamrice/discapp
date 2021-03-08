@@ -415,7 +415,7 @@ public class DiscAppController {
                 model.addAttribute(EMAIL, user.getEmail());
                 model.addAttribute(SHOW_EMAIL, user.getShowEmail());
 
-                if (applicationService.isOwnerOfApp(appId, user.getEmail()) || accountHelper.isRootAdminAccount()) {
+                if (applicationService.isUserAccountOwnerOfApp(appId, user.getEmail()) || accountHelper.isRootAdminAccount()) {
                     model.addAttribute("isAdmin", true);
                 }
             } else if (user != null && !user.getIsUserAccount()) {

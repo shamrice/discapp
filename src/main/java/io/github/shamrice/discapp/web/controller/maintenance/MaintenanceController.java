@@ -90,7 +90,7 @@ public abstract class MaintenanceController {
             model.addAttribute(IS_USER_ACCOUNT, true);
         }
 
-        if (applicationService.isOwnerOfApp(app.getId(), username)) {
+        if (applicationService.isUserAccountOwnerOfApp(app.getId(), username)) {
             model.addAttribute(IS_OWNER, true);
         }
 

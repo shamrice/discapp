@@ -207,7 +207,7 @@ public class ApplicationService {
         return null;
     }
 
-    public boolean isOwnerOfApp(long appId, String email) {
+    public boolean isUserAccountOwnerOfApp(long appId, String email) {
         if (email == null || email.isEmpty()) {
             log.info("An email address is required to check application ownership. Returning false.");
             return false;
@@ -217,8 +217,15 @@ public class ApplicationService {
             log.info("User: " + email + " is not an owner of any applications. Returning false.");
             return false;
         }
-        Application app = applicationRepository.findOneByIdAndOwnerIdAndDeleted(appId, user.getOwnerId(), false).orElse(null);
-        return app != null;
+
+        //make sure user account or system account matches appId.
+        if (user.getIsUserAccount() || (!user.getIsUserAccount() && user.getEmail().equals(String.valueOf(appId)))) {
+            Application app = applicationRepository.findOneByIdAndOwnerIdAndDeleted(appId, user.getOwnerId(), false).orElse(null);
+            return app != null;
+        } else {
+            log.info("User: " + email + " is not a matching account owner for appId: " + appId);
+            return false;
+        }
     }
 
     public List<Application> getByOwnerId(long ownerId) {

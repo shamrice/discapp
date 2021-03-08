@@ -141,13 +141,6 @@ public class AccountPasswordResetController extends AccountController {
             return new ModelAndView("account/password/systemPasswordResetForm", "model", modelMap);
         }
 
-        if (!applicationService.isOwnerOfApp(appId, email)) {
-            log.warn("Owner email: " + email + " attempted to reset system admin account for appId: " + appId
-                    + " but is not the current owner of that application.");
-            modelMap.addAttribute(STATUS, "Password reset failed. Please resubmit request.");
-            return new ModelAndView("account/password/passwordResetStatus", "model", modelMap);
-        }
-
         if (accountService.performSystemAccountPasswordReset(resetKey, resetCodeInt, email, appId, newPassword)) {
             modelMap.addAttribute(STATUS, "Password successfully reset.");
             modelMap.addAttribute("adminLogInUrl", "/admin/disc-maint.cgi?id=" + appId);

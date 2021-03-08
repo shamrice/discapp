@@ -73,7 +73,7 @@ public class MaintenancePermissionFilter extends GenericFilterBean {
                             if (appIdStr != null) {
                                 long appId = Long.parseLong(appIdStr);
 
-                                if (!applicationService.isOwnerOfApp(appId, email)) {
+                                if (!applicationService.isUserAccountOwnerOfApp(appId, email)) {
                                     log.warn("User: " + email + " is not the owner of appid: " + appId + " :: checking if is editor");
 
                                     if (url.contains(MaintenanceUrl.THREAD_EDIT_PAGE) || url.contains(MaintenanceUrl.THREADS_EDIT_PAGE)) {
