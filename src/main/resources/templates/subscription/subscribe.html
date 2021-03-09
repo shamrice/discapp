@@ -39,7 +39,7 @@
         <input type="hidden" id="reCaptchaResponse" name="reCaptchaResponse">
         <div style="width:30em; margin:auto; margin-top:5%; margin-bottom:2%">
 
-            [[${applicationSubscriptionModel.getSubscriptionEmailTextBoxLabel()}]]
+            <div th:utext="${applicationSubscriptionModel.getSubscriptionEmailTextBoxLabel()}"></div>
 
             <input type="email" name="email" th:value="${applicationSubscriptionModel.getEmail()}" size="40" />
             <br />
