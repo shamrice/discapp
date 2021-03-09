@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 @Controller
 @Slf4j
@@ -44,6 +45,9 @@ public class AuthenticationController {
                             DiscAppUser user = discAppUserDetailsService.getByEmail(String.valueOf(appId));
                             if (user != null && !user.getIsUserAccount()) {
                                 modelMap.addAttribute("appId", user.getUsername());
+                            } else {
+                                //generate random invalid uuid if system account not found.
+                                modelMap.addAttribute("appId", UUID.randomUUID().toString());
                             }
                         } catch (NumberFormatException formatException) {
                             log.error("App Id in query string for log in page was not a valid number: "
