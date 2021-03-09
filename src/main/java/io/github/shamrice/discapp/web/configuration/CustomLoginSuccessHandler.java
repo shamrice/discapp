@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENANCE_PAGE;
+
 @Slf4j
 public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
@@ -25,7 +27,7 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
 
-        //for redirect on system admin accounts to their related disc maintenance page.
+        //redirect system admin accounts to their related disc maintenance page.
         DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)authentication.getPrincipal();
         if (userPrincipal != null) {
             log.debug("Login user id: " + userPrincipal.getEmail());
@@ -34,14 +36,14 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
             if (!userPrincipal.isUserAccount()) {
                 log.info("User: " + userPrincipal.getEmail() + " :: is System admin account. Redirecting to related admin page.");
-                //todo : probably should pull that string from somewhere instead of just hard coded...
-                String redirect = "/admin/disc-maint.cgi?id=" + userPrincipal.getEmail();
+
+                String redirect = MAINTENANCE_PAGE + "?id=" + userPrincipal.getEmail();
                 getRedirectStrategy().sendRedirect(request, response, redirect);
                 return;
             }
         }
 
-        //todo : set authentication make age.
+        //todo : set authentication make age. <-- I no longer know what that means.
        super.onAuthenticationSuccess(request, response, authentication);
     }
 }
