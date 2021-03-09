@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.application.ApplicationSubscriptionService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.web.controller.ErrorController;
 import io.github.shamrice.discapp.web.define.url.ApplicationSubscriptionUrl;
 import io.github.shamrice.discapp.web.model.applicationsubscription.ApplicationSubscriptionModel;
 import io.github.shamrice.discapp.web.util.InputHelper;
@@ -12,6 +13,8 @@ import io.github.shamrice.discapp.web.util.WebHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +24,8 @@ import org.springframework.web.util.UriUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+
+import static io.github.shamrice.discapp.web.define.CommonModelAttributeNames.ERROR;
 
 @Controller
 @Slf4j
@@ -34,6 +39,9 @@ public class ApplicationSubscriptionController {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ErrorController errorController;
 
     @Autowired
     private WebHelper webHelper;
@@ -53,14 +61,12 @@ public class ApplicationSubscriptionController {
 
         Application app = applicationService.get(appId);
         if (app != null) {
-
             model.setApplicationStyleSheetUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
 
             model.setApplicationFaviconUrl(configurationService.getStringValue(
                     app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
         }
-
         return new ModelAndView("subscription/unsubscribe", "applicationSubscriptionModel", model);
     }
 
@@ -103,7 +109,8 @@ public class ApplicationSubscriptionController {
                                          @RequestParam(name = "email", required = false) String email,
                                          @RequestParam(name = "encoded", required = false) Boolean emailEncoded,
                                          @RequestParam(name = "errorMessage", required = false) String errorMessage,
-                                         HttpServletRequest request) {
+                                         HttpServletRequest request,
+                                         Model errorModel) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
         model.setApplicationId(appId);
@@ -112,32 +119,36 @@ public class ApplicationSubscriptionController {
         model.setErrorMessage(errorMessage);
 
         Application app = applicationService.get(appId);
-        if (app != null) {
 
-            if (email != null && !email.trim().isEmpty()) {
-
-                //decode email if it was encoded when passed so it looks correct to the user.
-                if (emailEncoded != null && emailEncoded) {
-                    email = UriUtils.decode(email, StandardCharsets.UTF_8);
-                }
-                model.setEmail(email);
-            }
-
-            model.setReturnToApplicationText("Return to " + app.getName());
-
-            model.setApplicationStyleSheetUrl(configurationService.getStringValue(
-                    app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
-
-            model.setApplicationFaviconUrl(configurationService.getStringValue(
-                    app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
-
-            model.setSubscribeButtonText("Subscribe");
-            model.setSubscriptionEmailTextBoxLabel(
-                    configurationService.getStringValue(
-                            app.getId(), ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML,
-                            "Enter your email address in order to receive daily updates. ")
-            );
+        if (app == null) {
+            log.warn("Attempted to get subscription sign up page for non-existent app id: " + appId
+                    + " : Redirecting to not found page.");
+            return errorController.getNotFoundView("Disc App with ID of " + appId + " does not exist.", errorModel);
         }
+
+        if (email != null && !email.trim().isEmpty()) {
+
+            //decode email if it was encoded when passed so it looks correct to the user.
+            if (emailEncoded != null && emailEncoded) {
+                email = UriUtils.decode(email, StandardCharsets.UTF_8);
+            }
+            model.setEmail(email);
+        }
+
+        model.setReturnToApplicationText("Return to " + app.getName());
+
+        model.setApplicationStyleSheetUrl(configurationService.getStringValue(
+                app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+
+        model.setApplicationFaviconUrl(configurationService.getStringValue(
+                app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+
+        model.setSubscribeButtonText("Subscribe");
+        model.setSubscriptionEmailTextBoxLabel(
+                configurationService.getStringValue(
+                        app.getId(), ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML,
+                        "Enter your email address in order to receive daily updates. ")
+        );
 
         return new ModelAndView("subscription/subscribe", "applicationSubscriptionModel", model);
     }
@@ -152,7 +163,8 @@ public class ApplicationSubscriptionController {
     @PostMapping(ApplicationSubscriptionUrl.SUBSCRIBE_URL)
     public ModelAndView postSubscribeView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute ApplicationSubscriptionModel applicationSubscriptionModel,
-                                          HttpServletRequest request) {
+                                          HttpServletRequest request,
+                                          Model errorModel) {
 
         String baseUrl = webHelper.getBaseUrl(request);
         applicationSubscriptionModel.setBaseUrl(baseUrl);
@@ -166,7 +178,7 @@ public class ApplicationSubscriptionController {
                 log.warn("Failed to create subscription request for " + applicationSubscriptionModel.getEmail()
                         + " due to ReCaptcha verification failure.");
                 String errorMessage = "Failed to create subscription request. Please try again.";
-                return getSubscribeView(appId, null, null, errorMessage, request);
+                return getSubscribeView(appId, null, null, errorMessage, request, errorModel);
             }
 
             applicationSubscriptionModel.setReturnToApplicationText("Return to " + app.getName());
@@ -228,9 +240,10 @@ public class ApplicationSubscriptionController {
      */
     @GetMapping(ApplicationSubscriptionUrl.CONFIRM_URL)
     public ModelAndView getConfirmationView(@RequestParam(name = "id") long appId,
-                                           @RequestParam(name = "email") String email,
-                                           @RequestParam(name = "code") int confirmationCode,
-                                           HttpServletRequest request) {
+                                            @RequestParam(name = "email") String email,
+                                            @RequestParam(name = "code") int confirmationCode,
+                                            HttpServletRequest request,
+                                            Model errorModel) {
 
         ApplicationSubscriptionModel model = new ApplicationSubscriptionModel();
         model.setApplicationId(appId);
@@ -238,30 +251,34 @@ public class ApplicationSubscriptionController {
         model.setEmail(email);
 
         Application app = applicationService.get(appId);
-        if (app != null) {
-            model.setReturnToApplicationText("Return to " + app.getName());
 
-            model.setApplicationStyleSheetUrl(configurationService.getStringValue(
-                    app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+        if (app == null) {
+            log.warn("Attempted to confirm subscription sign up for non-existent app id: " + appId
+                    + " for new subscriber: " + email + " : Redirecting to not found page.");
+            return errorController.getNotFoundView("Mailing list subscription confirmation cannot be performed as this forum no longer exists.", errorModel);
+        }
 
-            model.setApplicationFaviconUrl(configurationService.getStringValue(
-                    app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+        model.setReturnToApplicationText("Return to " + app.getName());
 
-            if (email != null && !email.trim().isEmpty()) {
-                try {
-                    if (applicationSubscriptionService.subscribeToApplication(app.getId(), email, confirmationCode)) {
-                        String confirmationHtml = configurationService.getStringValue(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "Your are now subscribed. Your will receive updates when new articles are posted.");
-                        model.setConfirmationHtml(confirmationHtml);
-                    } else {
-                        model.setConfirmationHtml("Failed to confirm subscription. Please try again.");
-                    }
-                } catch (Exception ex) {
-                    log.error("Failed to confirm subscription for user: " + ex.getMessage(), ex);
-                    model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
+        model.setApplicationStyleSheetUrl(configurationService.getStringValue(
+                app.getId(), ConfigurationProperty.STYLE_SHEET_URL, "/styles/default.css"));
+
+        model.setApplicationFaviconUrl(configurationService.getStringValue(
+                app.getId(), ConfigurationProperty.FAVICON_URL, "/favicon.ico"));
+
+        if (email != null && !email.trim().isEmpty()) {
+            try {
+                if (applicationSubscriptionService.subscribeToApplication(app.getId(), email, confirmationCode)) {
+                    String confirmationHtml = configurationService.getStringValue(appId, ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "Your are now subscribed. Your will receive updates when new articles are posted.");
+                    model.setConfirmationHtml(confirmationHtml);
+                } else {
+                    model.setConfirmationHtml("Failed to confirm subscription. Please try again.");
                 }
+            } catch (Exception ex) {
+                log.error("Failed to confirm subscription for user: " + ex.getMessage(), ex);
+                model.setSubscriptionResponseMessage("An error occurred. Please try again later.");
             }
         }
         return new ModelAndView("subscription/confirm", "applicationSubscriptionModel", model);
     }
-
 }

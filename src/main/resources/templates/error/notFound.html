@@ -8,23 +8,19 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
-
 <div class="grey_box">
-
-    <div>
+    <div style="padding:1em;">
         The disc app you requested does not exist. Please check the index number and try again.
     </div>
-
-    <div th:text="${errorText}"></div>
-
+    <div style="padding:1em;" th:text="${errorText}"></div>
     <div>
         <br/>
-        <form>
+        <form method="post" action="/error">
             <input class="button" onclick="history.back()" type="button" value="Click here to return to previous page">
+            &nbsp;
+            <input class="button" type="submit" name="returnToHomePage" value="Click here to return to the home page" />
         </form>
     </div>
-
 </div>
-
 </body>
 </html>
