@@ -163,6 +163,11 @@ a.tab:hover { background-color:#88f; color:#eee; }
     color: green;
 }
 
+.info-message {
+    color: red;
+    padding-bottom: 10px;
+}
+
 .admin_post {
     color: #fff;
     background: #f00;

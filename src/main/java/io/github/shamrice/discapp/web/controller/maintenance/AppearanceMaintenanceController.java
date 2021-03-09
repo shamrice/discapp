@@ -198,7 +198,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
     }
 
-        @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
+    @GetMapping(CONTROLLER_URL_DIRECTORY + "appearance-frameset.cgi")
     public ModelAndView getAppearanceView(@RequestParam(name = "id") long appId,
                                           @ModelAttribute MaintenanceViewModel maintenanceViewModel,
                                           Model model,
@@ -208,14 +208,11 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             String username = accountHelper.getLoggedInEmail();
             setCommonModelAttributes(model, app, username);
             maintenanceViewModel.setApplicationId(app.getId());
-
         } catch (Exception ex) {
             model.addAttribute("error", "No disc app with id " + appId + " found. " + ex.getMessage());
         }
-
         return new ModelAndView("admin/appearance-frameset", "maintenanceViewModel", maintenanceViewModel);
     }
-
 
     @PostMapping(CONTROLLER_URL_DIRECTORY + "modify/application")
     public ModelAndView postModifyApplication(@RequestParam(name = "id") long appId,
@@ -225,8 +222,8 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if (maintenanceViewModel.getApplicationName() == null || maintenanceViewModel.getApplicationName().isEmpty()) {
             log.warn("Cannot update application name to an empty string");
-            maintenanceViewModel.setInfoMessage("Cannot update disc app name to an empty value.");
-            return getAppearanceView(appId, maintenanceViewModel, model, response);
+            maintenanceViewModel.setApplicationInfoMessage("Cannot update application name to an empty value.");
+            return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
         }
 
         String email = accountHelper.getLoggedInEmail();
@@ -251,7 +248,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
                 applicationService.save(app);
 
-                maintenanceViewModel.setInfoMessage("Successfully updated application name.");
+                maintenanceViewModel.setApplicationInfoMessage("Application name updated.");
 
             } else {
                 maintenanceViewModel.setInfoMessage("Logged in user does not exist");
@@ -291,7 +288,7 @@ public class AppearanceMaintenanceController extends MaintenanceController {
             configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.STYLE_SHEET_URL, styleSheetUrl);
         }
 
-        maintenanceViewModel.setInfoMessage("Successfully updated Style Sheet URL.");
+        maintenanceViewModel.setStyleSheetInfoMessage("Style sheet settings updated.");
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
     }
@@ -326,9 +323,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
                     Prologue saved = applicationService.savePrologue(prologue);
                     if (saved != null) {
-                        maintenanceViewModel.setInfoMessage("Prologue updated successfully. ");
+                        maintenanceViewModel.setPrologueEpilogueInfoMessage("Prologue updated. ");
                     } else {
-                        maintenanceViewModel.setInfoMessage("Failed to save prologue. ");
+                        maintenanceViewModel.setPrologueEpilogueInfoMessage("Failed to save prologue. ");
                     }
                 }
 
@@ -347,18 +344,18 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                     epilogue.setText(maintenanceViewModel.getEpilogueText());
 
                     Epilogue savedEpilogue = applicationService.saveEpilogue(epilogue);
-                    String currentMessage = maintenanceViewModel.getInfoMessage();
+                    String currentMessage = maintenanceViewModel.getPrologueEpilogueInfoMessage();
                     if (currentMessage == null) {
                         currentMessage = "";
                     }
 
                     if (savedEpilogue != null) {
-                        currentMessage += " Epilogue updated successfully.";
+                        currentMessage += " Epilogue updated.";
                     } else {
                         currentMessage += " Failed to save epilogue.";
                     }
 
-                    maintenanceViewModel.setInfoMessage(currentMessage);
+                    maintenanceViewModel.setPrologueEpilogueInfoMessage(currentMessage);
                 }
             } else {
                 maintenanceViewModel.setInfoMessage("Logged in user does not exist");
@@ -399,9 +396,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
 
         if (sortOrderSaved && expandSaved & previewSaved && highlightSaved && threadBreakSaved && entryBreakSaved
                 && maxThreadCountSaved && threadDepthSaved && previewTopLevelSaved && previewReplySaved) {
-            maintenanceViewModel.setInfoMessage("Successfully saved changes to threads.");
+            maintenanceViewModel.setThreadInfoMessage("Thread settings updated.");
         } else {
-            maintenanceViewModel.setInfoMessage("Failed to save changes to threads.");
+            maintenanceViewModel.setThreadInfoMessage("Failed to save changes to threads.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -418,9 +415,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         boolean footerSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FOOTER_TEXT, String.valueOf(maintenanceViewModel.getFooter()));
 
         if (headerSaved && footerSaved) {
-            maintenanceViewModel.setInfoMessage("Successfully saved changes to header and footer.");
+            maintenanceViewModel.setHeaderFooterInfoMessage("Header and footer settings updated.");
         } else {
-            maintenanceViewModel.setInfoMessage("Failed to save changes to header and footer.");
+            maintenanceViewModel.setHeaderFooterInfoMessage("Failed to save changes to header and footer.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -441,9 +438,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         boolean messageSaved = configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.THREAD_BODY_LABEL_TEXT, String.valueOf(maintenanceViewModel.getMessageHeader()));
 
         if (authorHeaderSaved && dateHeaderSaved && emailSaved && subjectSaved && messageSaved) {
-            maintenanceViewModel.setInfoMessage("Successfully saved changes to labels.");
+            maintenanceViewModel.setLabelInfoMessage("Label settings updated.");
         } else {
-            maintenanceViewModel.setInfoMessage("Failed to save changes to labels.");
+            maintenanceViewModel.setLabelInfoMessage("Failed to save changes to labels.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -469,9 +466,9 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         if (shareButtonSaved && editButtonSaved && returnButtonSaved && previewButtonSaved && postButtonSaved
                 && previousPageButtonSaved && nextPageButtonSaved && replyButtonSaved) {
 
-            maintenanceViewModel.setInfoMessage("Successfully saved changes to buttons.");
+            maintenanceViewModel.setButtonInfoMessage("Button settings updated.");
         } else {
-            maintenanceViewModel.setInfoMessage("Failed to save changes to buttons.");
+            maintenanceViewModel.setButtonInfoMessage("Failed to save changes to buttons.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -507,13 +504,13 @@ public class AppearanceMaintenanceController extends MaintenanceController {
         Application app = applicationService.get(appId);
 
         if (!configurationService.saveApplicationConfiguration(app.getId(), ConfigurationProperty.FAVICON_URL, favicon)) {
-            maintenanceViewModel.setInfoMessage("Failed to update Favicon.");
+            maintenanceViewModel.setFaviconInfoMessage("Failed to update Favicon.");
         } else {
             configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-url");
             configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_CUSTOM_URL, favicon);
 
             maintenanceViewModel.setFavicon(favicon);
-            maintenanceViewModel.setInfoMessage("Successfully updated Favicon URL");
+            maintenanceViewModel.setFaviconInfoMessage("Favicon URL updated.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
@@ -539,15 +536,15 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, AppCustomFaviconUrl.CONTROLLER_DIRECTORY_URL + appId + "/" + existingFavicon.getFileName());
 
                 if (styleSave && activeSave) {
-                    maintenanceViewModel.setInfoMessage("Successfully set favicon for application to: " + maintenanceViewModel.getFaviconFileName());
+                    maintenanceViewModel.setFaviconInfoMessage("Favicon settings updated to use file " + maintenanceViewModel.getFaviconFileName());
                 } else {
-                    maintenanceViewModel.setInfoMessage("Failed to set favicon to uploaded file. Please try again.");
+                    maintenanceViewModel.setFaviconInfoMessage("Failed to set favicon to uploaded file. Please try again.");
                 }
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
             if (uploadSourceFile == null || uploadSourceFile.isEmpty()) {
-                maintenanceViewModel.setInfoMessage("No file selected to be uploaded. Please select a file.");
+                maintenanceViewModel.setFaviconInfoMessage("No file selected to be uploaded. Please select a file.");
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
@@ -561,12 +558,12 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                     && !fileName.toLowerCase().contains(".apng")
                     && !fileName.toLowerCase().contains(".svg")
             )) {
-                maintenanceViewModel.setInfoMessage("Favicon file selected is not a valid favicon file type.");
+                maintenanceViewModel.setFaviconInfoMessage("Favicon file selected is not a valid favicon file type.");
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
-
+            //TODO : set this max value somewhere constant...
             if (uploadSourceFile.getSize() > 655360) {
-                maintenanceViewModel.setInfoMessage("Favicon could not be uploaded. File is not valid. Please make sure file is less than 640KB");
+                maintenanceViewModel.setFaviconInfoMessage("Favicon could not be uploaded. File is not valid. Please make sure file is less than 640KB");
                 return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
             }
 
@@ -581,11 +578,11 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                 configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_STYLE_SETTING, "favicon-custom-file");
                 boolean activeSave = configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.FAVICON_URL, "/favicon/" + appId + "/" + fileName);
                 log.info("Favicon file upload for appId: " + app.getId() + " saved successfully.");
-                maintenanceViewModel.setInfoMessage(
-                        "Favicon file set successfully to " + uploadSourceFile.getOriginalFilename());
+                maintenanceViewModel.setFaviconInfoMessage(
+                        "Uploaded success. " + uploadSourceFile.getOriginalFilename() + " set as favicon.");
 
             } else {
-                maintenanceViewModel.setInfoMessage("Failed to upload favicon file. Please try again.");
+                maintenanceViewModel.setFaviconInfoMessage("Failed to upload favicon file. Please try again.");
             }
 
 
@@ -620,14 +617,14 @@ public class AppearanceMaintenanceController extends MaintenanceController {
                     maintenanceViewModel.getDisplayAfterPostHoldMessageText());
 
             if (isPostDisplaySuccess && isAfterPostDisplaySuccess && isPostMessageSuccess && isAfterPostMessageSuccess) {
-                maintenanceViewModel.setInfoMessage("Hold permission display settings updated.");
+                maintenanceViewModel.setHoldInfoMessage("Hold permission display settings updated.");
             } else {
-                maintenanceViewModel.setInfoMessage("Failed to save hold permission display settings.");
+                maintenanceViewModel.setHoldInfoMessage("Failed to save hold permission display settings.");
             }
 
         } catch (Exception ex) {
             log.error("Failed to update hold appearance config.", ex);
-            maintenanceViewModel.setInfoMessage("Failed to update hold permission display settings.");
+            maintenanceViewModel.setHoldInfoMessage("Failed to update hold permission display settings.");
         }
 
         return getAppearanceFormsView(appId, maintenanceViewModel, model, response);
