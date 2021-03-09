@@ -60,8 +60,19 @@ public class SiteAdminController {
     @Autowired
     private InputHelper inputHelper;
 
+    private static String appVersion;
+
+    private String getAppVersion() {
+        if (appVersion == null) {
+            appVersion = io.github.shamrice.discapp.Application.class.getPackage().getImplementationVersion();
+            log.info("Website version: " + appVersion);
+        }
+        return appVersion;
+    }
+
     @GetMapping(CONTROLLER_URL_DIRECTORY)
-    public ModelAndView getSiteAdmin(ModelAndView model) {
+    public ModelAndView getSiteAdmin(Model model) {
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/admin", "model", model);
     }
 
@@ -69,6 +80,7 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminIpBlock(SiteAdminIpBlockViewModel siteAdminIpBlockViewModel, Model model) {
         List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
         siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
     }
 
@@ -92,6 +104,7 @@ public class SiteAdminController {
 
         List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
         siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
     }
 
@@ -117,6 +130,7 @@ public class SiteAdminController {
 
         List<ApplicationIpBlock> ipBlockList = applicationIpBlockRepository.findByApplicationId(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID);
         siteAdminIpBlockViewModel.setIpBlockList(ipBlockList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/ipBlock", "siteAdminIpBlockViewModel", siteAdminIpBlockViewModel);
     }
 
@@ -124,6 +138,7 @@ public class SiteAdminController {
     public ModelAndView getSiteAdminSubscribers(SiteAdminSubscriberViewModel siteAdminSubscriberViewModel, Model model) {
         List<ApplicationSubscription> subscriptionList = applicationSubscriptionRepository.findAll(Sort.by("applicationId").ascending());
         siteAdminSubscriberViewModel.setApplicationSubscriptions(subscriptionList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/subscribers", "siteAdminSubscriberViewModel", siteAdminSubscriberViewModel);
     }
 
@@ -146,6 +161,7 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for subscriber id: " + applicationSubscriptionId + " to: " + enabled);
             siteAdminSubscriberViewModel.setErrorMessage("Failed to set subscriber Id: " + applicationSubscriptionId + " enabled to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminSubscribers(siteAdminSubscriberViewModel, model);
     }
 
@@ -190,6 +206,7 @@ public class SiteAdminController {
         siteAdminAccountViewModel.setUserType(userType);
         siteAdminAccountViewModel.setUserList(modelUserList);
 
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/accounts", "siteAdminAccountViewModel", siteAdminAccountViewModel);
     }
 
@@ -211,6 +228,7 @@ public class SiteAdminController {
             log.error("Failed to set show email settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " email enabled to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
@@ -231,6 +249,7 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " enabled to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
@@ -251,6 +270,7 @@ public class SiteAdminController {
             log.error("Failed to set is admin settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is admin to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
@@ -271,6 +291,7 @@ public class SiteAdminController {
             log.error("Failed to set is user account settings for disc app user id: " + userId + " to: " + enabled);
             siteAdminAccountViewModel.setErrorMessage("Failed to set userId: " + userId + " is user account to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminAccounts(userType, siteAdminAccountViewModel, model);
     }
 
@@ -287,6 +308,7 @@ public class SiteAdminController {
             siteAdminOwnerViewModel.setErrorMessage("Unable to find owner with id: " + ownerId);
         }
         siteAdminOwnerViewModel.setUserType(userType);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/owner", "siteAdminOwnerViewModel", siteAdminOwnerViewModel);
 
     }
@@ -296,6 +318,7 @@ public class SiteAdminController {
                                                  Model model) {
         List<Application> fullApplicationList = applicationRepository.findAll(Sort.by("id").ascending());
         siteAdminApplicationViewModel.setApplicationList(fullApplicationList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/applications", "siteAdminApplicationViewModel", siteAdminApplicationViewModel);
     }
 
@@ -320,6 +343,7 @@ public class SiteAdminController {
             log.error("Failed to set enabled settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " enabled to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
@@ -347,6 +371,7 @@ public class SiteAdminController {
             log.error("Failed to set deleted settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " deleted to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
@@ -366,6 +391,7 @@ public class SiteAdminController {
             log.error("Failed to set searchable settings for application id: " + appId + " to: " + enabled);
             siteAdminApplicationViewModel.setErrorMessage("Failed to set appId: " + appId + " searchable to: " + enabled);
         }
+        model.addAttribute("appVersion", getAppVersion());
         return getSiteAdminApplications(siteAdminApplicationViewModel, model);
     }
 
@@ -374,12 +400,14 @@ public class SiteAdminController {
                                             Model model) {
         List<ImportData> fullImportDataList = importDataRepository.findAll(Sort.by("id").ascending());
         siteAdminImportViewModel.setImportDataList(fullImportDataList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/imports", "siteAdminImportViewModel", siteAdminImportViewModel);
     }
 
     @GetMapping(IMPORT_DELETE)
     public ModelAndView getSiteAdminImportDelete(@RequestParam(name = "id") Long importId,
-                                                 SiteAdminImportViewModel siteAdminImportViewModel) {
+                                                 SiteAdminImportViewModel siteAdminImportViewModel,
+                                                 Model model) {
 
         try {
             log.info("Deleting import id: " + importId);
@@ -389,7 +417,8 @@ public class SiteAdminController {
             log.error("Failed to delete import id: " + importId);
             siteAdminImportViewModel.setErrorMessage("Failed to delete import id: " + importId + " :: " + ex.getMessage());
         }
-        return getSiteAdminImports(siteAdminImportViewModel, null);
+        model.addAttribute("appVersion", getAppVersion());
+        return getSiteAdminImports(siteAdminImportViewModel, model);
     }
 
     @GetMapping(IMPORT_DOWNLOAD)
@@ -423,13 +452,14 @@ public class SiteAdminController {
             }
         }
         siteAdminThreadViewModel.setThreadList(fullThreadList);
+        model.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/threads", "siteAdminThreadViewModel", siteAdminThreadViewModel);
     }
 
     @GetMapping(THREAD_RESTORE)
     public ModelAndView getSiteAdminThreadRestore(@RequestParam(name = "id") Long threadId,
-                                                 SiteAdminThreadViewModel siteAdminThreadViewModel) {
-
+                                                  SiteAdminThreadViewModel siteAdminThreadViewModel,
+                                                  Model model) {
         try {
             log.info("Restoring thread id: " + threadId);
             Thread thread = threadService.getThreadById(threadId);
@@ -446,16 +476,18 @@ public class SiteAdminController {
             log.error("Failed to restore thread id: " + threadId + " :: " + ex.getMessage(), ex);
             siteAdminThreadViewModel.setErrorMessage("Failed to restore thread id: " + threadId + " :: " + ex.getMessage());
         }
-        return getSiteAdminThreads(siteAdminThreadViewModel, null);
+        model.addAttribute("appVersion", getAppVersion());
+        return getSiteAdminThreads(siteAdminThreadViewModel, model);
     }
 
     @GetMapping(UPDATE_URL)
-    public ModelAndView getSiteAdminUpdateView(SiteAdminUpdateViewModel model) {
+    public ModelAndView getSiteAdminUpdateView(SiteAdminUpdateViewModel model, Model headerModel) {
+        headerModel.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/update", "siteAdminUpdateViewModel", model);
     }
 
     @PostMapping(UPDATE_URL)
-    public ModelAndView postSiteAdminUpdateView(@ModelAttribute SiteAdminUpdateViewModel model) {
+    public ModelAndView postSiteAdminUpdateView(@ModelAttribute SiteAdminUpdateViewModel model, Model headerModel) {
 
         if (model.getNewUpdateText() != null && !model.getNewUpdateText().trim().isEmpty()
                 && model.getNewUpdateSubject() != null && !model.getNewUpdateSubject().trim().isEmpty()) {
@@ -463,6 +495,7 @@ public class SiteAdminController {
             if (model.getPreviewButton() != null && !model.getPreviewButton().isEmpty()) {
                 model.setShowPreview(true);
                 model.setUpdatePreviewText(addHtmlToUpdateBody(model.getNewUpdateText()));
+                headerModel.addAttribute("appVersion", getAppVersion());
                 return new ModelAndView("site_admin/update", "siteAdminUpdateViewModel", model);
             } else {
                 String body = addHtmlToUpdateBody(model.getNewUpdateText());
@@ -483,12 +516,13 @@ public class SiteAdminController {
                 }
             }
         }
-
+        headerModel.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/update", "siteAdminUpdateViewModel", model);
     }
 
     @GetMapping(UPDATE_MANAGE)
-    public ModelAndView getSiteAdminUpdateManageView(SiteAdminUpdateViewModel model) {
+    public ModelAndView getSiteAdminUpdateManageView(SiteAdminUpdateViewModel model, Model headerModel) {
+        headerModel.addAttribute("appVersion", getAppVersion());
         model.setSiteUpdateLogList(siteService.getSiteUpdateLogs());
         return new ModelAndView("site_admin/updateManage", "siteAdminUpdateViewModel", model);
     }
@@ -507,7 +541,9 @@ public class SiteAdminController {
     }
 
     @GetMapping(UPDATE_EDIT)
-    public ModelAndView getSiteAdminUpdateEdit(@RequestParam(name = "id") long updateId, SiteAdminUpdateViewModel model) {
+    public ModelAndView getSiteAdminUpdateEdit(@RequestParam(name = "id") long updateId,
+                                               SiteAdminUpdateViewModel model,
+                                               Model headerModel) {
         SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(updateId);
 
         String updatePlainText = siteUpdateLog.getMessage();
@@ -517,11 +553,15 @@ public class SiteAdminController {
         model.setEditUpdateId(siteUpdateLog.getId());
         model.setEditUpdateSubject(siteUpdateLog.getSubject());
         model.setEditUpdateText(updatePlainText);
+
+        headerModel.addAttribute("appVersion", getAppVersion());
         return new ModelAndView("site_admin/updateEdit", "siteAdminUpdateViewModel", model);
     }
 
     @PostMapping(UPDATE_EDIT)
-    public ModelAndView postSiteAdminUpdateEdit(@ModelAttribute SiteAdminUpdateViewModel model) {
+    public ModelAndView postSiteAdminUpdateEdit(@ModelAttribute SiteAdminUpdateViewModel model,
+                                                Model headerModel) {
+        headerModel.addAttribute("appVersion", getAppVersion());
         if (model.getEditUpdateSubject() != null && !model.getEditUpdateSubject().trim().isEmpty()
                 && model.getEditUpdateText() != null && !model.getEditUpdateText().trim().isEmpty()) {
             SiteUpdateLog siteUpdateLog = siteService.getSiteUpdateLog(model.getEditUpdateId());
