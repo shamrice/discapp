@@ -19,26 +19,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.LIST_MAINTENANCE_PAGE;
+import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.LIST_MAINTENANCE_PREVIEW_PAGE;
 import static io.github.shamrice.discapp.web.model.maintenance.MaintenanceMailingListViewModel.*;
 
 @Controller
 @Slf4j
 public class MailingListMaintenanceController extends MaintenanceController {
 
-
     @GetMapping(LIST_MAINTENANCE_PAGE)
     public ModelAndView getListMaintenanceView(@RequestParam(name = "id") long appId,
                                                @RequestParam(name = "tab", required = false) String tab,
                                                @RequestParam(name = "status", required =  false) String status,
                                                HttpServletRequest request,
-                                               Model model) {
+                                               Model model,
+                                               MaintenanceMailingListViewModel listViewModel) {
 
         Application app = applicationService.get(appId);
         String username = accountHelper.getLoggedInEmail();
 
         setCommonModelAttributes(model, app, username);
 
-        MaintenanceMailingListViewModel listViewModel = new MaintenanceMailingListViewModel();
+        if (listViewModel == null) {
+            listViewModel = new MaintenanceMailingListViewModel();
+        }
 
         if (status != null && !status.isEmpty()) {
             listViewModel.setInfoMessage(status);
@@ -86,17 +89,20 @@ public class MailingListMaintenanceController extends MaintenanceController {
 
         } else if (tab.equalsIgnoreCase(APPEARANCE_TAB)) {
 
-            String descriptionText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML, "Enter your email address in order to receive daily updates.");
-            String followUpPageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML, "A confirmation message has been sent to your address.");
-            String confirmationMessage = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, "Please click on the link below to confirm your subscription.");
-            String confirmationPageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "You are now subscribed. You will receive updates when new articles are posted. ");
-            String unsubscribePageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are unsubscribed from this mailing list.");
+            //if not coming back from preview, pull from config. otherwise values already passed in model.
+            if (listViewModel.getUpdateFormsEditButton() == null) {
+                String descriptionText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_DESCRIPTION_PAGE_HTML, "Enter your email address in order to receive daily updates.");
+                String followUpPageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_FOLLOW_UP_PAGE_HTML, "A confirmation message has been sent to your address.");
+                String confirmationMessage = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_EMAIL_MESSAGE, "Please click on the link below to confirm your subscription.");
+                String confirmationPageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_CONFIRMATION_PAGE_HTML, "You are now subscribed. You will receive updates when new articles are posted. ");
+                String unsubscribePageText = configurationService.getStringValue(app.getId(), ConfigurationProperty.MAILING_LIST_UNSUBSCRIBE_PAGE_HTML, "You are unsubscribed from this mailing list.");
 
-            listViewModel.setDescriptionText(descriptionText);
-            listViewModel.setFollowUpPageText(followUpPageText);
-            listViewModel.setConfirmationMessageText(confirmationMessage);
-            listViewModel.setConfirmationPageText(confirmationPageText);
-            listViewModel.setUnsubscribePageText(unsubscribePageText);
+                listViewModel.setDescriptionText(descriptionText);
+                listViewModel.setFollowUpPageText(followUpPageText);
+                listViewModel.setConfirmationMessageText(confirmationMessage);
+                listViewModel.setConfirmationPageText(confirmationPageText);
+                listViewModel.setUnsubscribePageText(unsubscribePageText);
+            }
 
         } else if (tab.equalsIgnoreCase(SUBSCRIBERS_TAB)) {
 
@@ -130,8 +136,17 @@ public class MailingListMaintenanceController extends MaintenanceController {
                                                 @ModelAttribute MaintenanceMailingListViewModel listViewModel,
                                                 HttpServletRequest request,
                                                 Model model) {
-
         String status = "Saved.";
+
+        //preview button clicked, show preview page
+        if (listViewModel.getUpdateFormsPreviewButton() != null && !listViewModel.getUpdateFormsPreviewButton().isEmpty()) {
+            return getListPreviewView(appId, tab, listViewModel, request, model);
+        }
+
+        //return from preview button clicked, show get appearance tab on main template.
+        if (listViewModel.getUpdateFormsEditButton() != null && !listViewModel.getUpdateFormsEditButton().isEmpty()) {
+            return getListMaintenanceView(appId, tab, null, request, model, listViewModel);
+        }
 
         if (listViewModel.getChangeBehaviorButton() != null && !listViewModel.getChangeBehaviorButton().isEmpty()) {
             if (configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
@@ -169,4 +184,19 @@ public class MailingListMaintenanceController extends MaintenanceController {
 
     }
 
+    @GetMapping(LIST_MAINTENANCE_PREVIEW_PAGE)
+    public ModelAndView getListPreviewView(@RequestParam(name = "id") long appId,
+                                                @RequestParam(name = "tab", required = false) String tab,
+                                                @ModelAttribute MaintenanceMailingListViewModel listViewModel,
+                                                HttpServletRequest request,
+                                                Model model) {
+        Application app = applicationService.get(appId);
+        String username = accountHelper.getLoggedInEmail();
+
+        setCommonModelAttributes(model, app, username);
+        //tab can only be from appearance page.
+        listViewModel.setCurrentTab(APPEARANCE_TAB);
+        listViewModel.setApplicationId(appId);
+        return new ModelAndView("admin/disc-list-preview", "maintenanceMailingListViewModel", listViewModel);
+    }
 }

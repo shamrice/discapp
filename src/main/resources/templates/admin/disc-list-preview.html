@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="@{|Disc App Maintenance Page - ${appName}|}"></title>
+    <link rel="stylesheet" type="text/css" href="/styles/maint.css"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <style type="text/css">
+        div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;}
+        .mailing_list_config_preview {border: 2px inset #000;padding:1em;min-height: 5em;}
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+
+<div th:replace="admin/fragments/account-controls :: account-controls">
+    static thread prototyping placeholder
+</div>
+
+<div th:if="${maintenanceMailingListViewModel.getInfoMessage()}" class="alert alert-error grey_box"
+     th:text="${maintenanceMailingListViewModel.getInfoMessage()}">
+</div>
+
+<div id="tabs">
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Forms</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Forms')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Forms|}">Forms</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Appearance</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Appearance|}">Appearance</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Subscribers</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Subscribers')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Subscribers|}">Subscribers</a>
+
+    <span th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Reply')}" class="tab"
+          style="background-color:#fff; color:#00f;border:3px solid blue; border-bottom-color:#fff;">Reply Notifications</span>
+    <a th:unless="${maintenanceMailingListViewModel.getCurrentTab().equals('Reply')}" class="tab"
+       th:href="@{|/admin/disc-list-maint.cgi?id=${maintenanceMailingListViewModel.getApplicationId()}&tab=Reply|}">Reply
+        Notifications</a>
+</div>
+
+
+<form th:if="${maintenanceMailingListViewModel.getCurrentTab().equals('Appearance')}" method="post"
+      action="/admin/disc-list-maint.cgi" enctype="multipart/form-data">
+    <div class="grey_box" style="width:40em; text-align:left;">
+        <p><b>Note:</b> The actual mailing list related HTML pages will also be stylized with your application's
+            CSS settings that are set on the appearance maintenance page.
+        </p>
+        <p>
+        <div><b>Description preview</b> (Description of your mailing list. You may use up to 512 characters.)</div>
+        <div name="descriptionTextPreview" class="mailing_list_config_preview"
+                  th:utext="${maintenanceMailingListViewModel.getDescriptionText()}"></div>
+        </p>
+        <p>
+        <div><b>Followup page preview</b> (Text to appear after users submit their address. 512 chars max.)</div>
+        <div name="followUpPageTextPreview" class="mailing_list_config_preview"
+                  th:utext="${maintenanceMailingListViewModel.getFollowUpPageText()}"></div>
+        </p>
+        <p>
+        <div><b>Confirmation message preview</b> (Text to appear in the confirmation message sent to users after they subscribe.
+            512 chars max.)
+        </div>
+        <div name="confirmationMessageTextPreview" class="mailing_list_config_preview"
+                  th:utext="${maintenanceMailingListViewModel.getConfirmationMessageText()}"></div>
+        </p>
+        <p>
+        <div><b>Confirmation page preview</b> (Text to appear after users confirm their subscription. 512 chars max.)</div>
+        <div name="confirmationPageTextPreview" class="mailing_list_config_preview"
+                  th:utext="${maintenanceMailingListViewModel.getConfirmationPageText()}"></div>
+        </p>
+        <p>
+        <div><b>Unsubscription page preview</b> (Text to appear after users unsubscribe from your DiscList. 512 chars max.)
+        </div>
+        <div name="unsubscribePageTextPreview" class="mailing_list_config_preview"
+                  th:utext="${maintenanceMailingListViewModel.getUnsubscribePageText()}"></div>
+        </p>
+        <div style="margin-top:1em; text-align:center;">
+            <input type="submit" name="updateFormsEditButton" value="Edit" class="button"/>
+            &nbsp;
+            <input type="submit" name="updateFormsButton" value="Update" class="button"/>
+        </div>
+    </div>
+    <input type="hidden" name="id" th:value="${maintenanceMailingListViewModel.getApplicationId()}"/>
+    <input type="hidden" name="tab" value="Appearance"/>
+    <input type="hidden" name="descriptionText" th:value="${maintenanceMailingListViewModel.getDescriptionText()}"/>
+    <input type="hidden" name="followUpPageText" th:value="${maintenanceMailingListViewModel.getFollowUpPageText()}"/>
+    <input type="hidden" name="confirmationMessageText" th:value="${maintenanceMailingListViewModel.getConfirmationMessageText()}"/>
+    <input type="hidden" name="confirmationPageText" th:value="${maintenanceMailingListViewModel.getConfirmationPageText()}"/>
+    <input type="hidden" name="unsubscribePageText" th:value="${maintenanceMailingListViewModel.getUnsubscribePageText()}"/>
+
+</form>
+</body>
+</html>

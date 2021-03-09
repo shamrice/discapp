@@ -48,6 +48,8 @@ public class MaintenanceMailingListViewModel {
     private String confirmationPageText;
     private String unsubscribePageText;
     private String updateFormsButton;
+    private String updateFormsPreviewButton;
+    private String updateFormsEditButton;
 
     private String emailReplySetting;
     private String changeReplyBehaviorButton;
