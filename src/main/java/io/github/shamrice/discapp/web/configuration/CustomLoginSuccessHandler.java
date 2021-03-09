@@ -28,12 +28,12 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         //for redirect on system admin accounts to their related disc maintenance page.
         DiscAppUserPrincipal userPrincipal = (DiscAppUserPrincipal)authentication.getPrincipal();
         if (userPrincipal != null) {
-            log.debug("Login by user: " + userPrincipal.toString());
+            log.debug("Login user id: " + userPrincipal.getEmail());
 
             discAppUserDetailsService.setLastLoginDateToNow(userPrincipal.getId());
 
             if (!userPrincipal.isUserAccount()) {
-                log.info("Account: " + userPrincipal.toString() + " :: is System admin account. Redirecting to related admin page.");
+                log.info("User: " + userPrincipal.getEmail() + " :: is System admin account. Redirecting to related admin page.");
                 //todo : probably should pull that string from somewhere instead of just hard coded...
                 String redirect = "/admin/disc-maint.cgi?id=" + userPrincipal.getEmail();
                 getRedirectStrategy().sendRedirect(request, response, redirect);

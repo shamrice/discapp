@@ -1,5 +1,7 @@
 package io.github.shamrice.discapp.web.controller.authentication;
 
+import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthenticationController {
 
     @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
+
+    @Autowired
     private AccountHelper accountHelper;
 
     @GetMapping(AuthenticationUrl.LOGIN)
@@ -31,8 +36,20 @@ public class AuthenticationController {
                 DefaultSavedRequest savedReq = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
                 if (savedReq != null && savedReq.getRequestURI().contains("disc-maint.cgi")) {
                     String[] idVals = savedReq.getParameterValues("id");
-                    if (idVals.length > 0)
-                        modelMap.addAttribute("appId", idVals[0]);
+                    if (idVals.length > 0) {
+                        try {
+                            //this is a gross way to verify id query string is long before converting
+                            //it back to string to get the UUID username of the system account.
+                            long appId = Long.parseLong(idVals[0]);
+                            DiscAppUser user = discAppUserDetailsService.getByEmail(String.valueOf(appId));
+                            if (user != null && !user.getIsUserAccount()) {
+                                modelMap.addAttribute("appId", user.getUsername());
+                            }
+                        } catch (NumberFormatException formatException) {
+                            log.error("App Id in query string for log in page was not a valid number: "
+                                    + idVals[0], formatException);
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Error trying to get default saved request from session object. " + ex.getMessage(), ex);
