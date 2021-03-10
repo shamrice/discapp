@@ -44,13 +44,13 @@ public class AbuseController {
     private ApplicationService applicationService;
 
     @GetMapping(ABUSE_DELETE)
-    public ModelAndView getAbuseView(@RequestParam(name = "abuseId") Long abuseId,
-                                     @RequestParam(name = "discId", required = false) Long appId,
-                                     @RequestParam(name = "submitter", required = false) String submitter,
-                                     @RequestParam(name = "email", required = false) String email,
-                                     @RequestParam(name = "ip", required = false) String ip,
-                                     @RequestParam(name = "subject", required = false) String subject,
-                                     @RequestParam(name = "body", required = false) String body,
+    public ModelAndView getAbuseView(@RequestParam(name = ABUSE_ID_QUERY_PARAM) Long abuseId,
+                                     @RequestParam(name = DISC_APP_ID_QUERY_PARAM, required = false) Long appId,
+                                     @RequestParam(name = SUBMITTER_QUERY_PARAM, required = false) String submitter,
+                                     @RequestParam(name = EMAIL_QUERY_PARAM, required = false) String email,
+                                     @RequestParam(name = IP_QUERY_PARAM, required = false) String ip,
+                                     @RequestParam(name = SUBJECT_QUERY_PARAM, required = false) String subject,
+                                     @RequestParam(name = BODY_QUERY_PARAM, required = false) String body,
                                      AbuseViewModel abuseViewModel,
                                      Model model) {
         ReportedAbuse reportedAbuse = threadService.getReportedAbuse(abuseId);
@@ -80,7 +80,7 @@ public class AbuseController {
                             + " but they do not own it. Action has been blocked.");
                 }
             } else if (isRootAdmin) {
-                log.info("User: " + userEmail + " (ROOT) has deleted reported abuse: " + reportedAbuse.toString());
+                log.info("ROOT User has deleted reported abuse id: " + reportedAbuse.getId());
                 threadService.deleteReportedAbuse(reportedAbuse.getId());
                 abuseViewModel.setInfoMessage("Removed abuse record from database.");
             } else {
@@ -95,12 +95,12 @@ public class AbuseController {
     }
 
     @GetMapping(ABUSE_VIEW)
-    public ModelAndView getAbuseView(@RequestParam(name = "id", required = false) Long appId,
-                                     @RequestParam(name = "submitter", required = false) String submitter,
-                                     @RequestParam(name = "email", required = false) String email,
-                                     @RequestParam(name = "ip", required = false) String ip,
-                                     @RequestParam(name = "subject", required = false) String subject,
-                                     @RequestParam(name = "body", required = false) String body,
+    public ModelAndView getAbuseView(@RequestParam(name = ID_QUERY_PARAM, required = false) Long appId,
+                                     @RequestParam(name = SUBMITTER_QUERY_PARAM, required = false) String submitter,
+                                     @RequestParam(name = EMAIL_QUERY_PARAM, required = false) String email,
+                                     @RequestParam(name = IP_QUERY_PARAM, required = false) String ip,
+                                     @RequestParam(name = SUBJECT_QUERY_PARAM, required = false) String subject,
+                                     @RequestParam(name = BODY_QUERY_PARAM, required = false) String body,
                                      AbuseViewModel abuseViewModel,
                                      Model model) {
 
@@ -120,6 +120,7 @@ public class AbuseController {
         String userEmail = accountHelper.getLoggedInEmail();
         DiscAppUser user = userDetailsService.getByEmail(userEmail);
 
+        //generate list of owned applications that user can delete records for
         if (user != null && user.getOwnerId() != null) {
             List<Application> ownedApps = applicationService.getByOwnerId(user.getOwnerId());
             for (Application ownedApp : ownedApps) {
@@ -130,6 +131,8 @@ public class AbuseController {
             }
         }
 
+        boolean isRoot = accountHelper.isRootAdminAccount();
+
         for (ReportedAbuse reportedAbuse : reportedAbuses) {
             if (reportedAbuse.getThread() != null) {
 
@@ -137,33 +140,16 @@ public class AbuseController {
                 boolean isDeletable = false;
                 String deleteQueryParam = "";
 
-                if (ownedAppIds.contains(reportedAbuse.getApplicationId())) {
+                if (isRoot || ownedAppIds.contains(reportedAbuse.getApplicationId())) {
                     isDeletable = true;
-                    String appIdVal = "";
-                    if (appId != null) {
-                        appIdVal = appId.toString();
-                    }
 
-                    //TODO : store these strings somewhere.
-                    deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
-                            + "&discId=" + appIdVal
-                            + "&submitter=" + abuseViewModel.getSubmitter()
-                            + "&email=" + abuseViewModel.getEmail()
-                            + "&ip=" + abuseViewModel.getIpAddress()
-                            + "&subject=" + abuseViewModel.getSubject()
-                            + "&body=" + abuseViewModel.getMessage();
-                }
-
-                //if logged in as site root admin, all entries should be deletable.
-                if (accountHelper.isRootAdminAccount()) {
-                    isDeletable = true;
-                    deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
-                            + "&discId=" + reportedAbuse.getApplicationId()
-                            + "&submitter=" + abuseViewModel.getSubmitter()
-                            + "&email=" + abuseViewModel.getEmail()
-                            + "&ip=" + abuseViewModel.getIpAddress()
-                            + "&subject=" + abuseViewModel.getSubject()
-                            + "&body=" + abuseViewModel.getMessage();
+                    deleteQueryParam = "?" + ABUSE_ID_QUERY_PARAM + "=" + reportedAbuse.getId()
+                            + "&" + DISC_APP_ID_QUERY_PARAM + "=" + reportedAbuse.getApplicationId()
+                            + "&" + SUBMITTER_QUERY_PARAM + "=" + abuseViewModel.getSubmitter()
+                            + "&" + EMAIL_QUERY_PARAM + "=" + abuseViewModel.getEmail()
+                            + "&" + IP_QUERY_PARAM + "=" + abuseViewModel.getIpAddress()
+                            + "&" + SUBJECT_QUERY_PARAM + "=" + abuseViewModel.getSubject()
+                            + "&" + BODY_QUERY_PARAM + "=" + abuseViewModel.getMessage();
                 }
 
                 AbuseViewModel.ReportedThread reportedThread = new AbuseViewModel.ReportedThread(
@@ -195,7 +181,7 @@ public class AbuseController {
     }
 
     @GetMapping(ABUSE_SEARCH_VIEW)
-    public ModelAndView getAbuseSearchView(@RequestParam(name = "articleId") long threadId,
+    public ModelAndView getAbuseSearchView(@RequestParam(name = ARTICLE_ID_QUERY_PARAM) long threadId,
                                            AbuseViewModel abuseViewModel,
                                            Model model) {
          Thread thread = threadService.getThreadById(threadId);
