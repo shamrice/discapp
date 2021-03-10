@@ -75,7 +75,7 @@
 
 </div>
 
-<div th:if="${appId}" class="grey_box" style="width:32em;">
+<div th:if="${systemUsername}" class="grey_box" style="width:32em;">
 
     <div th:if="${param.error} and ${param.admin}" class="alert alert-error">
         Login failed. Please try again.
@@ -90,7 +90,7 @@
         <div>
             <input type="password" class="button" name="password" />
             <input type="submit" name="submit_password" value="Enter Password" class="button" />
-            <input type="hidden" name="username" th:value="${appId}" />
+            <input type="hidden" name="username" th:value="${systemUsername}" />
         </div>
     </form>
 </div>

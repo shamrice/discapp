@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.service.account;
 
+import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Owner;
 import io.github.shamrice.discapp.data.model.PasswordReset;
@@ -132,7 +133,7 @@ public class AccountService {
             return false;
         }
 
-        if (!applicationService.isOwnerOfApp(appId, email)) {
+        if (!isOwnerEmailOwnerOfApp(email, appId)) {
             log.warn("System account for appId: " + appId + " cannot be reset even though fields are correct because "
                     + email + " does not own the application.");
             return false;
@@ -161,35 +162,25 @@ public class AccountService {
     }
 
     public boolean createSystemAccountPasswordResetRequest(String ownerEmail, Long appId, String passwordResetUrl) {
-
-        if (discAppUserDetailsService.getByEmail(appId.toString()) == null) {
-            log.warn("Attempted to reset password for disc app admin for appId: " + appId + " but no such disc app exists.");
+        if (appId == null || passwordResetUrl == null || passwordResetUrl.isEmpty()) {
+            log.error("Failed to create system account password reset. All parameters required to create request.");
             return false;
         }
-
-        if (!applicationService.isOwnerOfApp(appId, ownerEmail)) {
-            log.warn("Attempted to reset admin system account for appId: " + appId + " with owner email: "
-                    + ownerEmail + ". But that is not the owner email for that application.");
+        if (!isOwnerEmailOwnerOfApp(ownerEmail, appId)) {
+            log.warn("Failed to create system account password reset. Email: " + ownerEmail
+                    + " does not own appId: " + appId);
             return false;
         }
 
         PasswordReset passwordReset = createNewPasswordResetRequest(ownerEmail, appId);
 
-        if (passwordReset != null) {
-            Map<String, Object> emailParams = new HashMap<>();
-            emailParams.put(PASSWORD_RESET_URL, passwordResetUrl + "/" + passwordReset.getKey());
-            emailParams.put(PASSWORD_RESET_CODE, passwordReset.getCode());
+        Map<String, Object> emailParams = new HashMap<>();
+        emailParams.put(PASSWORD_RESET_URL, passwordResetUrl + "/" + passwordReset.getKey());
+        emailParams.put(PASSWORD_RESET_CODE, passwordReset.getCode());
 
-            TemplateEmail passwordResetEmail = new TemplateEmail(ownerEmail, NotificationType.PASSWORD_RESET, emailParams, false);
-            EmailNotificationQueueService.addTemplateEmailToSend(passwordResetEmail);
-            return true;
-
-        } else {
-            log.error("Failed to create new admin system account password reset request for appId: "
-                    + appId + " with owner email: " + ownerEmail);
-        }
-
-        return false;
+        TemplateEmail passwordResetEmail = new TemplateEmail(ownerEmail, NotificationType.PASSWORD_RESET, emailParams, false);
+        EmailNotificationQueueService.addTemplateEmailToSend(passwordResetEmail);
+        return true;
     }
 
     public boolean createPasswordResetRequest(String email, String passwordResetUrl) {
@@ -215,6 +206,32 @@ public class AccountService {
         }
 
         return false;
+    }
+
+    private boolean isOwnerEmailOwnerOfApp(String ownerEmail, long appId) {
+        if (ownerEmail == null ||ownerEmail.isEmpty()) {
+            log.error("No owner email address passed to check if owner of appId: " + appId + " :: Returning false");
+            return false;
+        }
+        Owner owner = ownerRepository.findOneByEmail(ownerEmail);
+        if (owner == null) {
+            log.info("No owner exists for owner email: " + ownerEmail + " : Does not own appId: " + appId
+                    + " :: Returning false");
+            return false;
+        }
+        Application app = applicationService.get(appId);
+        if (app == null) {
+            log.info("No appId: " + appId + " exists. " + ownerEmail + " is not the owner. :: Returning false.");
+            return false;
+        }
+        if (!app.getOwnerId().equals(owner.getId())) {
+            log.info("AppId: " + appId + " owner Id does not match owner id of owner email: "
+                    + ownerEmail + " :: Returning false.");
+            return false;
+        } else {
+            log.info("Owner email: " + ownerEmail + " is the owner of appId: " + appId);
+            return true;
+        }
     }
 
     private PasswordReset createNewPasswordResetRequest(String email, Long appId) {

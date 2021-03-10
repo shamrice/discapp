@@ -207,34 +207,25 @@ public class ApplicationService {
         return null;
     }
 
-    public boolean isOwnerOfApp(long appId, String email) {
-        Long ownerIdForEmail = discAppUserDetailsService.getOwnerIdForEmail(email);
-
-        if (ownerIdForEmail != null && ownerIdForEmail > 0) {
-            Owner owner = accountService.getOwnerById(ownerIdForEmail);
-            if (owner != null) {
-                List<Application> ownedApps = applicationRepository.findByOwnerIdAndDeleted(owner.getId(), false);
-                for (Application application : ownedApps) {
-                    if (application.getId() != null && application.getId() == appId) {
-
-                        DiscAppUser user = discAppUserDetailsService.getByEmail(email);
-                        if (user != null && user.getIsUserAccount()) {
-                            log.info("User: " + email + " is owner of appId: " + appId + " :: and is regular user :: returning true.");
-                            return true;
-                        } else if (user != null && !user.getIsUserAccount() && user.getEmail().equals(String.valueOf(appId))) {
-                            log.info("User: " + email + " is owner of appId: " + appId + " :: and is matching system account to appId :: returning true.");
-                            return true;
-                        }
-                    }
-                }
-            }
-        } else {
-            log.info("User: " + email     + " is not an owner of any applications. Returning false.");
+    public boolean isUserAccountOwnerOfApp(long appId, String email) {
+        if (email == null || email.isEmpty()) {
+            log.info("An email address is required to check application ownership. Returning false.");
+            return false;
+        }
+        DiscAppUser user = discAppUserDetailsService.getByEmail(email);
+        if (user == null || !user.getEnabled() || user.getOwnerId() == null) {
+            log.info("User: " + email + " is not an owner of any applications. Returning false.");
+            return false;
         }
 
-        log.info("User: " + email + " does not own application id: " + appId + " :: returning false.");
-        return false;
-
+        //make sure user account or system account matches appId.
+        if (user.getIsUserAccount() || (!user.getIsUserAccount() && user.getEmail().equals(String.valueOf(appId)))) {
+            Application app = applicationRepository.findOneByIdAndOwnerIdAndDeleted(appId, user.getOwnerId(), false).orElse(null);
+            return app != null;
+        } else {
+            log.info("User: " + email + " is not a matching account owner for appId: " + appId);
+            return false;
+        }
     }
 
     public List<Application> getByOwnerId(long ownerId) {

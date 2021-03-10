@@ -27,22 +27,12 @@
         border-bottom:
         1px solid #444;
     }
-
     .dataTable td { border: 1px solid; }
-
-
-
-
-
     </style>
     <script>
         function resizeIframe(obj) {
             obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
         }
-
-
-
-
     </script>
 </head>
 <body>
@@ -65,6 +55,10 @@
               title="Hide application controls">close</span>
     </div>
 
+    <div class="info-message" th:if="${maintenanceViewModel.getApplicationInfoMessage()}"
+         th:text="${maintenanceViewModel.getApplicationInfoMessage()}">
+    </div>
+
     <form method="post"
           name="f"
           th:action="@{|/admin/modify/application?id=${maintenanceViewModel.getApplicationId()}|}"
@@ -77,7 +71,7 @@
             <tr>
                 <td><label>Disc App Id:</label></td>
                 <td class="value-label">
-                    <a target="_top"
+                    <a target="_blank"
                        th:href="@{|/indices/${maintenanceViewModel.getApplicationId()}|}"
                        th:text="${maintenanceViewModel.getApplicationId()}"></a>
                 </td>
@@ -123,6 +117,10 @@
     <div class="toggle" id="css_close_toggle">
         <span class="toggle close" onclick="switchElements('css_configuration_open', 'css_configuration_closed');"
               title="Hide css controls">close</span>
+    </div>
+
+    <div class="info-message" th:if="${maintenanceViewModel.getStyleSheetInfoMessage()}"
+         th:text="${maintenanceViewModel.getStyleSheetInfoMessage()}">
     </div>
 
     <script type="text/javascript">
@@ -238,6 +236,10 @@
     <div class="toggle" id="threadbox_close_toggle">
         <span class="toggle close" onclick="switchElements('thread_configuration_open', 'thread_configuration_closed');"
               title="Hide thread controls">close</span>
+    </div>
+
+    <div class="info-message" th:if="${maintenanceViewModel.getThreadInfoMessage()}"
+         th:text="${maintenanceViewModel.getThreadInfoMessage()}">
     </div>
 
     <form method="post"
@@ -404,6 +406,9 @@
         <span class="toggle close" onclick="switchElements('headerbox_open', 'headerbox_closed');"
               title="Hide header controls">close</span>
     </div>
+    <div class="info-message" th:if="${maintenanceViewModel.getHeaderFooterInfoMessage()}"
+         th:text="${maintenanceViewModel.getHeaderFooterInfoMessage()}">
+    </div>
     <form enctype="multipart/form-data"
           method="post"
           th:action="@{|/admin/modify/header-footer?id=${maintenanceViewModel.getApplicationId()}|}"
@@ -437,7 +442,9 @@
               onclick="switchElements('prologue_configuration_open', 'prologue_configuration_closed');"
               title="Hide prologue/epilogue controls">close</span>
     </div>
-
+    <div class="info-message" th:if="${maintenanceViewModel.getPrologueEpilogueInfoMessage()}"
+         th:text="${maintenanceViewModel.getPrologueEpilogueInfoMessage()}">
+    </div>
     <form method="post"
           name="f"
           th:action="@{|/admin/modify/prologue-epilogue?id=${maintenanceViewModel.getApplicationId()}|}"
@@ -507,7 +514,9 @@
             <span class="toggle close" onclick="switchElements('labelbox_open', 'labelbox_closed');"
                   title="Hide label controls">close</span>
     </div>
-
+    <div class="info-message" th:if="${maintenanceViewModel.getLabelInfoMessage()}"
+         th:text="${maintenanceViewModel.getLabelInfoMessage()}">
+    </div>
     <form enctype="multipart/form-data"
           method="post"
           th:action="@{|/admin/modify/labels?id=${maintenanceViewModel.getApplicationId()}|}"
@@ -569,7 +578,9 @@
             <span class="toggle close" onclick="switchElements('buttonbox_open', 'buttonbox_closed');"
                   title="Hide button controls">close</span>
     </div>
-
+    <div class="info-message" th:if="${maintenanceViewModel.getButtonInfoMessage()}"
+         th:text="${maintenanceViewModel.getButtonInfoMessage()}">
+    </div>
     <form enctype="multipart/form-data"
           method="post"
           th:action="@{|/admin/modify/buttons?id=${maintenanceViewModel.getApplicationId()}|}"
@@ -676,6 +687,9 @@
         <span class="toggle close" onclick="switchElements('hold_configuration_open', 'hold_configuration_closed');"
               title="Hide hold permissions controls">close</span>
     </div>
+    <div class="info-message" th:if="${maintenanceViewModel.getHoldInfoMessage()}"
+         th:text="${maintenanceViewModel.getHoldInfoMessage()}">
+    </div>
     <p>These settings control how a user is notified when hold permissions are set for either their user
         account or their account type on the
         <a th:href="@{|/admin/disc-security.cgi?id=${maintenanceViewModel.getApplicationId()}|}">
@@ -774,7 +788,9 @@
               onclick="switchElements('favicon_configuration_open', 'favicon_configuration_closed');"
               title="Hide favicon controls">close</span>
     </div>
-
+    <div class="info-message" th:if="${maintenanceViewModel.getFaviconInfoMessage()}"
+         th:text="${maintenanceViewModel.getFaviconInfoMessage()}">
+    </div>
     <script type="text/javascript">
             function displayFaviconUrlInput() {
                 document.getElementById("faviconUrlInput").style.display = 'block';

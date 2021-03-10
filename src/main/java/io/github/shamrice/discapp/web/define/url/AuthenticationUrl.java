@@ -8,6 +8,8 @@ public class AuthenticationUrl {
     public static final String LOGIN_LOCKED_PARAMETER = "?locked";
     public static final String LOGIN_ADMIN_PARAMETER = "&admin";
 
+    public static final String APP_ID_PARAMETER = "id";
+
     public static final String LOGIN = CONTROLLER_DIRECTORY_URL + "login";
     public static final String LOGOUT = CONTROLLER_DIRECTORY_URL + "logout";
     public static final String AUTH_INDICES_URL = "/auth/indices";

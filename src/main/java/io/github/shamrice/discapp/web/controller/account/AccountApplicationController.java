@@ -1,6 +1,7 @@
 package io.github.shamrice.discapp.web.controller.account;
 
 import io.github.shamrice.discapp.data.model.*;
+import io.github.shamrice.discapp.service.account.principal.DiscAppUserRoleManager;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.configuration.enums.AdminReportFrequency;
@@ -297,6 +298,7 @@ public class AccountApplicationController extends AccountController {
 
                         //check if owner already exists...
                         Owner owner = accountService.getOwnerById(user.getOwnerId());
+                        boolean newOwner = false;
 
                         if (owner == null) {
                             owner = new Owner();
@@ -306,6 +308,7 @@ public class AccountApplicationController extends AccountController {
                             owner.setEnabled(true);
                             owner.setCreateDt(new Date());
                             owner.setModDt(new Date());
+                            newOwner = true;
                         }
 
                         Owner savedOwner = accountService.saveOwner(owner);
@@ -374,6 +377,12 @@ public class AccountApplicationController extends AccountController {
                                 //send new application information notification email
                                 String baseUrl = webHelper.getBaseUrl(request);
                                 applicationService.sendNewApplicationInfoEmail(user.getEmail(), newApp, baseUrl);
+
+                                if (newOwner) {
+                                    //add admin role to user so they don't have to log back in.
+                                    DiscAppUserRoleManager roleManager = new DiscAppUserRoleManager();
+                                    roleManager.addAdminRoleToCurrentLoggedInUser();
+                                }
 
                                 accountViewModel.setInfoMessage("Successfully created new application.");
                                 return new ModelAndView("redirect:/account/application", "accountViewModel", accountViewModel);

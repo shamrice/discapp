@@ -12,16 +12,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import static io.github.shamrice.discapp.service.account.principal.UserRoles.*;
+
 @ToString
 @Slf4j
 public class DiscAppUserPrincipal implements UserDetails {
-
-    private static final String ROLE_PREFIX = "ROLE_";
-    private static final String ROLE_ADMIN = ROLE_PREFIX + "ADMIN";
-    private static final String ROLE_USER = ROLE_PREFIX + "USER";
-    private static final String ROLE_EDITOR = ROLE_PREFIX + "EDITOR";
-    private static final String ROLE_SYSTEM = ROLE_PREFIX + "SYSTEM";
-    private static final String ROLE_ROOT = ROLE_PREFIX + "ROOT";
 
     private final DiscAppUser user;
     private final boolean isRoot;

@@ -14,23 +14,27 @@ public class MaintenanceViewModel {
     private String infoMessage;
 
     //application config
+    private String applicationInfoMessage;
     private Long applicationId;
     private String applicationName;
     private Date applicationCreateDt;
     private Date applicationModDt;
 
     //prologue / epilogue config
+    private String prologueEpilogueInfoMessage;
     private String prologueText;
     private String epilogueText;
     private Date prologueModDt;
     private Date epilogueModDt;
 
     //style sheet config
+    private String styleSheetInfoMessage;
     private String styleSheetSelected;
     private String styleSheetUrl;
     private String styleSheetCustomText;
 
     // thread config
+    private String threadInfoMessage;
     private String threadSortOrder;
     private boolean expandThreadsOnIndex;
     private boolean previewFirstMessageOnIndex;
@@ -43,10 +47,12 @@ public class MaintenanceViewModel {
     private int previewReplyLength;
 
     //header/footer config
+    private String headerFooterInfoMessage;
     private String header;
     private String footer;
 
     //label config
+    private String labelInfoMessage;
     private String authorHeader;
     private String dateHeader;
     private String emailHeader;
@@ -54,6 +60,7 @@ public class MaintenanceViewModel {
     private String messageHeader;
 
     //buttons config
+    private String buttonInfoMessage;
     private String shareButton;
     private String editButton;
     private String returnButton;
@@ -64,6 +71,7 @@ public class MaintenanceViewModel {
     private String replyButton;
 
     //favicon config
+    private String faviconInfoMessage;
     private String favicon;
     private String faviconFileName;
     private String faviconStyleSelected;
@@ -74,6 +82,7 @@ public class MaintenanceViewModel {
     private String submittedFromDiv;
 
     //hold permissions config
+    private String holdInfoMessage;
     private boolean displayPostHoldMessage;
     private boolean displayAfterPostHoldMessage;
     private String displayPostHoldMessageText;

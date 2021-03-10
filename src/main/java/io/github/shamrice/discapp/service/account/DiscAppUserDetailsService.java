@@ -15,6 +15,7 @@ import io.github.shamrice.discapp.service.notification.email.EmailNotificationQu
 import io.github.shamrice.discapp.service.notification.email.type.TemplateEmail;
 import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.LockedException;
@@ -64,7 +65,21 @@ public class DiscAppUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Email cannot be blank");
         }
 
-        DiscAppUser user = discappUserRepository.findByEmail(email);
+        DiscAppUser user = null;
+
+        //log in user by email address if email otherwise, try by username if system account.
+        if (EmailValidator.getInstance().isValid(email)) {
+            user = discappUserRepository.findByEmail(email);
+        } else {
+            user = discappUserRepository.findByUsername(email);
+            if (user != null) {
+                if (user.getIsUserAccount()) {
+                    log.warn("Cannot log in user account by username. Only through email. Username attempted: "
+                            + email);
+                    throw new UsernameNotFoundException(email);
+                }
+            }
+        }
         if (user == null) {
             throw new UsernameNotFoundException(email);
         }

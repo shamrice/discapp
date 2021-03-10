@@ -1,5 +1,7 @@
 package io.github.shamrice.discapp.web.controller.authentication;
 
+import io.github.shamrice.discapp.data.model.DiscAppUser;
+import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
 import io.github.shamrice.discapp.web.define.url.AuthenticationUrl;
 import io.github.shamrice.discapp.web.util.AccountHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +14,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
+
+import static io.github.shamrice.discapp.web.define.url.AuthenticationUrl.APP_ID_PARAMETER;
+import static io.github.shamrice.discapp.web.define.url.MaintenanceUrl.MAINTENANCE_PAGE;
 
 @Controller
 @Slf4j
 public class AuthenticationController {
+
+    private static final String SPRING_SECURITY_SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
+
+    @Autowired
+    private DiscAppUserDetailsService discAppUserDetailsService;
 
     @Autowired
     private AccountHelper accountHelper;
@@ -28,11 +39,26 @@ public class AuthenticationController {
         //show disc app admin login box if attempting to access maintenance page.
         if (request != null && request.getSession() != null) {
             try {
-                DefaultSavedRequest savedReq = (DefaultSavedRequest) request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST");
-                if (savedReq != null && savedReq.getRequestURI().contains("disc-maint.cgi")) {
-                    String[] idVals = savedReq.getParameterValues("id");
-                    if (idVals.length > 0)
-                        modelMap.addAttribute("appId", idVals[0]);
+                DefaultSavedRequest savedReq = (DefaultSavedRequest) request.getSession().getAttribute(SPRING_SECURITY_SAVED_REQUEST);
+                if (savedReq != null && savedReq.getRequestURI().contains(MAINTENANCE_PAGE)) {
+                    String[] idVals = savedReq.getParameterValues(APP_ID_PARAMETER);
+                    if (idVals.length > 0) {
+                        try {
+                            //this is a gross way to verify id query string is long before converting
+                            //it back to string to get the UUID username of the system account.
+                            long appId = Long.parseLong(idVals[0]);
+                            DiscAppUser user = discAppUserDetailsService.getByEmail(String.valueOf(appId));
+                            if (user != null && !user.getIsUserAccount()) {
+                                modelMap.addAttribute("systemUsername", user.getUsername());
+                            } else {
+                                //generate random invalid uuid if system account not found.
+                                modelMap.addAttribute("systemUsername", UUID.randomUUID().toString());
+                            }
+                        } catch (NumberFormatException formatException) {
+                            log.error("App Id in query string for log in page was not a valid number: "
+                                    + idVals[0], formatException);
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 log.error("Error trying to get default saved request from session object. " + ex.getMessage(), ex);
