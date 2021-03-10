@@ -2,12 +2,15 @@ package io.github.shamrice.discapp.web.controller;
 
 import io.github.shamrice.discapp.data.model.Application;
 import io.github.shamrice.discapp.data.model.SiteUpdateLog;
+import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.site.SiteService;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
+import io.github.shamrice.discapp.web.define.url.AccountUrl;
 import io.github.shamrice.discapp.web.define.url.AppUrl;
+import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import io.github.shamrice.discapp.web.model.home.HomeOlderUpdatesViewModel;
 import io.github.shamrice.discapp.web.model.home.SearchApplicationModel;
 import io.github.shamrice.discapp.web.util.AccountHelper;
@@ -73,8 +76,7 @@ public class HomeController {
             statisticsService.increaseCurrentPageStats(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ipAddress);
         }
 
-        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
-
+        setCommonModelAttributes(model);
         return new ModelAndView("home/index", "model", model);
     }
 
@@ -105,7 +107,7 @@ public class HomeController {
             homeOlderUpdatesViewModel.setUpdateList(updateList);
         }
 
-        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
+        setCommonModelAttributes(model);
 
         return new ModelAndView("home/olderUpdates", "model", homeOlderUpdatesViewModel);
     }
@@ -153,7 +155,7 @@ public class HomeController {
             searchApplicationModel.setInfoMessage("Please enter a search criteria of at least " + minSearchLength + " characters.");
         }
 
-        model.addAttribute("isLoggedIn", accountHelper.isLoggedIn());
+        setCommonModelAttributes(model);
         return new ModelAndView("home/search-apps-results", "searchApplicationModel", searchApplicationModel);
     }
 
@@ -165,5 +167,21 @@ public class HomeController {
         String robotsTxtContents = configurationService.getStringValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.ROBOTS_TXT_CONTENTS, "");
         model.addAttribute("robotsTxtContents", robotsTxtContents);
         return "home/robots";
+    }
+
+    private void setCommonModelAttributes(Model model) {
+        DiscAppUserPrincipal user = accountHelper.getLoggedInUser();
+        if (user != null) {
+            model.addAttribute("isLoggedIn", true);
+            model.addAttribute("isUserAccount", user.isUserAccount());
+            if (!user.isUserAccount()) {
+                model.addAttribute("discAdminUrl", MaintenanceUrl.MAINTENANCE_PAGE + "?id=" + user.getEmail());
+            } else {
+                model.addAttribute("discAdminUrl", AccountUrl.ACCOUNT_APPLICATION);
+            }
+        } else {
+            model.addAttribute("isLoggedIn", false);
+            model.addAttribute("isUserAccount", false);
+        }
     }
 }
