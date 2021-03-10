@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.shamrice.discapp.web.define.url.AbuseUrl.*;
@@ -63,15 +64,20 @@ public class AbuseController {
                 boolean isOwnerFound = false;
                 for (Application ownedApp : applicationService.getByOwnerId(user.getOwnerId())) {
                     if (ownedApp.getId().equals(reportedAbuse.getApplicationId())) {
-                        log.info("User: " + userEmail + " has deleted reported abuse: " + reportedAbuse.toString());
-                        threadService.deleteReportedAbuse(reportedAbuse.getId());
-                        abuseViewModel.setInfoMessage("Removed abuse record from database.");
-                        isOwnerFound = true;
-                        break;
+                        //make sure it's a user account or the system account that matches the app id.
+                        if (user.getIsUserAccount() || user.getEmail().equals(ownedApp.getId().toString())) {
+                            log.info("User: " + userEmail + " has deleted reported abuse id: " + reportedAbuse.getId());
+                            threadService.deleteReportedAbuse(reportedAbuse.getId());
+                            abuseViewModel.setInfoMessage("Removed abuse record from database.");
+                            isOwnerFound = true;
+                            break;
+                        }
                     }
                 }
                 if (!isOwnerFound) {
                     abuseViewModel.setErrorMessage("You cannot delete entries that you do not own.");
+                    log.warn("User: " + userEmail + " attempted to delete reported abuse id: " + reportedAbuse.getId()
+                            + " but they do not own it. Action has been blocked.");
                 }
             } else if (isRootAdmin) {
                 log.info("User: " + userEmail + " (ROOT) has deleted reported abuse: " + reportedAbuse.toString());
@@ -110,12 +116,18 @@ public class AbuseController {
         List<ReportedAbuse> reportedAbuses = threadService.searchForReportedAbuse(appId, submitter, email, ip, subject, body);
 
         //get list of apps owned by logged in user.
-        List<Application> ownedApps = null;
+        List<Long> ownedAppIds = new ArrayList<>();
         String userEmail = accountHelper.getLoggedInEmail();
         DiscAppUser user = userDetailsService.getByEmail(userEmail);
-        if (user != null && user.getOwnerId() != null) {
-            ownedApps = applicationService.getByOwnerId(user.getOwnerId());
 
+        if (user != null && user.getOwnerId() != null) {
+            List<Application> ownedApps = applicationService.getByOwnerId(user.getOwnerId());
+            for (Application ownedApp : ownedApps) {
+                //only add matching app id for system accounts.
+                if (user.getIsUserAccount() || user.getEmail().equals(ownedApp.getId().toString())) {
+                    ownedAppIds.add(ownedApp.getId());
+                }
+            }
         }
 
         for (ReportedAbuse reportedAbuse : reportedAbuses) {
@@ -124,26 +136,22 @@ public class AbuseController {
                 //if user owns app that abuse is reported for, flag it as deletable.
                 boolean isDeletable = false;
                 String deleteQueryParam = "";
-                if (ownedApps != null) {
-                    for (Application app : ownedApps) {
-                        if (reportedAbuse.getApplicationId().equals(app.getId())) {
-                            isDeletable = true;
-                            String appIdVal = "";
-                            if (appId != null) {
-                                appIdVal = appId.toString();
-                            }
 
-                            //TODO : store these strings somewhere.
-                            deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
-                                    + "&discId=" + appIdVal
-                                    + "&submitter=" + abuseViewModel.getSubmitter()
-                                    + "&email=" + abuseViewModel.getEmail()
-                                    + "&ip=" + abuseViewModel.getIpAddress()
-                                    + "&subject=" + abuseViewModel.getSubject()
-                                    + "&body=" + abuseViewModel.getMessage();
-                            break;
-                        }
+                if (ownedAppIds.contains(reportedAbuse.getApplicationId())) {
+                    isDeletable = true;
+                    String appIdVal = "";
+                    if (appId != null) {
+                        appIdVal = appId.toString();
                     }
+
+                    //TODO : store these strings somewhere.
+                    deleteQueryParam = "?abuseId=" + reportedAbuse.getId()
+                            + "&discId=" + appIdVal
+                            + "&submitter=" + abuseViewModel.getSubmitter()
+                            + "&email=" + abuseViewModel.getEmail()
+                            + "&ip=" + abuseViewModel.getIpAddress()
+                            + "&subject=" + abuseViewModel.getSubject()
+                            + "&body=" + abuseViewModel.getMessage();
                 }
 
                 //if logged in as site root admin, all entries should be deletable.
