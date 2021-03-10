@@ -354,7 +354,7 @@ public class AccountApplicationController extends AccountController {
                                 newAdminAccount.setIsAdmin(true);
                                 newAdminAccount.setOwnerId(savedOwner.getId());
                                 newAdminAccount.setShowEmail(false);
-                                newAdminAccount.setEmail(savedApp.getId().toString()); //email and username set to appId
+                                newAdminAccount.setEmail(savedApp.getId().toString()); //email set to appId
                                 newAdminAccount.setUsername(UUID.randomUUID().toString());
                                 newAdminAccount.setCreateDt(new Date());
                                 newAdminAccount.setModDt(new Date());

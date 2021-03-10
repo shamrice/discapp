@@ -118,13 +118,20 @@ public class ConfigurationService {
         }
     }
 
-    public void setDefaultUserConfigurationValuesForUser(Long discappUserId) {
+    public void setDefaultUserConfigurationValuesForUser(Long discappUserId, boolean isUserAccount) {
 
         log.info("Setting up default user configuration values for userId: " + discappUserId + " in database.");
 
         //todo: pull these default values from properties file
         Map<UserConfigurationProperty, String> configsToSet = new HashMap<>();
-        configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "true");
+
+        //only set read tracking for user accounts as system accounts don't have access to those settings.
+        if (isUserAccount) {
+            configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "true");
+        } else {
+            configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "false");
+        }
+
         configsToSet.put(UserConfigurationProperty.USER_TIMEZONE_ENABLED, "false");
         configsToSet.put(UserConfigurationProperty.USER_TIMEZONE_LOCATION, "UTC");
 
