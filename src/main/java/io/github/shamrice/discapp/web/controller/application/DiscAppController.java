@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.data.model.ApplicationPermission;
 import io.github.shamrice.discapp.data.model.DiscAppUser;
 import io.github.shamrice.discapp.data.model.Thread;
 import io.github.shamrice.discapp.service.account.DiscAppUserDetailsService;
+import io.github.shamrice.discapp.service.account.principal.DiscAppUserPrincipal;
 import io.github.shamrice.discapp.service.application.ApplicationService;
 import io.github.shamrice.discapp.service.application.ApplicationSubscriptionService;
 import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
@@ -741,14 +742,14 @@ public class DiscAppController {
             String[] readThreadsCsv = null;
 
             //mark thread as read if user is logged in.
-            Long userId = accountHelper.getLoggedInDiscAppUserId();
-            if (userId != null) {
-                log.info("User logged in. Marking thread: " + threadId + " as read for userId: " + userId
+            DiscAppUserPrincipal userPrincipal = accountHelper.getLoggedInUser();
+            if (userPrincipal != null && userPrincipal.isUserAccount()) {
+                log.info("User logged in. Marking thread: " + threadId + " as read for userId: " + userPrincipal.getId()
                         + " on appId: " + appId + " :: and getting list of read threads");
-                userReadThreadService.markThreadAsRead(appId, userId, threadId);
+                userReadThreadService.markThreadAsRead(appId, userPrincipal.getId(), threadId);
 
                 //get list of read threads.
-                readThreadsCsv = userReadThreadService.getReadThreadsCsv(appId, userId);
+                readThreadsCsv = userReadThreadService.getReadThreadsCsv(appId, userPrincipal.getId());
             }
 
             int maxPreviewLength = configurationService.getIntegerValue(appId, ConfigurationProperty.PREVIEW_REPLY_LENGTH_IN_NUM_CHARS, 200);
