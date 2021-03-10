@@ -87,6 +87,17 @@ public class AccountHelper {
         return null;
     }
 
+    public DiscAppUserPrincipal getLoggedInUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            if (auth.isAuthenticated() && !auth.getPrincipal().equals(ANONYMOUS_USER)) {
+                DiscAppUserPrincipal principal = (DiscAppUserPrincipal) auth.getPrincipal();
+                return principal;
+            }
+        }
+        return null;
+    }
+
     public Long getLoggedInDiscAppUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {

@@ -128,7 +128,7 @@ public class ThreadService {
         return false;
     }
 
-    public boolean deleteReportedAbuse(long reportedAbuseId) {
+    public void deleteReportedAbuse(long reportedAbuseId) {
         log.info("Deleting reported abuse record Id: " + reportedAbuseId);
         ReportedAbuse abuseToDelete = reportedAbuseRepository.findById(reportedAbuseId).orElse(null);
         if (abuseToDelete != null) {
@@ -138,11 +138,10 @@ public class ThreadService {
             abuseToDelete.getThread().setModDt(new Date());
             abuseToDelete.getThread().setDeleted(false);
             reportedAbuseRepository.save(abuseToDelete);
-            log.info("Maked abuseId: " + reportedAbuseId + " as deleted. :: " + abuseToDelete.toString());
-            return true;
+            log.info("Marked abuseId: " + reportedAbuseId + " as deleted. for appId " + abuseToDelete.getApplicationId());
+        } else {
+            log.warn("Could not find reported abuse to mark as deleted. Id attempted: " + reportedAbuseId);
         }
-        log.warn("Could not find reported abuse to mark as deleted. Id attempted: " + reportedAbuseId);
-        return false;
     }
 
     public ReportedAbuse getReportedAbuse(long reportedAbuseId) {

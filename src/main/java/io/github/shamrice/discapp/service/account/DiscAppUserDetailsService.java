@@ -194,7 +194,7 @@ public class DiscAppUserDetailsService implements UserDetailsService {
                     //create default user configurations
                     if (isNewUser) {
                         log.info("Setting default user configuration values for new user: " + createdUser.getId());
-                        configurationService.setDefaultUserConfigurationValuesForUser(createdUser.getId());
+                        configurationService.setDefaultUserConfigurationValuesForUser(createdUser.getId(), createdUser.getIsUserAccount());
                     }
 
                     return true;

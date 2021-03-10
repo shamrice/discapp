@@ -17,7 +17,9 @@
                 <a th:if="${isLoggedIn}" href="/logout">Log Out</a>
                 <a th:unless="${isLoggedIn}" href="/login">Log In</a>
             </li>
-            <li th:if="${isLoggedIn}"><a href="/account/modify">Modify Account Settings</a></li>
+            <li th:if="${isLoggedIn and isUserAccount}"><a href="/account/modify">Modify Account Settings</a></li>
+            <li th:if="${isLoggedIn and isUserAccount}"><a th:href="${discAdminUrl}">Manage Disc Apps</a></li>
+            <li th:if="${isLoggedIn and not isUserAccount}"><a th:href="${discAdminUrl}">Manage Disc App</a></li>
             <li th:unless="${isLoggedIn}"><a href="/account/create">Create a New Account</a></li>
             <li><a href="/account/password">Reset Password</a></li>
             <li><a href="/indices/1">Help Forum</a></li>
