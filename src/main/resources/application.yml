@@ -4,10 +4,10 @@ spring.mail.properties.mail.smtp.starttls.enable: true
 spring:
 
   mail:
-    host: ${EMAIL_SMTP_HOST}
-    port: ${EMAIL_SMTP_PORT}
-    username: ${NOTIFICATION_EMAIL_ADDRESS}
-    password: ${NOTIFICATION_PASSWORD}
+    host: smtp.gmail.com
+    port: 587
+    username: nediscapp@gmail.com
+    password: ojxzoxwavsktvbzq
     protocol: smtp
     tls: true
     properties.mail.smtp:
@@ -25,15 +25,15 @@ spring:
 
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
-      maximum-pool-size: ${MAX_DB_CONNECTION_POOL_SIZE}
+      maximum-pool-size: 10
       idle-timeout: 1000
       pool-name: discapp_pool
 
     url: jdbc:postgresql://localhost:5432/discapp
     username: postgres
     password: password
-    maxActive: ${MAX_DB_ACTIVE_CONNECTIONS}
-    maxIdle: ${MAX_DB_IDLE_CONNECTIONS}
+    maxActive: 10
+    maxIdle: 5
     removeAbandoned: true
 
   #  testWhileIdle: true
@@ -52,32 +52,32 @@ logging:
   level:
     org:
       springframework:
-        web: ${LOG_LEVEL_SPRING_WEB}
-      hibernate: ${LOG_LEVEL_HIBERNATE}
+        web: WARN
+      hibernate: WARN
     io:
       github:
         shamrice:
-          discapp: ${LOG_LEVEL_DISCAPP}
+          discapp: INFO
 
 server:
   port: 8081
   servlet:
     session:
       cookie:
-        max-age: ${COOKIE_MAX_AGE}
-      timeout: ${SESSION_TIME_OUT}
+        max-age: 14d
+      timeout: 1d
 
 discapp:
   auth.remember-me:
-    key: ${REMEMBER_ME_PRIVATE_KEY}
-    token.duration: ${REMEMBER_ME_TOKEN_DURATION}
+    key: 0223c51a-56cc-4a4d-94eb-d5a140e75552
+    token.duration: 2592000
   notifier:
-    url: ${NOTIFIER_URL}
-    send-hour: ${NOTIFIER_SEND_HOUR}
+    url: https://nediscapp-notifier.herokuapp.com/
+    send-hour: 5
   root:
-    email: ${ROOT_EMAIL_ADDRESS}
+    email: nediscapp@gmail.com
   cache:
-    duration: ${CACHE_DURATION}
+    duration: 900000
   security:
     bcrypt:
-      strength: ${BCRYPT_STRENGTH}
+      strength: 5

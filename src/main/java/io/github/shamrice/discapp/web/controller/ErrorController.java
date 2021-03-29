@@ -72,6 +72,8 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
         return new ModelAndView("error/permissionDenied");
     }
 
+    @Override
+    @Deprecated
     public String getErrorPath() {
         return ErrorUrl.CONTROLLER_DIRECTORY_URL;
     }
