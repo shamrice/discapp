@@ -3,9 +3,9 @@
 Database creation script.
 
 */
-CREATE DATABASE IF NOT EXISTS discapp;
+CREATE DATABASE discapp;
 
-USE discapp;
+\c discapp
 
 DROP TABLE IF EXISTS discapp_user;
 DROP TABLE IF EXISTS prologue;
@@ -20,11 +20,6 @@ DROP TABLE IF EXISTS owner;
 DROP TABLE IF EXISTS site_update_log;
 DROP TABLE IF EXISTS user_read_thread;
 
-/*
-todo: add missing tables here
-*/
-
-commit;
 
 CREATE TABLE owner (
     id serial NOT NULL,
@@ -338,7 +333,5 @@ CREATE TABLE application_favicon (
     FOREIGN KEY (application_id) REFERENCES application(id)
 );
 
-
-commit;
 
 

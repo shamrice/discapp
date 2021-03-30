@@ -1,4 +1,3 @@
-
 spring.mail.properties.mail.smtp.starttls.enable: true
 
 spring:

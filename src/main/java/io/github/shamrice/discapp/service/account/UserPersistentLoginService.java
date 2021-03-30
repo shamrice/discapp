@@ -47,7 +47,7 @@ public class UserPersistentLoginService implements PersistentTokenRepository {
             persistentLogin.setToken(tokenValue);
             persistentLogin.setLastUsed(lastUsed);
             userPersistentLoginRepository.save(persistentLogin);
-            log.info("Updated persisted login :: " + persistentLogin.toString());
+            log.info("Updated persisted login for user: " + persistentLogin.getUsername());
         }
     }
 
@@ -55,10 +55,10 @@ public class UserPersistentLoginService implements PersistentTokenRepository {
     public PersistentRememberMeToken getTokenForSeries(String series) {
         UserPersistentLogin persistentLogin = userPersistentLoginRepository.findById(series).orElse(null);
         if (persistentLogin != null) {
-            log.info("Get token for series found: " + persistentLogin.toString());
+            log.info("Get token for series found");
             return new PersistentRememberMeToken(persistentLogin.getUsername(), persistentLogin.getSeries(), persistentLogin.getToken(), persistentLogin.getLastUsed());
         }
-        log.info("Unable to find persistent token for series: " + series);
+        log.info("Unable to find persistent token for series");
         return null;
     }
 
@@ -68,7 +68,7 @@ public class UserPersistentLoginService implements PersistentTokenRepository {
         DiscAppUser user = userDetailsService.getByUsername(username);
         if (user != null) {
             userPersistentLoginRepository.deleteByUsername(user.getEmail());
-            log.info("Removed user tokens for user: " + user.getEmail());
+            log.info("Removed user tokens for user id: " + user.getId());
         }
     }
 }
