@@ -43,7 +43,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input class="button" name="submit" type="submit" value="Login">&nbsp;
+                    <input class="button" name="submit" type="submit" value="Login"  onclick="var e=this;setTimeout(function() {e.disabled=true;e.value='Please wait...';}, 0); return true;">&nbsp;
                     <input class="button" name="reset" type="reset">
                 </td>
             </tr>
@@ -89,7 +89,7 @@
         <p style="text-align:center;">Or enter the admin password for this DiscussionApp-</p>
         <div>
             <input type="password" class="button" name="password" />
-            <input type="submit" name="submit_password" value="Enter Password" class="button" />
+            <input type="submit" name="submit_password" value="Enter Password" class="button"  onclick="var e=this;setTimeout(function() {e.disabled=true;e.value='Please wait...';}, 0); return true;" />
             <input type="hidden" name="username" th:value="${systemUsername}" />
         </div>
     </form>
