@@ -85,6 +85,11 @@
                        th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('all')}"/>all messages</label>
             <br/>
             <label>
+                <input type="radio" name="emailUpdateSetting" value="allPreview"
+                       th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('allPreview')}"/>
+                all messages with previews of message bodies</label>
+            <br/>
+            <label>
                 <input type="radio" name="emailUpdateSetting" value="first"
                        th:checked="${maintenanceMailingListViewModel.isEmailUpdateSettingChecked('first')}"/>first
                 messages in threads</label>

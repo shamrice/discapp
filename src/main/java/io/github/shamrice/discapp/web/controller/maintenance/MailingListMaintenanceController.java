@@ -26,6 +26,11 @@ import static io.github.shamrice.discapp.web.model.maintenance.MaintenanceMailin
 @Slf4j
 public class MailingListMaintenanceController extends MaintenanceController {
 
+    private static final String EMAIL_UPDATE_ALL = "all";
+    private static final String EMAIL_UPDATE_ALL_PREVIEW = "allPreview";
+    private static final String EMAIL_UPDATE_FIRST = "first";
+    private static final String EMAIL_UPDATE_FIRST_PREVIEW = "preview";
+
     @GetMapping(LIST_MAINTENANCE_PAGE)
     public ModelAndView getListMaintenanceView(@RequestParam(name = "id") long appId,
                                                @RequestParam(name = "tab", required = false) String tab,
@@ -149,10 +154,19 @@ public class MailingListMaintenanceController extends MaintenanceController {
         }
 
         if (listViewModel.getChangeBehaviorButton() != null && !listViewModel.getChangeBehaviorButton().isEmpty()) {
-            if (configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
-                log.info("Updated email update settings for appId: " + appId + " to: " + listViewModel.getEmailUpdateSetting());
-            } else {
-                log.warn("Failed to update mailing list email settings for appId: " + appId);
+            boolean emailUpdateSettingsSaved = false;
+            String emailUpdateSetting = listViewModel.getEmailUpdateSetting();
+            if (emailUpdateSetting.equals(EMAIL_UPDATE_ALL) || emailUpdateSetting.equals(EMAIL_UPDATE_ALL_PREVIEW)
+                    || emailUpdateSetting.equals(EMAIL_UPDATE_FIRST) || emailUpdateSetting.equals(EMAIL_UPDATE_FIRST_PREVIEW)) {
+                if (configurationService.saveApplicationConfiguration(appId, ConfigurationProperty.MAILING_LIST_EMAIL_UPDATE_SETTINGS, listViewModel.getEmailUpdateSetting())) {
+                    log.info("Updated email update settings for appId: " + appId + " to: " + listViewModel.getEmailUpdateSetting());
+                    emailUpdateSettingsSaved = true;
+                }
+            }
+
+            if (!emailUpdateSettingsSaved) {
+                log.warn("Failed to update mailing list email settings for appId: " + appId
+                        + " : Value attempted: " + emailUpdateSetting);
                 status = "Failed to save mailing list email settings.";
             }
         }
