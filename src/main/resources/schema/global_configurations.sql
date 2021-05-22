@@ -103,6 +103,13 @@ VALUES (0, 'epilogue.default.value', '<p align="center">
 </P>
 <BR><BR>
 <font color="#FFFFFF" size="-2"><a href="MAINTENANCE_URL?id=APP_ID">Admin</a></font>
+<br />
+    <div style="clear:both; font-size:smaller; text-align:center; margin-top:2em; margin-bottom:1em;">
+        <a href="https://nediscapp.herokuapp.com" target="_top">
+            Forum by <span style="color:#d44;">https://nediscapp.herokuapp.com</span>
+        </a>
+    </div>
+<br />
 ');
 
 INSERT INTO configuration (application_id, name, value)
