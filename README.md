@@ -4,4 +4,4 @@ NE Disc App is a message board service re-written from the ground up that allows
 
 
 
-**Link to current production site:** [Link](https://nediscapp.herokuapp.com/)
+**Link to current production site:** [https://nediscapp.herokuapp.com/](https://nediscapp.herokuapp.com/)
