@@ -60,6 +60,10 @@ logging:
 
 server:
   port: 8081
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED}
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE}
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES}
   servlet:
     session:
       cookie:
