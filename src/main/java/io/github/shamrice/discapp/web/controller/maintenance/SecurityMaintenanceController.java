@@ -203,6 +203,7 @@ public class SecurityMaintenanceController extends MaintenanceController {
                 appPermission.setDisplayIpAddress(maintenanceSecurityViewModel.isShowIp());
                 appPermission.setBlockBadWords(maintenanceSecurityViewModel.isBlockBadWords());
                 appPermission.setBlockSearchEngines(maintenanceSecurityViewModel.isBlockSearch());
+                appPermission.setBlockAnonymousPosting(maintenanceSecurityViewModel.isBlockAnonymousPosting());
                 if (applicationService.saveApplicationPermissions(appPermission)) {
                     log.info("Saved updated app permissions: " + appPermission.toString());
                     maintenanceSecurityViewModel.setSecurityMessage("Settings updated");
@@ -351,12 +352,14 @@ public class SecurityMaintenanceController extends MaintenanceController {
                 maintenanceSecurityViewModel.setRegisteredPermissions(applicationPermission.getRegisteredUserPermissions());
                 maintenanceSecurityViewModel.setUnregisteredPermissions(applicationPermission.getUnregisteredUserPermissions());
                 maintenanceSecurityViewModel.setBlockHtml(applicationPermission.getAllowHtmlPermissions());
+                maintenanceSecurityViewModel.setBlockAnonymousPosting(applicationPermission.getBlockAnonymousPosting());
             } else {
                 //if permissions are null. set default permission check boxes.
                 maintenanceSecurityViewModel.setUnregisteredPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);
                 maintenanceSecurityViewModel.setRegisteredPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);
                 maintenanceSecurityViewModel.setBlockHtml(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
                 maintenanceSecurityViewModel.setShowIp(true);
+                maintenanceSecurityViewModel.setBlockAnonymousPosting(false);
             }
 
             //set values for blocked ips if exist.

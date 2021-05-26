@@ -340,6 +340,7 @@ public class ApplicationService {
         appPermission.setDisplayIpAddress(true);
         appPermission.setBlockBadWords(false);
         appPermission.setBlockSearchEngines(false);
+        appPermission.setBlockAnonymousPosting(false);
         appPermission.setAllowHtmlPermissions(HtmlPermission.BLOCK_SUBJECT_SUBMITTER_FIELDS);
         appPermission.setUnregisteredUserPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);
         appPermission.setRegisteredUserPermissions(io.github.shamrice.discapp.service.application.permission.UserPermission.READ + io.github.shamrice.discapp.service.application.permission.UserPermission.REPLY + io.github.shamrice.discapp.service.application.permission.UserPermission.POST);

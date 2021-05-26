@@ -347,6 +347,9 @@ public class DiscAppController {
             model.addAttribute("holdPermission", holdMessage);
         }
 
+        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+        model.addAttribute(ANONYMOUS_POSTING_BLOCKED, applicationPermission.getBlockAnonymousPosting());
+
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
@@ -454,6 +457,9 @@ public class DiscAppController {
         model.addAttribute(APP_ID, appId);
         model.addAttribute("newThreadViewModel", newThreadViewModel);
 
+        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+        model.addAttribute(ANONYMOUS_POSTING_BLOCKED, applicationPermission.getBlockAnonymousPosting());
+
         String htmlBody = newThreadViewModel.getBody();
         if (htmlBody != null && !htmlBody.isEmpty()) {
             htmlBody = htmlBody.replaceAll("\r", "<br />");
@@ -524,19 +530,28 @@ public class DiscAppController {
                     return createNewThread(appId, null, newThreadViewModel, response, model);
                 }
 
+
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+
+                //set submitter to anon if not filled out
+                String submitter = "";
+                if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
+                    if (applicationPermission.getBlockAnonymousPosting()) {
+                        log.error("New message was attempted with no submitter but anonymous posting is disabled for appId: " + appId + " :: postcode: " + newThreadViewModel.getPostCode());
+                        newThreadViewModel.setErrorMessage("Author field is required to post a message.");
+                        return createNewThread(appId, null, newThreadViewModel, response, model);
+                    } else {
+                        submitter = BLANK_SUBMITTER;
+                    }
+                } else {
+                    submitter = newThreadViewModel.getSubmitter();
+                }
+
                 //redeem post code.
                 if (!threadService.redeemPostCode(appId, newThreadViewModel.getPostCode())) {
                     log.error("Invalid post code attempted to be redeemed for appId: " + appId + " :: postcode: " + newThreadViewModel.getPostCode());
                     newThreadViewModel.setErrorMessage("You have already posted this message.");
                     return createNewThread(appId, null, newThreadViewModel, response, model);
-                }
-
-                //set submitter to anon if not filled out
-                String submitter = "";
-                if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
-                    submitter = BLANK_SUBMITTER;
-                } else {
-                    submitter = newThreadViewModel.getSubmitter();
                 }
 
                 long parentId = Long.parseLong(newThreadViewModel.getParentId());
@@ -556,7 +571,7 @@ public class DiscAppController {
                 String email = newThreadViewModel.getEmail();
                 String body = newThreadViewModel.getBody();
 
-                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+
 
                 //sanitize inputs based on settings.
                 if (applicationPermission != null) {

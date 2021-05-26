@@ -10,6 +10,7 @@
     <style type="text/css">
     /* div.grey_box div.offset {margin-left:2em; margin-top:3px; padding-bottom:1em; margin-bottom:1em; font-size:smaller; text-align:left; border-bottom: 1px solid #444;} */
     div.checkboxes{ text-align:left; width:22em; margin:auto; }
+
     </style>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 </head>
@@ -31,54 +32,65 @@
      th:text="${maintenanceSecurityViewModel.getErrorMessage()}">
 </div>
 
-<form method="post" th:action="@{|/admin/disc-security.cgi?id=${appId}|}" enctype="multipart/form-data" th:object="${maintenanceSecurityViewModel}">
-    <input type="hidden" name="id" th:value="${appId}" />
+<form method="post" th:action="@{|/admin/disc-security.cgi?id=${appId}|}" enctype="multipart/form-data"
+      th:object="${maintenanceSecurityViewModel}">
+    <input type="hidden" name="id" th:value="${appId}"/>
     <div style="width:69em; margin:auto;">
         <div style="width:35em; margin-right:1em; float:left;">
             <div th:if="${maintenanceSecurityViewModel.getOwnerEmail()}" class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getOwnerEmailMessage()}" th:text="${maintenanceSecurityViewModel.getOwnerEmailMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getOwnerEmailMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getOwnerEmailMessage()}"></h3>
                 <div>
                     <label for="email">Owner Email</label>
-                    <input type="email" name="ownerEmail" th:value="${maintenanceSecurityViewModel.getOwnerEmail()}" size="35" id="email" />
-                    <input type="submit" name="changeOwnerEmail" value="Change Owner Email" class="button" />
+                    <input type="email" name="ownerEmail" th:value="${maintenanceSecurityViewModel.getOwnerEmail()}"
+                           size="35" id="email"/>
+                    <input type="submit" name="changeOwnerEmail" value="Change Owner Email" class="button"/>
                 </div>
             </div>
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getPermissionMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getPermissionMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getPermissionMessage()}"></h3>
                 <table class="colored">
                     <tr class="hidden_text">
                         <th>&nbsp</th>
-                        <th><a href="#">None<p>Users with this privilege won't have any access to your DiscussionApp.</p></a></th>
+                        <th><a href="#">None<p>Users with this privilege won't have any access to your
+                            DiscussionApp.</p></a></th>
                         <th><a href="#">Read<p>Users can't post any messages.</p></a></th>
                         <th><a href="#">Reply<p>Users can reply to messages, but can't create new threads.</p></a></th>
                         <th><a href="#">Post<p>Users can create new threads as well as respond to messages.</p></a></th>
-                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a></th>
+                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a>
+                        </th>
                     </tr>
                     <tr>
                         <td>Unregistered users</td>
                         <td>
                             <label>
-                                <input type="radio" name="unregisteredPermissions" value="n" th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('n')}"/>
+                                <input type="radio" name="unregisteredPermissions" value="n"
+                                       th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('n')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="unregisteredPermissions" value="r" th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('r')}"/>
+                                <input type="radio" name="unregisteredPermissions" value="r"
+                                       th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('r')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="unregisteredPermissions" value="rf" th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rf')}"/>
+                                <input type="radio" name="unregisteredPermissions" value="rf"
+                                       th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rf')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="unregisteredPermissions" value="rfp" th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rfp')}" />
+                                <input type="radio" name="unregisteredPermissions" value="rfp"
+                                       th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rfp')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="unregisteredPermissions" value="rfph" th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rfph')}" />
+                                <input type="radio" name="unregisteredPermissions" value="rfph"
+                                       th:checked="${maintenanceSecurityViewModel.isUnregisteredUsersPermissionChecked('rfph')}"/>
                             </label>
                         </td>
                     </tr>
@@ -86,45 +98,58 @@
                         <td>Registered users</td>
                         <td>
                             <label>
-                                <input type="radio" name="registeredPermissions" value="n" th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('n')}" />
+                                <input type="radio" name="registeredPermissions" value="n"
+                                       th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('n')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="registeredPermissions" value="r" th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('r')}"/>
+                                <input type="radio" name="registeredPermissions" value="r"
+                                       th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('r')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="registeredPermissions" value="rf" th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rf')}"/>
+                                <input type="radio" name="registeredPermissions" value="rf"
+                                       th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rf')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="registeredPermissions" value="rfp" th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rfp')}" />
+                                <input type="radio" name="registeredPermissions" value="rfp"
+                                       th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rfp')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" name="registeredPermissions" value="rfph" th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rfph')}"/>
+                                <input type="radio" name="registeredPermissions" value="rfph"
+                                       th:checked="${maintenanceSecurityViewModel.isRegisteredUsersPermissionChecked('rfph')}"/>
                             </label>
                         </td>
                     </tr>
                 </table>
-                <input type="submit" name="changeDefaultAccess" value="Change Default Access Permissions" class="button" />
+                <input type="submit" name="changeDefaultAccess" value="Change Default Access Permissions"
+                       class="button"/>
             </div>
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getUserPermissionMessage()}" th:text="${maintenanceSecurityViewModel.getUserPermissionMessage()}"></h3>
-                <p style="font-size:smaller;">Editors can use the URL <a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank" th:text="${maintenanceSecurityViewModel.getEditUrl()}"></a> to edit articles.</p>
+                <h3 th:if="${maintenanceSecurityViewModel.getUserPermissionMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getUserPermissionMessage()}"></h3>
+                <p style="font-size:smaller;">Editors can use the URL <a th:href="@{|disc-edit.cgi?id=${appId}|}"
+                                                                         target="_blank"
+                                                                         th:text="${maintenanceSecurityViewModel.getEditUrl()}"></a>
+                    to edit articles.</p>
                 <table class="colored">
                     <tr class="hidden_text">
                         <th>&nbsp</th>
-                        <th><a href="#">None<p>Users with this privilege won't have any access to your DiscussionApp.</p></a></th>
+                        <th><a href="#">None<p>Users with this privilege won't have any access to your
+                            DiscussionApp.</p></a></th>
                         <th><a href="#">Read<p>Users can't post any messages.</p></a></th>
                         <th><a href="#">Reply<p>Users can reply to messages, but can't create new threads.</p></a></th>
                         <th><a href="#">Post<p>Users can create new threads as well as respond to messages.</p></a></th>
-                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a></th>
-                        <th><a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank">Edit<p>Users with Edit privileges are moderators who can edit <em>any</em> message.
+                        <th><a href="#">Hold<p>Messages must be approved by a moderator with Edit privileges.</p></a>
+                        </th>
+                        <th><a th:href="@{|disc-edit.cgi?id=${appId}|}" target="_blank">Edit<p>Users with Edit
+                            privileges are moderators who can edit <em>any</em> message.
                             Be very selective about who you assign this privilege to.</p></a></th>
                         <th>Delete</th>
                     </tr>
@@ -133,113 +158,162 @@
                         <td th:text="${userPermission.getDiscAppUser().getUsername()}">
                         </td>
                         <td>
-                            <input type="hidden" th:field="*{userPermissions[__${itemStat.index}__].id}" th:value="${userPermission.getId()}" />
+                            <input type="hidden" th:field="*{userPermissions[__${itemStat.index}__].id}"
+                                   th:value="${userPermission.getId()}"/>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="n" th:checked="${userPermission.getUserPermissions().equals('n')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="n" th:checked="${userPermission.getUserPermissions().equals('n')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="r" th:checked="${userPermission.getUserPermissions().equals('r')}"/>
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="r" th:checked="${userPermission.getUserPermissions().equals('r')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rf" th:checked="${userPermission.getUserPermissions().equals('rf')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="rf" th:checked="${userPermission.getUserPermissions().equals('rf')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"  value="rfp" th:checked="${userPermission.getUserPermissions().equals('rfp')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="rfp" th:checked="${userPermission.getUserPermissions().equals('rfp')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rfph" th:checked="${userPermission.getUserPermissions().equals('rfph')}" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="rfph" th:checked="${userPermission.getUserPermissions().equals('rfph')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="rfpe" th:checked="${userPermission.getUserPermissions().equals('rfpe')}"/>
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="rfpe" th:checked="${userPermission.getUserPermissions().equals('rfpe')}"/>
                             </label>
                         </td>
                         <td>
                             <label>
-                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}" value="delete" />
+                                <input type="radio" th:field="*{userPermissions[__${itemStat.index}__].userPermissions}"
+                                       value="delete"/>
                             </label>
                         </td>
                     </tr>
                 </table>
-                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit" name="changeUserAccess" value="Change User Access Permissions" class="button" />
-                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit" name="deleteUsers" value="Delete Users" class="button" />
-                <input type="submit" name="searchUsersForm" value="Add Users" class="button" />
+                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit"
+                       name="changeUserAccess" value="Change User Access Permissions" class="button"/>
+                <input th:if="${not #lists.isEmpty(maintenanceSecurityViewModel.getUserPermissions())}" type="submit"
+                       name="deleteUsers" value="Delete Users" class="button"/>
+                <input type="submit" name="searchUsersForm" value="Add Users" class="button"/>
             </div>
         </div>
         <div style="width:33em; float:left;">
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getSecurityMessage()}" th:text="${maintenanceSecurityViewModel.getSecurityMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getSecurityMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getSecurityMessage()}"></h3>
                 <div class="checkboxes">
                     <div>
                         <label>
-                            <input type="checkbox" name="showIp" value="true" th:checked="${maintenanceSecurityViewModel.isShowIp()}" />Publicly display IP addresses</label>
+                            <input type="checkbox" name="showIp" value="true"
+                                   th:checked="${maintenanceSecurityViewModel.isShowIp()}"/>Publicly display IP
+                            addresses</label>
                     </div>
                     <div>
                         <label>
-                            <input type="checkbox" name="blockBadWords" value="true" th:checked="${maintenanceSecurityViewModel.isBlockBadWords()}"/>Block bad words</label>
+                            <input type="checkbox" name="blockBadWords" value="true"
+                                   th:checked="${maintenanceSecurityViewModel.isBlockBadWords()}"/>Block bad
+                            words</label>
                     </div>
                     <div>
                         <label>
-                            <input type="checkbox" name="blockSearch" value="true" th:checked="${maintenanceSecurityViewModel.isBlockSearch()}"/>Block search engines</label>
+                            <input type="checkbox" name="blockSearch" value="true"
+                                   th:checked="${maintenanceSecurityViewModel.isBlockSearch()}"/>Block search
+                            engines</label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" name="blockAnonymousPosting" value="true"
+                                   th:checked="${maintenanceSecurityViewModel.isBlockAnonymousPosting()}"/>Block
+                            anonymous posting</label>
+                        <sup>
+                            <a class="hidden_text" style="text-size:smaller;"
+                               href="#">?
+                                <span>Checking this option will require the author field to be
+                                    filled out for unregistered users in order to post messages.
+                                </span>
+                            </a>
+                        </sup>
                     </div>
                 </div>
-                <input type="submit" name="changeSecurity" value="Change Security Settings" class="button" style="margin-top:1em;" />
+                <input type="submit" name="changeSecurity" value="Change Security Settings" class="button"
+                       style="margin-top:1em;"/>
             </div>
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getIpMessage()}" th:text="${maintenanceSecurityViewModel.getIpMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getIpMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getIpMessage()}"></h3>
                 <div style="margin-bottom:1ex;">IP address prefixes to block</div>
                 <table>
                     <tr>
                         <td>
-                            <input type="text" th:name="|blockIpList[0]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[0]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[0]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[0]}" size="20"
+                                   maxlength="39"/>
                         </td>
                         <td>
-                            <input type="text" th:name="|blockIpList[1]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[1]}" size="20" maxlength="39" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text" th:name="|blockIpList[2]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[2]}" size="20" maxlength="39" />
-                        </td>
-                        <td>
-                            <input type="text" th:name="|blockIpList[3]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[3]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[1]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[1]}" size="20"
+                                   maxlength="39"/>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" th:name="|blockIpList[4]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[4]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[2]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[2]}" size="20"
+                                   maxlength="39"/>
                         </td>
                         <td>
-                            <input type="text" th:name="|blockIpList[5]|" th:value="${maintenanceSecurityViewModel.getBlockIpList()[5]}" size="20" maxlength="39" />
+                            <input type="text" th:name="|blockIpList[3]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[3]}" size="20"
+                                   maxlength="39"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" th:name="|blockIpList[4]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[4]}" size="20"
+                                   maxlength="39"/>
+                        </td>
+                        <td>
+                            <input type="text" th:name="|blockIpList[5]|"
+                                   th:value="${maintenanceSecurityViewModel.getBlockIpList()[5]}" size="20"
+                                   maxlength="39"/>
                         </td>
                     </tr>
                 </table>
-                <input type="submit" name="changeIPs" value="Update IP Settings" class="button" />
+                <input type="submit" name="changeIPs" value="Update IP Settings" class="button"/>
             </div>
             <div class="grey_box">
-                <h3 th:if="${maintenanceSecurityViewModel.getHtmlMessage()}" th:text="${maintenanceSecurityViewModel.getHtmlMessage()}"></h3>
+                <h3 th:if="${maintenanceSecurityViewModel.getHtmlMessage()}"
+                    th:text="${maintenanceSecurityViewModel.getHtmlMessage()}"></h3>
                 <div class="checkboxes">
                     <label>
                         <input type="radio" name="blockHtml" value="allow"
                                th:checked="${maintenanceSecurityViewModel.isBlockHtml('allow')}"/>allow HTML everywhere</label>
-                    <br />
+                    <br/>
                     <label>
-                        <input type="radio" name="blockHtml" value="subject" th:checked="${maintenanceSecurityViewModel.isBlockHtml('subject')}" />block HTML in subject and author fields</label>
-                    <br />
+                        <input type="radio" name="blockHtml" value="subject"
+                               th:checked="${maintenanceSecurityViewModel.isBlockHtml('subject')}"/>block HTML in
+                        subject and author fields</label>
+                    <br/>
                     <label>
-                        <input type="radio" name="blockHtml" value="forbid" th:checked="${maintenanceSecurityViewModel.isBlockHtml('forbid')}" />block HTML everywhere</label>
-                    <br />
+                        <input type="radio" name="blockHtml" value="forbid"
+                               th:checked="${maintenanceSecurityViewModel.isBlockHtml('forbid')}"/>block HTML everywhere</label>
+                    <br/>
                     <div style="text-align:center; margin-top:1em;">
-                        <input type="submit" name="changeHTMLPerms" value="Change HTML Permissions" class="button" />
+                        <input type="submit" name="changeHTMLPerms" value="Change HTML Permissions" class="button"/>
                     </div>
                 </div>
             </div>
@@ -249,13 +323,13 @@
         <a th:href="@{|/abuse/abuse.cgi?id=${appId}|}">Abuse Database</a>
     </div>
     <div>
-        <input type="hidden" name=".cgifields" value="block_search" />
-        <input type="hidden" name=".cgifields" value="block_html" />
-        <input type="hidden" name=".cgifields" value="block_bad_words" />
-        <input type="hidden" name=".cgifields" value="show_ip" />
-        <input type="hidden" name=".cgifields" value="perm_for_52833" />
-        <input type="hidden" name=".cgifields" value="accounts_can" />
-        <input type="hidden" name=".cgifields" value="world_can" />
+        <input type="hidden" name=".cgifields" value="block_search"/>
+        <input type="hidden" name=".cgifields" value="block_html"/>
+        <input type="hidden" name=".cgifields" value="block_bad_words"/>
+        <input type="hidden" name=".cgifields" value="show_ip"/>
+        <input type="hidden" name=".cgifields" value="perm_for_52833"/>
+        <input type="hidden" name=".cgifields" value="accounts_can"/>
+        <input type="hidden" name=".cgifields" value="world_can"/>
     </div>
 </form>
 

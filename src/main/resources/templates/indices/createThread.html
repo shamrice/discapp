@@ -36,7 +36,7 @@
         <div style="font-size:larger;" th:utext="${holdPermission}"></div>
     </div>
 
-    <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"
+    <form id="createNewMessageForm" method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}"
           enctype="multipart/form-data" action="submit">
 
         <input type="hidden" name="appId" th:value="${appId}"/>
@@ -54,7 +54,7 @@
 
                             <input type="hidden" name="showEmail" th:value="${showEmail}"/>
                             <input type="hidden" name="email" size="30" maxlength="60" th:value="${email}"/>
-                            <input type="hidden" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
+                            <input type="hidden" id="submitter" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
                         </td>
                     </tr>
 
@@ -63,7 +63,7 @@
                     <tr>
                         <td class="entries_header" th:utext="${submitterLabel}"></td>
                         <td>
-                            <input type="text" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
+                            <input type="text" id="submitter" name="submitter" size="30" maxlength="50" th:value="${submitter}"/>
                             <a th:unless="${isLoggedInSystemAccount}" th:href="@{|/auth/indices?id=${appId}|}">login</a>
                         </td>
                     </tr>
@@ -116,7 +116,24 @@
             <input type="hidden" name="parentThreadSubject" th:value="${parentThreadSubject}"/>
             <input type="hidden" name="parentThreadBody" th:value="${parentThreadBody}"/>
 
-            <div class="buttons">
+            <div th:if="${anonymousPostingBlocked}" class="buttons">
+                <input th:if="${PREVIEW_BUTTON_IS_IMAGE}" type="image" name="previewArticle" th:src="${previewButtonText}" value="preview" class="button"
+                       id="previewArticle" />
+                <input th:unless="${PREVIEW_BUTTON_IS_IMAGE}" type="submit" name="previewArticle" th:value="${previewButtonText}" class="button"
+                       id="previewArticle" />
+
+                <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThreadWithCheck" th:src="${postMessageButtonText}" value="post_message" class="button"
+                       id="submitNewThreadWithCheck" onclick="checkSubmitter();return false;"/>
+                <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="button" name="submitNewThreadWithCheck" th:value="${postMessageButtonText}" class="button"
+                       id="submitNewThreadWithCheck" onclick="checkSubmitter();"/>
+
+                <input type="hidden" name="submitNewThread" value="submitNewThread"/>
+                <input type="hidden" name="postpostarticle" value="1"/>
+
+                <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp" th:src="${returnButtonText}" value="return" class="button" id="returnToApp" />
+                <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp" />
+            </div>
+            <div th:unless="${anonymousPostingBlocked}" class="buttons">
                 <input th:if="${PREVIEW_BUTTON_IS_IMAGE}" type="image" name="previewArticle" th:src="${previewButtonText}" value="preview" class="button"
                        id="previewArticle" />
                 <input th:unless="${PREVIEW_BUTTON_IS_IMAGE}" type="submit" name="previewArticle" th:value="${previewButtonText}" class="button"
@@ -125,13 +142,14 @@
                 <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThread" th:src="${postMessageButtonText}" value="post_message" class="button"
                        id="submitNewThread" />
                 <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="submit" name="submitNewThread" th:value="${postMessageButtonText}" class="button"
-                       id="submitNewThread" />
+                       id="submitNewThread"/>
 
                 <input type="hidden" name="postpostarticle" value="1"/>
 
                 <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp" th:src="${returnButtonText}" value="return" class="button" id="returnToApp" />
                 <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp" />
             </div>
+
         </div>
 
         <div th:if="${parentThreadId != 0}" class="message_and_thread">
@@ -147,6 +165,17 @@
 
     </form>
 </div>
+
+<script th:if="${anonymousPostingBlocked}" type="application/javascript">
+    function checkSubmitter() {
+        if (document.getElementById('submitter').value.length == 0) {
+            alert('Please fill out the author field to post this message.');
+        } else {
+            document.getElementById('createNewMessageForm').submit();
+        }
+    }
+</script>
+
 </body>
 </html>
 
