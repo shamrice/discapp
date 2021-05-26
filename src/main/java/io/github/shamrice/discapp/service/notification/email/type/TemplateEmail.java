@@ -11,17 +11,17 @@ import java.util.Map;
 public class TemplateEmail {
 
     @NonNull
-    private String to;
+    private final String to;
 
     @NonNull
-    private NotificationType notificationType;
+    private final NotificationType notificationType;
 
     @Setter
     private Map<String, Object> subjectTemplateParams;
 
     @NonNull
-    private Map<String, Object> bodyTemplateParams;
+    private final Map<String, Object> bodyTemplateParams;
 
     @NonNull
-    private boolean isMimeMessage;
+    private final boolean isMimeMessage;
 }

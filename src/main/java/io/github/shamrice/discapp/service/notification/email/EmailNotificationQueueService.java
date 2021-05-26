@@ -75,10 +75,11 @@ public class EmailNotificationQueueService {
                     emailNotificationSender.send(
                             templateEmail.getTo(),
                             templateEmail.getNotificationType(),
+                            templateEmail.getSubjectTemplateParams(),
                             templateEmail.getBodyTemplateParams()
                     );
                 }
-                log.info("Sent email: " + templateEmail.toString());
+                log.info("Sent email: " + templateEmail);
 
             } catch (Exception ex) {
                 log.error("Error sending template email: " + ex.getMessage(), ex);

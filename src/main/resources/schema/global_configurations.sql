@@ -503,6 +503,24 @@ This is an automated message. Please do not respond to this message.
 </HTML>
 ');
 
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.import.subject.template', 'New DiscApp Message Board Import Uploaded: APPLICATION_NAME');
+
+INSERT INTO configuration (application_id, name, value)
+VALUES (0, 'email.notification.import.body.template', '
+A new DiscApp import has been uploaded that may need processing.
+
+Application Name: APPLICATION_NAME
+Index Id: APPLICATION_ID
+Import Name: IMPORT_FILE_NAME
+
+Please log into the admin section to download and review the requested import data.
+-------------------------------------------------------------------
+
+Message from NE Disc App:
+
+This is an automated message. Please do not respond to this message.
+');
 
 -- INDEXES
 CREATE INDEX idx_thread_application_id_parent_id_deleted_approved
