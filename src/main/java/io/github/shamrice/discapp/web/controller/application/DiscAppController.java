@@ -12,6 +12,7 @@ import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
@@ -347,6 +348,9 @@ public class DiscAppController {
             model.addAttribute("holdPermission", holdMessage);
         }
 
+        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+        model.addAttribute(ANONYMOUS_POSTING_BLOCKED, applicationPermission.getBlockAnonymousPosting());
+
         Application app = applicationService.get(appId);
 
         long parentId = 0L;
@@ -454,6 +458,9 @@ public class DiscAppController {
         model.addAttribute(APP_ID, appId);
         model.addAttribute("newThreadViewModel", newThreadViewModel);
 
+        ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+        model.addAttribute(ANONYMOUS_POSTING_BLOCKED, applicationPermission.getBlockAnonymousPosting());
+
         String htmlBody = newThreadViewModel.getBody();
         if (htmlBody != null && !htmlBody.isEmpty()) {
             htmlBody = htmlBody.replaceAll("\r", "<br />");
@@ -524,19 +531,28 @@ public class DiscAppController {
                     return createNewThread(appId, null, newThreadViewModel, response, model);
                 }
 
+
+                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+
+                //set submitter to anon if not filled out
+                String submitter = "";
+                if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
+                    if (applicationPermission.getBlockAnonymousPosting()) {
+                        log.error("New message was attempted with no submitter but anonymous posting is disabled for appId: " + appId + " :: postcode: " + newThreadViewModel.getPostCode());
+                        newThreadViewModel.setErrorMessage("Author field is required to post a message.");
+                        return createNewThread(appId, null, newThreadViewModel, response, model);
+                    } else {
+                        submitter = BLANK_SUBMITTER;
+                    }
+                } else {
+                    submitter = newThreadViewModel.getSubmitter();
+                }
+
                 //redeem post code.
                 if (!threadService.redeemPostCode(appId, newThreadViewModel.getPostCode())) {
                     log.error("Invalid post code attempted to be redeemed for appId: " + appId + " :: postcode: " + newThreadViewModel.getPostCode());
                     newThreadViewModel.setErrorMessage("You have already posted this message.");
                     return createNewThread(appId, null, newThreadViewModel, response, model);
-                }
-
-                //set submitter to anon if not filled out
-                String submitter = "";
-                if (newThreadViewModel.getSubmitter() == null || newThreadViewModel.getSubmitter().trim().isEmpty()) {
-                    submitter = BLANK_SUBMITTER;
-                } else {
-                    submitter = newThreadViewModel.getSubmitter();
                 }
 
                 long parentId = Long.parseLong(newThreadViewModel.getParentId());
@@ -556,7 +572,7 @@ public class DiscAppController {
                 String email = newThreadViewModel.getEmail();
                 String body = newThreadViewModel.getBody();
 
-                ApplicationPermission applicationPermission = applicationService.getApplicationPermissions(appId);
+
 
                 //sanitize inputs based on settings.
                 if (applicationPermission != null) {
@@ -660,15 +676,21 @@ public class DiscAppController {
                                     if (EmailValidator.getInstance().isValid(parentThread.getEmail().trim())) {
 
                                         //email to non-disc app user replies or only enabled disc app users.
-                                        if (parentThread.getDiscAppUser() == null || parentThread.getDiscAppUser().getEnabled()) {
+                                        DiscAppUser user = parentThread.getDiscAppUser();
+                                        boolean userRepliesEnabled = true;
+                                        if (user != null) {
+                                            userRepliesEnabled = configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, true);
+                                        }
 
-                                            //todo : if discapp user, check that they want email replies sent in settings
+                                        if (user == null || (user.getEnabled() && userRepliesEnabled)) {
 
                                             Application app = applicationService.get(appId);
                                             String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
 
                                             ReplyNotification replyNotification = new ReplyNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
                                             EmailNotificationQueueService.addReplyToSend(replyNotification);
+                                        } else {
+                                            log.info("Reply notification not sent to: " + parentThread.getEmail() + " : Reply notifications are disabled for that user.");
                                         }
 
                                     } else {

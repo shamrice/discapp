@@ -18,6 +18,7 @@
         /* li { margin-top: 1ex } */
 
         div.message_preview { width:30em; }
+
     </style>
 
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -28,22 +29,24 @@
     <div th:utext="${headerText}"></div>
 
     <div class="message_and_thread">
-
         <div class="message">
             <div class="headers">
                 <div class="header">
                     <span class="author_header" name="submitter" th:text="${newThreadViewModel.getSubmitter()}"></span>
                     <span th:if="${newThreadViewModel.isMarkAdminPost()}" class="admin_post">Admin</span>
                 </div>
-                <div class="header"><span class="email_header" name="email" th:text="${newThreadViewModel.getEmail()}"></span></div>
-                <div class="header"><span class="subject_header" name="subject" th:text="${newThreadViewModel.getSubject()}"></span></div>
+                <div class="header"><span class="email_header" name="email"
+                                          th:text="${newThreadViewModel.getEmail()}"></span></div>
+                <div class="header"><span class="subject_header" name="subject"
+                                          th:text="${newThreadViewModel.getSubject()}"></span></div>
             </div>
             <br>
             <div class="message_text" name="formatted_body" th:utext="${newThreadViewModel.getHtmlBody()}"></div>
             <br>
             <div class="buttons">
 
-                <form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data" action="submit">
+                <form method="post" th:action="@{|/createThread?disc=${appId}|}" th:object="${newThreadViewModel}"
+                      enctype="multipart/form-data" action="submit">
 
                     <input type="hidden" name="submitter" th:value="${newThreadViewModel.getSubmitter()}"/>
                     <input type="hidden" name="email" th:value="${newThreadViewModel.getEmail()}"/>
@@ -52,41 +55,64 @@
                     <input type="hidden" name="parentId" th:value="${newThreadViewModel.getParentId()}"/>
                     <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
                     <input type="hidden" name="showEmail" th:value="${newThreadViewModel.isShowEmail()}"/>
-                    <input type="hidden" name="parentThreadSubmitter" th:value="${newThreadViewModel.getParentThreadSubmitter()}"/>
-                    <input type="hidden" name="parentThreadSubject" th:value="${newThreadViewModel.getParentThreadSubject()}"/>
-                    <input type="hidden" name="parentThreadBody" th:value="${newThreadViewModel.getParentThreadBody()}"/>
+                    <input type="hidden" name="parentThreadSubmitter"
+                           th:value="${newThreadViewModel.getParentThreadSubmitter()}"/>
+                    <input type="hidden" name="parentThreadSubject"
+                           th:value="${newThreadViewModel.getParentThreadSubject()}"/>
+                    <input type="hidden" name="parentThreadBody"
+                           th:value="${newThreadViewModel.getParentThreadBody()}"/>
                     <input type="hidden" name="currentPage" th:value="${newThreadViewModel.getCurrentPage()}"/>
-                    <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}" />
-                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}" />
-                    <input th:if="${newThreadViewModel.isMarkAdminPost()}" type="hidden" name="markAdminPost" th:value="${newThreadViewModel.isMarkAdminPost()}"/>
+                    <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}"/>
+                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}"/>
+                    <input th:if="${newThreadViewModel.isMarkAdminPost()}" type="hidden" name="markAdminPost"
+                           th:value="${newThreadViewModel.isMarkAdminPost()}"/>
 
-                    <input th:if="${EDIT_BUTTON_IS_IMAGE}" type="image" name="editMessage" th:src="${editButtonText}" th:value="${editButtonText}" class="button" id="editMessage" style="float:left;" />
-                    <input th:unless="${EDIT_BUTTON_IS_IMAGE}" type="submit" name="editMessage" th:value="${editButtonText}" class="button" id="editMessage" style="float:left;" />
+                    <input th:if="${EDIT_BUTTON_IS_IMAGE}" type="image" name="editMessage" th:src="${editButtonText}"
+                           th:value="${editButtonText}" class="button" id="editMessage" style="float:left;"/>
+                    <input th:unless="${EDIT_BUTTON_IS_IMAGE}" type="submit" name="editMessage"
+                           th:value="${editButtonText}" class="button" id="editMessage" style="float:left;"/>
                 </form>
 
 
-                <form method="post" th:action="@{|~/postThread?disc=${appId}|}" th:object="${newThreadViewModel}" enctype="multipart/form-data" action="submit">
-                    <input type="hidden" name="submitter" th:value="${newThreadViewModel.getSubmitter()}"/>
+                <form id="createNewMessageForm" method="post" th:action="@{|~/postThread?disc=${appId}|}"
+                      th:object="${newThreadViewModel}" enctype="multipart/form-data" action="submit">
+                    <input type="hidden" id="submitter" name="submitter" th:value="${newThreadViewModel.getSubmitter()}"/>
                     <input type="hidden" name="email" th:value="${newThreadViewModel.getEmail()}"/>
                     <input type="hidden" name="subject" th:value="${newThreadViewModel.getSubject()}"/>
                     <input type="hidden" name="body" th:value="${newThreadViewModel.getBody()}"/>
                     <input type="hidden" name="parentId" th:value="${newThreadViewModel.getParentId()}"/>
-                    <input type="hidden" name="parentThreadSubject" th:value="${newThreadViewModel.getParentThreadSubject()}"/>
+                    <input type="hidden" name="parentThreadSubject"
+                           th:value="${newThreadViewModel.getParentThreadSubject()}"/>
                     <input type="hidden" name="disc" th:value="${newThreadViewModel.getAppId()}"/>
                     <input type="hidden" name="showEmail" th:value="${newThreadViewModel.isShowEmail()}"/>
                     <input type="hidden" name="currentPage" th:value="${newThreadViewModel.getCurrentPage()}"/>
-                    <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}" />
-                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}" />
-                    <input th:if="${newThreadViewModel.isMarkAdminPost()}" type="hidden" name="markAdminPost" th:value="${newThreadViewModel.isMarkAdminPost()}"/>
+                    <input type="hidden" name="subscribe" th:value="${newThreadViewModel.getSubscribe()}"/>
+                    <input type="hidden" name="postCode" th:value="${newThreadViewModel.getPostCode()}"/>
+                    <input th:if="${newThreadViewModel.isMarkAdminPost()}" type="hidden" name="markAdminPost"
+                           th:value="${newThreadViewModel.isMarkAdminPost()}"/>
 
-                    <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThread" th:src="${postMessageButtonText}" th:value="${postMessageButtonText}" class="button" id="submitNewThread"
+                    <span th:if="${anonymousPostingBlocked}">
+                    <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThreadCheck"
+                           th:src="${postMessageButtonText}" th:value="${postMessageButtonText}" class="button"
+                           id="submitNewThreadCheck" style="float:left;"  onclick="checkSubmitter();return false;"/>
+                    <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="button" name="submitNewThreadCheck"
+                           th:value="${postMessageButtonText}" class="button" id="submitNewThreadCheck"
+                           style="float:left;" onclick="checkSubmitter();"/>
+                        <input type="hidden" name="submitNewThread" value="submitNewThread" id="submitNewThread"/>
+                    </span>
+                    <span th:unless="${anonymousPostingBlocked}">
+                        <input th:if="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="image" name="submitNewThread"
+                               th:src="${postMessageButtonText}" th:value="${postMessageButtonText}" class="button"
+                               id="submitNewThread" style="float:left;"/>
+                    <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="submit" name="submitNewThread"
+                           th:value="${postMessageButtonText}" class="button" id="submitNewThread"
                            style="float:left;"/>
-                    <input th:unless="${POST_MESSAGE_BUTTON_IS_IMAGE}" type="submit" name="submitNewThread" th:value="${postMessageButtonText}" class="button" id="submitNewThread"
+                    </span>
+                    <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp"
+                           th:src="${returnButtonText}" th:value="${returnButtonText}" class="button" id="returnToApp"
                            style="float:left;"/>
-
-                    <input th:if="${RETURN_BUTTON_IS_IMAGE}" type="image" name="returnToApp" th:src="${returnButtonText}" th:value="${returnButtonText}" class="button" id="returnToApp"
-                           style="float:left;"/>
-                    <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp" th:value="${returnButtonText}" class="button" id="returnToApp"
+                    <input th:unless="${RETURN_BUTTON_IS_IMAGE}" type="submit" name="returnToApp"
+                           th:value="${returnButtonText}" class="button" id="returnToApp"
                            style="float:left;"/>
                 </form>
             </div>
@@ -95,6 +121,16 @@
     </div>
     <div th:utext="${footerText}"></div>
 </div>
+<script th:if="${anonymousPostingBlocked}" type="application/javascript">
+    function checkSubmitter() {
+        if (document.getElementById('submitter').value.length == 0) {
+            alert('Please edit this post and add an author to post this message.');
+        } else {
+            document.getElementById('createNewMessageForm').submit();
+        }
+    }
+
+</script>
 </body>
 </html>
 

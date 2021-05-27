@@ -6,5 +6,6 @@ public enum NotificationType {
     ACCOUNT_LOCKED,
     MAILING_LIST_CONFIRMATION,
     REPLY_NOTIFICATION,
-    NEW_APP_INFO
+    NEW_APP_INFO,
+    IMPORT_UPLOADED
 }

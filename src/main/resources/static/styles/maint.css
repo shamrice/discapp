@@ -201,3 +201,13 @@ td.accounts_moderated {
     border:1px solid black;
     padding:10px;
 }
+
+td.account_info_td {
+    padding: 0 5px 2px 0;
+    text-align: right;
+}
+
+td.change_password_td {
+    padding: 0 5px 2px 0;
+    text-align: right;
+}

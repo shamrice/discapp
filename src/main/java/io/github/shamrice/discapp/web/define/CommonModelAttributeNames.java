@@ -79,6 +79,7 @@ public class CommonModelAttributeNames {
     public static final String PARENT_THREAD_ID = "parentThreadId";
 
     public static final String SUBMITTER = "submitter";
+    public static final String ANONYMOUS_POSTING_BLOCKED = "anonymousPostingBlocked";
     public static final String SUBJECT = "subject";
     public static final String BODY = "body";
     public static final String SHOW_EMAIL = "showEmail";

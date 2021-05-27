@@ -125,11 +125,14 @@ public class ConfigurationService {
         //todo: pull these default values from properties file
         Map<UserConfigurationProperty, String> configsToSet = new HashMap<>();
 
-        //only set read tracking for user accounts as system accounts don't have access to those settings.
+        // only set read tracking and reply notifications
+        // for user accounts as system accounts don't have access to those settings.
         if (isUserAccount) {
             configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "true");
+            configsToSet.put(UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, "true");
         } else {
             configsToSet.put(UserConfigurationProperty.THREAD_READ_TRACKING_ENABLED, "false");
+            configsToSet.put(UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, "false");
         }
 
         configsToSet.put(UserConfigurationProperty.USER_TIMEZONE_ENABLED, "false");

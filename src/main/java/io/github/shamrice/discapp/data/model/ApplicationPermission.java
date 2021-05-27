@@ -25,6 +25,7 @@ public class ApplicationPermission {
     private Boolean displayIpAddress;
     private Boolean blockBadWords;
     private Boolean blockSearchEngines;
+    private Boolean blockAnonymousPosting;
     private String allowHtmlPermissions;
     private String unregisteredUserPermissions;
     private String registeredUserPermissions;

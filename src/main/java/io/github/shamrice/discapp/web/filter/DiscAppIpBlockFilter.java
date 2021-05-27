@@ -132,13 +132,17 @@ public class DiscAppIpBlockFilter extends GenericFilterBean {
      */
     private void handleIpPrefixBlockedForApp(ServletResponse servletResponse, long appId, String ipAddress) throws IOException {
 
+        if (ipAddress == null || ipAddress.isBlank()) {
+            log.info("Cannot check if IP is blocked on appId: " + appId + ". IP is null or empty.");
+            return;
+        }
+
         List<ApplicationIpBlock> ipBlocks = applicationService.getBlockedIpPrefixes(appId);
         if (ipBlocks != null) {
             for (ApplicationIpBlock ipBlock : ipBlocks) {
-                if (ipAddress.contains(ipBlock.getIpAddressPrefix())) {
-
+                if (ipAddress.startsWith(ipBlock.getIpAddressPrefix())) {
                     log.warn("Ip address: " + ipAddress + " is blocked from accessing appId: " + appId
-                            + " : matching: " + ipBlock.getIpAddressPrefix()
+                            + " : matching prefix: " + ipBlock.getIpAddressPrefix()
                             + " :: redirecting to permission denied page.");
                     HttpServletResponse response = (HttpServletResponse) servletResponse;
                     if (!response.isCommitted()) {

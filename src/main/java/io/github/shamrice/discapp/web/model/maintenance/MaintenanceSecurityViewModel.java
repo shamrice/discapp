@@ -36,6 +36,7 @@ public class MaintenanceSecurityViewModel {
     private boolean showIp;
     private boolean blockBadWords;
     private boolean blockSearch;
+    private boolean blockAnonymousPosting;
     private String changeSecurity;
     private String securityMessage;
 
