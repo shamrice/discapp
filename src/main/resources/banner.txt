@@ -8,6 +8,6 @@
 
      By: Erik Eriksen
      Web: https://github.com/shamrice/discapp
-     Version: 2.4.0
+     Version: 2.5.0
 
 *******************************************************************************
