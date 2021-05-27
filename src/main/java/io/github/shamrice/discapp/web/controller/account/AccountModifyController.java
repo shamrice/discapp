@@ -39,13 +39,19 @@ public class AccountModifyController extends AccountController {
 
 
     @GetMapping(ACCOUNT_MODIFY)
-    public ModelAndView getAccountModify(@ModelAttribute AccountViewModel accountViewModel,
+    public ModelAndView getAccountModify(@RequestParam(name = "status", required = false) String saveStatus,
+                                         @ModelAttribute AccountViewModel accountViewModel,
                                          HttpServletRequest request,
                                          ModelMap modelMap) {
 
         String email = accountHelper.getLoggedInEmail();
 
         if (accountViewModel != null && email != null && !email.trim().isEmpty()) {
+
+            if (saveStatus != null && !saveStatus.isBlank()) {
+                accountViewModel.setInfoMessage(saveStatus);
+            }
+
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
 
             accountViewModel.setMaxDiscApps(configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.MAX_APPS_PER_ACCOUNT, 1));
@@ -122,6 +128,9 @@ public class AccountModifyController extends AccountController {
             String[] timezoneIds = TimeZone.getAvailableIDs();
             List<String> timezones = Arrays.asList(timezoneIds);
             accountViewModel.setTimeZones(timezones);
+
+            //reply notifications enabled.
+            accountViewModel.setReplyNotificationsEnabled(configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, true));
         }
 
         //NPE safety net.
@@ -157,24 +166,24 @@ public class AccountModifyController extends AccountController {
                         || (confirmNewPassword == null || confirmNewPassword.isEmpty())) {
 
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, request, modelMap);
+                    return getAccountModify(null, accountViewModel, request, modelMap);
                 }
 
                 if (newPassword.length() < 8) { //todo : set length in some constant somewhere or config...
                     accountViewModel.setErrorMessage("Password must be at least 8 characters.");
-                    return getAccountModify(accountViewModel, request, modelMap);
+                    return getAccountModify(null, accountViewModel, request, modelMap);
                 }
 
                 if (!newPassword.trim().equals(confirmNewPassword.trim())) {
                     accountViewModel.setErrorMessage("Passwords do not match.");
-                    return getAccountModify(accountViewModel, request, modelMap);
+                    return getAccountModify(null, accountViewModel, request, modelMap);
                 } else {
 
                     //verify passwords entered are correct.
                     if (!BCrypt.checkpw(currentPassword, user.getPassword())) {
                         log.error("Cannot update account password. Original password does not match existing password for account.");
                         accountViewModel.setErrorMessage("Failed to update password");
-                        return getAccountModify(accountViewModel, request, modelMap);
+                        return getAccountModify(null, accountViewModel, request, modelMap);
                     }
 
                     user.setPassword(newPassword.trim());
@@ -184,7 +193,7 @@ public class AccountModifyController extends AccountController {
                         log.error("Failed to update password for user: " + user.getEmail() + " : userId: " + user.getId());
                         accountViewModel.setErrorMessage("Failed to update password.");
                     }
-                    return getAccountModify(accountViewModel, request, modelMap);
+                    return getAccountModify(null, accountViewModel, request, modelMap);
                 }
             }
         }
@@ -196,13 +205,14 @@ public class AccountModifyController extends AccountController {
     public ModelAndView getAccountModifyAccount(@ModelAttribute AccountViewModel accountViewModel,
                                                 HttpServletRequest request,
                                                 ModelMap modelMap) {
-        return getAccountModify(accountViewModel, request, modelMap);
+        return getAccountModify(null, accountViewModel, request, modelMap);
     }
 
     @PostMapping(ACCOUNT_MODIFY_ACCOUNT)
     public ModelAndView postAccountModify(@ModelAttribute AccountViewModel accountViewModel,
                                           HttpServletRequest request,
                                           ModelMap modelMap) {
+        String status = "Failed to update account information.";
         if (accountViewModel != null) {
 
             String username = inputHelper.sanitizeInput(accountViewModel.getUsername());
@@ -211,7 +221,7 @@ public class AccountModifyController extends AccountController {
             if (username == null || username.trim().isEmpty()) {
                 log.warn("Account: " + email + " attempted to create an empty disc app username.");
                 accountViewModel.setErrorMessage("Disc App display name cannot be empty.");
-                return getAccountModify(accountViewModel, request, modelMap);
+                return getAccountModify(null, accountViewModel, request, modelMap);
             }
 
             DiscAppUser user = discAppUserDetailsService.getByEmail(email);
@@ -224,7 +234,7 @@ public class AccountModifyController extends AccountController {
                     log.warn("Account modification failed for user: " + email
                             + " because username is already taken. Username: " + username);
                     accountViewModel.setErrorMessage("Display name: " + username + " has already been taken. Please specify a different disc app display name.");
-                    return getAccountModify(accountViewModel, request, modelMap);
+                    return getAccountModify(null, accountViewModel, request, modelMap);
                 }
 
                 boolean showEmail = accountViewModel.isShowEmail();
@@ -233,18 +243,26 @@ public class AccountModifyController extends AccountController {
                     username = user.getUsername();
                 }
 
+                UserConfiguration replyNotificationEnabled = configurationService.getUserConfiguration(user.getId(), UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED.getPropName());
+                if (replyNotificationEnabled == null) {
+                    replyNotificationEnabled = new UserConfiguration();
+                    replyNotificationEnabled.setName(UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED.getPropName());
+                    replyNotificationEnabled.setDiscappUserId(user.getId());
+                }
+                replyNotificationEnabled.setValue(String.valueOf(accountViewModel.isReplyNotificationsEnabled()));
+                configurationService.saveUserConfiguration(UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, replyNotificationEnabled);
+
                 if (!discAppUserDetailsService.updateDiscAppUser(user.getId(), username, showEmail)) {
                     log.error("Failed to update user : " + email + ". Changes will not be saved.");
-                    accountViewModel.setErrorMessage("Failed to update user.");
                 } else {
-                    accountViewModel.setInfoMessage("Successfully updated user information.");
+                    status = "Successfully updated account information.";
                     log.info("User " + email + " account information was updated.");
 
                 }
             }
         }
 
-        return new ModelAndView("redirect:/account/modify");
+        return new ModelAndView("redirect:/account/modify?status=" + status);
     }
 
 
@@ -300,7 +318,7 @@ public class AccountModifyController extends AccountController {
             }
         }
 
-        return getAccountModify(accountViewModel, request, modelMap);
+        return getAccountModify(null, accountViewModel, request, modelMap);
     }
 
 
@@ -383,7 +401,7 @@ public class AccountModifyController extends AccountController {
             }
         }
 
-        return getAccountModify(accountViewModel, request, modelMap);
+        return getAccountModify(null, accountViewModel, request, modelMap);
     }
 
 }

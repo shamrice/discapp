@@ -12,6 +12,7 @@ import io.github.shamrice.discapp.service.application.permission.HtmlPermission;
 import io.github.shamrice.discapp.service.application.permission.UserPermission;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
+import io.github.shamrice.discapp.service.configuration.UserConfigurationProperty;
 import io.github.shamrice.discapp.service.stats.StatisticsService;
 import io.github.shamrice.discapp.service.thread.ThreadService;
 import io.github.shamrice.discapp.service.thread.ThreadSortOrder;
@@ -675,15 +676,21 @@ public class DiscAppController {
                                     if (EmailValidator.getInstance().isValid(parentThread.getEmail().trim())) {
 
                                         //email to non-disc app user replies or only enabled disc app users.
-                                        if (parentThread.getDiscAppUser() == null || parentThread.getDiscAppUser().getEnabled()) {
+                                        DiscAppUser user = parentThread.getDiscAppUser();
+                                        boolean userRepliesEnabled = true;
+                                        if (user != null) {
+                                            userRepliesEnabled = configurationService.getUserConfigBooleanValue(user.getId(), UserConfigurationProperty.USER_REPLY_NOTIFICATION_ENABLED, true);
+                                        }
 
-                                            //todo : if discapp user, check that they want email replies sent in settings
+                                        if (user == null || (user.getEnabled() && userRepliesEnabled)) {
 
                                             Application app = applicationService.get(appId);
                                             String discussionFullUrl = webHelper.getBaseUrl(request) + "/" + DISCUSSION_URL;
 
                                             ReplyNotification replyNotification = new ReplyNotification(appId, app.getName(), discussionFullUrl, parentThread.getEmail(), newThreadId);
                                             EmailNotificationQueueService.addReplyToSend(replyNotification);
+                                        } else {
+                                            log.info("Reply notification not sent to: " + parentThread.getEmail() + " : Reply notifications are disabled for that user.");
                                         }
 
                                     } else {

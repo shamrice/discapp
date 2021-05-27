@@ -41,6 +41,7 @@ public class AccountViewModel {
     private String newPassword;
     private String confirmPassword;
     private boolean showEmail;
+    private boolean replyNotificationsEnabled;
     private String email;
     private Long ownerId;
     private boolean enabled;

@@ -28,29 +28,35 @@
           method="post" th:object="${accountViewModel}">
         <table>
             <tr>
-                <td><label>Email Address:</label></td>
+                <td class="account_info_td"><label>Email Address:</label></td>
                 <td class="value-label" th:text="${accountViewModel.getEmail()}"></td>
             </tr>
 
             <tr>
-                <td><label>Member Since:</label></td>
+                <td class="account_info_td"><label>Member Since:</label></td>
                 <td class="value-label" th:text="${accountViewModel.getCreateDt()}"></td>
             </tr>
             <tr>
-                <td><label>Last Modified:</label></td>
+                <td class="account_info_td"><label>Last Modified:</label></td>
                 <td class="value-label" th:text="${accountViewModel.getModDt()}"></td>
             </tr>
 
             <tr>
-                <td><label>User Display Name:</label></td>
+                <td class="account_info_td"><label>User Display Name:</label></td>
                 <td><input class="button" type="text" id="username" name="username"
                            th:value="${accountViewModel.getUsername()}" maxlength="50"/></td>
             </tr>
 
             <tr>
-                <td><label> Show Email:</label></td>
-                <td>
+                <td class="account_info_td"><label>Show Email:</label></td>
+                <td style="text-align:left;">
                     <input type="checkbox" name="showEmail" th:checked="${accountViewModel.isShowEmail()}"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="account_info_td"><label>Enable Email Reply Notifications:</label></td>
+                <td style="text-align:left;">
+                    <input type="checkbox" name="replyNotificationsEnabled" th:checked="${accountViewModel.isReplyNotificationsEnabled()}"/>
                 </td>
             </tr>
             <tr>
@@ -227,17 +233,17 @@
         <table>
 
             <tr>
-                <td><label>Current Password: </label></td>
+                <td class="change_password_td"><label>Current Password: </label></td>
                 <td><input class="button" type="password" name="password" th:value="${accountViewModel.getPassword()}"/>
                 </td>
             </tr>
             <tr>
-                <td><label>New Password: </label></td>
+                <td class="change_password_td"><label>New Password: </label></td>
                 <td><input class="button" type="password" name="newPassword"
                            th:value="${accountViewModel.getNewPassword()}"/></td>
             </tr>
             <tr>
-                <td><label>Confirm New Password:</label></td>
+                <td class="change_password_td"><label>Confirm New Password:</label></td>
                 <td><input class="button" type="password" name="confirmPassword"
                            th:value="${accountViewModel.getConfirmPassword()}"/></td>
             </tr>
