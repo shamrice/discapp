@@ -136,10 +136,12 @@ public class HomeController {
         if (searchValue != null && searchValue.trim().length() >= minSearchLength) {
 
             int pageNum = 0;
-            try {
-                pageNum = Integer.parseInt(pageNumStr);
-            } catch (NumberFormatException ex) {
-                log.warn("Invalid page number attempted on home page search: " + pageNumStr + " : Defaulting to page 0.");
+            if (pageNumStr != null) {
+                try {
+                    pageNum = Integer.parseInt(pageNumStr);
+                } catch (NumberFormatException ex) {
+                    log.warn("Invalid page number attempted on home page search: " + pageNumStr + " : Defaulting to page 0.");
+                }
             }
 
             if (pageNum < 0) {
