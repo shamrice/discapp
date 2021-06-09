@@ -1,5 +1,6 @@
 package io.github.shamrice.discapp.service.notification.email.sender;
 
+import io.github.shamrice.discapp.exception.DiscAppConfigurationException;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.notification.NotificationType;
@@ -27,6 +28,9 @@ public class EmailNotificationSender {
     public boolean sendMimeMessage(String to, NotificationType notificationType,
                                    Map<String, Object> subjectTemplateParams, Map<String, Object> bodyTemplateParams) {
         try {
+
+            String fromEmailAddress = getFromEmailAddress();
+
             String subject = getSubjectForType(notificationType);
             String body = getBodyForType(notificationType);
 
@@ -46,6 +50,8 @@ public class EmailNotificationSender {
             MimeMessage mimeMessage = emailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
             mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setReplyTo(fromEmailAddress);
+            mimeMessageHelper.setFrom(fromEmailAddress);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(body, true);
 
@@ -53,7 +59,7 @@ public class EmailNotificationSender {
             log.info("Sent email message to: " + to + " with subject: " + subject + " body: " + body
                     + " for notification type: " + notificationType.name());
             return true;
-        } catch (MessagingException ex) {
+        } catch (MessagingException | DiscAppConfigurationException ex) {
             log.error("Failed to send message to: " + to + " notification type: " + notificationType.name() + " :: " + ex.getMessage(), ex);
         }
         return false;
@@ -84,9 +90,14 @@ public class EmailNotificationSender {
             }
         }
 
-        message.setSubject(subject);
-        message.setText(body);
         try {
+            String fromEmailAddress = getFromEmailAddress();
+
+            message.setReplyTo(fromEmailAddress);
+            message.setFrom(fromEmailAddress);
+            message.setSubject(subject);
+            message.setText(body);
+
             emailSender.send(message);
             log.info("Sent " + notificationType.name() + " email to: " + to + " message: " + message.toString());
         } catch (Exception sendExc) {
@@ -124,4 +135,15 @@ public class EmailNotificationSender {
         };
     }
 
+    private String getFromEmailAddress() throws DiscAppConfigurationException {
+        String fromEmailAddress = configurationService.getStringValue(
+                ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
+                ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
+
+        if (fromEmailAddress == null || fromEmailAddress.isBlank()) {
+            throw new DiscAppConfigurationException(ConfigurationProperty.EMAIL_ADMIN_ADDRESS, "Cannot find admin email configuration property value. Property either does not exist or does not have a value.");
+        }
+
+        return fromEmailAddress;
+    }
 }

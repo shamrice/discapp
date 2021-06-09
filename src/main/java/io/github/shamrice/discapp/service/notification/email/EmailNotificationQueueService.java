@@ -106,10 +106,16 @@ public class EmailNotificationQueueService {
                 bodyParams.put("APP_DISCUSSION_URL", replyNotification.getDiscussionUrl());
                 bodyParams.put("THREAD_ID", replyNotification.getNewThreadId());
 
-                emailNotificationSender.sendMimeMessage(replyNotification.getEmailAddress(),
+                boolean sendStatus = emailNotificationSender.sendMimeMessage(replyNotification.getEmailAddress(),
                         NotificationType.REPLY_NOTIFICATION, subjectParams, bodyParams);
-                log.info("Sent reply notification for thread: " + replyNotification.getNewThreadId() + " to: "
-                        + replyNotification.getEmailAddress());
+
+                if (sendStatus) {
+                    log.info("Sent reply notification for thread: " + replyNotification.getNewThreadId() + " to: "
+                            + replyNotification.getEmailAddress());
+                } else {
+                    log.error("Failed to send notification for thread: " + replyNotification.getNewThreadId() + " to: "
+                            + replyNotification.getEmailAddress());
+                }
 
             } catch (Exception ex) {
                 log.error("Error reading reply notification queue " + EmailNotificationQueueService.class.getSimpleName()
