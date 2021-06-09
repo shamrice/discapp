@@ -36,6 +36,11 @@
             </td>
         </tr>
     </table>
+    <div style="text-align:center;">
+        <a th:if="${searchApplicationModel.isHasPrevious()}" th:href="@{|/search-apps?searchValue=${searchApplicationModel.getSearchText()}&page=${searchApplicationModel.getPreviousPageNumber()}|}">< Previous Page</a>
+        <span th:if="${searchApplicationModel.isHasPrevious() and searchApplicationModel.isHasNext()}"> | </span>
+        <a th:if="${searchApplicationModel.isHasNext()}" th:href="@{|/search-apps?searchValue=${searchApplicationModel.getSearchText()}&page=${searchApplicationModel.getNextPageNumber()}|}">Next Page ></a>
+    </div>
 </div>
 
 <div th:replace="home/fragments/site-navigation :: site-navigation">

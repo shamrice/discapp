@@ -34,6 +34,8 @@ import static io.github.shamrice.discapp.web.define.url.HomeUrl.*;
 @Slf4j
 public class HomeController {
 
+    private static final int MAX_SEARCH_RESULTS = 10;
+
     @Autowired
     private ConfigurationService configurationService;
 
@@ -114,20 +116,50 @@ public class HomeController {
 
     @GetMapping(SEARCH_APPS)
     public ModelAndView getSearchAppsView(@RequestParam String searchValue,
+                                          @RequestParam(name = "page", required = false) String pageNumStr,
                                           SearchApplicationModel searchApplicationModel,
                                           HttpServletRequest request,
                                           Model model) {
 
         String baseUrl = webHelper.getBaseUrl(request);
         searchApplicationModel.setBaseUrl(baseUrl);
+
+        if (searchValue != null && !searchValue.isBlank()) {
+            searchApplicationModel.setSearchText(searchValue);
+        }
+
         model.addAttribute("searchText", searchValue);
 
         int minSearchLength = configurationService.getIntegerValue(ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID, ConfigurationProperty.HOME_PAGE_SEARCH_MIN_LENGTH, 1);
 
         Map<Long, SearchApplicationModel.SearchResult> searchResults = new HashMap<>();
         if (searchValue != null && searchValue.trim().length() >= minSearchLength) {
-            List<Application> foundApps = applicationService.searchByApplicationName(searchValue.trim());
+
+            int pageNum = 0;
+            try {
+                pageNum = Integer.parseInt(pageNumStr);
+            } catch (NumberFormatException ex) {
+                log.warn("Invalid page number attempted on home page search: " + pageNumStr + " : Defaulting to page 0.");
+            }
+
+            if (pageNum < 0) {
+                pageNum = 0;
+            }
+
+            if (pageNum != 0) {
+                searchApplicationModel.setHasPrevious(true);
+            }
+
+            searchApplicationModel.setPageNum(pageNum);
+
+            List<Application> foundApps = applicationService.searchByApplicationName(searchValue.trim(), pageNum, MAX_SEARCH_RESULTS);
+
             if (foundApps != null && foundApps.size() > 0) {
+
+                if (foundApps.size() >= MAX_SEARCH_RESULTS) {
+                    searchApplicationModel.setHasNext(true);
+                }
+
                 for (Application app : foundApps) {
 
                     SearchApplicationModel.SearchResult searchResult = new SearchApplicationModel.SearchResult(
@@ -145,8 +177,11 @@ public class HomeController {
                                 (e1, e2) -> e1,
                                 LinkedHashMap::new)
                         );
+
                 searchApplicationModel.setSearchResults(searchResults);
-                searchApplicationModel.setInfoMessage("Found " + searchResults.size() + " search results.");
+
+                long numResults = applicationService.countByApplicationName(searchValue.trim());
+                searchApplicationModel.setInfoMessage("Found " + numResults + " search results.");
             } else {
                 searchApplicationModel.setInfoMessage("No results found.");
             }

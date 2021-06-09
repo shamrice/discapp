@@ -21,4 +21,21 @@ public class SearchApplicationModel {
     private Map<Long, SearchResult> searchResults;
     private String baseUrl;
     private String searchText;
+    private int pageNum = 0;
+    private boolean hasNext = false;
+    private boolean hasPrevious = false;
+
+    public String getSearchText() {
+        return searchText == null ? "" : searchText;
+    }
+
+    public int getPreviousPageNumber() {
+        return pageNum <= 0 ? 0 : pageNum - 1;
+    }
+
+    public int getNextPageNumber() {
+        return pageNum + 1;
+    }
+
+
 }
