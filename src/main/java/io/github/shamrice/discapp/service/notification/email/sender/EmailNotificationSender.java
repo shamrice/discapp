@@ -6,6 +6,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.notification.NotificationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -25,11 +26,12 @@ public class EmailNotificationSender {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Value("${spring.mail.username}")
+    private String fromEmailAddress;
+
     public boolean sendMimeMessage(String to, NotificationType notificationType,
                                    Map<String, Object> subjectTemplateParams, Map<String, Object> bodyTemplateParams) {
         try {
-
-            String fromEmailAddress = getFromEmailAddress();
 
             String subject = getSubjectForType(notificationType);
             String body = getBodyForType(notificationType);
@@ -59,7 +61,7 @@ public class EmailNotificationSender {
             log.info("Sent email message to: " + to + " with subject: " + subject + " body: " + body
                     + " for notification type: " + notificationType.name());
             return true;
-        } catch (MessagingException | DiscAppConfigurationException ex) {
+        } catch (MessagingException ex) {
             log.error("Failed to send message to: " + to + " notification type: " + notificationType.name() + " :: " + ex.getMessage(), ex);
         }
         return false;
@@ -91,8 +93,6 @@ public class EmailNotificationSender {
         }
 
         try {
-            String fromEmailAddress = getFromEmailAddress();
-
             message.setReplyTo(fromEmailAddress);
             message.setFrom(fromEmailAddress);
             message.setSubject(subject);
@@ -135,15 +135,4 @@ public class EmailNotificationSender {
         };
     }
 
-    private String getFromEmailAddress() throws DiscAppConfigurationException {
-        String fromEmailAddress = configurationService.getStringValue(
-                ConfigurationService.SITE_WIDE_CONFIGURATION_APP_ID,
-                ConfigurationProperty.EMAIL_ADMIN_ADDRESS, null);
-
-        if (fromEmailAddress == null || fromEmailAddress.isBlank()) {
-            throw new DiscAppConfigurationException(ConfigurationProperty.EMAIL_ADMIN_ADDRESS, "Cannot find admin email configuration property value. Property either does not exist or does not have a value.");
-        }
-
-        return fromEmailAddress;
-    }
 }
