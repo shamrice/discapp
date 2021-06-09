@@ -182,7 +182,7 @@ public class HomeController {
 
                 searchApplicationModel.setSearchResults(searchResults);
 
-                long numResults = applicationService.countByApplicationName(searchValue.trim());
+                long numResults = applicationService.countByApplicationSearchName(searchValue.trim());
                 searchApplicationModel.setInfoMessage("Found " + numResults + " search results.");
             } else {
                 searchApplicationModel.setInfoMessage("No results found.");

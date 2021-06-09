@@ -74,7 +74,7 @@ public class ApplicationService {
         return applicationRepository.findByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchableOrderByIdAsc(appName, false, true, true, pageable);
     }
 
-    public long countByApplicationName(String appName) {
+    public long countByApplicationSearchName(String appName) {
         return applicationRepository.countByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchable(appName, false, true, true);
     }
 
