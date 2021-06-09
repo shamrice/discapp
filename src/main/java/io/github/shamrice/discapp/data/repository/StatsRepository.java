@@ -11,6 +11,7 @@ import java.util.List;
 public interface StatsRepository extends JpaRepository<Stats, Long> {
 
     Stats findOneByApplicationIdAndStatDate(long applicationId, String statDate);
+    List<Stats> findByApplicationIdAndStatDateOrderByCreateDtDesc(long applicationId, String statDate);
 
     List<Stats> findByApplicationIdOrderByCreateDtDesc(long applicationId, Pageable pageable);
 }

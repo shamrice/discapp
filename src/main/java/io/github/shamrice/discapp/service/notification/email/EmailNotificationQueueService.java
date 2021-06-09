@@ -38,9 +38,9 @@ public class EmailNotificationQueueService {
             log.error("Cannot add null template email to queue.");
             return;
         }
-        log.info("Adding template email to queue to be sent: " + templateEmail.toString());
+        log.info("Adding template email to queue to be sent: " + templateEmail);
         if (!templateEmailQueue.offer(templateEmail)) {
-            log.error("Failed to add template email to queue. Queue is full. Email: " + templateEmail.toString());
+            log.error("Failed to add template email to queue. Queue is full. Email: " + templateEmail);
         }
     }
 
@@ -51,9 +51,9 @@ public class EmailNotificationQueueService {
             return;
         }
 
-        log.info("Adding reply email notification to queue to be sent: " + replyNotification.toString());
+        log.info("Adding reply email notification to queue to be sent: " + replyNotification);
         if (!replyNotificationQueue.offer(replyNotification)) {
-            log.error("Failed to add reply to notification queue. Queue is full. Reply: " + replyNotification.toString());
+            log.error("Failed to add reply to notification queue. Queue is full. Reply: " + replyNotification);
         }
     }
 

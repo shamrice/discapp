@@ -1,6 +1,5 @@
 package io.github.shamrice.discapp.service.notification.email.sender;
 
-import io.github.shamrice.discapp.exception.DiscAppConfigurationException;
 import io.github.shamrice.discapp.service.configuration.ConfigurationProperty;
 import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.notification.NotificationType;
