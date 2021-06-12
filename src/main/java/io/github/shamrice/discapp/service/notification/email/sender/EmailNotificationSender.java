@@ -5,6 +5,7 @@ import io.github.shamrice.discapp.service.configuration.ConfigurationService;
 import io.github.shamrice.discapp.service.notification.NotificationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,9 +25,13 @@ public class EmailNotificationSender {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Value("${spring.mail.username}")
+    private String fromEmailAddress;
+
     public boolean sendMimeMessage(String to, NotificationType notificationType,
                                    Map<String, Object> subjectTemplateParams, Map<String, Object> bodyTemplateParams) {
         try {
+
             String subject = getSubjectForType(notificationType);
             String body = getBodyForType(notificationType);
 
@@ -46,6 +51,8 @@ public class EmailNotificationSender {
             MimeMessage mimeMessage = emailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
             mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setReplyTo(fromEmailAddress);
+            mimeMessageHelper.setFrom(fromEmailAddress);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(body, true);
 
@@ -84,9 +91,12 @@ public class EmailNotificationSender {
             }
         }
 
-        message.setSubject(subject);
-        message.setText(body);
         try {
+            message.setReplyTo(fromEmailAddress);
+            message.setFrom(fromEmailAddress);
+            message.setSubject(subject);
+            message.setText(body);
+
             emailSender.send(message);
             log.info("Sent " + notificationType.name() + " email to: " + to + " message: " + message.toString());
         } catch (Exception sendExc) {

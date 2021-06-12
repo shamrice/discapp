@@ -18,6 +18,8 @@ import io.github.shamrice.discapp.web.define.url.MaintenanceUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -67,8 +69,13 @@ public class ApplicationService {
         epilogueCache.setMaxCacheAgeMilliseconds(cacheDuration);
     }
 
-    public List<Application> searchByApplicationName(String appName) {
-        return applicationRepository.findByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchableOrderByIdAsc(appName, false, true, true);
+    public List<Application> searchByApplicationName(String appName, Integer pageNum, int maxSearchResults) {
+        Pageable pageable = PageRequest.of(pageNum, maxSearchResults);
+        return applicationRepository.findByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchableOrderByIdAsc(appName, false, true, true, pageable);
+    }
+
+    public long countByApplicationSearchName(String appName) {
+        return applicationRepository.countByNameContainingIgnoreCaseAndDeletedAndEnabledAndSearchable(appName, false, true, true);
     }
 
     public Application save(Application application) {
